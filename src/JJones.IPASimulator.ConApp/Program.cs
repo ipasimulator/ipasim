@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JJones.IPASimulator.ConApp.Native;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,7 @@ namespace JJones.IPASimulator.ConApp
     {
         static void Main(string[] args)
         {
+            var file = PeLib.PeLib_openFile("output.exe");
         }
     }
 }
