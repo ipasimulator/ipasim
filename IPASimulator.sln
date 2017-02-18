@@ -9,8 +9,25 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{2456DB
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{CFDAA17A-750B-4F9E-89EB-E5BE771CC357}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JJones.IPASimulator.ConApp", "src\JJones.IPASimulator.ConApp\JJones.IPASimulator.ConApp.csproj", "{45BF8D39-F22D-43D9-A77D-46E87E52F0FF}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{45BF8D39-F22D-43D9-A77D-46E87E52F0FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45BF8D39-F22D-43D9-A77D-46E87E52F0FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45BF8D39-F22D-43D9-A77D-46E87E52F0FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45BF8D39-F22D-43D9-A77D-46E87E52F0FF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{45BF8D39-F22D-43D9-A77D-46E87E52F0FF} = {CFDAA17A-750B-4F9E-89EB-E5BE771CC357}
 	EndGlobalSection
 EndGlobal
