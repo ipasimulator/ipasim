@@ -12,6 +12,8 @@ namespace JJones.IPASimulator.ConApp
         static void Main(string[] args)
         {
             var file = PeLib.PeLib_openFile("output.exe");
+            var mzHeader = PeLib.PeFile_mzHeader(file);
+            var peHeader = PeLib.PeFile_peHeader(file);
         }
     }
 }
