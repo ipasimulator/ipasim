@@ -1,4 +1,5 @@
-﻿using JJones.IPASimulator.ConApp.Native;
+﻿using ELFSharp.MachO;
+using JJones.IPASimulator.ConApp.Native;
 using System;
 using System.Collections.Generic;
 using System.Linq;
