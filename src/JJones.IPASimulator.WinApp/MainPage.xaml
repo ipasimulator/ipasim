@@ -3,7 +3,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Button Click="Button_Click" Content="Load assembly" />
-    </Grid>
+    <StackPanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Button Click="loadIPAButton_Click" Content="Load .ipa" />
+
+        <Button Click="loadDllButton_Click" Content="Load .dll" />
+    </StackPanel>
 </Page>
