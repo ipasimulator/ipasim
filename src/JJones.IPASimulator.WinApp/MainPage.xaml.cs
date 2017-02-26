@@ -57,6 +57,22 @@ namespace JJones.IPASimulator.WinApp
                         if (magic == 0xCAFEBABE)
                         {
                             var nfat_arch = rdr.ReadUInt32();
+                            for (var i = 0u; i < nfat_arch; i++)
+                            {
+                                var cpuType = rdr.ReadUInt32();
+                                var cpuSubtype = rdr.ReadUInt32();
+                                var offset = rdr.ReadUInt32();
+                                var size = rdr.ReadUInt32();
+                                var align = rdr.ReadUInt32();
+
+                                if (cpuType == 12) // CPU_TYPE_ARM
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                        {
 
                         }
                     }
