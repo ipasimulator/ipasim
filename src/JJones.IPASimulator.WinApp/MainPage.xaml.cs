@@ -9,6 +9,8 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text.RegularExpressions;
+using UnicornManaged;
+using UnicornManaged.Const;
 using Windows.ApplicationModel;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
@@ -73,6 +75,10 @@ namespace JJones.IPASimulator.WinApp
                 var folder = await ApplicationData.Current.LocalCacheFolder.CreateFolderAsync("DLLs", CreationCollisionOption.OpenIfExists);
                 file = await file.CopyAsync(folder, "Application.dll", NameCollisionOption.ReplaceExisting);
             }
+        }
+        private void unicornButton_Click(object sender, RoutedEventArgs e)
+        {
+            var uni = new Unicorn(Common.UC_ARCH_ARM, Common.UC_MODE_ARM);
         }
     }
 }

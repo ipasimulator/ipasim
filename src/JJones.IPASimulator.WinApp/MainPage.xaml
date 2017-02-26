@@ -7,5 +7,7 @@
         <Button Click="loadIPAButton_Click" Content="Load .ipa" />
 
         <Button Click="loadDllButton_Click" Content="Load .dll" />
+
+        <Button Click="unicornButton_Click" Content="Unicorn" />
     </StackPanel>
 </Page>
