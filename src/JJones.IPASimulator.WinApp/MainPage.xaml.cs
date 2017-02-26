@@ -73,7 +73,6 @@ namespace JJones.IPASimulator.WinApp
                         }
                         else
                         {
-
                         }
                     }
                 }
