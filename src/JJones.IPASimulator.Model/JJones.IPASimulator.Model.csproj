@@ -107,9 +107,11 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IO\CountingStream.cs" />
     <Compile Include="IO\PeekableStream.cs" />
     <Compile Include="IO\PeekingStream.cs" />
-    <Compile Include="MachO\CpuSubtype.cs" />
+    <Compile Include="MachO\CpuMask.cs" />
+    <Compile Include="MachO\CpuArmSubtype.cs" />
     <Compile Include="MachO\CpuType.cs" />
     <Compile Include="MachO\FatArchitecture.cs" />
     <Compile Include="MachO\MachHeader.cs" />

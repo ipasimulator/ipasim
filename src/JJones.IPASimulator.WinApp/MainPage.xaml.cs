@@ -1,4 +1,5 @@
-﻿using MiscUtil.Conversion;
+﻿using JJones.IPASimulator.Model.MachO;
+using MiscUtil.Conversion;
 using MiscUtil.IO;
 using System;
 using System.Collections.Generic;
@@ -51,28 +52,25 @@ namespace JJones.IPASimulator.WinApp
                     var appRegex = new Regex(@"Payload/([^/]+)\.app/\1", RegexOptions.IgnoreCase);
                     var appEntry = archive.Entries.FirstOrDefault(z => appRegex.IsMatch(z.FullName));
                     using (var str = appEntry.Open())
-                    using (var rdr = new EndianBinaryReader(EndianBitConverter.Big, str))
+                    using (var rdr = new MachOReader(str))
                     {
-                        var magic = rdr.ReadUInt32();
-                        if (magic == 0xCAFEBABE)
+                        if (rdr.TryReadHeader())
                         {
-                            var nfat_arch = rdr.ReadUInt32();
-                            for (var i = 0u; i < nfat_arch; i++)
+                            if (rdr.NFatArch > 0)
                             {
-                                var cpuType = rdr.ReadUInt32();
-                                var cpuSubtype = rdr.ReadUInt32();
-                                var offset = rdr.ReadUInt32();
-                                var size = rdr.ReadUInt32();
-                                var align = rdr.ReadUInt32();
-
-                                if (cpuType == 12) // CPU_TYPE_ARM
+                                for (var i = 0; i < rdr.NFatArch; i++)
                                 {
-                                    break;
+                                    var arch = rdr.ReadFatArch();
+                                    if (arch.CpuType == CpuType.ARM && arch.CpuSubtype == (uint)CpuArmSubtype.v7)
+                                    {
+                                        rdr.SeekArch(arch);
+                                        if (rdr.TryReadMachHeader())
+                                        {
+
+                                        }
+                                    }
                                 }
                             }
-                        }
-                        else
-                        {
                         }
                     }
                 }

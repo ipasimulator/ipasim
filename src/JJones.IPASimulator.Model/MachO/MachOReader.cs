@@ -2,11 +2,7 @@
 using MiscUtil.Conversion;
 using MiscUtil.IO;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JJones.IPASimulator.Model.MachO
 {
@@ -16,51 +12,83 @@ namespace JJones.IPASimulator.Model.MachO
 
         public MachOReader(Stream stream)
         {
-            rdr = new EndianBinaryReader(EndianBitConverter.Big, stream);
-            peekingRdr = new EndianBinaryReader(EndianBitConverter.Big, new PeekingStream(new PeekableStream(stream, 4)));
+            var peekableStream = new PeekableStream(new CountingStream(stream), 4);
+            rdr = new EndianBinaryReader(EndianBitConverter.Big, peekableStream);
+            peekingRdr = new EndianBinaryReader(EndianBitConverter.Big, new PeekingStream(peekableStream));
         }
 
-        public IReadOnlyList<FatArchitecture> FatArchitectures { get; private set; }
+        public uint NFatArch { get; private set; }
         public MachHeader MachHeader { get; private set; }
-        
-        public bool TryReadFatHeaders()
+
+        public bool TryReadHeader()
+        {
+            return TryReadFatHeader() ||
+                TryReadMachHeader();
+        }
+        public bool TryReadFatHeader()
         {
             if (IsMagic(0xCAFEBABE))
             {
-                var nfat_arch = rdr.ReadUInt32();
-                var archs = new FatArchitecture[nfat_arch];
-                for (var i = 0u; i < nfat_arch; i++) // TODO: maybe don't read them all at once.
-                {
-                    archs[i] = FatArchitecture.Read(rdr);
-                }
-                FatArchitectures = archs;
+                NFatArch = rdr.ReadUInt32();
                 return true;
             }
             return false;
         }
-        public bool TryReadMachHeaders(FatArchitecture architecture = null)
+        public bool TryReadMachHeader()
         {
-            if (architecture != null)
+            var magic = peekingRdr.ReadUInt32(); // TODO: this may be little endian as well!
+            MachHeaderKind kind;
+            if (magic == 0xFEEDFACE)
             {
-                // Skips to architecture's offset:
-                var count = architecture.Offset - rdr.BaseStream.Position;
-                var buffer = new byte[1024];
-                var read = 0L;
-                while (read < count)
-                {
-                    var toRead = (int)Math.Min(count - read, 1024);
-                    var result = rdr.Read(buffer, 0, toRead);
-                    if (result != toRead)
-                    {
-                        throw new EndOfStreamException();
-                    }
-                    read += result;
-                }
+                kind = MachHeaderKind.x86;
             }
+            else if (magic == 0xFEEDFACF)
+            {
+                kind = MachHeaderKind.x64;
+            }
+            else
+            {
+                return false;
+            }
+            rdr.ReadUInt32(); // magic
 
-            var header = MachHeader.TryRead(rdr, peekingRdr);
-            MachHeader = header;
-            return header != null;
+            var cpuType = rdr.ReadUInt32();
+            var cpuSubtype = rdr.ReadUInt32();
+            var filetype = rdr.ReadUInt32();
+            var ncmds = rdr.ReadUInt32();
+            var sizeofcmds = rdr.ReadUInt32();
+            var flags = rdr.ReadUInt32();
+            if (kind == MachHeaderKind.x64)
+            {
+                rdr.ReadUInt32(); // reserved
+            }
+            MachHeader = new MachHeader(kind, (CpuType)cpuType, cpuSubtype, filetype, ncmds, sizeofcmds, flags);
+            return true;
+        }
+        public FatArchitecture ReadFatArch()
+        {
+            var cpuType = rdr.ReadUInt32();
+            var cpuSubtype = rdr.ReadUInt32();
+            var offset = rdr.ReadUInt32();
+            var size = rdr.ReadUInt32();
+            var align = rdr.ReadUInt32();
+            return new FatArchitecture((CpuType)cpuType, cpuSubtype, offset, size, align);
+        }
+        public void SeekArch(FatArchitecture arch)
+        {
+            var count = arch.Offset - rdr.BaseStream.Position;
+            var buffer = new byte[1024];
+            var read = 0L;
+            while (read < count)
+            {
+                var toRead = (int)Math.Min(count - read, 1024);
+                var result = rdr.Read(buffer, 0, toRead);
+                if (result != toRead)
+                {
+                    throw new EndOfStreamException();
+                }
+                read += result;
+            }
         }
         public void Dispose()
         {
@@ -71,7 +99,7 @@ namespace JJones.IPASimulator.Model.MachO
         private bool IsMagic(uint value)
         {
             var magic = peekingRdr.ReadUInt32();
-            if (magic == 0xFEEDFACE)
+            if (magic == value)
             {
                 rdr.ReadUInt32(); // Skips magic.
                 return true;

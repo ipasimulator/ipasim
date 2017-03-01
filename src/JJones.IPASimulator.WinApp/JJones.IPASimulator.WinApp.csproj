@@ -143,6 +143,12 @@
       <HintPath>..\..\..\..\Files\Sources\unicorn\bindings\dotnet\UnicornManaged\bin\Release\UnicornPortable.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JJones.IPASimulator.Model\JJones.IPASimulator.Model.csproj">
+      <Project>{7d21adeb-4e06-4635-9005-c70b148c3e21}</Project>
+      <Name>JJones.IPASimulator.Model</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
