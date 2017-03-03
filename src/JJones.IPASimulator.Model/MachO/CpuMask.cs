@@ -1,11 +1,11 @@
 ﻿namespace JJones.IPASimulator.Model.MachO
 {
-    public enum CpuMask : uint
+    public enum CpuMask : int
     {
         /// <summary>
         /// Mask for architecture bits
         /// </summary>
-        CPU_ARCH_MASK = 0xff000000,
+        CPU_ARCH_MASK = unchecked((int)0xff000000),
         /// <summary>
         /// 64 bit ABI
         /// </summary>

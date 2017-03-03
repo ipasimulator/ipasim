@@ -1,6 +1,6 @@
 ﻿namespace JJones.IPASimulator.Model.MachO
 {
-    public enum CpuType : uint
+    public enum CpuType : int
     {
         PowerPC = 18,
         i386 = 7,
