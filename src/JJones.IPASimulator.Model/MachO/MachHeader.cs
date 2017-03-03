@@ -1,10 +1,8 @@
-﻿using MiscUtil.IO;
-
-namespace JJones.IPASimulator.Model.MachO
+﻿namespace JJones.IPASimulator.Model.MachO
 {
     public class MachHeader
     {
-        public MachHeader(MachHeaderKind kind, CpuType cpuType, uint cpuSubtype, uint filetype, uint ncmds, uint sizeofcmds, uint flags)
+        public MachHeader(MachHeaderKind kind, CpuType cpuType, uint cpuSubtype, FileType filetype, uint ncmds, uint sizeofcmds, Flags flags)
         {
             Kind = kind;
             CpuType = cpuType;
@@ -18,9 +16,9 @@ namespace JJones.IPASimulator.Model.MachO
         public MachHeaderKind Kind { get; }
         public CpuType CpuType { get; }
         public uint CpuSubtype { get; }
-        public uint FileType { get; }
+        public FileType FileType { get; }
         public uint NCmds { get; }
         public uint SizeOfCmds { get; }
-        public uint Flags { get; }
+        public Flags Flags { get; }
     }
 }

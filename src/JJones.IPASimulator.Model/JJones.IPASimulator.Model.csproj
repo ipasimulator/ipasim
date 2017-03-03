@@ -115,6 +115,8 @@
     <Compile Include="MachO\CpuArmSubtype.cs" />
     <Compile Include="MachO\CpuType.cs" />
     <Compile Include="MachO\FatArchitecture.cs" />
+    <Compile Include="MachO\FileType.cs" />
+    <Compile Include="MachO\Flags.cs" />
     <Compile Include="MachO\MachHeader.cs" />
     <Compile Include="MachO\MachHeaderKind.cs" />
     <Compile Include="MachO\MachOReader.cs" />

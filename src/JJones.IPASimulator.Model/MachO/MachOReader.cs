@@ -75,7 +75,7 @@ namespace JJones.IPASimulator.Model.MachO
             {
                 rdr.ReadUInt32(); // reserved
             }
-            MachHeader = new MachHeader(kind, (CpuType)cpuType, cpuSubtype, filetype, ncmds, sizeofcmds, flags);
+            MachHeader = new MachHeader(kind, (CpuType)cpuType, cpuSubtype, (FileType)filetype, ncmds, sizeofcmds, (Flags)flags);
             return true;
         }
         public FatArchitecture ReadFatArch()
