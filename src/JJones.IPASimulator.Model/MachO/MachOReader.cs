@@ -1,4 +1,5 @@
-﻿using JJones.IPASimulator.Model.IO;
+﻿using JJones.IPASimulator.Model.Conversion;
+using JJones.IPASimulator.Model.IO;
 using MiscUtil.Conversion;
 using MiscUtil.IO;
 using System;
@@ -8,13 +9,15 @@ namespace JJones.IPASimulator.Model.MachO
 {
     public class MachOReader : IDisposable
     {
+        private readonly GeneralEndianBitConverter bitConverter;
         private readonly EndianBinaryReader rdr, peekingRdr;
 
         public MachOReader(Stream stream)
         {
             var peekableStream = new PeekableStream(new CountingStream(stream), 4);
-            rdr = new EndianBinaryReader(EndianBitConverter.Big, peekableStream);
-            peekingRdr = new EndianBinaryReader(EndianBitConverter.Big, new PeekingStream(peekableStream));
+            bitConverter = new GeneralEndianBitConverter(Endianness.BigEndian);
+            rdr = new EndianBinaryReader(bitConverter, peekableStream);
+            peekingRdr = new EndianBinaryReader(bitConverter, new PeekingStream(peekableStream));
         }
 
         public uint NFatArch { get; private set; }
@@ -36,15 +39,25 @@ namespace JJones.IPASimulator.Model.MachO
         }
         public bool TryReadMachHeader()
         {
-            var magic = peekingRdr.ReadUInt32(); // TODO: this may be little endian as well!
+            var magic = peekingRdr.ReadUInt32();
             MachHeaderKind kind;
             if (magic == 0xFEEDFACE)
             {
                 kind = MachHeaderKind.x86;
             }
+            else if (magic == 0xCEFAEDFE)
+            {
+                kind = MachHeaderKind.x86;
+                bitConverter.SwitchEndianness();
+            }
             else if (magic == 0xFEEDFACF)
             {
                 kind = MachHeaderKind.x64;
+            }
+            else if (magic == 0xCFFAEDFE)
+            {
+                kind = MachHeaderKind.x64;
+                bitConverter.SwitchEndianness();
             }
             else
             {

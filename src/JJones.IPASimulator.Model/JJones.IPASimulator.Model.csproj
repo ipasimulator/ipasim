@@ -107,6 +107,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Conversion\GeneralEndianBitConverter.cs" />
     <Compile Include="IO\CountingStream.cs" />
     <Compile Include="IO\PeekableStream.cs" />
     <Compile Include="IO\PeekingStream.cs" />
