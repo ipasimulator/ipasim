@@ -14,7 +14,7 @@ namespace JJones.IPASimulator.Model.MachO
 
         public MachOReader(Stream stream)
         {
-            var peekableStream = new PeekableStream(new CountingStream(stream), 4);
+            var peekableStream = new PeekableStream(new SeekableStream(new CountingStream(stream)), 4);
             bitConverter = new GeneralEndianBitConverter(Endianness.BigEndian);
             rdr = new EndianBinaryReader(bitConverter, peekableStream);
             peekingRdr = new EndianBinaryReader(bitConverter, new PeekingStream(peekableStream));
@@ -115,6 +115,11 @@ namespace JJones.IPASimulator.Model.MachO
                 (LoadCommandType)rdr.ReadUInt32(),
                 rdr.ReadUInt32()
             );
+        }
+        public void SkipCommand(LoadCommand header)
+        {
+            rdr.Seek((int)(header.Size - LoadCommand.HeaderSize), SeekOrigin.Current);
+            
         }
         public SegmentCommand ReadSegmentCommand(LoadCommand header)
         {

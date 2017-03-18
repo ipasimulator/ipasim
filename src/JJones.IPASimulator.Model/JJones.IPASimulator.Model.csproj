@@ -112,6 +112,7 @@
     <Compile Include="IO\EndianBinaryReaderExtensions.cs" />
     <Compile Include="IO\PeekableStream.cs" />
     <Compile Include="IO\PeekingStream.cs" />
+    <Compile Include="IO\SeekableStream.cs" />
     <Compile Include="MachO\CpuMask.cs" />
     <Compile Include="MachO\CpuArmSubtype.cs" />
     <Compile Include="MachO\CpuType.cs" />

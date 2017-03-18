@@ -87,6 +87,9 @@ namespace JJones.IPASimulator.WinApp
                                         var sect = rdr.ReadSection();
                                     }
                                     break;
+                                default:
+                                    rdr.SkipCommand(lcmd);
+                                    break;
                             }
                         }
                     }

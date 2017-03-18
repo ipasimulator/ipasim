@@ -27,6 +27,15 @@ namespace JJones.IPASimulator.Model.IO
             }
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                str.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
         public override void Flush() => str.Flush();
         public override int Read(byte[] buffer, int offset, int count)
         {
