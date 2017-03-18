@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JJones.IPASimulator.Model.MachO
+namespace JJones.IPASimulator.Model.MachO.Commands
 {
     public class SegmentCommand : SegmentCommandBase
     {

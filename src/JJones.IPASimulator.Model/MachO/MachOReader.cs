@@ -1,5 +1,6 @@
 ﻿using JJones.IPASimulator.Model.Conversion;
 using JJones.IPASimulator.Model.IO;
+using JJones.IPASimulator.Model.MachO.Commands;
 using MiscUtil.Conversion;
 using MiscUtil.IO;
 using System;
@@ -174,6 +175,22 @@ namespace JJones.IPASimulator.Model.MachO
                 rdr.ReadUInt32(),
                 rdr.ReadUInt32(),
                 rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32()
+            );
+        }
+        public SymtabCommand ReadSymtabCommand(LoadCommand header)
+        {
+            if (header.Type != LoadCommandType.Symtab)
+            {
+                throw new ArgumentException(null, nameof(header));
+            }
+
+            return new SymtabCommand
+            (
+                header.Size,
                 rdr.ReadUInt32(),
                 rdr.ReadUInt32(),
                 rdr.ReadUInt32(),

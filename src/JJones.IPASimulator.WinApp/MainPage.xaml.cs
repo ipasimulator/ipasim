@@ -1,5 +1,6 @@
 ﻿using JJones.IPASimulator.Model.IO;
 using JJones.IPASimulator.Model.MachO;
+using JJones.IPASimulator.Model.MachO.Commands;
 using MiscUtil.Conversion;
 using MiscUtil.IO;
 using System;
@@ -94,6 +95,11 @@ namespace JJones.IPASimulator.WinApp
                                 case LoadCommandType.DyldInfoOnly:
                                     {
                                         var cmd = rdr.ReadDyldInfoComand(lcmd);
+                                        break;
+                                    }
+                                case LoadCommandType.Symtab:
+                                    {
+                                        var cmd = rdr.ReadSymtabCommand(lcmd);
                                         break;
                                     }
                                 default:
