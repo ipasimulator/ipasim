@@ -82,15 +82,25 @@ namespace JJones.IPASimulator.WinApp
                             switch (lcmd.Type)
                             {
                                 case LoadCommandType.Segment:
-                                    var cmd = rdr.ReadSegmentCommand(lcmd);
-                                    for (var j = 0; j < cmd.NSects; j++)
                                     {
-                                        var sect = rdr.ReadSection();
+                                        var cmd = rdr.ReadSegmentCommand(lcmd);
+                                        for (var j = 0; j < cmd.NSects; j++)
+                                        {
+                                            var sect = rdr.ReadSection();
+                                        }
+                                        break;
                                     }
-                                    break;
+                                case LoadCommandType.DyldInfo:
+                                case LoadCommandType.DyldInfoOnly:
+                                    {
+                                        var cmd = rdr.ReadDyldInfoComand(lcmd);
+                                        break;
+                                    }
                                 default:
-                                    rdr.SkipCommand(lcmd);
-                                    break;
+                                    {
+                                        rdr.SkipCommand(lcmd);
+                                        break;
+                                    }
                             }
                         }
                     }

@@ -116,6 +116,7 @@
     <Compile Include="MachO\CpuMask.cs" />
     <Compile Include="MachO\CpuArmSubtype.cs" />
     <Compile Include="MachO\CpuType.cs" />
+    <Compile Include="MachO\DyldInfoCommand.cs" />
     <Compile Include="MachO\FatArchitecture.cs" />
     <Compile Include="MachO\FileType.cs" />
     <Compile Include="MachO\Flags.cs" />

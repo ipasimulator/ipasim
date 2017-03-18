@@ -2,6 +2,7 @@
 {
     public abstract class SectionBase
     {
+        public const uint StructureSize = 60;
         public const string Text = "__text";
         public const string FVMLibInit0 = "__fvmlib_init0";
         public const string FVMLibInit1 = "__fvmlib_init1";

@@ -1,7 +1,10 @@
-﻿namespace JJones.IPASimulator.Model.MachO
+﻿using System;
+
+namespace JJones.IPASimulator.Model.MachO
 {
     public abstract class SegmentCommandBase : LoadCommand
     {
+        public new const uint StructureSize = 32 + LoadCommand.StructureSize;
         public const string PageZero = "__PAGEZERO";
         public const string Text = "__TEXT";
         public const string Data = "__DATA";

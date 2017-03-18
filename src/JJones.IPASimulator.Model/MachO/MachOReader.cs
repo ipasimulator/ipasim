@@ -118,11 +118,15 @@ namespace JJones.IPASimulator.Model.MachO
         }
         public void SkipCommand(LoadCommand header)
         {
-            rdr.Seek((int)(header.Size - LoadCommand.HeaderSize), SeekOrigin.Current);
-            
+            rdr.Seek((int)(header.Size - LoadCommand.StructureSize), SeekOrigin.Current);
         }
         public SegmentCommand ReadSegmentCommand(LoadCommand header)
         {
+            if (header.Type != LoadCommandType.Segment)
+            {
+                throw new ArgumentException(null, nameof(header));
+            }
+
             return new SegmentCommand
             (
                 header.Size,
@@ -139,6 +143,11 @@ namespace JJones.IPASimulator.Model.MachO
         }
         public SegmentCommand64 ReadSegmentCommand64(LoadCommand header)
         {
+            if (header.Type != LoadCommandType.Segment64)
+            {
+                throw new ArgumentException(null, nameof(header));
+            }
+
             return new SegmentCommand64
             (
                 header.Size,
@@ -151,6 +160,24 @@ namespace JJones.IPASimulator.Model.MachO
                 (VmProtection)rdr.ReadInt32(),
                 rdr.ReadUInt32(),
                 (SegmentFlags)rdr.ReadUInt32()
+            );
+        }
+        public DyldInfoCommand ReadDyldInfoComand(LoadCommand header)
+        {
+            return new DyldInfoCommand
+            (
+                header.Type,
+                header.Size,
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32()
             );
         }
         public Section ReadSection()

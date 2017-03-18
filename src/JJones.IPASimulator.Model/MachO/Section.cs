@@ -2,6 +2,8 @@
 {
     public class Section : SectionBase
     {
+        public new const uint StructureSize = 8 + SectionBase.StructureSize;
+
         public Section(string sectionName, string segmentName, uint address, uint size, uint offset, uint align, uint relOffset, uint nReloc, uint flags, uint reserved1, uint reserved2)
             : base(sectionName, segmentName, offset, align, relOffset, nReloc, flags, reserved1, reserved2)
         {
