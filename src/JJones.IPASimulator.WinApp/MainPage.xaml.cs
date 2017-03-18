@@ -102,6 +102,11 @@ namespace JJones.IPASimulator.WinApp
                                         var cmd = rdr.ReadSymtabCommand(lcmd);
                                         break;
                                     }
+                                case LoadCommandType.DySymtab:
+                                    {
+                                        var cmd = rdr.ReadDySymtabCommand(lcmd);
+                                        break;
+                                    }
                                 default:
                                     {
                                         rdr.SkipCommand(lcmd);

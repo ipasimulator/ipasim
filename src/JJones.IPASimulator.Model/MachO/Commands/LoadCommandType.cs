@@ -12,7 +12,7 @@
         Ident,
         FVMFile,
         Prepage,
-        DySymTab,
+        DySymtab,
         LoadDylib,
         IdDylib,
         LoadDyLinker,

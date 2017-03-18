@@ -163,6 +163,23 @@ namespace JJones.IPASimulator.Model.MachO
                 (SegmentFlags)rdr.ReadUInt32()
             );
         }
+        public Section ReadSection()
+        {
+            return new Section
+            (
+                rdr.ReadNullPaddedString(16),
+                rdr.ReadNullPaddedString(16),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32()
+            );
+        }
         public DyldInfoCommand ReadDyldInfoComand(LoadCommand header)
         {
             return new DyldInfoCommand
@@ -197,12 +214,25 @@ namespace JJones.IPASimulator.Model.MachO
                 rdr.ReadUInt32()
             );
         }
-        public Section ReadSection()
+        public DySymtabCommand ReadDySymtabCommand(LoadCommand header)
         {
-            return new Section
+            if (header.Type != LoadCommandType.DySymtab)
+            {
+                throw new ArgumentException(null, nameof(header));
+            }
+
+            return new DySymtabCommand
             (
-                rdr.ReadNullPaddedString(16),
-                rdr.ReadNullPaddedString(16),
+                header.Size,
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
                 rdr.ReadUInt32(),
                 rdr.ReadUInt32(),
                 rdr.ReadUInt32(),
