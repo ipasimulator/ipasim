@@ -112,6 +112,11 @@ namespace JJones.IPASimulator.WinApp
                                         var cmd = rdr.ReadDyLinkerCommand(lcmd);
                                         break;
                                     }
+                                case LoadCommandType.Uuid:
+                                    {
+                                        var cmd = rdr.ReadUuidCommand(lcmd);
+                                        break;
+                                    }
                                 default:
                                     {
                                         rdr.SkipCommand(lcmd);

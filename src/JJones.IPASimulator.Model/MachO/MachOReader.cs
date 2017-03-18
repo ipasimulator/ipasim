@@ -263,6 +263,19 @@ namespace JJones.IPASimulator.Model.MachO
                 rdr.ReadNullPaddedString((int)(header.Size - offset))
             );
         }
+        public UuidCommand ReadUuidCommand(LoadCommand header)
+        {
+            if (header.Type != LoadCommandType.Uuid)
+            {
+                throw new ArgumentException(null, nameof(header));
+            }
+
+            return new UuidCommand
+            (
+                header.Size,
+                new Guid(rdr.ReadBytesOrThrow(16))
+            );
+        }
         public void Dispose()
         {
             rdr.Dispose();

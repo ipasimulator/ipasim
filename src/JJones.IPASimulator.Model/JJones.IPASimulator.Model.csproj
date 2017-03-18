@@ -116,6 +116,7 @@
     <Compile Include="MachO\Commands\DyLinkerCommand.cs" />
     <Compile Include="MachO\Commands\DySymtabCommand.cs" />
     <Compile Include="MachO\Commands\SymtabCommand.cs" />
+    <Compile Include="MachO\Commands\UuidCommand.cs" />
     <Compile Include="MachO\CpuMask.cs" />
     <Compile Include="MachO\CpuArmSubtype.cs" />
     <Compile Include="MachO\CpuType.cs" />
