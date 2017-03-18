@@ -82,6 +82,10 @@ namespace JJones.IPASimulator.WinApp
                             {
                                 case LoadCommandType.Segment:
                                     var cmd = rdr.ReadSegmentCommand(lcmd);
+                                    for (var j = 0; j < cmd.NSects; j++)
+                                    {
+                                        var sect = rdr.ReadSection();
+                                    }
                                     break;
                             }
                         }

@@ -2,7 +2,7 @@
 {
     public class SegmentCommand : LoadCommand
     {
-        public SegmentCommand(uint size, string segmentName, uint vmAddress, uint vmSize, uint fileOffset, uint fileSize, VmProtection maxProtection, VmProtection initProtection, uint nSects, uint flags) : base(LoadCommandType.Segment, size)
+        public SegmentCommand(uint size, string segmentName, uint vmAddress, uint vmSize, uint fileOffset, uint fileSize, VmProtection maxProtection, VmProtection initProtection, uint nSects, SegmentFlags flags) : base(LoadCommandType.Segment, size)
         {
             SegmentName = segmentName;
             VMAddress = vmAddress;
@@ -23,6 +23,6 @@
         public VmProtection MaxProtection { get; }
         public VmProtection InitProtection { get; }
         public uint NSects { get; }
-        public uint Flags { get; }
+        public SegmentFlags Flags { get; }
     }
 }

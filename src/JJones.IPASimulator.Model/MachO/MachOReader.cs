@@ -64,7 +64,7 @@ namespace JJones.IPASimulator.Model.MachO
                 return false;
             }
             rdr.ReadUInt32(); // magic
-            
+
             MachHeader = new MachHeader
             (
                 kind,
@@ -128,6 +128,23 @@ namespace JJones.IPASimulator.Model.MachO
                 rdr.ReadUInt32(),
                 (VmProtection)rdr.ReadInt32(),
                 (VmProtection)rdr.ReadInt32(),
+                rdr.ReadUInt32(),
+                (SegmentFlags)rdr.ReadUInt32()
+            );
+        }
+        public Section ReadSection()
+        {
+            return new Section
+            (
+                rdr.ReadNullPaddedString(16),
+                rdr.ReadNullPaddedString(16),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
                 rdr.ReadUInt32(),
                 rdr.ReadUInt32()
             );
