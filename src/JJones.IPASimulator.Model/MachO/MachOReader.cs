@@ -64,28 +64,33 @@ namespace JJones.IPASimulator.Model.MachO
                 return false;
             }
             rdr.ReadUInt32(); // magic
-
-            var cpuType = rdr.ReadUInt32();
-            var cpuSubtype = rdr.ReadUInt32();
-            var filetype = rdr.ReadUInt32();
-            var ncmds = rdr.ReadUInt32();
-            var sizeofcmds = rdr.ReadUInt32();
-            var flags = rdr.ReadUInt32();
+            
+            MachHeader = new MachHeader
+            (
+                kind,
+                (CpuType)rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                (FileType)rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                (Flags)rdr.ReadUInt32()
+            );
             if (kind == MachHeaderKind.x64)
             {
                 rdr.ReadUInt32(); // reserved
             }
-            MachHeader = new MachHeader(kind, (CpuType)cpuType, cpuSubtype, (FileType)filetype, ncmds, sizeofcmds, (Flags)flags);
             return true;
         }
         public FatArchitecture ReadFatArch()
         {
-            var cpuType = rdr.ReadUInt32();
-            var cpuSubtype = rdr.ReadUInt32();
-            var offset = rdr.ReadUInt32();
-            var size = rdr.ReadUInt32();
-            var align = rdr.ReadUInt32();
-            return new FatArchitecture((CpuType)cpuType, cpuSubtype, offset, size, align);
+            return new FatArchitecture
+            (
+                (CpuType)rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32()
+            );
         }
         public void SeekArch(FatArchitecture arch)
         {
@@ -102,6 +107,30 @@ namespace JJones.IPASimulator.Model.MachO
                 }
                 read += result;
             }
+        }
+        public LoadCommand ReadLoadCommand()
+        {
+            return new LoadCommand
+            (
+                (LoadCommandType)rdr.ReadUInt32(),
+                rdr.ReadUInt32()
+            );
+        }
+        public SegmentCommand ReadSegmentCommand(LoadCommand header)
+        {
+            return new SegmentCommand
+            (
+                header.Size,
+                rdr.ReadNullPaddedString(16),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32(),
+                (VmProtection)rdr.ReadInt32(),
+                (VmProtection)rdr.ReadInt32(),
+                rdr.ReadUInt32(),
+                rdr.ReadUInt32()
+            );
         }
         public void Dispose()
         {

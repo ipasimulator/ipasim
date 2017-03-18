@@ -109,6 +109,7 @@
   <ItemGroup>
     <Compile Include="Conversion\GeneralEndianBitConverter.cs" />
     <Compile Include="IO\CountingStream.cs" />
+    <Compile Include="IO\EndianBinaryReaderExtensions.cs" />
     <Compile Include="IO\PeekableStream.cs" />
     <Compile Include="IO\PeekingStream.cs" />
     <Compile Include="MachO\CpuMask.cs" />
@@ -117,9 +118,14 @@
     <Compile Include="MachO\FatArchitecture.cs" />
     <Compile Include="MachO\FileType.cs" />
     <Compile Include="MachO\Flags.cs" />
+    <Compile Include="MachO\LoadCommand.cs" />
+    <Compile Include="MachO\LoadCommandMask.cs" />
+    <Compile Include="MachO\LoadCommandType.cs" />
     <Compile Include="MachO\MachHeader.cs" />
     <Compile Include="MachO\MachHeaderKind.cs" />
     <Compile Include="MachO\MachOReader.cs" />
+    <Compile Include="MachO\SegmentCommand.cs" />
+    <Compile Include="MachO\VmProtection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\JJones.IPASimulator.Model.rd.xml" />
   </ItemGroup>

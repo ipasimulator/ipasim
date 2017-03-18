@@ -54,22 +54,35 @@ namespace JJones.IPASimulator.WinApp
                     using (var str = appEntry.Open())
                     using (var rdr = new MachOReader(str))
                     {
-                        if (rdr.TryReadHeader())
+                        if (!rdr.TryReadHeader())
                         {
-                            if (rdr.NFatArch > 0)
-                            {
-                                for (var i = 0; i < rdr.NFatArch; i++)
-                                {
-                                    var arch = rdr.ReadFatArch();
-                                    if (arch.CpuType == CpuType.ARM && arch.CpuSubtype == (uint)CpuArmSubtype.v7)
-                                    {
-                                        rdr.SeekArch(arch);
-                                        if (rdr.TryReadMachHeader())
-                                        {
+                            return;
+                        }
 
-                                        }
-                                    }
-                                }
+                        // Finds the correct arch:
+                        for (var i = 0; i < rdr.NFatArch; i++)
+                        {
+                            var arch = rdr.ReadFatArch();
+                            if (arch.CpuType == CpuType.ARM && arch.CpuSubtype == (uint)CpuArmSubtype.v7)
+                            {
+                                rdr.SeekArch(arch);
+                                break;
+                            }
+                        }
+
+                        if (!rdr.TryReadMachHeader())
+                        {
+                            return;
+                        }
+
+                        for (var i = 0; i < rdr.MachHeader.NCmds; i++)
+                        {
+                            var lcmd = rdr.ReadLoadCommand();
+                            switch (lcmd.Type)
+                            {
+                                case LoadCommandType.Segment:
+                                    var cmd = rdr.ReadSegmentCommand(lcmd);
+                                    break;
                             }
                         }
                     }
@@ -92,6 +105,7 @@ namespace JJones.IPASimulator.WinApp
         private void unicornButton_Click(object sender, RoutedEventArgs e)
         {
             var uni = new Unicorn(Common.UC_ARCH_ARM, Common.UC_MODE_ARM);
+
         }
     }
 }

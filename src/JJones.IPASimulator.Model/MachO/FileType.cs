@@ -7,11 +7,11 @@
         FixedVM,
         Core,
         Preload,
-        DynamicLibrary,
-        DynamicLinker,
+        Dylib,
+        DyLinker,
         Bundle,
-        DynamicLibraryStub,
-        Debug,
-        Kext
+        DylibStub,
+        Dsym,
+        KextBundle
     }
 }
