@@ -1,4 +1,5 @@
-﻿using JJones.IPASimulator.Model.MachO;
+﻿using JJones.IPASimulator.Model.IO;
+using JJones.IPASimulator.Model.MachO;
 using MiscUtil.Conversion;
 using MiscUtil.IO;
 using System;
@@ -52,7 +53,7 @@ namespace JJones.IPASimulator.WinApp
                     var appRegex = new Regex(@"Payload/([^/]+)\.app/\1", RegexOptions.IgnoreCase);
                     var appEntry = archive.Entries.FirstOrDefault(z => appRegex.IsMatch(z.FullName));
                     using (var str = appEntry.Open())
-                    using (var rdr = new MachOReader(str))
+                    using (var rdr = new MachOReader(new SeekableStream(new CountingStream(str))))
                     {
                         if (!rdr.TryReadHeader())
                         {

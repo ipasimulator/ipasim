@@ -14,7 +14,7 @@ namespace JJones.IPASimulator.Model.MachO
 
         public MachOReader(Stream stream)
         {
-            var peekableStream = new PeekableStream(new SeekableStream(new CountingStream(stream)), 4);
+            var peekableStream = new PeekableStream(stream, 4);
             bitConverter = new GeneralEndianBitConverter(Endianness.BigEndian);
             rdr = new EndianBinaryReader(bitConverter, peekableStream);
             peekingRdr = new EndianBinaryReader(bitConverter, new PeekingStream(peekableStream));
