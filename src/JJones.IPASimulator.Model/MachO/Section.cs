@@ -2,6 +2,19 @@
 {
     public class Section
     {
+        public const string Text = "__text";
+        public const string FVMLibInit0 = "__fvmlib_init0";
+        public const string FVMLibInit1 = "__fvmlib_init1";
+        public const string Data = "__data";
+        public const string Bss = "__bss";
+        public const string Common = "__common";
+        public const string ObjCSymbols = "__symbol_table";
+        public const string ObjCModules = "__module_info";
+        public const string ObjCStrings = "__selector_strs";
+        public const string ObjCRefs = "__selector_refs";
+        public const string IconHeader = "__header";
+        public const string IconTiff = "__tiff";
+
         public Section(string sectionName, string segmentName, uint address, uint size, uint offset, uint align, uint relOffset, uint nReloc, uint flags, uint reserved1, uint reserved2)
             : this(sectionName, segmentName, address, size, offset, align, relOffset, nReloc,
                   (SectionType)(flags & (uint)SectionFlagsMask.Type),

@@ -2,6 +2,15 @@
 {
     public class SegmentCommand : LoadCommand
     {
+        public const string PageZero = "__PAGEZERO";
+        public const string Text = "__TEXT";
+        public const string Data = "__DATA";
+        public const string ObjC = "__OBJC";
+        public const string Icon = "__ICON";
+        public const string LinkEdit = "__LINKEDIT";
+        public const string UnixStack = "__UNIXSTACK";
+        public const string Import = "__IMPORT";
+
         public SegmentCommand(uint size, string segmentName, uint vmAddress, uint vmSize, uint fileOffset, uint fileSize, VmProtection maxProtection, VmProtection initProtection, uint nSects, SegmentFlags flags) : base(LoadCommandType.Segment, size)
         {
             SegmentName = segmentName;
