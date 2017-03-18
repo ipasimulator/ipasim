@@ -125,10 +125,14 @@
     <Compile Include="MachO\MachHeaderKind.cs" />
     <Compile Include="MachO\MachOReader.cs" />
     <Compile Include="MachO\Section.cs" />
+    <Compile Include="MachO\Section64.cs" />
     <Compile Include="MachO\SectionAttributes.cs" />
+    <Compile Include="MachO\SectionBase.cs" />
     <Compile Include="MachO\SectionFlagsMask.cs" />
     <Compile Include="MachO\SectionType.cs" />
     <Compile Include="MachO\SegmentCommand.cs" />
+    <Compile Include="MachO\SegmentCommand64.cs" />
+    <Compile Include="MachO\SegmentCommandBase.cs" />
     <Compile Include="MachO\SegmentFlags.cs" />
     <Compile Include="MachO\VmProtection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

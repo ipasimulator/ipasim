@@ -132,6 +132,22 @@ namespace JJones.IPASimulator.Model.MachO
                 (SegmentFlags)rdr.ReadUInt32()
             );
         }
+        public SegmentCommand64 ReadSegmentCommand64(LoadCommand header)
+        {
+            return new SegmentCommand64
+            (
+                header.Size,
+                rdr.ReadNullPaddedString(16),
+                rdr.ReadUInt64(),
+                rdr.ReadUInt64(),
+                rdr.ReadUInt64(),
+                rdr.ReadUInt64(),
+                (VmProtection)rdr.ReadInt32(),
+                (VmProtection)rdr.ReadInt32(),
+                rdr.ReadUInt32(),
+                (SegmentFlags)rdr.ReadUInt32()
+            );
+        }
         public Section ReadSection()
         {
             return new Section
