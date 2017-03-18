@@ -244,6 +244,25 @@ namespace JJones.IPASimulator.Model.MachO
                 rdr.ReadUInt32()
             );
         }
+        public DyLinkerCommand ReadDyLinkerCommand(LoadCommand header)
+        {
+            if (header.Type != LoadCommandType.LoadDyLinker)
+            {
+                throw new ArgumentException(null, nameof(header));
+            }
+
+            var offset = rdr.ReadUInt32();
+            if (offset != LoadCommand.StructureSize + 4)
+            {
+                throw new IOException();
+            }
+
+            return new DyLinkerCommand
+            (
+                header.Size,
+                rdr.ReadNullPaddedString((int)(header.Size - offset))
+            );
+        }
         public void Dispose()
         {
             rdr.Dispose();
