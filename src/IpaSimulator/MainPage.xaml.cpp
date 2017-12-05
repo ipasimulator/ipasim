@@ -1,10 +1,11 @@
-﻿//
+//
 // MainPage.xaml.cpp
 // Implementation of the MainPage class.
 //
 
 #include "pch.h"
 #include "MainPage.xaml.h"
+#include <LIEF/LIEF.hpp>
 
 using namespace IpaSimulator;
 
@@ -18,10 +19,13 @@ using namespace Windows::UI::Xaml::Data;
 using namespace Windows::UI::Xaml::Input;
 using namespace Windows::UI::Xaml::Media;
 using namespace Windows::UI::Xaml::Navigation;
-
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
+using namespace std;
 
 MainPage::MainPage()
 {
-	InitializeComponent();
+    InitializeComponent();
+
+    LIEF::MachO::FatBinary* bin = LIEF::MachO::Parser::parse("test.ipa");
+    cout << *bin << endl;
+    delete bin;
 }
