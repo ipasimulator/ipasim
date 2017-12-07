@@ -569,6 +569,7 @@ struct arm_thread_state64_t {
 
 
 
+
   static const HEADER_FLAGS header_flags_array[] = {
     HEADER_FLAGS::MH_NOUNDEFS,              HEADER_FLAGS::MH_INCRLINK,
     HEADER_FLAGS::MH_DYLDLINK,              HEADER_FLAGS::MH_BINDATLOAD,

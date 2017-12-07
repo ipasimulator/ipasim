@@ -19,9 +19,8 @@
 #include <fstream>
 #include <cassert>
 #include <sstream>
-#include <algorithm> 
 
-#include "LIEF/logging++.hpp"
+#include "easylogging++.h"
 
 #include "LIEF/BinaryStream/VectorStream.hpp"
 #include "LIEF/exception.hpp"
@@ -107,13 +106,8 @@ std::string VectorStream::get_string(uint64_t offset, uint64_t size) const {
     max_size = std::min<size_t>(max_size, size);
   }
   const char* str = this->read_string(offset);
-  const char* end = str + max_size;
-  const char* it_null = std::find(str, end, '\0');
-  if (it_null == end) {
-    throw LIEF::read_out_of_bound(offset);
-  }
+  const char* it_null = std::find(str, str + max_size, '\0');
   std::string tmp{str, it_null};
-  tmp.push_back('\0');
   return tmp.c_str();
 }
 

@@ -23,7 +23,7 @@
 #include <mbedtls/oid.h>
 #include <mbedtls/x509_crt.h>
 
-#include "LIEF/logging++.hpp"
+#include "easylogging++.h"
 
 #include "LIEF/filesystem/filesystem.h"
 #include "LIEF/exception.hpp"

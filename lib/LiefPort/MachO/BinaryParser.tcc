@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "LIEF/logging++.hpp"
+#include "easylogging++.h"
 
 #include "LIEF/MachO/DyldInfo.hpp"
 #include "LIEF/MachO/FunctionStarts.hpp"
@@ -43,7 +43,7 @@ void BinaryParser::parse(void) {
     }
   }
 
-  if (this->binary_->has_dyld_info() and this->config_.parse_dyldinfo_deeply()) {
+  if (this->binary_->has_dyld_info()) {
 
     try {
       this->parse_dyldinfo_binds<MACHO_T>();

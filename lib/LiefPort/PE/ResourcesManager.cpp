@@ -19,7 +19,7 @@
 
 #include "rang.hpp"
 
-#include "LIEF/logging++.hpp"
+#include "easylogging++.h"
 
 #include "LIEF/exception.hpp"
 #include "LIEF/visitors/Hash.hpp"

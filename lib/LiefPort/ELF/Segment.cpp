@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <iterator>
 
-#include "LIEF/logging++.hpp"
+#include "easylogging++.h"
 
 #include "LIEF/exception.hpp"
 

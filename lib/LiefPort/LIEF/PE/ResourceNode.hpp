@@ -29,9 +29,6 @@
 namespace LIEF {
 namespace PE {
 
-class ResourceDirectory;
-class ResourceData;
-
 class Parser;
 class Builder;
 

@@ -264,7 +264,6 @@
     <ClInclude Include="LIEF\iterators.hpp" />
     <ClInclude Include="LIEF\json.hpp" />
     <ClInclude Include="LIEF\LIEF.hpp" />
-    <ClInclude Include="LIEF\logging++.hpp" />
     <ClInclude Include="LIEF\logging.hpp" />
     <ClInclude Include="LIEF\MachO.hpp" />
     <ClInclude Include="LIEF\MachO\Binary.hpp" />
@@ -284,7 +283,6 @@
     <ClInclude Include="LIEF\MachO\LoadCommand.hpp" />
     <ClInclude Include="LIEF\MachO\MainCommand.hpp" />
     <ClInclude Include="LIEF\MachO\Parser.hpp" />
-    <ClInclude Include="LIEF\MachO\ParserConfig.hpp" />
     <ClInclude Include="LIEF\MachO\Relocation.hpp" />
     <ClInclude Include="LIEF\MachO\RelocationDyld.hpp" />
     <ClInclude Include="LIEF\MachO\RelocationObject.hpp" />
@@ -403,7 +401,6 @@
     <ClCompile Include="Abstract\Relocation.cpp" />
     <ClCompile Include="Abstract\Section.cpp" />
     <ClCompile Include="Abstract\Symbol.cpp" />
-    <ClCompile Include="Abstract\Visitor.cpp" />
     <ClCompile Include="BinaryStream\BinaryStream.cpp" />
     <ClCompile Include="BinaryStream\VectorStream.cpp" />
     <ClCompile Include="ELF\Binary.cpp" />
@@ -433,7 +430,6 @@
     <ClCompile Include="ELF\SymbolVersionRequirement.cpp" />
     <ClCompile Include="ELF\SysvHash.cpp" />
     <ClCompile Include="ELF\utils.cpp" />
-    <ClCompile Include="ELF\Visitor.cpp" />
     <ClCompile Include="exception.cpp" />
     <ClCompile Include="iostream.cpp" />
     <ClCompile Include="logging.cpp" />
@@ -453,7 +449,6 @@
     <ClCompile Include="MachO\LoadCommand.cpp" />
     <ClCompile Include="MachO\MainCommand.cpp" />
     <ClCompile Include="MachO\Parser.cpp" />
-    <ClCompile Include="MachO\ParserConfig.cpp" />
     <ClCompile Include="MachO\Relocation.cpp" />
     <ClCompile Include="MachO\RelocationDyld.cpp" />
     <ClCompile Include="MachO\RelocationObject.cpp" />
@@ -466,7 +461,6 @@
     <ClCompile Include="MachO\utils.cpp" />
     <ClCompile Include="MachO\UUIDCommand.cpp" />
     <ClCompile Include="MachO\VersionMin.cpp" />
-    <ClCompile Include="MachO\Visitor.cpp" />
     <ClCompile Include="PE\Binary.cpp" />
     <ClCompile Include="PE\Builder.cpp" />
     <ClCompile Include="PE\CodeIntegrity.cpp" />

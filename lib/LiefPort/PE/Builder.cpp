@@ -19,7 +19,7 @@
 #include <iterator>
 #include <numeric>
 
-#include "LIEF/logging++.hpp"
+#include "easylogging++.h"
 
 #include "LIEF/utf8.h"
 #include "LIEF/exception.hpp"

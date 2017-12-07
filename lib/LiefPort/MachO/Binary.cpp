@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "LIEF/logging++.hpp"
+#include "easylogging++.h"
 
 #include "LIEF/MachO/Binary.hpp"
 #include "LIEF/MachO/Builder.hpp"
@@ -24,7 +24,6 @@
 
 #include <algorithm>
 #include <numeric>
-#include <sstream>
 
 #if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
 #include <unistd.h>

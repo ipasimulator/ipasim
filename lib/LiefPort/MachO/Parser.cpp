@@ -21,7 +21,7 @@
 #include <stdexcept>
 #include <functional>
 
-#include "LIEF/logging++.hpp"
+#include "easylogging++.h"
 
 #include "LIEF/filesystem/filesystem.h"
 #include "LIEF/exception.hpp"
@@ -38,11 +38,10 @@ Parser::~Parser(void) = default;
 
 
 // From File
-Parser::Parser(const std::string& file, const ParserConfig& conf) :
+Parser::Parser(const std::string& file) :
   LIEF::Parser{file},
   stream_{std::unique_ptr<VectorStream>(new VectorStream{file})},
-  binaries_{},
-  config_{conf}
+  binaries_{}
 {
   this->build();
   for (Binary* binary : this->binaries_) {
@@ -52,20 +51,19 @@ Parser::Parser(const std::string& file, const ParserConfig& conf) :
 }
 
 
-FatBinary* Parser::parse(const std::string& filename, const ParserConfig& conf) {
+FatBinary* Parser::parse(const std::string& filename) {
   if (not is_macho(filename)) {
     throw bad_file("'" + filename + "' is not a MachO binary");
   }
 
-  Parser parser{filename, conf};
+  Parser parser{filename};
   return new FatBinary{parser.binaries_};
 }
 
 // From Vector
-Parser::Parser(const std::vector<uint8_t>& data, const std::string& name, const ParserConfig& conf) :
+Parser::Parser(const std::vector<uint8_t>& data, const std::string& name) :
   stream_{std::unique_ptr<VectorStream>(new VectorStream{data})},
-  binaries_{},
-  config_{conf}
+  binaries_{}
 {
   this->build();
 
@@ -75,12 +73,12 @@ Parser::Parser(const std::vector<uint8_t>& data, const std::string& name, const 
 }
 
 
-FatBinary* Parser::parse(const std::vector<uint8_t>& data, const std::string& name, const ParserConfig& conf) {
+FatBinary* Parser::parse(const std::vector<uint8_t>& data, const std::string& name) {
   if (not is_macho(data)) {
     throw bad_file("'" + name + "' is not a MachO binary");
   }
 
-  Parser parser{data, name, conf};
+  Parser parser{data, name};
   return new FatBinary{parser.binaries_};
 }
 
@@ -114,7 +112,7 @@ void Parser::build_fat(void) {
 
     std::vector<uint8_t> data = {raw, raw + size};
 
-    Binary *binary = BinaryParser{std::move(data), offset, this->config_}.get_binary();
+    Binary *binary = BinaryParser{std::move(data), offset}.get_binary();
     this->binaries_.push_back(binary);
   }
 }
@@ -129,7 +127,7 @@ void Parser::build(void) {
         type == MACHO_TYPES::FAT_CIGAM) {
       this->build_fat();
     } else { // fit binary
-      Binary *binary = BinaryParser(std::move(this->stream_), 0, this->config_).get_binary();
+      Binary *binary = BinaryParser(std::move(this->stream_)).get_binary();
       this->binaries_.push_back(binary);
     }
   } catch (const std::exception& e) {

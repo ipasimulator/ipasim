@@ -102,9 +102,6 @@
     <ClCompile Include="Abstract\Symbol.cpp">
       <Filter>Abstract</Filter>
     </ClCompile>
-    <ClCompile Include="Abstract\Visitor.cpp">
-      <Filter>Abstract</Filter>
-    </ClCompile>
     <ClCompile Include="BinaryStream\BinaryStream.cpp">
       <Filter>BinaryStream</Filter>
     </ClCompile>
@@ -159,9 +156,6 @@
     <ClCompile Include="MachO\Parser.cpp">
       <Filter>MachO</Filter>
     </ClCompile>
-    <ClCompile Include="MachO\ParserConfig.cpp">
-      <Filter>MachO</Filter>
-    </ClCompile>
     <ClCompile Include="MachO\Relocation.cpp">
       <Filter>MachO</Filter>
     </ClCompile>
@@ -196,9 +190,6 @@
       <Filter>MachO</Filter>
     </ClCompile>
     <ClCompile Include="MachO\VersionMin.cpp">
-      <Filter>MachO</Filter>
-    </ClCompile>
-    <ClCompile Include="MachO\Visitor.cpp">
       <Filter>MachO</Filter>
     </ClCompile>
     <ClCompile Include="visitors\hash.cpp">
@@ -292,9 +283,6 @@
       <Filter>ELF</Filter>
     </ClCompile>
     <ClCompile Include="ELF\utils.cpp">
-      <Filter>ELF</Filter>
-    </ClCompile>
-    <ClCompile Include="ELF\Visitor.cpp">
       <Filter>ELF</Filter>
     </ClCompile>
     <ClCompile Include="ELF\DataHandler\Handler.cpp">
@@ -554,9 +542,6 @@
     <ClInclude Include="LIEF\MachO\Parser.hpp">
       <Filter>LIEF\MachO</Filter>
     </ClInclude>
-    <ClInclude Include="LIEF\MachO\ParserConfig.hpp">
-      <Filter>LIEF\MachO</Filter>
-    </ClInclude>
     <ClInclude Include="LIEF\MachO\Relocation.hpp">
       <Filter>LIEF\MachO</Filter>
     </ClInclude>
@@ -633,9 +618,6 @@
       <Filter>LIEF</Filter>
     </ClInclude>
     <ClInclude Include="LIEF\logging.hpp">
-      <Filter>LIEF</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\logging++.hpp">
       <Filter>LIEF</Filter>
     </ClInclude>
     <ClInclude Include="LIEF\MachO.hpp">

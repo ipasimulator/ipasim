@@ -15,7 +15,7 @@
  */
 #include <numeric>
 
-#include "LIEF/logging++.hpp"
+#include "easylogging++.h"
 
 #include "LIEF/BinaryStream/VectorStream.hpp"
 
