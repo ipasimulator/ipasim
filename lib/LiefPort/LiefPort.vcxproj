@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{860d7cdb-b1f0-4680-b255-bde405471b58}</ProjectGuid>
+    <Keyword>WindowsRuntimeComponent</Keyword>
+    <RootNamespace>LiefPort</RootNamespace>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <AppContainerApplication>true</AppContainerApplication>
+    <ApplicationType>Windows Store</ApplicationType>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformMinVersion>10.0.10586.0</WindowsTargetPlatformMinVersion>
+    <ApplicationTypeRevision>10.0</ApplicationTypeRevision>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <GenerateManifest>false</GenerateManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions>_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
+      <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>28204</DisableSpecificWarnings>
+      <ForcedIncludeFiles>iso646.h</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions>_WINRT_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
+      <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>28204</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions>_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
+      <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>28204</DisableSpecificWarnings>
+      <ForcedIncludeFiles>iso646.h</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions>_WINRT_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
+      <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>28204</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions>_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
+      <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>28204</DisableSpecificWarnings>
+      <ForcedIncludeFiles>iso646.h</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PreprocessorDefinitions>_WINRT_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
+      <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
+      <DisableSpecificWarnings>28204</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="LIEF\Abstract\Abstract.hpp" />
+    <ClInclude Include="LIEF\Abstract\Binary.hpp" />
+    <ClInclude Include="LIEF\Abstract\enums.hpp" />
+    <ClInclude Include="LIEF\Abstract\EnumToString.hpp" />
+    <ClInclude Include="LIEF\Abstract\Header.hpp" />
+    <ClInclude Include="LIEF\Abstract\Parser.hpp" />
+    <ClInclude Include="LIEF\Abstract\Relocation.hpp" />
+    <ClInclude Include="LIEF\Abstract\Section.hpp" />
+    <ClInclude Include="LIEF\Abstract\Symbol.hpp" />
+    <ClInclude Include="LIEF\Abstract\type_traits.hpp" />
+    <ClInclude Include="LIEF\BinaryStream\BinaryStream.hpp" />
+    <ClInclude Include="LIEF\BinaryStream\VectorStream.hpp" />
+    <ClInclude Include="LIEF\Builder.hpp" />
+    <ClInclude Include="LIEF\config.h" />
+    <ClInclude Include="LIEF\ELF.hpp" />
+    <ClInclude Include="LIEF\ELF\Binary.hpp" />
+    <ClInclude Include="LIEF\ELF\Builder.hpp" />
+    <ClInclude Include="LIEF\ELF\DataHandler\Handler.hpp" />
+    <ClInclude Include="LIEF\ELF\DataHandler\Node.hpp" />
+    <ClInclude Include="LIEF\ELF\DynamicEntry.hpp" />
+    <ClInclude Include="LIEF\ELF\DynamicEntryArray.hpp" />
+    <ClInclude Include="LIEF\ELF\DynamicEntryFlags.hpp" />
+    <ClInclude Include="LIEF\ELF\DynamicEntryLibrary.hpp" />
+    <ClInclude Include="LIEF\ELF\DynamicEntryRpath.hpp" />
+    <ClInclude Include="LIEF\ELF\DynamicEntryRunPath.hpp" />
+    <ClInclude Include="LIEF\ELF\DynamicSharedObject.hpp" />
+    <ClInclude Include="LIEF\ELF\enums.hpp" />
+    <ClInclude Include="LIEF\ELF\EnumToString.hpp" />
+    <ClInclude Include="LIEF\ELF\GnuHash.hpp" />
+    <ClInclude Include="LIEF\ELF\Header.hpp" />
+    <ClInclude Include="LIEF\ELF\Note.hpp" />
+    <ClInclude Include="LIEF\ELF\Parser.hpp" />
+    <ClInclude Include="LIEF\ELF\Relocation.hpp" />
+    <ClInclude Include="LIEF\ELF\RelocationSizes.hpp" />
+    <ClInclude Include="LIEF\ELF\Section.hpp" />
+    <ClInclude Include="LIEF\ELF\Segment.hpp" />
+    <ClInclude Include="LIEF\ELF\Structures.hpp" />
+    <ClInclude Include="LIEF\ELF\Symbol.hpp" />
+    <ClInclude Include="LIEF\ELF\SymbolVersion.hpp" />
+    <ClInclude Include="LIEF\ELF\SymbolVersionAux.hpp" />
+    <ClInclude Include="LIEF\ELF\SymbolVersionAuxRequirement.hpp" />
+    <ClInclude Include="LIEF\ELF\SymbolVersionDefinition.hpp" />
+    <ClInclude Include="LIEF\ELF\SymbolVersionRequirement.hpp" />
+    <ClInclude Include="LIEF\ELF\SysvHash.hpp" />
+    <ClInclude Include="LIEF\ELF\type_traits.hpp" />
+    <ClInclude Include="LIEF\ELF\utils.hpp" />
+    <ClInclude Include="LIEF\exception.hpp" />
+    <ClInclude Include="LIEF\filesystem\filesystem.h" />
+    <ClInclude Include="LIEF\filesystem\fwd.h" />
+    <ClInclude Include="LIEF\filesystem\path.h" />
+    <ClInclude Include="LIEF\filesystem\resolver.h" />
+    <ClInclude Include="LIEF\iostream.hpp" />
+    <ClInclude Include="LIEF\iterators.hpp" />
+    <ClInclude Include="LIEF\json.hpp" />
+    <ClInclude Include="LIEF\LIEF.hpp" />
+    <ClInclude Include="LIEF\logging++.hpp" />
+    <ClInclude Include="LIEF\logging.hpp" />
+    <ClInclude Include="LIEF\MachO.hpp" />
+    <ClInclude Include="LIEF\MachO\Binary.hpp" />
+    <ClInclude Include="LIEF\MachO\BinaryParser.hpp" />
+    <ClInclude Include="LIEF\MachO\BindingInfo.hpp" />
+    <ClInclude Include="LIEF\MachO\Builder.hpp" />
+    <ClInclude Include="LIEF\MachO\DyldInfo.hpp" />
+    <ClInclude Include="LIEF\MachO\DylibCommand.hpp" />
+    <ClInclude Include="LIEF\MachO\DylinkerCommand.hpp" />
+    <ClInclude Include="LIEF\MachO\DynamicSymbolCommand.hpp" />
+    <ClInclude Include="LIEF\MachO\enums.hpp" />
+    <ClInclude Include="LIEF\MachO\EnumToString.hpp" />
+    <ClInclude Include="LIEF\MachO\ExportInfo.hpp" />
+    <ClInclude Include="LIEF\MachO\FatBinary.hpp" />
+    <ClInclude Include="LIEF\MachO\FunctionStarts.hpp" />
+    <ClInclude Include="LIEF\MachO\Header.hpp" />
+    <ClInclude Include="LIEF\MachO\LoadCommand.hpp" />
+    <ClInclude Include="LIEF\MachO\MainCommand.hpp" />
+    <ClInclude Include="LIEF\MachO\Parser.hpp" />
+    <ClInclude Include="LIEF\MachO\ParserConfig.hpp" />
+    <ClInclude Include="LIEF\MachO\Relocation.hpp" />
+    <ClInclude Include="LIEF\MachO\RelocationDyld.hpp" />
+    <ClInclude Include="LIEF\MachO\RelocationObject.hpp" />
+    <ClInclude Include="LIEF\MachO\Section.hpp" />
+    <ClInclude Include="LIEF\MachO\SegmentCommand.hpp" />
+    <ClInclude Include="LIEF\MachO\SourceVersion.hpp" />
+    <ClInclude Include="LIEF\MachO\Structures.hpp" />
+    <ClInclude Include="LIEF\MachO\Symbol.hpp" />
+    <ClInclude Include="LIEF\MachO\SymbolCommand.hpp" />
+    <ClInclude Include="LIEF\MachO\ThreadCommand.hpp" />
+    <ClInclude Include="LIEF\MachO\type_traits.hpp" />
+    <ClInclude Include="LIEF\MachO\undef.h" />
+    <ClInclude Include="LIEF\MachO\utils.hpp" />
+    <ClInclude Include="LIEF\MachO\UUIDCommand.hpp" />
+    <ClInclude Include="LIEF\MachO\VersionMin.hpp" />
+    <ClInclude Include="LIEF\PE.hpp" />
+    <ClInclude Include="LIEF\PE\AuxiliarySymbol.hpp" />
+    <ClInclude Include="LIEF\PE\Binary.hpp" />
+    <ClInclude Include="LIEF\PE\Builder.hpp" />
+    <ClInclude Include="LIEF\PE\CodeIntegrity.hpp" />
+    <ClInclude Include="LIEF\PE\DataDirectory.hpp" />
+    <ClInclude Include="LIEF\PE\Debug.hpp" />
+    <ClInclude Include="LIEF\PE\DosHeader.hpp" />
+    <ClInclude Include="LIEF\PE\enums.hpp" />
+    <ClInclude Include="LIEF\PE\EnumToString.hpp" />
+    <ClInclude Include="LIEF\PE\Export.hpp" />
+    <ClInclude Include="LIEF\PE\ExportEntry.hpp" />
+    <ClInclude Include="LIEF\PE\Header.hpp" />
+    <ClInclude Include="LIEF\PE\Import.hpp" />
+    <ClInclude Include="LIEF\PE\ImportEntry.hpp" />
+    <ClInclude Include="LIEF\PE\LoadConfigurations.hpp" />
+    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfiguration.hpp" />
+    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV0.hpp" />
+    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV1.hpp" />
+    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV2.hpp" />
+    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV3.hpp" />
+    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV4.hpp" />
+    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV5.hpp" />
+    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV6.hpp" />
+    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV7.hpp" />
+    <ClInclude Include="LIEF\PE\OptionalHeader.hpp" />
+    <ClInclude Include="LIEF\PE\Parser.hpp" />
+    <ClInclude Include="LIEF\PE\Relocation.hpp" />
+    <ClInclude Include="LIEF\PE\RelocationEntry.hpp" />
+    <ClInclude Include="LIEF\PE\ResourceData.hpp" />
+    <ClInclude Include="LIEF\PE\ResourceDirectory.hpp" />
+    <ClInclude Include="LIEF\PE\ResourceNode.hpp" />
+    <ClInclude Include="LIEF\PE\ResourcesManager.hpp" />
+    <ClInclude Include="LIEF\PE\resources\LangCodeItem.hpp" />
+    <ClInclude Include="LIEF\PE\resources\ResourceDialog.hpp" />
+    <ClInclude Include="LIEF\PE\resources\ResourceDialogItem.hpp" />
+    <ClInclude Include="LIEF\PE\resources\ResourceFixedFileInfo.hpp" />
+    <ClInclude Include="LIEF\PE\resources\ResourceIcon.hpp" />
+    <ClInclude Include="LIEF\PE\resources\ResourceStringFileInfo.hpp" />
+    <ClInclude Include="LIEF\PE\resources\ResourceVarFileInfo.hpp" />
+    <ClInclude Include="LIEF\PE\resources\ResourceVersion.hpp" />
+    <ClInclude Include="LIEF\PE\RichEntry.hpp" />
+    <ClInclude Include="LIEF\PE\RichHeader.hpp" />
+    <ClInclude Include="LIEF\PE\Section.hpp" />
+    <ClInclude Include="LIEF\PE\signature\AuthenticatedAttributes.hpp" />
+    <ClInclude Include="LIEF\PE\signature\ContentInfo.hpp" />
+    <ClInclude Include="LIEF\PE\signature\OIDToString.hpp" />
+    <ClInclude Include="LIEF\PE\signature\Signature.hpp" />
+    <ClInclude Include="LIEF\PE\signature\SignatureParser.hpp" />
+    <ClInclude Include="LIEF\PE\signature\SignerInfo.hpp" />
+    <ClInclude Include="LIEF\PE\signature\types.hpp" />
+    <ClInclude Include="LIEF\PE\signature\x509.hpp" />
+    <ClInclude Include="LIEF\PE\Structures.hpp" />
+    <ClInclude Include="LIEF\PE\Symbol.hpp" />
+    <ClInclude Include="LIEF\PE\TLS.hpp" />
+    <ClInclude Include="LIEF\PE\type_traits.hpp" />
+    <ClInclude Include="LIEF\PE\undef.h" />
+    <ClInclude Include="LIEF\PE\utils.hpp" />
+    <ClInclude Include="LIEF\to_json.hpp" />
+    <ClInclude Include="LIEF\types.hpp" />
+    <ClInclude Include="LIEF\utf8.h" />
+    <ClInclude Include="LIEF\utf8\checked.h" />
+    <ClInclude Include="LIEF\utf8\core.h" />
+    <ClInclude Include="LIEF\utf8\unchecked.h" />
+    <ClInclude Include="LIEF\utils.hpp" />
+    <ClInclude Include="LIEF\version.h" />
+    <ClInclude Include="LIEF\visibility.h" />
+    <ClInclude Include="LIEF\Visitable.hpp" />
+    <ClInclude Include="LIEF\Visitor.hpp" />
+    <ClInclude Include="LIEF\visitors\elf_json.hpp" />
+    <ClInclude Include="LIEF\visitors\Hash.hpp" />
+    <ClInclude Include="LIEF\visitors\json.hpp" />
+    <ClInclude Include="LIEF\visitors\pe_json.hpp" />
+    <ClInclude Include="PE\signature\pkcs7.h" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\advapi32_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\comctl32_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\gdi32_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\kernel32_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\libraries_table.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\mfc42u_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcp110_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcp120_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcr100_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcr110_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcr120_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcrt_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\ntdll_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\ole32_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\oleaut32_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\shcore_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\shell32_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\shlwapi_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\user32_dll_lookup.hpp" />
+    <ClInclude Include="PE\utils\ordinals_lookup_tables\ws2_32_dll_lookup.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Abstract\Binary.cpp" />
+    <ClCompile Include="Abstract\EnumToString.cpp" />
+    <ClCompile Include="Abstract\Header.cpp" />
+    <ClCompile Include="Abstract\Parser.cpp" />
+    <ClCompile Include="Abstract\Relocation.cpp" />
+    <ClCompile Include="Abstract\Section.cpp" />
+    <ClCompile Include="Abstract\Symbol.cpp" />
+    <ClCompile Include="Abstract\Visitor.cpp" />
+    <ClCompile Include="BinaryStream\BinaryStream.cpp" />
+    <ClCompile Include="BinaryStream\VectorStream.cpp" />
+    <ClCompile Include="ELF\Binary.cpp" />
+    <ClCompile Include="ELF\Builder.cpp" />
+    <ClCompile Include="ELF\DataHandler\Handler.cpp" />
+    <ClCompile Include="ELF\DataHandler\Node.cpp" />
+    <ClCompile Include="ELF\DynamicEntry.cpp" />
+    <ClCompile Include="ELF\DynamicEntryArray.cpp" />
+    <ClCompile Include="ELF\DynamicEntryFlags.cpp" />
+    <ClCompile Include="ELF\DynamicEntryLibrary.cpp" />
+    <ClCompile Include="ELF\DynamicEntryRpath.cpp" />
+    <ClCompile Include="ELF\DynamicEntryRunPath.cpp" />
+    <ClCompile Include="ELF\DynamicSharedObject.cpp" />
+    <ClCompile Include="ELF\EnumToString.cpp" />
+    <ClCompile Include="ELF\GnuHash.cpp" />
+    <ClCompile Include="ELF\Header.cpp" />
+    <ClCompile Include="ELF\Note.cpp" />
+    <ClCompile Include="ELF\Parser.cpp" />
+    <ClCompile Include="ELF\Relocation.cpp" />
+    <ClCompile Include="ELF\Section.cpp" />
+    <ClCompile Include="ELF\Segment.cpp" />
+    <ClCompile Include="ELF\Symbol.cpp" />
+    <ClCompile Include="ELF\SymbolVersion.cpp" />
+    <ClCompile Include="ELF\SymbolVersionAux.cpp" />
+    <ClCompile Include="ELF\SymbolVersionAuxRequirement.cpp" />
+    <ClCompile Include="ELF\SymbolVersionDefinition.cpp" />
+    <ClCompile Include="ELF\SymbolVersionRequirement.cpp" />
+    <ClCompile Include="ELF\SysvHash.cpp" />
+    <ClCompile Include="ELF\utils.cpp" />
+    <ClCompile Include="ELF\Visitor.cpp" />
+    <ClCompile Include="exception.cpp" />
+    <ClCompile Include="iostream.cpp" />
+    <ClCompile Include="logging.cpp" />
+    <ClCompile Include="MachO\Binary.cpp" />
+    <ClCompile Include="MachO\BinaryParser.cpp" />
+    <ClCompile Include="MachO\BindingInfo.cpp" />
+    <ClCompile Include="MachO\Builder.cpp" />
+    <ClCompile Include="MachO\DyldInfo.cpp" />
+    <ClCompile Include="MachO\DylibCommand.cpp" />
+    <ClCompile Include="MachO\DylinkerCommand.cpp" />
+    <ClCompile Include="MachO\DynamicSymbolCommand.cpp" />
+    <ClCompile Include="MachO\EnumToString.cpp" />
+    <ClCompile Include="MachO\ExportInfo.cpp" />
+    <ClCompile Include="MachO\FatBinary.cpp" />
+    <ClCompile Include="MachO\FunctionStarts.cpp" />
+    <ClCompile Include="MachO\Header.cpp" />
+    <ClCompile Include="MachO\LoadCommand.cpp" />
+    <ClCompile Include="MachO\MainCommand.cpp" />
+    <ClCompile Include="MachO\Parser.cpp" />
+    <ClCompile Include="MachO\ParserConfig.cpp" />
+    <ClCompile Include="MachO\Relocation.cpp" />
+    <ClCompile Include="MachO\RelocationDyld.cpp" />
+    <ClCompile Include="MachO\RelocationObject.cpp" />
+    <ClCompile Include="MachO\Section.cpp" />
+    <ClCompile Include="MachO\SegmentCommand.cpp" />
+    <ClCompile Include="MachO\SourceVersion.cpp" />
+    <ClCompile Include="MachO\Symbol.cpp" />
+    <ClCompile Include="MachO\SymbolCommand.cpp" />
+    <ClCompile Include="MachO\ThreadCommand.cpp" />
+    <ClCompile Include="MachO\utils.cpp" />
+    <ClCompile Include="MachO\UUIDCommand.cpp" />
+    <ClCompile Include="MachO\VersionMin.cpp" />
+    <ClCompile Include="MachO\Visitor.cpp" />
+    <ClCompile Include="PE\Binary.cpp" />
+    <ClCompile Include="PE\Builder.cpp" />
+    <ClCompile Include="PE\CodeIntegrity.cpp" />
+    <ClCompile Include="PE\DataDirectory.cpp" />
+    <ClCompile Include="PE\Debug.cpp" />
+    <ClCompile Include="PE\DosHeader.cpp" />
+    <ClCompile Include="PE\EnumToString.cpp" />
+    <ClCompile Include="PE\Export.cpp" />
+    <ClCompile Include="PE\ExportEntry.cpp" />
+    <ClCompile Include="PE\Header.cpp" />
+    <ClCompile Include="PE\Import.cpp" />
+    <ClCompile Include="PE\ImportEntry.cpp" />
+    <ClCompile Include="PE\LoadConfigurations\LoadConfiguration.cpp" />
+    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV0.cpp" />
+    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV1.cpp" />
+    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV2.cpp" />
+    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV3.cpp" />
+    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV4.cpp" />
+    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV5.cpp" />
+    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV6.cpp" />
+    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV7.cpp" />
+    <ClCompile Include="PE\OptionalHeader.cpp" />
+    <ClCompile Include="PE\Parser.cpp" />
+    <ClCompile Include="PE\Relocation.cpp" />
+    <ClCompile Include="PE\RelocationEntry.cpp" />
+    <ClCompile Include="PE\ResourceData.cpp" />
+    <ClCompile Include="PE\ResourceDirectory.cpp" />
+    <ClCompile Include="PE\ResourceNode.cpp" />
+    <ClCompile Include="PE\ResourcesManager.cpp" />
+    <ClCompile Include="PE\resources\LangCodeItem.cpp" />
+    <ClCompile Include="PE\resources\ResourceDialog.cpp" />
+    <ClCompile Include="PE\resources\ResourceDialogItem.cpp" />
+    <ClCompile Include="PE\resources\ResourceFixedFileInfo.cpp" />
+    <ClCompile Include="PE\resources\ResourceIcon.cpp" />
+    <ClCompile Include="PE\resources\ResourceStringFileInfo.cpp" />
+    <ClCompile Include="PE\resources\ResourceVarFileInfo.cpp" />
+    <ClCompile Include="PE\resources\ResourceVersion.cpp" />
+    <ClCompile Include="PE\RichEntry.cpp" />
+    <ClCompile Include="PE\RichHeader.cpp" />
+    <ClCompile Include="PE\Section.cpp" />
+    <ClCompile Include="PE\signature\AuthenticatedAttributes.cpp" />
+    <ClCompile Include="PE\signature\ContentInfo.cpp" />
+    <ClCompile Include="PE\signature\OIDToString.cpp" />
+    <ClCompile Include="PE\signature\Signature.cpp" />
+    <ClCompile Include="PE\signature\SignatureParser.cpp" />
+    <ClCompile Include="PE\signature\SignerInfo.cpp" />
+    <ClCompile Include="PE\signature\x509.cpp" />
+    <ClCompile Include="PE\Symbol.cpp" />
+    <ClCompile Include="PE\TLS.cpp" />
+    <ClCompile Include="PE\utils.cpp" />
+    <ClCompile Include="PE\Visitor.cpp" />
+    <ClCompile Include="utils.cpp" />
+    <ClCompile Include="Visitable.cpp" />
+    <ClCompile Include="Visitor.cpp" />
+    <ClCompile Include="visitors\elf_json.cpp" />
+    <ClCompile Include="visitors\hash.cpp" />
+    <ClCompile Include="visitors\json.cpp" />
+    <ClCompile Include="visitors\pe_json.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Abstract\Section.tcc" />
+    <None Include="ELF\Binary.tcc" />
+    <None Include="ELF\Builder.tcc" />
+    <None Include="ELF\Parser.tcc" />
+    <None Include="LIEF\ELF\Relocations\AArch64.def" />
+    <None Include="LIEF\ELF\Relocations\ARM.def" />
+    <None Include="LIEF\ELF\Relocations\Hexagon.def" />
+    <None Include="LIEF\ELF\Relocations\i386.def" />
+    <None Include="LIEF\ELF\Relocations\Mips.def" />
+    <None Include="LIEF\ELF\Relocations\PowerPC.def" />
+    <None Include="LIEF\ELF\Relocations\PowerPC64.def" />
+    <None Include="LIEF\ELF\Relocations\Sparc.def" />
+    <None Include="LIEF\ELF\Relocations\SystemZ.def" />
+    <None Include="LIEF\ELF\Relocations\x86_64.def" />
+    <None Include="MachO\Binary.tcc" />
+    <None Include="MachO\BinaryParser.tcc" />
+    <None Include="MachO\Builder.tcc" />
+    <None Include="PE\Builder.tcc" />
+    <None Include="PE\LoadConfigurations\LoadConfiguration.tcc" />
+    <None Include="PE\LoadConfigurations\LoadConfigurations.tcc" />
+    <None Include="PE\LoadConfigurations\LoadConfigurationV0.tcc" />
+    <None Include="PE\LoadConfigurations\LoadConfigurationV1.tcc" />
+    <None Include="PE\LoadConfigurations\LoadConfigurationV2.tcc" />
+    <None Include="PE\LoadConfigurations\LoadConfigurationV3.tcc" />
+    <None Include="PE\LoadConfigurations\LoadConfigurationV4.tcc" />
+    <None Include="PE\LoadConfigurations\LoadConfigurationV5.tcc" />
+    <None Include="PE\LoadConfigurations\LoadConfigurationV6.tcc" />
+    <None Include="PE\LoadConfigurations\LoadConfigurationV7.tcc" />
+    <None Include="PE\Parser.tcc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

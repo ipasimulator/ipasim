@@ -14,6 +14,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{CFDAA1
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IpaSimulator", "src\IpaSimulator\IpaSimulator.vcxproj", "{274F3169-A744-4FBC-A59F-5A4BDEEE1737}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "LIbrary", "LIbrary", "{664E9D43-FDD2-4D54-87BC-42D93FBAA290}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LiefPort", "lib\LiefPort\LiefPort.vcxproj", "{860D7CDB-B1F0-4680-B255-BDE405471B58}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -42,12 +46,25 @@ Global
 		{274F3169-A744-4FBC-A59F-5A4BDEEE1737}.Release|x86.ActiveCfg = Release|Win32
 		{274F3169-A744-4FBC-A59F-5A4BDEEE1737}.Release|x86.Build.0 = Release|Win32
 		{274F3169-A744-4FBC-A59F-5A4BDEEE1737}.Release|x86.Deploy.0 = Release|Win32
+		{860D7CDB-B1F0-4680-B255-BDE405471B58}.Debug|ARM.ActiveCfg = Debug|ARM
+		{860D7CDB-B1F0-4680-B255-BDE405471B58}.Debug|ARM.Build.0 = Debug|ARM
+		{860D7CDB-B1F0-4680-B255-BDE405471B58}.Debug|x64.ActiveCfg = Debug|x64
+		{860D7CDB-B1F0-4680-B255-BDE405471B58}.Debug|x64.Build.0 = Debug|x64
+		{860D7CDB-B1F0-4680-B255-BDE405471B58}.Debug|x86.ActiveCfg = Debug|Win32
+		{860D7CDB-B1F0-4680-B255-BDE405471B58}.Debug|x86.Build.0 = Debug|Win32
+		{860D7CDB-B1F0-4680-B255-BDE405471B58}.Release|ARM.ActiveCfg = Release|ARM
+		{860D7CDB-B1F0-4680-B255-BDE405471B58}.Release|ARM.Build.0 = Release|ARM
+		{860D7CDB-B1F0-4680-B255-BDE405471B58}.Release|x64.ActiveCfg = Release|x64
+		{860D7CDB-B1F0-4680-B255-BDE405471B58}.Release|x64.Build.0 = Release|x64
+		{860D7CDB-B1F0-4680-B255-BDE405471B58}.Release|x86.ActiveCfg = Release|Win32
+		{860D7CDB-B1F0-4680-B255-BDE405471B58}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{274F3169-A744-4FBC-A59F-5A4BDEEE1737} = {CFDAA17A-750B-4F9E-89EB-E5BE771CC357}
+		{860D7CDB-B1F0-4680-B255-BDE405471B58} = {664E9D43-FDD2-4D54-87BC-42D93FBAA290}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8B2DCEB9-E131-4AED-8FD0-98EBB3009E98}
