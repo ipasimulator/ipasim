@@ -444,6 +444,7 @@
     <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV7.cpp">
       <Filter>PE\LoadConfigurations</Filter>
     </ClCompile>
+    <ClCompile Include="easylogging++.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LIEF\Abstract\Abstract.hpp">
@@ -995,6 +996,7 @@
     <ClInclude Include="PE\signature\pkcs7.h">
       <Filter>PE\signature</Filter>
     </ClInclude>
+    <ClInclude Include="easylogging++.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Abstract\Section.tcc">

@@ -18,7 +18,7 @@
 #define LIEF_CONFIG_H_
 
 //#if @ENABLE_JSON_SUPPORT@
-#define LIEF_JSON_SUPPORT
+//#define LIEF_JSON_SUPPORT
 //#endif
 
 #endif

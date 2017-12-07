@@ -118,13 +118,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_PE_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
       <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>28204</DisableSpecificWarnings>
-      <ForcedIncludeFiles>iso646.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,12 +134,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>_WINRT_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_PE_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
       <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>28204</DisableSpecificWarnings>
+      <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -149,13 +150,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_PE_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
       <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>28204</DisableSpecificWarnings>
-      <ForcedIncludeFiles>iso646.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -165,12 +166,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>_WINRT_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_PE_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
       <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>28204</DisableSpecificWarnings>
+      <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -180,13 +182,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_PE_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
       <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>28204</DisableSpecificWarnings>
-      <ForcedIncludeFiles>iso646.h</ForcedIncludeFiles>
+      <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -196,12 +198,13 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>_WINRT_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_PE_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
       <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>28204</DisableSpecificWarnings>
+      <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -209,6 +212,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="easylogging++.h" />
     <ClInclude Include="LIEF\Abstract\Abstract.hpp" />
     <ClInclude Include="LIEF\Abstract\Binary.hpp" />
     <ClInclude Include="LIEF\Abstract\enums.hpp" />
@@ -403,6 +407,7 @@
     <ClCompile Include="Abstract\Symbol.cpp" />
     <ClCompile Include="BinaryStream\BinaryStream.cpp" />
     <ClCompile Include="BinaryStream\VectorStream.cpp" />
+    <ClCompile Include="easylogging++.cc" />
     <ClCompile Include="ELF\Binary.cpp" />
     <ClCompile Include="ELF\Builder.cpp" />
     <ClCompile Include="ELF\DataHandler\Handler.cpp" />
