@@ -54,6 +54,7 @@ size_t Hash::value(void) const {
 size_t Hash::hash(const std::vector<uint8_t>& raw) {
   std::vector<uint8_t> sha256(32, 0);
   //TODO:mbedtls_sha256(raw.data(), raw.size(), sha256.data(), 0);
+  throw - 1;
 
   return std::accumulate(
      std::begin(sha256),
