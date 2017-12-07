@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 #include "LIEF/ELF/DynamicEntryRunPath.hpp"
+#include "LIEF/exception.hpp"
 
 #include <iomanip>
 #include <numeric>

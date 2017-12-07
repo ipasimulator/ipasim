@@ -18,9 +18,6 @@
 #include "LIEF/ELF/utils.hpp"
 #include "LIEF/ELF/Parser.hpp"
 
-#include "LIEF/PE/utils.hpp"
-#include "LIEF/PE/Parser.hpp"
-
 #include "LIEF/MachO/utils.hpp"
 #include "LIEF/MachO/Parser.hpp"
 

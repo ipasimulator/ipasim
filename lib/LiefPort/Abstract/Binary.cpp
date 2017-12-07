@@ -17,7 +17,6 @@
 #include "LIEF/exception.hpp"
 
 #include "LIEF/ELF/Binary.hpp"
-#include "LIEF/PE/Binary.hpp"
 #include "LIEF/MachO/Binary.hpp"
 
 namespace LIEF {

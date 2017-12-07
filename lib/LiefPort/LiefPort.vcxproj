@@ -118,13 +118,14 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_PE_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
       <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalOptions>/bigobj -D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>28204</DisableSpecificWarnings>
       <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -134,13 +135,14 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_PE_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
       <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalOptions>/bigobj -D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>28204</DisableSpecificWarnings>
       <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -150,13 +152,14 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_PE_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
       <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalOptions>/bigobj -D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>28204</DisableSpecificWarnings>
       <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -166,13 +169,14 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_PE_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
       <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalOptions>/bigobj -D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>28204</DisableSpecificWarnings>
       <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -182,13 +186,14 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_PE_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
       <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalOptions>/bigobj -D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>28204</DisableSpecificWarnings>
       <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -198,13 +203,14 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_PE_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
       <AdditionalUsingDirectories>$(WindowsSDK_WindowsMetadata);$(AdditionalUsingDirectories)</AdditionalUsingDirectories>
       <AdditionalOptions>/bigobj -D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>28204</DisableSpecificWarnings>
       <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
+      <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -302,64 +308,6 @@
     <ClInclude Include="LIEF\MachO\utils.hpp" />
     <ClInclude Include="LIEF\MachO\UUIDCommand.hpp" />
     <ClInclude Include="LIEF\MachO\VersionMin.hpp" />
-    <ClInclude Include="LIEF\PE.hpp" />
-    <ClInclude Include="LIEF\PE\AuxiliarySymbol.hpp" />
-    <ClInclude Include="LIEF\PE\Binary.hpp" />
-    <ClInclude Include="LIEF\PE\Builder.hpp" />
-    <ClInclude Include="LIEF\PE\CodeIntegrity.hpp" />
-    <ClInclude Include="LIEF\PE\DataDirectory.hpp" />
-    <ClInclude Include="LIEF\PE\Debug.hpp" />
-    <ClInclude Include="LIEF\PE\DosHeader.hpp" />
-    <ClInclude Include="LIEF\PE\enums.hpp" />
-    <ClInclude Include="LIEF\PE\EnumToString.hpp" />
-    <ClInclude Include="LIEF\PE\Export.hpp" />
-    <ClInclude Include="LIEF\PE\ExportEntry.hpp" />
-    <ClInclude Include="LIEF\PE\Header.hpp" />
-    <ClInclude Include="LIEF\PE\Import.hpp" />
-    <ClInclude Include="LIEF\PE\ImportEntry.hpp" />
-    <ClInclude Include="LIEF\PE\LoadConfigurations.hpp" />
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfiguration.hpp" />
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV0.hpp" />
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV1.hpp" />
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV2.hpp" />
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV3.hpp" />
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV4.hpp" />
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV5.hpp" />
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV6.hpp" />
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV7.hpp" />
-    <ClInclude Include="LIEF\PE\OptionalHeader.hpp" />
-    <ClInclude Include="LIEF\PE\Parser.hpp" />
-    <ClInclude Include="LIEF\PE\Relocation.hpp" />
-    <ClInclude Include="LIEF\PE\RelocationEntry.hpp" />
-    <ClInclude Include="LIEF\PE\ResourceData.hpp" />
-    <ClInclude Include="LIEF\PE\ResourceDirectory.hpp" />
-    <ClInclude Include="LIEF\PE\ResourceNode.hpp" />
-    <ClInclude Include="LIEF\PE\ResourcesManager.hpp" />
-    <ClInclude Include="LIEF\PE\resources\LangCodeItem.hpp" />
-    <ClInclude Include="LIEF\PE\resources\ResourceDialog.hpp" />
-    <ClInclude Include="LIEF\PE\resources\ResourceDialogItem.hpp" />
-    <ClInclude Include="LIEF\PE\resources\ResourceFixedFileInfo.hpp" />
-    <ClInclude Include="LIEF\PE\resources\ResourceIcon.hpp" />
-    <ClInclude Include="LIEF\PE\resources\ResourceStringFileInfo.hpp" />
-    <ClInclude Include="LIEF\PE\resources\ResourceVarFileInfo.hpp" />
-    <ClInclude Include="LIEF\PE\resources\ResourceVersion.hpp" />
-    <ClInclude Include="LIEF\PE\RichEntry.hpp" />
-    <ClInclude Include="LIEF\PE\RichHeader.hpp" />
-    <ClInclude Include="LIEF\PE\Section.hpp" />
-    <ClInclude Include="LIEF\PE\signature\AuthenticatedAttributes.hpp" />
-    <ClInclude Include="LIEF\PE\signature\ContentInfo.hpp" />
-    <ClInclude Include="LIEF\PE\signature\OIDToString.hpp" />
-    <ClInclude Include="LIEF\PE\signature\Signature.hpp" />
-    <ClInclude Include="LIEF\PE\signature\SignatureParser.hpp" />
-    <ClInclude Include="LIEF\PE\signature\SignerInfo.hpp" />
-    <ClInclude Include="LIEF\PE\signature\types.hpp" />
-    <ClInclude Include="LIEF\PE\signature\x509.hpp" />
-    <ClInclude Include="LIEF\PE\Structures.hpp" />
-    <ClInclude Include="LIEF\PE\Symbol.hpp" />
-    <ClInclude Include="LIEF\PE\TLS.hpp" />
-    <ClInclude Include="LIEF\PE\type_traits.hpp" />
-    <ClInclude Include="LIEF\PE\undef.h" />
-    <ClInclude Include="LIEF\PE\utils.hpp" />
     <ClInclude Include="LIEF\to_json.hpp" />
     <ClInclude Include="LIEF\types.hpp" />
     <ClInclude Include="LIEF\utf8.h" />
@@ -375,27 +323,6 @@
     <ClInclude Include="LIEF\visitors\Hash.hpp" />
     <ClInclude Include="LIEF\visitors\json.hpp" />
     <ClInclude Include="LIEF\visitors\pe_json.hpp" />
-    <ClInclude Include="PE\signature\pkcs7.h" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\advapi32_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\comctl32_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\gdi32_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\kernel32_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\libraries_table.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\mfc42u_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcp110_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcp120_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcr100_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcr110_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcr120_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcrt_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\ntdll_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\ole32_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\oleaut32_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\shcore_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\shell32_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\shlwapi_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\user32_dll_lookup.hpp" />
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\ws2_32_dll_lookup.hpp" />
     <ClInclude Include="rang.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -467,56 +394,6 @@
     <ClCompile Include="MachO\utils.cpp" />
     <ClCompile Include="MachO\UUIDCommand.cpp" />
     <ClCompile Include="MachO\VersionMin.cpp" />
-    <ClCompile Include="PE\Binary.cpp" />
-    <ClCompile Include="PE\Builder.cpp" />
-    <ClCompile Include="PE\CodeIntegrity.cpp" />
-    <ClCompile Include="PE\DataDirectory.cpp" />
-    <ClCompile Include="PE\Debug.cpp" />
-    <ClCompile Include="PE\DosHeader.cpp" />
-    <ClCompile Include="PE\EnumToString.cpp" />
-    <ClCompile Include="PE\Export.cpp" />
-    <ClCompile Include="PE\ExportEntry.cpp" />
-    <ClCompile Include="PE\Header.cpp" />
-    <ClCompile Include="PE\Import.cpp" />
-    <ClCompile Include="PE\ImportEntry.cpp" />
-    <ClCompile Include="PE\LoadConfigurations\LoadConfiguration.cpp" />
-    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV0.cpp" />
-    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV1.cpp" />
-    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV2.cpp" />
-    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV3.cpp" />
-    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV4.cpp" />
-    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV5.cpp" />
-    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV6.cpp" />
-    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV7.cpp" />
-    <ClCompile Include="PE\OptionalHeader.cpp" />
-    <ClCompile Include="PE\Parser.cpp" />
-    <ClCompile Include="PE\Relocation.cpp" />
-    <ClCompile Include="PE\RelocationEntry.cpp" />
-    <ClCompile Include="PE\ResourceData.cpp" />
-    <ClCompile Include="PE\ResourceDirectory.cpp" />
-    <ClCompile Include="PE\ResourceNode.cpp" />
-    <ClCompile Include="PE\ResourcesManager.cpp" />
-    <ClCompile Include="PE\resources\LangCodeItem.cpp" />
-    <ClCompile Include="PE\resources\ResourceDialog.cpp" />
-    <ClCompile Include="PE\resources\ResourceDialogItem.cpp" />
-    <ClCompile Include="PE\resources\ResourceFixedFileInfo.cpp" />
-    <ClCompile Include="PE\resources\ResourceIcon.cpp" />
-    <ClCompile Include="PE\resources\ResourceStringFileInfo.cpp" />
-    <ClCompile Include="PE\resources\ResourceVarFileInfo.cpp" />
-    <ClCompile Include="PE\resources\ResourceVersion.cpp" />
-    <ClCompile Include="PE\RichEntry.cpp" />
-    <ClCompile Include="PE\RichHeader.cpp" />
-    <ClCompile Include="PE\Section.cpp" />
-    <ClCompile Include="PE\signature\AuthenticatedAttributes.cpp" />
-    <ClCompile Include="PE\signature\ContentInfo.cpp" />
-    <ClCompile Include="PE\signature\OIDToString.cpp" />
-    <ClCompile Include="PE\signature\Signature.cpp" />
-    <ClCompile Include="PE\signature\SignatureParser.cpp" />
-    <ClCompile Include="PE\signature\SignerInfo.cpp" />
-    <ClCompile Include="PE\signature\x509.cpp" />
-    <ClCompile Include="PE\Symbol.cpp" />
-    <ClCompile Include="PE\TLS.cpp" />
-    <ClCompile Include="PE\utils.cpp" />
     <ClCompile Include="utils.cpp" />
     <ClCompile Include="Visitable.cpp" />
     <ClCompile Include="Visitor.cpp" />
@@ -543,18 +420,6 @@
     <None Include="MachO\Binary.tcc" />
     <None Include="MachO\BinaryParser.tcc" />
     <None Include="MachO\Builder.tcc" />
-    <None Include="PE\Builder.tcc" />
-    <None Include="PE\LoadConfigurations\LoadConfiguration.tcc" />
-    <None Include="PE\LoadConfigurations\LoadConfigurations.tcc" />
-    <None Include="PE\LoadConfigurations\LoadConfigurationV0.tcc" />
-    <None Include="PE\LoadConfigurations\LoadConfigurationV1.tcc" />
-    <None Include="PE\LoadConfigurations\LoadConfigurationV2.tcc" />
-    <None Include="PE\LoadConfigurations\LoadConfigurationV3.tcc" />
-    <None Include="PE\LoadConfigurations\LoadConfigurationV4.tcc" />
-    <None Include="PE\LoadConfigurations\LoadConfigurationV5.tcc" />
-    <None Include="PE\LoadConfigurations\LoadConfigurationV6.tcc" />
-    <None Include="PE\LoadConfigurations\LoadConfigurationV7.tcc" />
-    <None Include="PE\Parser.tcc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

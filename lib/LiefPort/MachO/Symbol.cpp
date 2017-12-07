@@ -20,6 +20,7 @@
 #endif
 
 #include "LIEF/visitors/Hash.hpp"
+#include "LIEF/exception.hpp"
 
 #include "LIEF/MachO/Symbol.hpp"
 #include "LIEF/MachO/EnumToString.hpp"

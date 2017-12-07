@@ -34,18 +34,6 @@
     <Filter Include="LIEF\visitors">
       <UniqueIdentifier>{2ceae4ed-e93a-4eeb-af75-e0d67cbf7534}</UniqueIdentifier>
     </Filter>
-    <Filter Include="LIEF\PE">
-      <UniqueIdentifier>{3fb7c3f4-b3ba-4518-acf8-111e2ad631e6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="LIEF\PE\signature">
-      <UniqueIdentifier>{92875c8e-2685-4c4b-8551-4182caf2ee20}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="LIEF\PE\resources">
-      <UniqueIdentifier>{bbeb9378-315d-4f1d-a9ef-02323e776601}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="LIEF\PE\LoadConfigurations">
-      <UniqueIdentifier>{ad442827-9f39-4d1f-8b97-7ed381804ba0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="LIEF\ELF">
       <UniqueIdentifier>{d0b8612d-0ad4-4c5e-937e-224c78ce4ebc}</UniqueIdentifier>
     </Filter>
@@ -60,24 +48,6 @@
     </Filter>
     <Filter Include="ELF\DataHandler">
       <UniqueIdentifier>{8a68cfa4-5576-4c43-8760-b34e911155e6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="PE">
-      <UniqueIdentifier>{a0949e84-8918-4936-86e4-e31184236946}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="PE\utils">
-      <UniqueIdentifier>{4098237f-fa80-41e5-9839-921a9503d0a1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="PE\utils\ordinals_lookup_tables">
-      <UniqueIdentifier>{45253b6f-b7f4-46e6-aa0c-0d7c560a8391}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="PE\signature">
-      <UniqueIdentifier>{47f2b481-6ae1-46aa-9a3d-264646ad4afd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="PE\resources">
-      <UniqueIdentifier>{341ebe93-5cee-49e7-868a-75c41218a21e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="PE\LoadConfigurations">
-      <UniqueIdentifier>{edbe3f83-30a8-4f07-84cc-addf5b72239f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -192,9 +162,6 @@
     <ClCompile Include="MachO\VersionMin.cpp">
       <Filter>MachO</Filter>
     </ClCompile>
-    <ClCompile Include="visitors\hash.cpp">
-      <Filter>visitors</Filter>
-    </ClCompile>
     <ClCompile Include="exception.cpp" />
     <ClCompile Include="iostream.cpp" />
     <ClCompile Include="logging.cpp" />
@@ -291,157 +258,10 @@
     <ClCompile Include="ELF\DataHandler\Node.cpp">
       <Filter>ELF\DataHandler</Filter>
     </ClCompile>
-    <ClCompile Include="PE\Binary.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\Builder.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\CodeIntegrity.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\DataDirectory.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\Debug.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\DosHeader.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\EnumToString.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\Export.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\ExportEntry.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\Header.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\Import.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\ImportEntry.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\OptionalHeader.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\Parser.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\Relocation.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\RelocationEntry.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\ResourceData.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\ResourceDirectory.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\ResourceNode.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\ResourcesManager.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\RichEntry.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\RichHeader.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\Section.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\Symbol.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\TLS.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\utils.cpp">
-      <Filter>PE</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\signature\AuthenticatedAttributes.cpp">
-      <Filter>PE\signature</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\signature\ContentInfo.cpp">
-      <Filter>PE\signature</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\signature\OIDToString.cpp">
-      <Filter>PE\signature</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\signature\Signature.cpp">
-      <Filter>PE\signature</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\signature\SignatureParser.cpp">
-      <Filter>PE\signature</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\signature\SignerInfo.cpp">
-      <Filter>PE\signature</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\signature\x509.cpp">
-      <Filter>PE\signature</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\resources\LangCodeItem.cpp">
-      <Filter>PE\resources</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\resources\ResourceDialog.cpp">
-      <Filter>PE\resources</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\resources\ResourceDialogItem.cpp">
-      <Filter>PE\resources</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\resources\ResourceFixedFileInfo.cpp">
-      <Filter>PE\resources</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\resources\ResourceIcon.cpp">
-      <Filter>PE\resources</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\resources\ResourceStringFileInfo.cpp">
-      <Filter>PE\resources</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\resources\ResourceVarFileInfo.cpp">
-      <Filter>PE\resources</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\resources\ResourceVersion.cpp">
-      <Filter>PE\resources</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\LoadConfigurations\LoadConfiguration.cpp">
-      <Filter>PE\LoadConfigurations</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV0.cpp">
-      <Filter>PE\LoadConfigurations</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV1.cpp">
-      <Filter>PE\LoadConfigurations</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV2.cpp">
-      <Filter>PE\LoadConfigurations</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV3.cpp">
-      <Filter>PE\LoadConfigurations</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV4.cpp">
-      <Filter>PE\LoadConfigurations</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV5.cpp">
-      <Filter>PE\LoadConfigurations</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV6.cpp">
-      <Filter>PE\LoadConfigurations</Filter>
-    </ClCompile>
-    <ClCompile Include="PE\LoadConfigurations\LoadConfigurationV7.cpp">
-      <Filter>PE\LoadConfigurations</Filter>
-    </ClCompile>
     <ClCompile Include="easylogging++.cc" />
+    <ClCompile Include="visitors\hash.cpp">
+      <Filter>visitors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LIEF\Abstract\Abstract.hpp">
@@ -591,9 +411,6 @@
     <ClInclude Include="LIEF\utf8\unchecked.h">
       <Filter>LIEF\utf8</Filter>
     </ClInclude>
-    <ClInclude Include="LIEF\visitors\Hash.hpp">
-      <Filter>LIEF\visitors</Filter>
-    </ClInclude>
     <ClInclude Include="LIEF\Builder.hpp">
       <Filter>LIEF</Filter>
     </ClInclude>
@@ -619,9 +436,6 @@
       <Filter>LIEF</Filter>
     </ClInclude>
     <ClInclude Include="LIEF\MachO.hpp">
-      <Filter>LIEF</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE.hpp">
       <Filter>LIEF</Filter>
     </ClInclude>
     <ClInclude Include="LIEF\to_json.hpp">
@@ -651,9 +465,6 @@
     <ClInclude Include="LIEF\version.h">
       <Filter>LIEF</Filter>
     </ClInclude>
-    <ClInclude Include="LIEF\PE\signature\types.hpp">
-      <Filter>LIEF\PE\signature</Filter>
-    </ClInclude>
     <ClInclude Include="LIEF\MachO\enums.hpp">
       <Filter>LIEF\MachO</Filter>
     </ClInclude>
@@ -668,174 +479,6 @@
     </ClInclude>
     <ClInclude Include="LIEF\visitors\pe_json.hpp">
       <Filter>LIEF\visitors</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\AuxiliarySymbol.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\Binary.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\Builder.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\CodeIntegrity.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\DataDirectory.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\Debug.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\DosHeader.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\enums.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\EnumToString.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\Export.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\ExportEntry.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\Header.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\Import.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\ImportEntry.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\LoadConfigurations.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\OptionalHeader.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\Parser.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\Relocation.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\RelocationEntry.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\ResourceData.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\ResourceDirectory.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\ResourceNode.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\ResourcesManager.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\RichEntry.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\RichHeader.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\Section.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\Structures.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\Symbol.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\TLS.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\type_traits.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\undef.h">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\utils.hpp">
-      <Filter>LIEF\PE</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\signature\AuthenticatedAttributes.hpp">
-      <Filter>LIEF\PE\signature</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\signature\ContentInfo.hpp">
-      <Filter>LIEF\PE\signature</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\signature\OIDToString.hpp">
-      <Filter>LIEF\PE\signature</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\signature\Signature.hpp">
-      <Filter>LIEF\PE\signature</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\signature\SignatureParser.hpp">
-      <Filter>LIEF\PE\signature</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\signature\SignerInfo.hpp">
-      <Filter>LIEF\PE\signature</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\signature\x509.hpp">
-      <Filter>LIEF\PE\signature</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\resources\LangCodeItem.hpp">
-      <Filter>LIEF\PE\resources</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\resources\ResourceDialog.hpp">
-      <Filter>LIEF\PE\resources</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\resources\ResourceDialogItem.hpp">
-      <Filter>LIEF\PE\resources</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\resources\ResourceFixedFileInfo.hpp">
-      <Filter>LIEF\PE\resources</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\resources\ResourceIcon.hpp">
-      <Filter>LIEF\PE\resources</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\resources\ResourceStringFileInfo.hpp">
-      <Filter>LIEF\PE\resources</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\resources\ResourceVarFileInfo.hpp">
-      <Filter>LIEF\PE\resources</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\resources\ResourceVersion.hpp">
-      <Filter>LIEF\PE\resources</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfiguration.hpp">
-      <Filter>LIEF\PE\LoadConfigurations</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV0.hpp">
-      <Filter>LIEF\PE\LoadConfigurations</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV1.hpp">
-      <Filter>LIEF\PE\LoadConfigurations</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV2.hpp">
-      <Filter>LIEF\PE\LoadConfigurations</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV3.hpp">
-      <Filter>LIEF\PE\LoadConfigurations</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV4.hpp">
-      <Filter>LIEF\PE\LoadConfigurations</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV5.hpp">
-      <Filter>LIEF\PE\LoadConfigurations</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV6.hpp">
-      <Filter>LIEF\PE\LoadConfigurations</Filter>
-    </ClInclude>
-    <ClInclude Include="LIEF\PE\LoadConfigurations\LoadConfigurationV7.hpp">
-      <Filter>LIEF\PE\LoadConfigurations</Filter>
     </ClInclude>
     <ClInclude Include="LIEF\ELF\Binary.hpp">
       <Filter>LIEF\ELF</Filter>
@@ -930,71 +573,11 @@
     <ClInclude Include="LIEF\ELF\DataHandler\Node.hpp">
       <Filter>LIEF\ELF\DataHandler</Filter>
     </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\advapi32_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\comctl32_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\gdi32_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\kernel32_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\libraries_table.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\mfc42u_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcp110_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcp120_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcr100_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcr110_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcr120_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\msvcrt_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\ntdll_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\ole32_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\oleaut32_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\shcore_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\shell32_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\shlwapi_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\user32_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\utils\ordinals_lookup_tables\ws2_32_dll_lookup.hpp">
-      <Filter>PE\utils\ordinals_lookup_tables</Filter>
-    </ClInclude>
-    <ClInclude Include="PE\signature\pkcs7.h">
-      <Filter>PE\signature</Filter>
-    </ClInclude>
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="rang.hpp" />
+    <ClInclude Include="LIEF\visitors\Hash.hpp">
+      <Filter>LIEF\visitors</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Abstract\Section.tcc">
@@ -1047,42 +630,6 @@
     </None>
     <None Include="ELF\Parser.tcc">
       <Filter>ELF</Filter>
-    </None>
-    <None Include="PE\Builder.tcc">
-      <Filter>PE</Filter>
-    </None>
-    <None Include="PE\Parser.tcc">
-      <Filter>PE</Filter>
-    </None>
-    <None Include="PE\LoadConfigurations\LoadConfiguration.tcc">
-      <Filter>PE\LoadConfigurations</Filter>
-    </None>
-    <None Include="PE\LoadConfigurations\LoadConfigurations.tcc">
-      <Filter>PE\LoadConfigurations</Filter>
-    </None>
-    <None Include="PE\LoadConfigurations\LoadConfigurationV0.tcc">
-      <Filter>PE\LoadConfigurations</Filter>
-    </None>
-    <None Include="PE\LoadConfigurations\LoadConfigurationV1.tcc">
-      <Filter>PE\LoadConfigurations</Filter>
-    </None>
-    <None Include="PE\LoadConfigurations\LoadConfigurationV2.tcc">
-      <Filter>PE\LoadConfigurations</Filter>
-    </None>
-    <None Include="PE\LoadConfigurations\LoadConfigurationV3.tcc">
-      <Filter>PE\LoadConfigurations</Filter>
-    </None>
-    <None Include="PE\LoadConfigurations\LoadConfigurationV4.tcc">
-      <Filter>PE\LoadConfigurations</Filter>
-    </None>
-    <None Include="PE\LoadConfigurations\LoadConfigurationV5.tcc">
-      <Filter>PE\LoadConfigurations</Filter>
-    </None>
-    <None Include="PE\LoadConfigurations\LoadConfigurationV6.tcc">
-      <Filter>PE\LoadConfigurations</Filter>
-    </None>
-    <None Include="PE\LoadConfigurations\LoadConfigurationV7.tcc">
-      <Filter>PE\LoadConfigurations</Filter>
     </None>
   </ItemGroup>
 </Project>
