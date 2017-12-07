@@ -21,6 +21,17 @@
 
 #if defined(_WIN32)
 # include <windows.h>
+extern "C" {
+    HANDLE WINAPI CreateFileW(
+        __in      LPCTSTR lpFileName,
+        __in      DWORD dwDesiredAccess,
+        __in      DWORD dwShareMode,
+        __in_opt  LPSECURITY_ATTRIBUTES lpSecurityAttributes,
+        __in      DWORD dwCreationDisposition,
+        __in      DWORD dwFlagsAndAttributes,
+        __in_opt  HANDLE hTemplateFile
+    );
+}
 #else
 # include <unistd.h>
 #endif

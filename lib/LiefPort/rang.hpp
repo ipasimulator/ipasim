@@ -177,8 +177,8 @@ namespace rang_implementation {
 #ifdef OS_WIN
 	inline HANDLE getVersionDependentHandle()
 	{
-		if (IsWindowsVersionOrGreater(10, 0, 0)) return nullptr;
-		return GetStdHandle(STD_OUTPUT_HANDLE);
+		/*if (IsWindowsVersionOrGreater(10, 0, 0))*/ return nullptr;
+		/*return GetStdHandle(STD_OUTPUT_HANDLE);*/
 	}
 
 	inline HANDLE getConsoleHandle()
@@ -237,7 +237,7 @@ namespace rang_implementation {
 		HANDLE h = getConsoleHandle();
 		if (h && isTerminal(os.rdbuf())) {
 			setWinAttribute(value, current_state());
-			SetConsoleTextAttribute(h, current_state());
+			//SetConsoleTextAttribute(h, current_state());
 			return os;
 		}
 		return os << "\033[" << static_cast<int>(value) << "m";
