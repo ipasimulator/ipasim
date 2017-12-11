@@ -8,7 +8,7 @@
 #include <LIEF/LIEF.hpp>
 #include <LIEF/filesystem/filesystem.h>
 #include <sstream>
-#include <unicorn/unicorn.h>
+//#include <unicorn/unicorn.h>
 
 using namespace IpaSimulator;
 using namespace Platform;
@@ -42,6 +42,7 @@ MainPage::MainPage()
 #endif
     delete fat;
 
+#if 0
 #define X86_CODE32 "\x41\x4a"
 #define ADDRESS 0x1000000
     uc_engine *uc;
@@ -87,4 +88,5 @@ MainPage::MainPage()
     printf(">>> EDX = 0x%x\n", r_edx);
     
     uc_close(uc);
+#endif
 }

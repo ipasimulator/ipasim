@@ -107,7 +107,7 @@
       <ForcedIncludeFiles>iso646.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(ProjectDir)..\..\Debug\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\..\ARM\Debug\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
@@ -118,7 +118,7 @@
       <ForcedIncludeFiles>iso646.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(ProjectDir)..\..\Release\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\..\ARM\Release\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -151,7 +151,7 @@
       <ForcedIncludeFiles>iso646.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(ProjectDir)..\..\Debug\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\..\x64\Debug\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -162,7 +162,7 @@
       <ForcedIncludeFiles>iso646.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(ProjectDir)..\..\Release\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\..\x64\Release\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -212,6 +212,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\lib\LiefPort\LiefPort.vcxproj">
+      <Project>{09acb5e6-4cd4-4332-b393-d087a4c6d821}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
