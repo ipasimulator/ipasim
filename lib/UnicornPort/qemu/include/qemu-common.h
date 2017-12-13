@@ -27,17 +27,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
-#include <stdbool.h>
+#include "unicorn/platform.h"
 #include <string.h>
-#include <inttypes.h>
 #include <limits.h>
 #include <time.h>
 #include <ctype.h>
 #include <errno.h>
-#include <unistd.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <sys/time.h>
 #include <assert.h>
 #include "glib_compat.h"
 

@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <inttypes.h>
+#include "unicorn/platform.h"
 
 #include "cpu.h"
 #include "sysemu/cpus.h"
@@ -384,11 +384,18 @@ const char *get_register_name_32(unsigned int reg)
     return x86_reg_info_32[reg].name;
 }
 
+#ifdef _MSC_VER
+#include <intrin.h>
+#endif
+
 void host_cpuid(uint32_t function, uint32_t count,
                 uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx)
 {
     uint32_t vec[4];
 
+#ifdef _MSC_VER
+    __cpuidex((int*)vec, function, count);
+#else
 #ifdef __x86_64__
     asm volatile("cpuid"
                  : "=a"(vec[0]), "=b"(vec[1]),
@@ -407,6 +414,7 @@ void host_cpuid(uint32_t function, uint32_t count,
 #else
     abort();
 #endif
+#endif // _MSC_VER
 
     if (eax)
         *eax = vec[0];
@@ -1471,8 +1479,9 @@ static void x86_cpu_get_feature_words(struct uc_struct *uc, Object *obj, Visitor
     uint32_t *array = (uint32_t *)opaque;
     FeatureWord w;
     Error *err = NULL;
-    X86CPUFeatureWordInfo word_infos[FEATURE_WORDS] = { };
-    X86CPUFeatureWordInfoList list_entries[FEATURE_WORDS] = { };
+    // These all get setup below, so no need to initialise them here.
+    X86CPUFeatureWordInfo word_infos[FEATURE_WORDS];
+    X86CPUFeatureWordInfoList list_entries[FEATURE_WORDS];
     X86CPUFeatureWordInfoList *list = NULL;
 
     for (w = 0; w < FEATURE_WORDS; w++) {

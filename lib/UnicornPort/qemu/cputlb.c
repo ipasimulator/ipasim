@@ -235,7 +235,7 @@ void tlb_set_page(CPUState *cpu, target_ulong vaddr,
         addend = 0;
     } else {
         /* TLB_MMIO for rom/romd handled below */
-        addend = (uintptr_t)memory_region_get_ram_ptr(section->mr) + xlat;
+        addend = (uintptr_t)((char*)memory_region_get_ram_ptr(section->mr) + xlat);
     }
 
     code_address = address;

@@ -2265,7 +2265,7 @@ float32 float32_rem( float32 a, float32 b STATUS_PARAM )
         while ( 0 < expDiff ) {
             q64 = estimateDiv128To64( aSig64, 0, bSig64 );
             q64 = ( 2 < q64 ) ? q64 - 2 : 0;
-            aSig64 = - ( ( bSig * q64 )<<38 );
+            aSig64 = 0- ( ( bSig * q64 )<<38 );
             expDiff -= 62;
         }
         expDiff += 64;
@@ -2285,7 +2285,7 @@ float32 float32_rem( float32 a, float32 b STATUS_PARAM )
         aSig = alternateASig;
     }
     zSign = ( (int32_t) aSig < 0 );
-    if ( zSign ) aSig = - aSig;
+    if ( zSign ) aSig = 0- aSig;
     return normalizeRoundAndPackFloat32( aSign ^ zSign, bExp, aSig STATUS_VAR );
 
 }
@@ -2693,7 +2693,7 @@ float32 float32_log2( float32 a STATUS_PARAM )
     }
 
     if ( zSign )
-        zSig = -zSig;
+        zSig = 0-zSig;
 
     return normalizeRoundAndPackFloat32( zSign, 0x85, zSig STATUS_VAR );
 }
@@ -3995,7 +3995,7 @@ float64 float64_rem( float64 a, float64 b STATUS_PARAM )
     while ( 0 < expDiff ) {
         q = estimateDiv128To64( aSig, 0, bSig );
         q = ( 2 < q ) ? q - 2 : 0;
-        aSig = - ( ( bSig>>2 ) * q );
+        aSig = 0- ( ( bSig>>2 ) * q );
         expDiff -= 62;
     }
     expDiff += 64;
@@ -4020,7 +4020,7 @@ float64 float64_rem( float64 a, float64 b STATUS_PARAM )
         aSig = alternateASig;
     }
     zSign = ( (int64_t) aSig < 0 );
-    if ( zSign ) aSig = - aSig;
+    if ( zSign ) aSig = 0- aSig;
     return normalizeRoundAndPackFloat64( aSign ^ zSign, bExp, aSig STATUS_VAR );
 
 }
@@ -4366,7 +4366,7 @@ float64 float64_log2( float64 a STATUS_PARAM )
     }
 
     if ( zSign )
-        zSig = -zSig;
+        zSig = 0-zSig;
     return normalizeRoundAndPackFloat64( zSign, 0x408, zSig STATUS_VAR );
 }
 

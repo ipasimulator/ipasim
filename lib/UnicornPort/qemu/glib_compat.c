@@ -1250,7 +1250,11 @@ gpointer g_realloc(gpointer ptr, size_t size)
 
 char *g_strdup(const char *str)
 {
-   return str ? strdup(str) : NULL;
+#ifdef _MSC_VER
+    return str ? _strdup(str) : NULL;
+#else
+    return str ? strdup(str) : NULL;
+#endif
 }
 
 char *g_strdup_printf(const char *format, ...)

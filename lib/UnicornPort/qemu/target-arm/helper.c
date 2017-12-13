@@ -4836,8 +4836,19 @@ void HELPER(dc_zva)(CPUARMState *env, uint64_t vaddr_in)
          * 1K as an artefact of legacy v5 subpage support being present in the
          * same QEMU executable.
          */
+
         int maxidx = DIV_ROUND_UP(blocklen, TARGET_PAGE_SIZE);
+        // msvc doesnt allow non-constant array sizes, so we work out the size it would be
+        // TARGET_PAGE_SIZE is 1024
+        // blocklen is 64
+        // maxidx = (blocklen+TARGET_PAGE_SIZE-1) / TARGET_PAGE_SIZE
+        //        = (64+1024-1) / 1024
+        //        = 1
+#ifdef _MSC_VER
+        void *hostaddr[1];
+#else
         void *hostaddr[maxidx];
+#endif
         int try, i;
 
         for (try = 0; try < 2; try++) {

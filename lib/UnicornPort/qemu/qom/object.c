@@ -217,7 +217,7 @@ static void type_initialize_interface(struct uc_struct *uc, TypeImpl *ti, TypeIm
                                       TypeImpl *parent_type)
 {
     InterfaceClass *new_iface;
-    TypeInfo info = { };
+    TypeInfo info = { 0 };
     TypeImpl *iface_impl;
 
     info.parent = parent_type->name;

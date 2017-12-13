@@ -75,7 +75,7 @@ MachineClass *find_default_machine(struct uc_struct *uc, int arch)
     return mc;
 }
 
-__attribute__ ((visibility ("default")))
+DEFAULT_VISIBILITY
 int machine_initialize(struct uc_struct *uc)
 {
     MachineClass *machine_class;

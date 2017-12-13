@@ -178,7 +178,7 @@ static bool memory_listener_match(MemoryListener *listener,
         || listener->address_space_filter == section->address_space;
 }
 
-#define MEMORY_LISTENER_CALL_GLOBAL(_callback, _direction, _args...)    \
+#define MEMORY_LISTENER_CALL_GLOBAL(_callback, _direction, ...)    \
     do {                                                                \
         MemoryListener *_listener;                                      \
                                                                         \
@@ -186,7 +186,7 @@ static bool memory_listener_match(MemoryListener *listener,
         case Forward:                                                   \
             QTAILQ_FOREACH(_listener, &uc->memory_listeners, link) {        \
                 if (_listener->_callback) {                             \
-                    _listener->_callback(_listener, ##_args);           \
+                    _listener->_callback(_listener, ##__VA_ARGS__);           \
                 }                                                       \
             }                                                           \
             break;                                                      \
@@ -194,7 +194,7 @@ static bool memory_listener_match(MemoryListener *listener,
             QTAILQ_FOREACH_REVERSE(_listener, &uc->memory_listeners,        \
                                    memory_listeners, link) {            \
                 if (_listener->_callback) {                             \
-                    _listener->_callback(_listener, ##_args);           \
+                    _listener->_callback(_listener, ##__VA_ARGS__);           \
                 }                                                       \
             }                                                           \
             break;                                                      \
@@ -203,7 +203,7 @@ static bool memory_listener_match(MemoryListener *listener,
         }                                                               \
     } while (0)
 
-#define MEMORY_LISTENER_CALL(_callback, _direction, _section, _args...) \
+#define MEMORY_LISTENER_CALL(_callback, _direction, _section, ...) \
     do {                                                                \
         MemoryListener *_listener;                                      \
                                                                         \
@@ -212,7 +212,7 @@ static bool memory_listener_match(MemoryListener *listener,
             QTAILQ_FOREACH(_listener, &uc->memory_listeners, link) {        \
                 if (_listener->_callback                                \
                     && memory_listener_match(_listener, _section)) {    \
-                    _listener->_callback(_listener, _section, ##_args); \
+                    _listener->_callback(_listener, _section, ##__VA_ARGS__); \
                 }                                                       \
             }                                                           \
             break;                                                      \
@@ -221,7 +221,7 @@ static bool memory_listener_match(MemoryListener *listener,
                                    memory_listeners, link) {            \
                 if (_listener->_callback                                \
                     && memory_listener_match(_listener, _section)) {    \
-                    _listener->_callback(_listener, _section, ##_args); \
+                    _listener->_callback(_listener, _section, ##__VA_ARGS__); \
                 }                                                       \
             }                                                           \
             break;                                                      \
@@ -475,7 +475,7 @@ static void access_with_adjusted_size(hwaddr addr,
 
     /* FIXME: support unaligned access? */
     access_size = MAX(MIN(size, access_size_max), access_size_min);
-    access_mask = -1ULL >> (64 - access_size * 8);
+    access_mask = 0-1ULL >> (64 - access_size * 8);
     if (memory_region_big_endian(mr)) {
         for (i = 0; i < size; i += access_size) {
             access(mr, addr + i, value, access_size,
@@ -1229,7 +1229,7 @@ int memory_region_get_fd(MemoryRegion *mr)
 void *memory_region_get_ram_ptr(MemoryRegion *mr)
 {
     if (mr->alias) {
-        return memory_region_get_ram_ptr(mr->alias) + mr->alias_offset;
+        return (char*)memory_region_get_ram_ptr(mr->alias) + mr->alias_offset;
     }
 
     assert(mr->terminates);

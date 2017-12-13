@@ -121,7 +121,6 @@
 
 /* macro to check the victim tlb */
 #define VICTIM_TLB_HIT(ty)                                                    \
-({                                                                            \
     /* we are about to do a page table walk. our last hope is the             \
      * victim tlb. try to refill from the victim tlb before walking the       \
      * page table. */                                                         \
@@ -141,8 +140,20 @@
         }                                                                     \
     }                                                                         \
     /* return true when there is a vtlb hit, i.e. vidx >=0 */                 \
-    vidx >= 0;                                                                \
-})
+    return (vidx >= 0)
+
+#ifndef victim_tlb_hit_funcs
+#define victim_tlb_hit_funcs
+static inline bool victim_tlb_hit_read(CPUArchState *env, target_ulong addr, int mmu_idx, int index)
+{
+    VICTIM_TLB_HIT(ADDR_READ);
+}
+
+static inline bool victim_tlb_hit_write(CPUArchState *env, target_ulong addr, int mmu_idx, int index)
+{
+    VICTIM_TLB_HIT(addr_write);
+}
+#endif // victim_tlb_hit_funcs
 
 #ifndef SOFTMMU_CODE_ACCESS
 static inline DATA_TYPE glue(io_read, SUFFIX)(CPUArchState *env,
@@ -168,7 +179,7 @@ static inline DATA_TYPE glue(io_read, SUFFIX)(CPUArchState *env,
 #endif
 
 #ifdef SOFTMMU_CODE_ACCESS
-static __attribute__((unused))
+static QEMU_UNUSED_FUNC
 #endif
 WORD_TYPE helper_le_ld_name(CPUArchState *env, target_ulong addr, int mmu_idx,
                             uintptr_t retaddr)
@@ -293,7 +304,7 @@ WORD_TYPE helper_le_ld_name(CPUArchState *env, target_ulong addr, int mmu_idx,
             return 0;
         }
 #endif
-        if (!VICTIM_TLB_HIT(ADDR_READ)) {
+        if (!victim_tlb_hit_read(env, addr, mmu_idx, index)) {
             tlb_fill(ENV_GET_CPU(env), addr, READ_ACCESS_TYPE,
                      mmu_idx, retaddr);
         }
@@ -395,7 +406,7 @@ _out:
 
 #if DATA_SIZE > 1
 #ifdef SOFTMMU_CODE_ACCESS
-static __attribute__((unused))
+static QEMU_UNUSED_FUNC
 #endif
 WORD_TYPE helper_be_ld_name(CPUArchState *env, target_ulong addr, int mmu_idx,
                             uintptr_t retaddr)
@@ -520,7 +531,7 @@ WORD_TYPE helper_be_ld_name(CPUArchState *env, target_ulong addr, int mmu_idx,
             return 0;
         }
 #endif
-        if (!VICTIM_TLB_HIT(ADDR_READ)) {
+        if (!victim_tlb_hit_read(env, addr, mmu_idx, index)) {
             tlb_fill(ENV_GET_CPU(env), addr, READ_ACCESS_TYPE,
                      mmu_idx, retaddr);
         }
@@ -742,7 +753,7 @@ void helper_le_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
             return;
         }
 #endif
-        if (!VICTIM_TLB_HIT(addr_write)) {
+        if (!victim_tlb_hit_write(env, addr, mmu_idx, index)) {
             tlb_fill(ENV_GET_CPU(env), addr, MMU_DATA_STORE, mmu_idx, retaddr);
         }
         tlb_addr = env->tlb_table[mmu_idx][index].addr_write;
@@ -900,7 +911,7 @@ void helper_be_st_name(CPUArchState *env, target_ulong addr, DATA_TYPE val,
             return;
         }
 #endif
-        if (!VICTIM_TLB_HIT(addr_write)) {
+        if (!victim_tlb_hit_write(env, addr, mmu_idx, index)) {
             tlb_fill(ENV_GET_CPU(env), addr, MMU_DATA_STORE, mmu_idx, retaddr);
         }
         tlb_addr = env->tlb_table[mmu_idx][index].addr_write;

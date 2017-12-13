@@ -23,7 +23,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <inttypes.h>
+#include "unicorn/platform.h"
 
 #include "cpu.h"
 #include "internals.h"
@@ -1568,7 +1568,7 @@ static inline int gen_iwmmxt_address(DisasContext *s, uint32_t insn,
         if (insn & (1 << 23))
             tcg_gen_addi_i32(tcg_ctx, tmp, tmp, offset);
         else
-            tcg_gen_addi_i32(tcg_ctx, tmp, tmp, -offset);
+            tcg_gen_addi_i32(tcg_ctx, tmp, tmp, 0-offset);
         tcg_gen_mov_i32(tcg_ctx, dest, tmp);
         if (insn & (1 << 21))
             store_reg(s, rd, tmp);
@@ -1580,7 +1580,7 @@ static inline int gen_iwmmxt_address(DisasContext *s, uint32_t insn,
         if (insn & (1 << 23))
             tcg_gen_addi_i32(tcg_ctx, tmp, tmp, offset);
         else
-            tcg_gen_addi_i32(tcg_ctx, tmp, tmp, -offset);
+            tcg_gen_addi_i32(tcg_ctx, tmp, tmp, 0-offset);
         store_reg(s, rd, tmp);
     } else if (!(insn & (1 << 23)))
         return 1;
@@ -3913,7 +3913,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
                 /* Single load/store */
                 offset = (insn & 0xff) << 2;
                 if ((insn & (1 << 23)) == 0)
-                    offset = -offset;
+                    offset = 0-offset;
                 if (s->thumb && rn == 15) {
                     /* This is actually UNPREDICTABLE */
                     addr = tcg_temp_new_i32(tcg_ctx);
@@ -3961,7 +3961,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
                     addr = load_reg(s, rn);
                 }
                 if (insn & (1 << 24)) /* pre-decrement */
-                    tcg_gen_addi_i32(tcg_ctx, addr, addr, -((insn & 0xff) << 2));
+                    tcg_gen_addi_i32(tcg_ctx, addr, addr, 0-((insn & 0xff) << 2));
 
                 if (dp)
                     offset = 8;
@@ -3982,7 +3982,7 @@ static int disas_vfp_insn(DisasContext *s, uint32_t insn)
                 if (w) {
                     /* writeback */
                     if (insn & (1 << 24))
-                        offset = -offset * n;
+                        offset = (0-offset) * n;
                     else if (dp && (insn & 1))
                         offset = 4;
                     else
@@ -9283,7 +9283,7 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
                 }
                 offset = (insn & 0xff) * 4;
                 if ((insn & (1 << 23)) == 0)
-                    offset = -offset;
+                    offset = 0-offset;
                 if (insn & (1 << 24)) {
                     tcg_gen_addi_i32(tcg_ctx, addr, addr, offset);
                     offset = 0;
@@ -9465,7 +9465,7 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
                         offset += 4;
                 }
                 if (insn & (1 << 24)) {
-                    tcg_gen_addi_i32(tcg_ctx, addr, addr, -offset);
+                    tcg_gen_addi_i32(tcg_ctx, addr, addr, 0-offset);
                 }
 
                 TCGV_UNUSED_I32(loaded_var);
@@ -9498,7 +9498,7 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
                 if (insn & (1 << 21)) {
                     /* Base register writeback.  */
                     if (insn & (1 << 24)) {
-                        tcg_gen_addi_i32(tcg_ctx, addr, addr, -offset);
+                        tcg_gen_addi_i32(tcg_ctx, addr, addr, 0-offset);
                     }
                     /* Fault if writeback register is in register list.  */
                     if (insn & (1 << rn))
@@ -10287,21 +10287,21 @@ static int disas_thumb2_insn(CPUARMState *env, DisasContext *s, uint16_t insn_hw
                     tcg_temp_free_i32(tcg_ctx, tmp);
                     break;
                 case 0xc: /* Negative offset.  */
-                    tcg_gen_addi_i32(tcg_ctx, addr, addr, -imm);
+                    tcg_gen_addi_i32(tcg_ctx, addr, addr, 0-imm);
                     break;
                 case 0xe: /* User privilege.  */
                     tcg_gen_addi_i32(tcg_ctx, addr, addr, imm);
                     memidx = MMU_USER_IDX;
                     break;
                 case 0x9: /* Post-decrement.  */
-                    imm = -imm;
+                    imm = 0-imm;
                     /* Fall through.  */
                 case 0xb: /* Post-increment.  */
                     postinc = 1;
                     writeback = 1;
                     break;
                 case 0xd: /* Pre-decrement.  */
-                    imm = -imm;
+                    imm = 0-imm;
                     /* Fall through.  */
                 case 0xf: /* Pre-increment.  */
                     tcg_gen_addi_i32(tcg_ctx, addr, addr, imm);

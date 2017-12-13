@@ -249,7 +249,9 @@ static void phys_page_compact(PhysPageEntry *lp, Node *nodes, unsigned long *com
 
 static void phys_page_compact_all(AddressSpaceDispatch *d, int nodes_nb)
 {
-    DECLARE_BITMAP(compacted, nodes_nb);
+    //DECLARE_BITMAP(compacted, nodes_nb);
+    // this isnt actually used
+    unsigned long* compacted = NULL;
 
     if (d->phys_map.skip) {
         phys_page_compact(&d->phys_map, d->map.nodes, compacted);
@@ -1604,7 +1606,7 @@ static int memory_access_size(MemoryRegion *mr, unsigned l, hwaddr addr)
 
     /* Bound the maximum access by the alignment of the address.  */
     if (!mr->ops->impl.unaligned) {
-        unsigned align_size_max = addr & -addr;
+        unsigned align_size_max = addr & (0-addr);
         if (align_size_max != 0 && align_size_max < access_size_max) {
             access_size_max = align_size_max;
         }
@@ -1776,7 +1778,7 @@ static inline void cpu_physical_memory_write_rom_internal(AddressSpace *as,
 }
 
 /* used for ROM loading : can write in RAM and ROM */
-__attribute__ ((visibility ("default")))
+DEFAULT_VISIBILITY
 void cpu_physical_memory_write_rom(AddressSpace *as, hwaddr addr,
         const uint8_t *buf, int len)
 {

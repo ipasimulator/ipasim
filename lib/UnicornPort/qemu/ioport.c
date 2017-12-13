@@ -49,7 +49,7 @@ typedef struct MemoryRegionPortioList {
 
 static uint64_t unassigned_io_read(struct uc_struct* uc, void *opaque, hwaddr addr, unsigned size)
 {
-    return -1ULL;
+    return 0-1ULL;
 }
 
 static void unassigned_io_write(struct uc_struct* uc, void *opaque, hwaddr addr, uint64_t val,

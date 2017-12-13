@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <inttypes.h>
+#include "unicorn/platform.h"
 
 #include "cpu.h"
 #include "tcg-op.h"
@@ -4449,9 +4449,9 @@ static void disas_fp_1src(DisasContext *s, uint32_t insn)
         handle_fp_fcvt(s, opcode, rd, rn, dtype, type);
         break;
     }
-    case 0x0 ... 0x3:
-    case 0x8 ... 0xc:
-    case 0xe ... 0xf:
+    case 0x0: case 0x1: case 0x2: case 0x3:
+    case 0x8: case 0x9: case 0xa: case 0xb: case 0xc:
+    case 0xe: case 0xf:
         /* 32-to-32 and 64-to-64 ops */
         switch (type) {
         case 0:
@@ -7940,8 +7940,8 @@ static void disas_simd_scalar_two_reg_misc(DisasContext *s, uint32_t insn)
         }
         handle_2misc_narrow(s, true, opcode, u, false, size, rn, rd);
         return;
-    case 0xc ... 0xf:
-    case 0x16 ... 0x1d:
+    case 0x0c: case 0x0d: case 0x0e: case 0x0f:
+    case 0x16: case 0x17: case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d:
     case 0x1f:
         /* Floating point: U, size[1] and opcode indicate operation;
          * size[0] indicates single or double precision.
@@ -9523,7 +9523,10 @@ static void disas_simd_three_reg_same(DisasContext *s, uint32_t insn)
         handle_simd_3same_pair(s, is_q, u, opcode, size, rn, rm, rd);
         break;
     }
-    case 0x18 ... 0x31:
+    case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
+    case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
+    case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f:
+    case 0x30: case 0x31:
         /* floating point ops, sz[1] and U are part of opcode */
         disas_simd_3same_float(s, insn);
         break;
@@ -9866,8 +9869,8 @@ static void disas_simd_two_reg_misc(DisasContext *s, uint32_t insn)
             return;
         }
         break;
-    case 0xc ... 0xf:
-    case 0x16 ... 0x1d:
+    case 0x0c: case 0x0d: case 0x0e: case 0x0f:
+    case 0x16: case 0x17: case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d:
     case 0x1f:
     {
         /* Floating point: U, size[1] and opcode indicate operation;

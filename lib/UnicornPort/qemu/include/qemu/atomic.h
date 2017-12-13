@@ -18,7 +18,13 @@
 /* For C11 atomic ops */
 
 /* Compiler barrier */
+#ifdef _MSC_VER
+void _ReadWriteBarrier(void);
+#pragma intrinsic(_ReadWriteBarrier)
+#define barrier()   do { _ReadWriteBarrier(); } while (0)
+#else
 #define barrier()   ({ asm volatile("" ::: "memory"); (void)0; })
+#endif
 
 #ifndef __ATOMIC_RELAXED
 
@@ -31,9 +37,19 @@
 #if defined(__i386__) || defined(__x86_64__)
 #if !QEMU_GNUC_PREREQ(4, 4)
 #if defined __x86_64__
-#define smp_mb()    ({ asm volatile("mfence" ::: "memory"); (void)0; })
+# ifdef _MSC_VER
+ // TODO: fix me!!!
+# define smp_mb()    //{ __asm volatile("mfence" ::: "memory"); (void)0; }
+# else
+# define smp_mb()    ({ asm volatile("mfence" ::: "memory"); (void)0; })
+# endif
 #else
-#define smp_mb()    ({ asm volatile("lock; addl $0,0(%%esp) " ::: "memory"); (void)0; })
+# ifdef _MSC_VER
+ // TODO: fix me!!!
+# define smp_mb()    //{ __asm volatile("lock; addl $0,0(%esp) " ::: "memory"); (void)0; }
+# else
+# define smp_mb()    ({ asm volatile("lock; addl $0,0(%%esp) " ::: "memory"); (void)0; })
+# endif
 #endif
 #endif
 #endif

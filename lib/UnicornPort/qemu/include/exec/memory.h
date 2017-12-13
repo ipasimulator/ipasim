@@ -19,8 +19,7 @@
 #define DIRTY_MEMORY_CODE      0
 #define DIRTY_MEMORY_NUM       1        /* num of dirty bits */
 
-#include <stdint.h>
-#include <stdbool.h>
+#include "unicorn/platform.h"
 #include "qemu-common.h"
 #include "exec/cpu-common.h"
 #include "exec/hwaddr.h"

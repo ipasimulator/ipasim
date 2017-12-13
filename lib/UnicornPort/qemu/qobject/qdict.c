@@ -662,7 +662,7 @@ void qdict_array_split(QDict *src, QList **dst)
             qdict_del(src, indexstr);
         }
 
-        qlist_append_obj(*dst, subqobj ?: QOBJECT(subqdict));
+        qlist_append_obj(*dst, (subqobj!=NULL) ? subqobj : QOBJECT(subqdict));
     }
 }
 

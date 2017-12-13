@@ -69,7 +69,8 @@ static void patch_reloc(tcg_insn_unit *code_ptr, int type,
 
 /* The CIE and FDE header definitions will be common to all hosts.  */
 typedef struct {
-    uint32_t len __attribute__((aligned((sizeof(void *)))));
+    //uint32_t QEMU_ALIGN(sizeof(void *), len);
+    uint32_t QEMU_ALIGN(8, len);
     uint32_t id;
     uint8_t version;
     char augmentation[1];
@@ -78,17 +79,18 @@ typedef struct {
     uint8_t return_column;
 } DebugFrameCIE;
 
-typedef struct QEMU_PACKED {
-    uint32_t len __attribute__((aligned((sizeof(void *)))));
+QEMU_PACK( typedef struct {
+//  uint32_t QEMU_ALIGN(sizeof(void *), len);
+    uint32_t QEMU_ALIGN(8, len);
     uint32_t cie_offset;
     uintptr_t func_start;
     uintptr_t func_len;
-} DebugFrameFDEHeader;
+}) DebugFrameFDEHeader;
 
-typedef struct QEMU_PACKED {
+QEMU_PACK( typedef struct {
     DebugFrameCIE cie;
     DebugFrameFDEHeader fde;
-} DebugFrameHeader;
+}) DebugFrameHeader;
 
 /* Forward declarations for functions declared and used in tcg-target.c. */
 static int target_parse_constraint(TCGArgConstraint *ct, const char **pct_str);
@@ -115,12 +117,12 @@ TCGOpDef tcg_op_defs_org[] = {
 };
 
 #if TCG_TARGET_INSN_UNIT_SIZE == 1
-static __attribute__((unused)) inline void tcg_out8(TCGContext *s, uint8_t v)
+static QEMU_UNUSED_FUNC inline void tcg_out8(TCGContext *s, uint8_t v)
 {
     *s->code_ptr++ = v;
 }
 
-static __attribute__((unused)) inline void tcg_patch8(tcg_insn_unit *p,
+static QEMU_UNUSED_FUNC inline void tcg_patch8(tcg_insn_unit *p,
                                                       uint8_t v)
 {
     *p = v;
@@ -128,7 +130,7 @@ static __attribute__((unused)) inline void tcg_patch8(tcg_insn_unit *p,
 #endif
 
 #if TCG_TARGET_INSN_UNIT_SIZE <= 2
-static __attribute__((unused)) inline void tcg_out16(TCGContext *s, uint16_t v)
+static QEMU_UNUSED_FUNC inline void tcg_out16(TCGContext *s, uint16_t v)
 {
     if (TCG_TARGET_INSN_UNIT_SIZE == 2) {
         *s->code_ptr++ = v;
@@ -139,7 +141,7 @@ static __attribute__((unused)) inline void tcg_out16(TCGContext *s, uint16_t v)
     }
 }
 
-static __attribute__((unused)) inline void tcg_patch16(tcg_insn_unit *p,
+static QEMU_UNUSED_FUNC inline void tcg_patch16(tcg_insn_unit *p,
                                                        uint16_t v)
 {
     if (TCG_TARGET_INSN_UNIT_SIZE == 2) {
@@ -151,7 +153,7 @@ static __attribute__((unused)) inline void tcg_patch16(tcg_insn_unit *p,
 #endif
 
 #if TCG_TARGET_INSN_UNIT_SIZE <= 4
-static __attribute__((unused)) inline void tcg_out32(TCGContext *s, uint32_t v)
+static QEMU_UNUSED_FUNC inline void tcg_out32(TCGContext *s, uint32_t v)
 {
     if (TCG_TARGET_INSN_UNIT_SIZE == 4) {
         *s->code_ptr++ = v;
@@ -162,7 +164,7 @@ static __attribute__((unused)) inline void tcg_out32(TCGContext *s, uint32_t v)
     }
 }
 
-static __attribute__((unused)) inline void tcg_patch32(tcg_insn_unit *p,
+static QEMU_UNUSED_FUNC inline void tcg_patch32(tcg_insn_unit *p,
                                                        uint32_t v)
 {
     if (TCG_TARGET_INSN_UNIT_SIZE == 4) {
@@ -174,7 +176,7 @@ static __attribute__((unused)) inline void tcg_patch32(tcg_insn_unit *p,
 #endif
 
 #if TCG_TARGET_INSN_UNIT_SIZE <= 8
-static __attribute__((unused)) inline void tcg_out64(TCGContext *s, uint64_t v)
+static QEMU_UNUSED_FUNC inline void tcg_out64(TCGContext *s, uint64_t v)
 {
     if (TCG_TARGET_INSN_UNIT_SIZE == 8) {
         *s->code_ptr++ = v;
@@ -185,7 +187,7 @@ static __attribute__((unused)) inline void tcg_out64(TCGContext *s, uint64_t v)
     }
 }
 
-static __attribute__((unused)) inline void tcg_patch64(tcg_insn_unit *p,
+static QEMU_UNUSED_FUNC inline void tcg_patch64(tcg_insn_unit *p,
                                                        uint64_t v)
 {
     if (TCG_TARGET_INSN_UNIT_SIZE == 8) {

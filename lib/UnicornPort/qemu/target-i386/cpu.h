@@ -805,7 +805,7 @@ typedef struct BNDCSReg {
 #define MMX_Q(n) q
 
 typedef union {
-    floatx80 d __attribute__((aligned(16)));
+    floatx80 QEMU_ALIGN(16, d);
     MMXReg mmx;
 } FPReg;
 
@@ -869,7 +869,8 @@ typedef struct CPUX86State {
     uint64_t msr_bndcfgs;
 
     /* Beginning of state preserved by INIT (dummy marker).  */
-    struct {} start_init_save;
+    //struct {} start_init_save;
+    int start_init_save;
 
     /* FPU state */
     unsigned int fpstt; /* top of stack index */

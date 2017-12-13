@@ -2,8 +2,7 @@
 #define INT128_H
 
 //#include <assert.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include "unicorn/platform.h"
 
 typedef struct Int128 Int128;
 
@@ -77,7 +76,7 @@ static inline Int128 int128_add(Int128 a, Int128 b)
 
 static inline Int128 int128_neg(Int128 a)
 {
-    uint64_t lo = -a.lo;
+    uint64_t lo = 0-a.lo;
     return (Int128) { lo, ~(uint64_t)a.hi + !lo };
 }
 

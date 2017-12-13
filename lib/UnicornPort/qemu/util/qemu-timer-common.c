@@ -27,10 +27,9 @@
 /* real time host monotonic timer */
 
 #ifdef _WIN32
-
 int64_t clock_freq;
 
-static void __attribute__((constructor)) init_get_clock(void)
+INITIALIZER(init_get_clock)
 {
     LARGE_INTEGER freq;
     int ret;
