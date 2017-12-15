@@ -400,7 +400,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;qemu/target-arm;qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;DEBUG;__i386__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
@@ -415,7 +415,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;qemu/target-arm;qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;__i386__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
@@ -430,7 +430,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;qemu/target-arm;qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;DEBUG;__arm__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
@@ -445,7 +445,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;qemu/target-arm;qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;__arm__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
@@ -460,7 +460,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;qemu/target-arm;qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;DEBUG;__x86_64__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
@@ -475,7 +475,7 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;qemu/target-arm;qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;__x86_64__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
