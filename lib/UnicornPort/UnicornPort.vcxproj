@@ -71,57 +71,8 @@
     <ClCompile Include="qemu\target-arm\psci.c" />
     <ClCompile Include="qemu\target-arm\translate.c" />
     <ClCompile Include="qemu\target-arm\unicorn_arm.c" />
-    <ClCompile Include="qemu\target-i386\arch_memory_mapping.c" />
-    <ClCompile Include="qemu\target-i386\cc_helper.c" />
-    <ClCompile Include="qemu\target-i386\cpu.c" />
-    <ClCompile Include="qemu\target-i386\excp_helper.c" />
-    <ClCompile Include="qemu\target-i386\fpu_helper.c" />
-    <ClCompile Include="qemu\target-i386\helper.c" />
-    <ClCompile Include="qemu\target-i386\int_helper.c" />
-    <ClCompile Include="qemu\target-i386\mem_helper.c" />
-    <ClCompile Include="qemu\target-i386\misc_helper.c" />
-    <ClCompile Include="qemu\target-i386\seg_helper.c" />
-    <ClCompile Include="qemu\target-i386\smm_helper.c" />
-    <ClCompile Include="qemu\target-i386\svm_helper.c" />
-    <ClCompile Include="qemu\target-i386\translate.c" />
-    <ClCompile Include="qemu\target-i386\unicorn.c" />
-    <ClCompile Include="qemu\target-m68k\cpu.c" />
-    <ClCompile Include="qemu\target-m68k\helper.c" />
-    <ClCompile Include="qemu\target-m68k\op_helper.c" />
-    <ClCompile Include="qemu\target-m68k\translate.c" />
-    <ClCompile Include="qemu\target-m68k\unicorn.c" />
-    <ClCompile Include="qemu\target-mips\cpu.c" />
-    <ClCompile Include="qemu\target-mips\dsp_helper.c" />
-    <ClCompile Include="qemu\target-mips\helper.c" />
-    <ClCompile Include="qemu\target-mips\lmi_helper.c" />
-    <ClCompile Include="qemu\target-mips\msa_helper.c" />
-    <ClCompile Include="qemu\target-mips\op_helper.c" />
-    <ClCompile Include="qemu\target-mips\translate.c" />
-    <ClCompile Include="qemu\target-mips\translate_init.c" />
-    <ClCompile Include="qemu\target-mips\unicorn.c" />
-    <ClCompile Include="qemu\target-sparc\cc_helper.c" />
-    <ClCompile Include="qemu\target-sparc\cpu.c" />
-    <ClCompile Include="qemu\target-sparc\fop_helper.c" />
-    <ClCompile Include="qemu\target-sparc\helper.c" />
-    <ClCompile Include="qemu\target-sparc\int32_helper.c" />
-    <ClCompile Include="qemu\target-sparc\int64_helper.c" />
-    <ClCompile Include="qemu\target-sparc\ldst_helper.c" />
-    <ClCompile Include="qemu\target-sparc\mmu_helper.c" />
-    <ClCompile Include="qemu\target-sparc\translate.c" />
-    <ClCompile Include="qemu\target-sparc\unicorn.c" />
-    <ClCompile Include="qemu\target-sparc\unicorn64.c" />
-    <ClCompile Include="qemu\target-sparc\vis_helper.c" />
-    <ClCompile Include="qemu\target-sparc\win_helper.c" />
     <ClCompile Include="qemu\tcg-runtime.c" />
-    <ClCompile Include="qemu\tcg\aarch64\tcg-target.c" />
-    <ClCompile Include="qemu\tcg\arm\tcg-target.c" />
-    <ClCompile Include="qemu\tcg\i386\tcg-target.c" />
-    <ClCompile Include="qemu\tcg\ia64\tcg-target.c" />
-    <ClCompile Include="qemu\tcg\mips\tcg-target.c" />
     <ClCompile Include="qemu\tcg\optimize.c" />
-    <ClCompile Include="qemu\tcg\ppc\tcg-target.c" />
-    <ClCompile Include="qemu\tcg\s390\tcg-target.c" />
-    <ClCompile Include="qemu\tcg\sparc\tcg-target.c" />
     <ClCompile Include="qemu\tcg\tcg.c" />
     <ClCompile Include="qemu\translate-all.c" />
     <ClCompile Include="qemu\util\aes.c" />
@@ -133,10 +84,8 @@
     <ClCompile Include="qemu\util\getauxval.c" />
     <ClCompile Include="qemu\util\host-utils.c" />
     <ClCompile Include="qemu\util\module.c" />
-    <ClCompile Include="qemu\util\oslib-posix.c" />
     <ClCompile Include="qemu\util\oslib-win32.c" />
     <ClCompile Include="qemu\util\qemu-error.c" />
-    <ClCompile Include="qemu\util\qemu-thread-posix.c" />
     <ClCompile Include="qemu\util\qemu-thread-win32.c" />
     <ClCompile Include="qemu\util\qemu-timer-common.c" />
     <ClCompile Include="qemu\vl.c" />
@@ -145,9 +94,7 @@
   <ItemGroup>
     <ClInclude Include="list.h" />
     <ClInclude Include="qemu.h" />
-    <ClInclude Include="qemu\aarch64.h" />
     <ClInclude Include="qemu\arm.h" />
-    <ClInclude Include="qemu\armeb.h" />
     <ClInclude Include="qemu\fpu\softfloat-macros.h" />
     <ClInclude Include="qemu\fpu\softfloat-specialize.h" />
     <ClInclude Include="qemu\include\config-host.h" />
@@ -234,15 +181,6 @@
     <ClInclude Include="qemu\include\sysemu\memory_mapping.h" />
     <ClInclude Include="qemu\include\sysemu\os-win32.h" />
     <ClInclude Include="qemu\include\sysemu\sysemu.h" />
-    <ClInclude Include="qemu\m68k.h" />
-    <ClInclude Include="qemu\mips.h" />
-    <ClInclude Include="qemu\mips64.h" />
-    <ClInclude Include="qemu\mips64el.h" />
-    <ClInclude Include="qemu\mipsel.h" />
-    <ClInclude Include="qemu\powerpc.h" />
-    <ClInclude Include="qemu\softmmu_template.h" />
-    <ClInclude Include="qemu\sparc.h" />
-    <ClInclude Include="qemu\sparc64.h" />
     <ClInclude Include="qemu\target-arm\arm_ldst.h" />
     <ClInclude Include="qemu\target-arm\cpu-qom.h" />
     <ClInclude Include="qemu\target-arm\cpu.h" />
@@ -252,38 +190,7 @@
     <ClInclude Include="qemu\target-arm\op_addsub.h" />
     <ClInclude Include="qemu\target-arm\translate.h" />
     <ClInclude Include="qemu\target-arm\unicorn.h" />
-    <ClInclude Include="qemu\target-i386\cc_helper_template.h" />
-    <ClInclude Include="qemu\target-i386\cpu-qom.h" />
-    <ClInclude Include="qemu\target-i386\cpu.h" />
-    <ClInclude Include="qemu\target-i386\helper.h" />
-    <ClInclude Include="qemu\target-i386\ops_sse.h" />
-    <ClInclude Include="qemu\target-i386\ops_sse_header.h" />
-    <ClInclude Include="qemu\target-i386\shift_helper_template.h" />
-    <ClInclude Include="qemu\target-i386\svm.h" />
-    <ClInclude Include="qemu\target-i386\topology.h" />
-    <ClInclude Include="qemu\target-i386\unicorn.h" />
-    <ClInclude Include="qemu\target-m68k\cpu-qom.h" />
-    <ClInclude Include="qemu\target-m68k\cpu.h" />
-    <ClInclude Include="qemu\target-m68k\helper.h" />
-    <ClInclude Include="qemu\target-m68k\m68k-qreg.h" />
-    <ClInclude Include="qemu\target-m68k\unicorn.h" />
-    <ClInclude Include="qemu\target-mips\cpu-qom.h" />
-    <ClInclude Include="qemu\target-mips\cpu.h" />
-    <ClInclude Include="qemu\target-mips\helper.h" />
-    <ClInclude Include="qemu\target-mips\mips-defs.h" />
-    <ClInclude Include="qemu\target-mips\unicorn.h" />
-    <ClInclude Include="qemu\target-sparc\cpu-qom.h" />
-    <ClInclude Include="qemu\target-sparc\cpu.h" />
-    <ClInclude Include="qemu\target-sparc\helper.h" />
-    <ClInclude Include="qemu\target-sparc\unicorn.h" />
-    <ClInclude Include="qemu\tcg\aarch64\tcg-target.h" />
-    <ClInclude Include="qemu\tcg\arm\tcg-target.h" />
     <ClInclude Include="qemu\tcg\i386\tcg-target.h" />
-    <ClInclude Include="qemu\tcg\ia64\tcg-target.h" />
-    <ClInclude Include="qemu\tcg\mips\tcg-target.h" />
-    <ClInclude Include="qemu\tcg\ppc\tcg-target.h" />
-    <ClInclude Include="qemu\tcg\s390\tcg-target.h" />
-    <ClInclude Include="qemu\tcg\sparc\tcg-target.h" />
     <ClInclude Include="qemu\tcg\tcg-be-ldst.h" />
     <ClInclude Include="qemu\tcg\tcg-be-null.h" />
     <ClInclude Include="qemu\tcg\tcg-op.h" />
@@ -293,7 +200,6 @@
     <ClInclude Include="qemu\translate-all.h" />
     <ClInclude Include="qemu\unicorn_common.h" />
     <ClInclude Include="qemu\vl.h" />
-    <ClInclude Include="qemu\x86_64.h" />
     <ClInclude Include="uc_priv.h" />
     <ClInclude Include="unicorn\arm.h" />
     <ClInclude Include="unicorn\arm64.h" />
@@ -303,9 +209,6 @@
     <ClInclude Include="unicorn\sparc.h" />
     <ClInclude Include="unicorn\unicorn.h" />
     <ClInclude Include="unicorn\x86.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="qemu\target-m68k\qregs.def" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{4cc4e22a-4160-4f67-9b4b-c8cfe084e631}</ProjectGuid>
@@ -402,8 +305,9 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;qemu/target-arm;qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;DEBUG;__i386__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__i386__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <ForcedIncludeFiles>arm.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -417,8 +321,9 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;qemu/target-arm;qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;__i386__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;__i386__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <ForcedIncludeFiles>arm.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -432,8 +337,9 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;qemu/target-arm;qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;DEBUG;__arm__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__arm__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <ForcedIncludeFiles>arm.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -447,8 +353,9 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;qemu/target-arm;qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;__arm__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;__arm__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <ForcedIncludeFiles>arm.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -462,8 +369,9 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;qemu/target-arm;qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;DEBUG;__x86_64__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__x86_64__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <ForcedIncludeFiles>arm.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -477,8 +385,9 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;qemu/target-arm;qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;__x86_64__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;__x86_64__;UNICORN_HAS_ARM;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <ForcedIncludeFiles>arm.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

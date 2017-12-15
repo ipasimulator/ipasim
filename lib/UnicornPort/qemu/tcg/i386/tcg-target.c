@@ -77,7 +77,13 @@ static const int tcg_target_call_iarg_regs[] = {
     TCG_REG_R8,
     TCG_REG_R9,
 #else
-    /* 32 bit mode uses stack based calling convention (GCC default). */
+    /* 32 bit mode uses stack based calling convention (GCC default).
+    We add a dummy value here for MSVC compatibility for the error:
+    "error C2466: cannot allocate an array of constant size 0"
+    The "tcg_target_call_iarg_regs" array is not accessed when
+    TCG_TARGET_REG_BITS == 32
+    */
+    0,
 #endif
 };
 
@@ -108,7 +114,18 @@ static const int tcg_target_call_oarg_regs[] = {
    detection, as we're not going to go so far as our own inline assembly.
    If not available, default values will be assumed.  */
 #if defined(CONFIG_CPUID_H)
+#ifdef _MSC_VER
+#include <intrin.h>
+   /* %ecx */
+#define bit_MOVBE  (1 << 22)
+   /* %edx */
+#define bit_CMOV   (1 << 15)
+   /* Extended Features (%eax == 7) */
+#define bit_BMI    (1 <<  3)
+#define bit_BMI2   (1 <<  8)
+#else
 #include <cpuid.h>
+#endif
 #endif
 
 /* For 32-bit, we are going to attempt to determine at runtime whether cmov
@@ -2059,9 +2076,9 @@ static inline void tcg_out_op(TCGContext *s, TCGOpcode opc,
 }
 
 static const TCGTargetOpDef x86_op_defs[] = {
-    { INDEX_op_exit_tb, { } },
-    { INDEX_op_goto_tb, { } },
-    { INDEX_op_br, { } },
+    { INDEX_op_exit_tb, { NULL } },
+    { INDEX_op_goto_tb, { NULL } },
+    { INDEX_op_br, { NULL } },
     { INDEX_op_ld8u_i32, { "r", "r" } },
     { INDEX_op_ld8s_i32, { "r", "r" } },
     { INDEX_op_ld16u_i32, { "r", "r" } },
@@ -2275,10 +2292,26 @@ static void tcg_target_init(TCGContext *s)
 {
 #ifdef CONFIG_CPUID_H
     unsigned a, b, c, d;
-    int max = __get_cpuid_max(0, 0);
+    int max;
+
+#ifdef _MSC_VER
+    int cpu_info[4];
+    __cpuid(cpu_info, 0);
+    max = cpu_info[0];
+#else
+    max = __get_cpuid_max(0, 0);
+#endif
 
     if (max >= 1) {
+#ifdef _MSC_VER
+        __cpuid(cpu_info, 1);
+        a = cpu_info[0];
+        b = cpu_info[1];
+        c = cpu_info[2];
+        d = cpu_info[3];
+#else
         __cpuid(1, a, b, c, d);
+#endif
 #ifndef have_cmov
         /* For 32-bit, 99% certainty that we're running on hardware that
            supports cmov, but we still need to check.  In case cmov is not
@@ -2294,7 +2327,11 @@ static void tcg_target_init(TCGContext *s)
 
     if (max >= 7) {
         /* BMI1 is available on AMD Piledriver and Intel Haswell CPUs.  */
+#ifdef _MSC_VER
+        __cpuidex(cpu_info, 7, 0);
+#else
         __cpuid_count(7, 0, a, b, c, d);
+#endif
 #ifdef bit_BMI
         have_bmi1 = (b & bit_BMI) != 0;
 #endif

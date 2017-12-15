@@ -226,9 +226,13 @@ static inline int64_t cpu_get_real_ticks(void)
 
 static inline int64_t cpu_get_real_ticks(void)
 {
+#ifdef _MSC_VER
+    return __rdtsc();
+#else
     int64_t val;
     asm volatile ("rdtsc" : "=A" (val));
     return val;
+#endif
 }
 
 #elif defined(__x86_64__)
