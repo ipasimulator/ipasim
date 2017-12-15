@@ -6,28 +6,7 @@
     <ClCompile Include="qemu\accel.c">
       <Filter>qemu</Filter>
     </ClCompile>
-    <ClCompile Include="qemu\cpu-exec.c">
-      <Filter>qemu</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\cpus.c">
-      <Filter>qemu</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\cputlb.c">
-      <Filter>qemu</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\exec.c">
-      <Filter>qemu</Filter>
-    </ClCompile>
     <ClCompile Include="qemu\glib_compat.c">
-      <Filter>qemu</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\ioport.c">
-      <Filter>qemu</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\memory.c">
-      <Filter>qemu</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\memory_mapping.c">
       <Filter>qemu</Filter>
     </ClCompile>
     <ClCompile Include="qemu\qemu-log.c">
@@ -39,20 +18,8 @@
     <ClCompile Include="qemu\tcg-runtime.c">
       <Filter>qemu</Filter>
     </ClCompile>
-    <ClCompile Include="qemu\translate-all.c">
-      <Filter>qemu</Filter>
-    </ClCompile>
     <ClCompile Include="qemu\vl.c">
       <Filter>qemu</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\fpu\softfloat.c">
-      <Filter>qemu\fpu</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\hw\arm\tosa.c">
-      <Filter>qemu\hw\arm</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\hw\arm\virt.c">
-      <Filter>qemu\hw\arm</Filter>
     </ClCompile>
     <ClCompile Include="qemu\hw\core\machine.c">
       <Filter>qemu\hw\core</Filter>
@@ -108,33 +75,6 @@
     <ClCompile Include="qemu\qom\qom-qobject.c">
       <Filter>qemu\qom</Filter>
     </ClCompile>
-    <ClCompile Include="qemu\target-arm\cpu.c">
-      <Filter>qemu\target-arm</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\target-arm\crypto_helper.c">
-      <Filter>qemu\target-arm</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\target-arm\helper.c">
-      <Filter>qemu\target-arm</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\target-arm\iwmmxt_helper.c">
-      <Filter>qemu\target-arm</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\target-arm\neon_helper.c">
-      <Filter>qemu\target-arm</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\target-arm\op_helper.c">
-      <Filter>qemu\target-arm</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\target-arm\psci.c">
-      <Filter>qemu\target-arm</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\target-arm\translate.c">
-      <Filter>qemu\target-arm</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\target-arm\unicorn_arm.c">
-      <Filter>qemu\target-arm</Filter>
-    </ClCompile>
     <ClCompile Include="qemu\util\aes.c">
       <Filter>qemu\util</Filter>
     </ClCompile>
@@ -174,12 +114,6 @@
     <ClCompile Include="qemu\util\qemu-timer-common.c">
       <Filter>qemu\util</Filter>
     </ClCompile>
-    <ClCompile Include="qemu\tcg\optimize.c">
-      <Filter>qemu\tcg</Filter>
-    </ClCompile>
-    <ClCompile Include="qemu\tcg\tcg.c">
-      <Filter>qemu\tcg</Filter>
-    </ClCompile>
     <ClCompile Include="qemu\include\qapi-types.c">
       <Filter>qemu\include</Filter>
     </ClCompile>
@@ -212,23 +146,11 @@
     <ClInclude Include="unicorn\x86.h">
       <Filter>unicorn</Filter>
     </ClInclude>
-    <ClInclude Include="qemu\arm.h">
-      <Filter>qemu</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\translate-all.h">
-      <Filter>qemu</Filter>
-    </ClInclude>
     <ClInclude Include="qemu\unicorn_common.h">
       <Filter>qemu</Filter>
     </ClInclude>
     <ClInclude Include="qemu\vl.h">
       <Filter>qemu</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\fpu\softfloat-macros.h">
-      <Filter>qemu\fpu</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\fpu\softfloat-specialize.h">
-      <Filter>qemu\fpu</Filter>
     </ClInclude>
     <ClInclude Include="qemu\include\config.h">
       <Filter>qemu\include</Filter>
@@ -470,60 +392,6 @@
     <ClInclude Include="qemu\include\sysemu\sysemu.h">
       <Filter>qemu\include\sysemu</Filter>
     </ClInclude>
-    <ClInclude Include="qemu\target-arm\arm_ldst.h">
-      <Filter>qemu\target-arm</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\target-arm\cpu.h">
-      <Filter>qemu\target-arm</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\target-arm\cpu-qom.h">
-      <Filter>qemu\target-arm</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\target-arm\helper.h">
-      <Filter>qemu\target-arm</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\target-arm\internals.h">
-      <Filter>qemu\target-arm</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\target-arm\kvm-consts.h">
-      <Filter>qemu\target-arm</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\target-arm\op_addsub.h">
-      <Filter>qemu\target-arm</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\target-arm\translate.h">
-      <Filter>qemu\target-arm</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\target-arm\unicorn.h">
-      <Filter>qemu\target-arm</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\tcg\tcg.h">
-      <Filter>qemu\tcg</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\tcg\tcg-be-ldst.h">
-      <Filter>qemu\tcg</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\tcg\tcg-be-null.h">
-      <Filter>qemu\tcg</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\tcg\tcg-op.h">
-      <Filter>qemu\tcg</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\tcg\tcg-opc.h">
-      <Filter>qemu\tcg</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\tcg\tcg-runtime.h">
-      <Filter>qemu\tcg</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\tcg\i386\tcg-target.h">
-      <Filter>qemu\tcg\i386</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\include\config-host.h">
-      <Filter>qemu\include</Filter>
-    </ClInclude>
-    <ClInclude Include="qemu\include\config-target.h">
-      <Filter>qemu\include</Filter>
-    </ClInclude>
     <ClInclude Include="qemu\include\qapi-types.h">
       <Filter>qemu\include</Filter>
     </ClInclude>
@@ -541,14 +409,8 @@
     <Filter Include="qemu">
       <UniqueIdentifier>{c4df0e15-b66e-4085-9415-8925437ca9d0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="qemu\fpu">
-      <UniqueIdentifier>{77746b1e-b9fc-4e97-be07-0242c4c0b12f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="qemu\hw">
       <UniqueIdentifier>{35c6c63f-2bfc-4844-838d-ed1603dffcc7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="qemu\hw\arm">
-      <UniqueIdentifier>{6940f284-0d07-4408-bc3e-9c8b983cd4f4}</UniqueIdentifier>
     </Filter>
     <Filter Include="qemu\hw\core">
       <UniqueIdentifier>{e838a141-1a68-4246-99a4-76b3fd624455}</UniqueIdentifier>
@@ -607,17 +469,8 @@
     <Filter Include="qemu\qom">
       <UniqueIdentifier>{b3a43f1a-6881-4913-a5ce-b0d8b4bdb936}</UniqueIdentifier>
     </Filter>
-    <Filter Include="qemu\target-arm">
-      <UniqueIdentifier>{77df29fb-9f77-4457-abb6-89c9b2ccd8f0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="qemu\util">
       <UniqueIdentifier>{26dbe0c7-e669-4bc9-ac56-e28128f48662}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="qemu\tcg">
-      <UniqueIdentifier>{dd89a7e9-ece4-442a-a1a2-5af091bb9920}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="qemu\tcg\i386">
-      <UniqueIdentifier>{2573ff77-1342-4222-a3e3-3f154d6b7349}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
