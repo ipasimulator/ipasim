@@ -186,44 +186,49 @@ MainPage::MainPage()
         throw 1;
     }
 
-    // process load commands
-    for (auto& c : bin.commands()) {
-        auto type = c.command();
-        switch (type) {
-        case LOAD_COMMAND_TYPES::LC_SEGMENT: {
-            auto& seg = static_cast<SegmentCommand&>(c);
+    // load segments
+    for (auto& seg : bin.segments()) {
+        // convert protection
+        auto vmprot = seg.init_protection();
+        uc_prot perms = UC_PROT_NONE;
+        if (vmprot & VM_PROTECTIONS::VM_PROT_READ) {
+            perms |= UC_PROT_READ;
+        }
+        if (vmprot & VM_PROTECTIONS::VM_PROT_WRITE) {
+            perms |= UC_PROT_WRITE;
+        }
+        if (vmprot & VM_PROTECTIONS::VM_PROT_EXECUTE) {
+            perms |= UC_PROT_EXEC;
+        }
 
-            // convert protection
-            auto vmprot = seg.init_protection();
-            uc_prot perms = UC_PROT_NONE;
-            if (vmprot & VM_PROTECTIONS::VM_PROT_READ) {
-                perms |= UC_PROT_READ;
-            }
-            if (vmprot & VM_PROTECTIONS::VM_PROT_WRITE) {
-                perms |= UC_PROT_WRITE;
-            }
-            if (vmprot & VM_PROTECTIONS::VM_PROT_EXECUTE) {
-                perms |= UC_PROT_EXEC;
-            }
+        // TODO: memory must be zeroed, does unicorn do that?
+        uint64_t address = seg.virtual_address();
+        err = uc_mem_map(uc, address, seg.virtual_size(), perms);
+        if (err) {
+            throw 1;
+        }
 
-            // TODO: memory must be zeroed, does unicorn do that?
-            uint64_t address = seg.virtual_address();
-            err = uc_mem_map(uc, address, seg.virtual_size(), perms);
+        uint64_t size = seg.file_size();
+        if (size > 0) {
+            auto& content = seg.content();
+            err = uc_mem_write(uc, address, content.data(), content.size());
             if (err) {
                 throw 1;
             }
-
-            uint64_t size = seg.file_size();
-            if (size > 0) {
-                auto& content = seg.content();
-                err = uc_mem_write(uc, address, content.data(), content.size());
-                if (err) {
-                    throw 1;
-                }
-            }
-
-            break;
         }
+    }
+
+    // load libraries
+    for (auto& lib : bin.libraries()) {
+        // TODO!!
+    }
+
+    // ensure we processed all commands
+    for (auto& c : bin.commands()) {
+        auto type = c.command();
+        switch (type) {
+        case LOAD_COMMAND_TYPES::LC_SEGMENT: // segments
+            break;
         default: throw 1;
         }
     }
