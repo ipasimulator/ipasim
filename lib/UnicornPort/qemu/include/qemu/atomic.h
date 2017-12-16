@@ -199,6 +199,14 @@ void _ReadWriteBarrier(void);
 #endif
 
 /* Provide shorter names for GCC atomic builtins.  */
+#ifdef _MSC_VER
+// these return the new value (so we make it return the previous value)
+#define atomic_fetch_inc(ptr)        ((InterlockedIncrement(ptr))-1)
+#define atomic_fetch_dec(ptr)        ((InterlockedDecrement(ptr))+1)
+#define atomic_fetch_add(ptr, n)     ((InterlockedAdd(ptr,  n))-n)
+#define atomic_fetch_sub(ptr, n)     ((InterlockedAdd(ptr, -n))+n)
+#else
+// these return the previous value
 #define atomic_fetch_inc(ptr)  __sync_fetch_and_add(ptr, 1)
 #define atomic_fetch_dec(ptr)  __sync_fetch_and_add(ptr, -1)
 #define atomic_fetch_add       __sync_fetch_and_add
@@ -206,13 +214,21 @@ void _ReadWriteBarrier(void);
 #define atomic_fetch_and       __sync_fetch_and_and
 #define atomic_fetch_or        __sync_fetch_and_or
 #define atomic_cmpxchg         __sync_val_compare_and_swap
+#endif
 
 /* And even shorter names that return void.  */
+#ifdef _MSC_VER
+#define atomic_inc(ptr)        ((void) InterlockedIncrement(ptr))
+#define atomic_dec(ptr)        ((void) InterlockedDecrement(ptr))
+#define atomic_add(ptr, n)     ((void) InterlockedAdd(ptr, n))
+#define atomic_sub(ptr, n)     ((void) InterlockedAdd(ptr, -n))
+#else
 #define atomic_inc(ptr)        ((void) __sync_fetch_and_add(ptr, 1))
 #define atomic_dec(ptr)        ((void) __sync_fetch_and_add(ptr, -1))
 #define atomic_add(ptr, n)     ((void) __sync_fetch_and_add(ptr, n))
 #define atomic_sub(ptr, n)     ((void) __sync_fetch_and_sub(ptr, n))
 #define atomic_and(ptr, n)     ((void) __sync_fetch_and_and(ptr, n))
 #define atomic_or(ptr, n)      ((void) __sync_fetch_and_or(ptr, n))
+#endif
 
 #endif

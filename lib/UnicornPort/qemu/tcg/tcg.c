@@ -488,7 +488,7 @@ static inline int tcg_global_mem_new_internal(TCGContext *s, TCGType type, int r
 #endif
         pstrcpy(buf, sizeof(buf), name);
         pstrcat(buf, sizeof(buf), "_0");
-        ts->name = strdup(buf);
+        ts->name = g_strdup(buf);
         ts++;
 
         ts->base_type = type;
@@ -503,7 +503,7 @@ static inline int tcg_global_mem_new_internal(TCGContext *s, TCGType type, int r
 #endif
         pstrcpy(buf, sizeof(buf), name);
         pstrcat(buf, sizeof(buf), "_1");
-        ts->name = strdup(buf);
+        ts->name = g_strdup(buf);
 
         s->nb_globals += 2;
     } else

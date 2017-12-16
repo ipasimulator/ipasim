@@ -1270,7 +1270,17 @@ char *g_strdup_printf(const char *format, ...)
 char *g_strdup_vprintf(const char *format, va_list ap)
 {
    char *str_res = NULL;
+#ifdef _MSC_VER
+   int len = _vscprintf(format, ap);
+   if( len < 0 )
+       return NULL;
+   str_res = (char *)malloc(len+1);
+   if(str_res==NULL)
+       return NULL;
+   vsnprintf(str_res, len+1, format, ap);
+#else
    vasprintf(&str_res, format, ap);
+#endif
    return str_res;
 }
 

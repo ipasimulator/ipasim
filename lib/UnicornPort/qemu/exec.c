@@ -1927,7 +1927,7 @@ void *cpu_physical_memory_map(AddressSpace *as, hwaddr addr,
 void cpu_physical_memory_unmap(AddressSpace *as, void *buffer, hwaddr len,
         int is_write, hwaddr access_len)
 {
-    return address_space_unmap(as, buffer, len, is_write, access_len);
+    address_space_unmap(as, buffer, len, is_write, access_len);
 }
 
 /* warning: addr must be aligned */

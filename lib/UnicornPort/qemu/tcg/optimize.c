@@ -269,7 +269,7 @@ static TCGArg do_constant_folding_2(TCGOpcode op, TCGArg x, TCGArg y)
         return ~x;
 
     CASE_OP_32_64(neg):
-        return -x;
+        return 0-x;
 
     CASE_OP_32_64(andc):
         return x & ~y;
@@ -867,7 +867,7 @@ static TCGArg *tcg_constant_folding(TCGContext *s, uint16_t *tcg_opc_ptr,
 
         CASE_OP_32_64(neg):
             /* Set to 1 all bits to the left of the rightmost.  */
-            mask = -(temps[args[1]].mask & -temps[args[1]].mask);
+            mask = 0-(temps[args[1]].mask & (0-temps[args[1]].mask));
             break;
 
         CASE_OP_32_64(deposit):

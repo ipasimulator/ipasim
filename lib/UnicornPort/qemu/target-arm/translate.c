@@ -2688,9 +2688,22 @@ static int disas_dsp_insn(DisasContext *s, uint32_t insn)
     return 1;
 }
 
-#define VFP_REG_SHR(x, n) (((n) > 0) ? (x) >> (n) : (x) << -(n))
-#define VFP_SREG(insn, bigbit, smallbit) \
-  ((VFP_REG_SHR(insn, bigbit - 1) & 0x1e) | (((insn) >> (smallbit)) & 1))
+// this causes "warning C4293: shift count negative or too big, undefined behavior"
+// on msvc, so is replaced with separate versions for the shift to perform.
+//#define VFP_REG_SHR(x, n) (((n) > 0) ? (x) >> (n) : (x) << -(n))
+#if 0
+//#define VFP_SREG(insn, bigbit, smallbit) \
+//  ((VFP_REG_SHR(insn, bigbit - 1) & 0x1e) | (((insn) >> (smallbit)) & 1))
+#endif
+
+#define VFP_REG_SHR_NEG(insn, n) ((insn) << -(n))
+#define VFP_SREG_NEG(insn, bigbit, smallbit) \
+  ((VFP_REG_SHR_NEG(insn, bigbit - 1) & 0x1e) | (((insn) >> (smallbit)) & 1))
+
+#define VFP_REG_SHR_POS(x, n) ((insn) >> (n))
+#define VFP_SREG_POS(insn, bigbit, smallbit) \
+  ((VFP_REG_SHR_POS(insn, bigbit - 1) & 0x1e) | (((insn) >> (smallbit)) & 1))
+
 #define VFP_DREG(reg, insn, bigbit, smallbit) do { \
     if (arm_dc_feature(s, ARM_FEATURE_VFP3)) { \
         reg = (((insn) >> (bigbit)) & 0x0f) \
@@ -2701,11 +2714,11 @@ static int disas_dsp_insn(DisasContext *s, uint32_t insn)
         reg = ((insn) >> (bigbit)) & 0x0f; \
     }} while (0)
 
-#define VFP_SREG_D(insn) VFP_SREG(insn, 12, 22)
+#define VFP_SREG_D(insn) VFP_SREG_POS(insn, 12, 22)
 #define VFP_DREG_D(reg, insn) VFP_DREG(reg, insn, 12, 22)
-#define VFP_SREG_N(insn) VFP_SREG(insn, 16,  7)
+#define VFP_SREG_N(insn) VFP_SREG_POS(insn, 16,  7)
 #define VFP_DREG_N(reg, insn) VFP_DREG(reg, insn, 16,  7)
-#define VFP_SREG_M(insn) VFP_SREG(insn,  0,  5)
+#define VFP_SREG_M(insn) VFP_SREG_NEG(insn,  0,  5)
 #define VFP_DREG_M(reg, insn) VFP_DREG(reg, insn,  0,  5)
 
 /* Move between integer and VFP cores.  */

@@ -124,6 +124,7 @@
       <AdditionalOptions>-D_SCL_SECURE_NO_WARNINGS</AdditionalOptions>
       <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <DisableSpecificWarnings>4244;4101</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -133,13 +134,14 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>-D_SCL_SECURE_NO_WARNINGS</AdditionalOptions>
       <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <DisableSpecificWarnings>4244;4101</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -156,6 +158,7 @@
       <AdditionalOptions>-D_SCL_SECURE_NO_WARNINGS</AdditionalOptions>
       <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <DisableSpecificWarnings>4244;4101</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -165,13 +168,14 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>-D_SCL_SECURE_NO_WARNINGS</AdditionalOptions>
       <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <DisableSpecificWarnings>4244;4101</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -188,6 +192,7 @@
       <AdditionalOptions>-D_SCL_SECURE_NO_WARNINGS</AdditionalOptions>
       <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <DisableSpecificWarnings>4244;4101</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -197,13 +202,14 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>ELPP_NO_DEFAULT_LOG_FILE;VDEBUG=9;LIEF_ELF_MODULE;LIEF_MACHO_MODULE;NOMINMAX;_WINRT_DLL;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>-D_SCL_SECURE_NO_WARNINGS</AdditionalOptions>
       <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
+      <DisableSpecificWarnings>4244;4101</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

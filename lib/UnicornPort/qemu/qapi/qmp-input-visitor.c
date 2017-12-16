@@ -104,7 +104,7 @@ static void qmp_input_pop(QmpInputVisitor *qiv, Error **errp)
         if (top_ht) {
             if (g_hash_table_size(top_ht)) {
                 const char *key;
-                g_hash_table_find(top_ht, always_true, &key);
+                g_hash_table_find(top_ht, always_true, (gpointer)&key);
                 error_set(errp, QERR_QMP_EXTRA_MEMBER, key);
             }
             g_hash_table_unref(top_ht);

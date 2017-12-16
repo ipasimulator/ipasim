@@ -704,7 +704,7 @@ uint32_t HELPER(neon_rshl_s32)(uint32_t valop, uint32_t shiftop)
     if ((shift >= 32) || (shift <= -32)) {
         dest = 0;
     } else if (shift < 0) {
-        int64_t big_dest = ((int64_t)val + (1 << (-1 - shift)));
+        int64_t big_dest = ((int64_t)val + (1ULL << (-1 - shift)));
         dest = big_dest >> -shift;
     } else {
         dest = val << shift;
@@ -765,7 +765,7 @@ uint32_t HELPER(neon_rshl_u32)(uint32_t val, uint32_t shiftop)
     } else if (shift == -32) {
         dest = val >> 31;
     } else if (shift < 0) {
-        uint64_t big_dest = ((uint64_t)val + (1 << (-1 - shift)));
+        uint64_t big_dest = ((uint64_t)val + (1ULL << (-1 - shift)));
         dest = big_dest >> -shift;
     } else {
         dest = val << shift;
@@ -998,7 +998,7 @@ uint32_t HELPER(neon_qrshl_u32)(CPUARMState *env, uint32_t val, uint32_t shiftop
     } else if (shift == -32) {
         dest = val >> 31;
     } else if (shift < 0) {
-        uint64_t big_dest = ((uint64_t)val + (1 << (-1 - shift)));
+        uint64_t big_dest = ((uint64_t)val + (1ULL << (-1 - shift)));
         dest = big_dest >> -shift;
     } else {
         dest = val << shift;
@@ -1094,7 +1094,7 @@ uint32_t HELPER(neon_qrshl_s32)(CPUARMState *env, uint32_t valop, uint32_t shift
     } else if (shift <= -32) {
         dest = 0;
     } else if (shift < 0) {
-        int64_t big_dest = ((int64_t)val + (1 << (-1 - shift)));
+        int64_t big_dest = ((int64_t)val + (1ULL << (-1 - shift)));
         dest = big_dest >> -shift;
     } else {
         dest = val << shift;

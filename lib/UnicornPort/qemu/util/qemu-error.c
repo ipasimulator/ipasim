@@ -11,6 +11,8 @@
  */
 
 #include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
 
 static const char *progname;
 
