@@ -48,6 +48,8 @@
     <ClCompile Include="..\..\qemu\target-arm\unicorn_arm.c" />
     <ClCompile Include="..\..\qemu\tcg\optimize.c" />
     <ClCompile Include="..\..\qemu\tcg\tcg.c" />
+    <ClCompile Include="..\..\qemu\tcg\tci\tcg-target.c" />
+    <ClCompile Include="..\..\qemu\tci.c" />
     <ClCompile Include="..\..\qemu\translate-all.c" />
   </ItemGroup>
   <ItemGroup>
@@ -64,13 +66,13 @@
     <ClInclude Include="..\..\qemu\target-arm\op_addsub.h" />
     <ClInclude Include="..\..\qemu\target-arm\translate.h" />
     <ClInclude Include="..\..\qemu\target-arm\unicorn.h" />
-    <ClInclude Include="..\..\qemu\tcg\i386\tcg-target.h" />
     <ClInclude Include="..\..\qemu\tcg\tcg-be-ldst.h" />
     <ClInclude Include="..\..\qemu\tcg\tcg-be-null.h" />
     <ClInclude Include="..\..\qemu\tcg\tcg-op.h" />
     <ClInclude Include="..\..\qemu\tcg\tcg-opc.h" />
     <ClInclude Include="..\..\qemu\tcg\tcg-runtime.h" />
     <ClInclude Include="..\..\qemu\tcg\tcg.h" />
+    <ClInclude Include="..\..\qemu\tcg\tci\tcg-target.h" />
     <ClInclude Include="..\..\qemu\translate-all.h" />
     <ClInclude Include="config-target.h" />
   </ItemGroup>

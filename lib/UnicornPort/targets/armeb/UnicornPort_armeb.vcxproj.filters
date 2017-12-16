@@ -22,8 +22,8 @@
     <Filter Include="qemu\tcg">
       <UniqueIdentifier>{7182317e-10c0-4bb1-84da-279320c67089}</UniqueIdentifier>
     </Filter>
-    <Filter Include="qemu\tcg\i386">
-      <UniqueIdentifier>{ba7f5b29-4726-423b-80a1-afc334b69eb7}</UniqueIdentifier>
+    <Filter Include="qemu\tcg\tci">
+      <UniqueIdentifier>{e020c69a-ccea-495b-812a-f2947a47653c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -93,6 +93,12 @@
     <ClCompile Include="..\..\qemu\translate-all.c">
       <Filter>qemu</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\qemu\tci.c">
+      <Filter>qemu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\qemu\tcg\tci\tcg-target.c">
+      <Filter>qemu\tcg\tci</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\qemu\fpu\softfloat-macros.h">
@@ -134,9 +140,6 @@
     <ClInclude Include="config-target.h">
       <Filter>qemu\include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\qemu\tcg\i386\tcg-target.h">
-      <Filter>qemu\tcg\i386</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\qemu\tcg\tcg.h">
       <Filter>qemu\tcg</Filter>
     </ClInclude>
@@ -160,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="..\..\qemu\translate-all.h">
       <Filter>qemu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\qemu\tcg\tci\tcg-target.h">
+      <Filter>qemu\tcg\tci</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
