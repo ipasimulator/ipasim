@@ -48,7 +48,14 @@
     <ClCompile Include="..\..\qemu\target-arm\unicorn_arm.c" />
     <ClCompile Include="..\..\qemu\tcg\optimize.c" />
     <ClCompile Include="..\..\qemu\tcg\tcg.c" />
-    <ClCompile Include="..\..\qemu\tcg\tci\tcg-target.c" />
+    <ClCompile Include="..\..\qemu\tcg\tci\tcg-target.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\..\qemu\tci.c" />
     <ClCompile Include="..\..\qemu\translate-all.c" />
   </ItemGroup>
@@ -171,8 +178,8 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <ForcedIncludeFiles>arm.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>../..;../../qemu/include;../../qemu;../../qemu/tcg;../../qemu/target-arm;../../qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__i386__;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../..;../../qemu/include;../../qemu;../../qemu/tcg;../../qemu/target-arm;../../qemu/tcg/tci;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>CONFIG_TCG_INTERPRETER;WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__i386__;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4018;4244;4267</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -187,8 +194,8 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <ForcedIncludeFiles>arm.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>../..;../../qemu/include;../../qemu;../../qemu/tcg;../../qemu/target-arm;../../qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;__i386__;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../..;../../qemu/include;../../qemu;../../qemu/tcg;../../qemu/target-arm;../../qemu/tcg/tci;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>CONFIG_TCG_INTERPRETER;WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;__i386__;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4018;4244;4267</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -205,8 +212,8 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <ForcedIncludeFiles>arm.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>../..;../../qemu/include;../../qemu;../../qemu/tcg;../../qemu/target-arm;../../qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__arm__;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../..;../../qemu/include;../../qemu;../../qemu/tcg;../../qemu/target-arm;../../qemu/tcg/tci;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>CONFIG_TCG_INTERPRETER;WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__arm__;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4018;4244;4267</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -221,8 +228,8 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <ForcedIncludeFiles>arm.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>../..;../../qemu/include;../../qemu;../../qemu/tcg;../../qemu/target-arm;../../qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;__arm__;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../..;../../qemu/include;../../qemu;../../qemu/tcg;../../qemu/target-arm;../../qemu/tcg/tci;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>CONFIG_TCG_INTERPRETER;WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;__arm__;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4018;4244;4267</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -239,8 +246,8 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <ForcedIncludeFiles>arm.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>../..;../../qemu/include;../../qemu;../../qemu/tcg;../../qemu/target-arm;../../qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__x86_64__;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../..;../../qemu/include;../../qemu;../../qemu/tcg;../../qemu/target-arm;../../qemu/tcg/tci;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>CONFIG_TCG_INTERPRETER;WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__x86_64__;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4018;4244;4267</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -255,8 +262,8 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <ForcedIncludeFiles>arm.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>../..;../../qemu/include;../../qemu;../../qemu/tcg;../../qemu/target-arm;../../qemu/tcg/i386;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;__x86_64__;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../..;../../qemu/include;../../qemu;../../qemu/tcg;../../qemu/target-arm;../../qemu/tcg/tci;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>CONFIG_TCG_INTERPRETER;WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;__x86_64__;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DisableSpecificWarnings>4018;4244;4267</DisableSpecificWarnings>
     </ClCompile>
     <Link>

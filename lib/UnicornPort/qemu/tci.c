@@ -837,7 +837,7 @@ uintptr_t tcg_qemu_tb_exec(CPUArchState *env, uint8_t *tb_ptr)
         case INDEX_op_neg_i32:
             t0 = *tb_ptr++;
             t1 = tci_read_r32(&tb_ptr);
-            tci_write_reg32(t0, -t1);
+            tci_write_reg32(t0, 0-t1);
             break;
 #endif
 #if TCG_TARGET_REG_BITS == 64

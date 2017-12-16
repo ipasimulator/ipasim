@@ -862,18 +862,18 @@ static void tcg_target_init(TCGContext *s)
     assert(ARRAY_SIZE(tcg_op_defs) <= UINT8_MAX);
 
     /* Registers available for 32 bit operations. */
-    tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I32], 0,
+    tcg_regset_set32(s->tcg_target_available_regs[TCG_TYPE_I32], 0,
                      BIT(TCG_TARGET_NB_REGS) - 1);
     /* Registers available for 64 bit operations. */
-    tcg_regset_set32(tcg_target_available_regs[TCG_TYPE_I64], 0,
+    tcg_regset_set32(s->tcg_target_available_regs[TCG_TYPE_I64], 0,
                      BIT(TCG_TARGET_NB_REGS) - 1);
     /* TODO: Which registers should be set here? */
-    tcg_regset_set32(tcg_target_call_clobber_regs, 0,
+    tcg_regset_set32(s->tcg_target_call_clobber_regs, 0,
                      BIT(TCG_TARGET_NB_REGS) - 1);
 
     tcg_regset_clear(s->reserved_regs);
     tcg_regset_set_reg(s->reserved_regs, TCG_REG_CALL_STACK);
-    tcg_add_target_add_op_defs(tcg_target_op_defs);
+    tcg_add_target_add_op_defs(s, tcg_target_op_defs);
 
     /* We use negative offsets from "sp" so that we can distinguish
        stores that might pretend to be call arguments.  */

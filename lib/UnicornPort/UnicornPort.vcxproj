@@ -270,7 +270,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__i386__;UNICORN_HAS_ARM;_LIB;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CONFIG_TCG_INTERPRETER;WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__i386__;UNICORN_HAS_ARM;_LIB;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4244;4018;4267</DisableSpecificWarnings>
@@ -292,7 +292,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;__i386__;UNICORN_HAS_ARM;_LIB;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CONFIG_TCG_INTERPRETER;WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;__i386__;UNICORN_HAS_ARM;_LIB;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4244;4018;4267</DisableSpecificWarnings>
@@ -316,7 +316,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__arm__;UNICORN_HAS_ARM;_LIB;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CONFIG_TCG_INTERPRETER;WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__arm__;UNICORN_HAS_ARM;_LIB;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4244;4018;4267</DisableSpecificWarnings>
@@ -338,7 +338,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;__arm__;UNICORN_HAS_ARM;_LIB;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CONFIG_TCG_INTERPRETER;WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;__arm__;UNICORN_HAS_ARM;_LIB;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4244;4018;4267</DisableSpecificWarnings>
@@ -362,7 +362,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__x86_64__;UNICORN_HAS_ARM;_LIB;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CONFIG_TCG_INTERPRETER;WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__x86_64__;UNICORN_HAS_ARM;_LIB;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4244;4018;4267</DisableSpecificWarnings>
@@ -384,7 +384,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>qemu/include;qemu;qemu/tcg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;__x86_64__;UNICORN_HAS_ARM;_LIB;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>CONFIG_TCG_INTERPRETER;WIN32_LEAN_AND_MEAN;WIN32;NDEBUG;__x86_64__;UNICORN_HAS_ARM;_LIB;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
       <DisableSpecificWarnings>4244;4018;4267</DisableSpecificWarnings>
