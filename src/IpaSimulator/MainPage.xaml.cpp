@@ -9,7 +9,7 @@
 #include <LIEF/filesystem/filesystem.h>
 #include <sstream>
 #include <unicorn/unicorn.h>
-#include <string.h>
+#include <memory>
 
 using namespace IpaSimulator;
 using namespace Platform;
@@ -26,6 +26,7 @@ using namespace Windows::UI::Xaml::Navigation;
 using namespace std;
 using namespace LIEF::MachO;
 
+#if 0
 /* Sample code to demonstrate how to emulate ARM code */
 
 // code to be emulated
@@ -62,7 +63,7 @@ static void test_arm(void)
     err = uc_open(UC_ARCH_ARM, UC_MODE_ARM, &uc);
     if (err) {
         printf("Failed on uc_open() with error returned: %u (%s)\n",
-                err, uc_strerror(err));
+            err, uc_strerror(err));
         return;
     }
 
@@ -85,7 +86,7 @@ static void test_arm(void)
 
     // emulate machine code in infinite time (last param = 0), or when
     // finishing all the code.
-    err = uc_emu_start(uc, ADDRESS, ADDRESS + sizeof(ARM_CODE) -1, 0, 0);
+    err = uc_emu_start(uc, ADDRESS, ADDRESS + sizeof(ARM_CODE) - 1, 0, 0);
     if (err) {
         printf("Failed on uc_emu_start() with error returned: %u\n", err);
     }
@@ -115,7 +116,7 @@ static void test_thumb(void)
     err = uc_open(UC_ARCH_ARM, UC_MODE_THUMB, &uc);
     if (err) {
         printf("Failed on uc_open() with error returned: %u (%s)\n",
-                err, uc_strerror(err));
+            err, uc_strerror(err));
         return;
     }
 
@@ -137,7 +138,7 @@ static void test_thumb(void)
     // emulate machine code in infinite time (last param = 0), or when
     // finishing all the code.
     // Note we start at ADDRESS | 1 to indicate THUMB mode.
-    err = uc_emu_start(uc, ADDRESS | 1, ADDRESS + sizeof(THUMB_CODE) -1, 0, 0);
+    err = uc_emu_start(uc, ADDRESS | 1, ADDRESS + sizeof(THUMB_CODE) - 1, 0, 0);
     if (err) {
         printf("Failed on uc_emu_start() with error returned: %u\n", err);
     }
@@ -150,60 +151,80 @@ static void test_thumb(void)
 
     uc_close(uc);
 }
+#endif
+
+template<class T> inline T operator~ (T a) { return (T)~(int)a; }
+template<class T> inline T operator| (T a, T b) { return (T)((int)a | (int)b); }
+template<class T> inline T operator& (T a, T b) { return (T)((int)a & (int)b); }
+template<class T> inline T operator^ (T a, T b) { return (T)((int)a ^ (int)b); }
+template<class T> inline T& operator|= (T& a, T b) { return (T&)((int&)a |= (int)b); }
+template<class T> inline T& operator&= (T& a, T b) { return (T&)((int&)a &= (int)b); }
+template<class T> inline T& operator^= (T& a, T b) { return (T&)((int&)a ^= (int)b); }
 
 MainPage::MainPage()
 {
-	InitializeComponent();
+    InitializeComponent();
 
-#if 0
+    // load test Mach-O binary
     filesystem::path dir(ApplicationData::Current->TemporaryFolder->Path->Data());
-    filesystem::path file("todo.ipa");
+    filesystem::path file("test.ipa");
     filesystem::path full = dir / file;
-    FatBinary* fat = Parser::parse(full.str()); // TODO: maybe convert to unique_ptr
+    unique_ptr<FatBinary> fat(Parser::parse(full.str()));
     Binary& bin = fat->at(0);
+
+    // check header info
+    auto& header = bin.header();
+    if (header.cpu_type() != CPU_TYPES::CPU_TYPE_ARM) {
+        throw 1;
+    }
+
+    // initialize unicorn engine
+    uc_engine *uc;
+    uc_err err;
+    err = uc_open(UC_ARCH_ARM, UC_MODE_ARM, &uc);
+    if (err) {
+        throw 1;
+    }
+
+    // process load commands
     for (auto& c : bin.commands()) {
-        uint32_t s = c.size();
-        buffer_t b = c.data();
+        auto type = c.command();
+        switch (type) {
+        case LOAD_COMMAND_TYPES::LC_SEGMENT: {
+            auto& seg = static_cast<SegmentCommand&>(c);
+
+            // convert protection
+            auto vmprot = seg.init_protection();
+            uc_prot perms = UC_PROT_NONE;
+            if (vmprot & VM_PROTECTIONS::VM_PROT_READ) {
+                perms |= UC_PROT_READ;
+            }
+            if (vmprot & VM_PROTECTIONS::VM_PROT_WRITE) {
+                perms |= UC_PROT_WRITE;
+            }
+            if (vmprot & VM_PROTECTIONS::VM_PROT_EXECUTE) {
+                perms |= UC_PROT_EXEC;
+            }
+
+            // TODO: memory must be zeroed, does unicorn do that?
+            uint64_t address = seg.virtual_address();
+            err = uc_mem_map(uc, address, seg.virtual_size(), perms);
+            if (err) {
+                throw 1;
+            }
+
+            uint64_t size = seg.file_size();
+            if (size > 0) {
+                auto& content = seg.content();
+                err = uc_mem_write(uc, address, content.data(), content.size());
+                if (err) {
+                    throw 1;
+                }
+            }
+
+            break;
+        }
+        default: throw 1;
+        }
     }
-    delete fat;
-#endif
-
-    //Redirect stdout to a file
-    Platform::String^ outfilename = Windows::Storage::ApplicationData::Current->LocalFolder->Path + L"\\stdout.txt";
-    FILE *stdout_capture;
-    if ((stdout_capture = _wfreopen(outfilename->Data(), L"w", stdout)) == NULL)
-    {
-        OutputDebugString(L"Couldn't open file to redirect stdout\n");
-        exit(-1);
-    }
-
-    //Print file location to OutputDebugString
-    OutputDebugString(L"Redirecting stdout to ");
-    OutputDebugString(outfilename->Data());
-    OutputDebugString(L"\n");
-
-    test_arm();
-    printf("==========================\n");
-    test_thumb();
-
-    //End capturing stdout
-    freopen("CON", "w", stdout);
-    fclose(stdout_capture);
-
-    //Output the captured stdout to OutputDebugString
-    if ((stdout_capture = _wfreopen(outfilename->Data(), L"r", stdout)) == NULL)
-    {
-        OutputDebugString(L"Couldn't open file to read redirected stdout\n");
-        exit(-1);
-    }
-    char* buffer;
-    fseek(stdout_capture, 0, SEEK_END);
-    size_t stdout_len = ftell(stdout_capture);
-    rewind(stdout_capture);
-    buffer = (char*)malloc((sizeof(char)*stdout_len));
-    memset(buffer, 0, (sizeof(char)*stdout_len));
-    size_t result = fread(buffer, 1, stdout_len, stdout_capture);
-    OutputDebugStringA(buffer);
-    free(buffer);
-    fclose(stdout_capture);
 }
