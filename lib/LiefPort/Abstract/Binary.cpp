@@ -34,10 +34,6 @@ EXE_FORMATS Binary::format(void) const {
     return EXE_FORMATS::FORMAT_ELF;
   }
 
-  if (typeid(*this) == typeid(LIEF::PE::Binary)) {
-    return EXE_FORMATS::FORMAT_PE;
-  }
-
   if (typeid(*this) == typeid(LIEF::MachO::Binary)) {
     return EXE_FORMATS::FORMAT_MACHO;
   }
