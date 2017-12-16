@@ -401,6 +401,9 @@
     <ClInclude Include="unicorn\platform.h">
       <Filter>unicorn</Filter>
     </ClInclude>
+    <ClInclude Include="qemu\include\config-host.h">
+      <Filter>qemu\include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="unicorn">
