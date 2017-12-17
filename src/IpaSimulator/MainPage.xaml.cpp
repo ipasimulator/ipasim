@@ -218,16 +218,33 @@ MainPage::MainPage()
         }
     }
 
+    // TODO: remove
+    auto lib = LoadPackagedLibrary(L"Foundation.dll", 0); // TODO: does this load library continuously? (it should, right?)
+    if (lib) {
+        auto addr = GetProcAddress(lib, "_OBJC_CLASS_NSIndexPath");
+        FreeLibrary(lib);
+    }
+
     // load libraries
     for (auto& lib : bin.libraries()) {
-        // TODO!!
+        // translate name
+        auto imp = lib.name();
+        string exp;
+        if (imp == "/System/Library/Frameworks/Foundation.framework/Foundation") exp = "Foundation.dll";
+        //else throw 1;
+        // TODO: what to do here?
     }
+
+
 
     // ensure we processed all commands
     for (auto& c : bin.commands()) {
         auto type = c.command();
         switch (type) {
         case LOAD_COMMAND_TYPES::LC_SEGMENT: // segments
+            break;
+        case LOAD_COMMAND_TYPES::LC_DYLD_INFO:
+        case LOAD_COMMAND_TYPES::LC_DYLD_INFO_ONLY: // TODO.
             break;
         default: throw 1;
         }

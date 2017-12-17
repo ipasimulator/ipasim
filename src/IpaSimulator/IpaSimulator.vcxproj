@@ -192,7 +192,28 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <None Include="..\..\packages\WinObjC.Frameworks.Core.0.2.171110\build\lib\Universal Windows\$(PlatformShortName)\*.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\packages\WinObjC.Logging.0.2.171110\build\lib\Universal Windows\$(PlatformShortName)\*.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\packages\WinObjC.Language.0.2.171110\build\lib\Universal Windows\$(PlatformShortName)\*.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\packages\WinObjC.Language.0.2.171110\build\lib\Universal Windows\$(PlatformShortName)\$(Configuration)\*.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\packages\WinObjC.Language.0.2.171110\build\deps\prebuilt\Universal Windows\$(PlatformShortName)\$(Configuration)\*.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\packages\WinObjC.Frameworks.ThirdParty.0.2.171110\build\deps\prebuilt\Universal Windows\$(PlatformShortName)\*.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="IpaSimulator_TemporaryKey.pfx" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\LockScreenLogo.scale-200.png" />
@@ -230,4 +251,19 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\NuGet.Build.Packaging.0.1.193\build\NuGet.Build.Packaging.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\NuGet.Build.Packaging.0.1.193\build\NuGet.Build.Packaging.props'))" />
+    <Error Condition="!Exists('..\..\packages\NuGet.Build.Packaging.0.1.193\build\NuGet.Build.Packaging.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\NuGet.Build.Packaging.0.1.193\build\NuGet.Build.Packaging.targets'))" />
+    <Error Condition="!Exists('..\..\packages\WinObjC.Frameworks.ThirdParty.0.2.171110\build\WinObjC.Frameworks.ThirdParty.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WinObjC.Frameworks.ThirdParty.0.2.171110\build\WinObjC.Frameworks.ThirdParty.props'))" />
+    <Error Condition="!Exists('..\..\packages\WinObjC.Frameworks.ThirdParty.0.2.171110\build\WinObjC.Frameworks.ThirdParty.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WinObjC.Frameworks.ThirdParty.0.2.171110\build\WinObjC.Frameworks.ThirdParty.targets'))" />
+    <Error Condition="!Exists('..\..\packages\WinObjC.Logging.0.2.171110\build\WinObjC.Logging.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WinObjC.Logging.0.2.171110\build\WinObjC.Logging.props'))" />
+    <Error Condition="!Exists('..\..\packages\WinObjC.Logging.0.2.171110\build\WinObjC.Logging.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WinObjC.Logging.0.2.171110\build\WinObjC.Logging.targets'))" />
+    <Error Condition="!Exists('..\..\packages\WinObjC.Language.0.2.171110\build\WinObjC.Language.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WinObjC.Language.0.2.171110\build\WinObjC.Language.props'))" />
+    <Error Condition="!Exists('..\..\packages\WinObjC.Language.0.2.171110\build\WinObjC.Language.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WinObjC.Language.0.2.171110\build\WinObjC.Language.targets'))" />
+    <Error Condition="!Exists('..\..\packages\WinObjC.Frameworks.Core.0.2.171110\build\WinObjC.Frameworks.Core.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WinObjC.Frameworks.Core.0.2.171110\build\WinObjC.Frameworks.Core.props'))" />
+    <Error Condition="!Exists('..\..\packages\WinObjC.Frameworks.Core.0.2.171110\build\WinObjC.Frameworks.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\WinObjC.Frameworks.Core.0.2.171110\build\WinObjC.Frameworks.Core.targets'))" />
+  </Target>
 </Project>

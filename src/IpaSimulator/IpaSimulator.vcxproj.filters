@@ -50,6 +50,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="IpaSimulator_TemporaryKey.pfx" />
+    <None Include="packages.config" />
+    <None Include="..\..\packages\WinObjC.Frameworks.Core.0.2.171110\build\lib\Universal Windows\$(PlatformShortName)\*.dll" />
+    <None Include="..\..\packages\WinObjC.Frameworks.Core.0.2.171110\build\lib\Universal Windows\$(PlatformShortName)\*.dll" />
+    <None Include="..\..\packages\WinObjC.Frameworks.Core.0.2.171110\build\lib\Universal Windows\$(PlatformShortName)\*.dll" />
+    <None Include="..\..\packages\WinObjC.Frameworks.Core.0.2.171110\build\lib\Universal Windows\$(PlatformShortName)\*.dll" />
+    <None Include="..\..\packages\WinObjC.Frameworks.Core.0.2.171110\build\lib\Universal Windows\$(PlatformShortName)\*.dll" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainPage.xaml" />

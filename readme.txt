@@ -1,4 +1,5 @@
 UnicornPort
 -----------
 
-TODO: temporarily added tcg/i386 to Additional Include Directories, remove it after adding tci!
+TODO: describe main program idea
+TODO: add unit tests testing that overlapping memory_map_ptr gives errors
