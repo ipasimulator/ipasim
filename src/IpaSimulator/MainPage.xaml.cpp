@@ -217,13 +217,17 @@ MainPage::MainPage()
         }
         else {
             // we allocate memory for the whole segment (which should be mapped as contiguous region of virtual memory)
-            // TODO: memory must be zeroed!
             void *addr = malloc(vsize);
             auto& buff = seg.content();
-            memcpy(addr, buff.data(), vsize);
+            memcpy(addr, buff.data(), buff.size());
             uc_mem_map_ptr(uc, (uint64_t)addr, vsize, perms, addr);
-            ptrdiff_t slide = (uintptr_t)addr - vaddr;
 
+            // set the remaining memory to zeros
+            if (buff.size() < vsize) {
+                memset((uint8_t*)addr + buff.size(), 0, vsize - buff.size());
+            }
+
+            ptrdiff_t slide = (uintptr_t)addr - vaddr;
             UPDATE_FIRST_SLIDE(slide)
 
             if (slide != 0) {
