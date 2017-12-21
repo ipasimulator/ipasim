@@ -201,19 +201,52 @@ MainPage::MainPage()
             perms |= UC_PROT_EXEC;
         }
 
-        // TODO: memory must be zeroed, does unicorn do that?
-        uint64_t address = seg.virtual_address();
-        err = uc_mem_map(uc, address, seg.virtual_size(), perms);
-        if (err) {
-            throw 1;
-        }
+        uint64_t vaddr = seg.virtual_address();
+        uint64_t vsize = seg.virtual_size();
+        // TODO: virtual address and size must be 4kB-aligned for uc_mem_map_ptr to work, are they always?
 
-        uint64_t size = seg.file_size();
-        if (size > 0) {
-            auto& content = seg.content();
-            err = uc_mem_write(uc, address, content.data(), content.size());
-            if (err) {
-                throw 1;
+        if (perms == UC_PROT_NONE) {
+            // no protection means we don't have to malloc, we just map it
+            uc_mem_map_ptr(uc, vaddr, vsize, perms, (void*)vaddr);
+        }
+        else {
+            // we allocate memory for the whole segment (which should be mapped as contiguous region of virtual memory)
+            // TODO: memory must be zeroed, does malloc do that?
+            void *addr = malloc(vsize);
+            uc_mem_map_ptr(uc, (uint64_t)addr, vsize, perms, addr);
+            ptrdiff_t delta = vaddr - (uintptr_t)addr;
+            if (delta != 0) {
+                // we have to relocate the segment
+                for (auto& rel : seg.relocations()) {
+                    if (rel.origin() == RELOCATION_ORIGINS::ORIGIN_DYLDINFO) {
+                        // finds base address for this relocation
+                        // (inspired by ImageLoaderMachOClassic::getRelocBase)
+                        if (header.has(HEADER_FLAGS::MH_SPLIT_SEGS)) {
+                            throw 1;
+                        }
+                        // TODO.
+
+                        uint64_t reladdr = rel.address();
+                        if (rel.size() == 32) {
+
+
+                        }
+                        else {
+                            throw 1;
+                        }
+                    }
+#if 0
+                    else if (rel.origin() == RELOCATION_ORIGINS::ORIGIN_RELOC_TABLE) {
+                        switch (rel.type()) {
+                        case ARM_RELOCATION::ARM_RELOC_VANILLA:
+                            break;
+                        }
+                    }
+#endif
+                    else {
+                        throw 1;
+                    }
+                }
             }
         }
     }
@@ -234,8 +267,6 @@ MainPage::MainPage()
         //else throw 1;
         // TODO: what to do here?
     }
-
-
 
     // ensure we processed all commands
     for (auto& c : bin.commands()) {
