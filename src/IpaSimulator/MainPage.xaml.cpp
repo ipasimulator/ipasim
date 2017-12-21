@@ -182,9 +182,13 @@ MainPage::MainPage()
     uc_engine *uc;
     uc_err err;
     err = uc_open(UC_ARCH_ARM, UC_MODE_ARM, &uc);
-    if (err) {
+    if (err) { // TODO: handle errors with some macro
         throw 1;
     }
+
+    ptrdiff_t first_slide; // slide of the first segment
+    bool was_first = false;
+#define UPDATE_FIRST_SLIDE(val) if (!was_first) { was_first = true; first_slide = val; }
 
     // load segments
     for (auto& seg : bin.segments()) {
@@ -208,6 +212,8 @@ MainPage::MainPage()
         if (perms == UC_PROT_NONE) {
             // no protection means we don't have to malloc, we just map it
             uc_mem_map_ptr(uc, vaddr, vsize, perms, (void*)vaddr);
+
+            UPDATE_FIRST_SLIDE(0)
         }
         else {
             // we allocate memory for the whole segment (which should be mapped as contiguous region of virtual memory)
@@ -216,12 +222,15 @@ MainPage::MainPage()
             auto& buff = seg.content();
             memcpy(addr, buff.data(), vsize);
             uc_mem_map_ptr(uc, (uint64_t)addr, vsize, perms, addr);
-            ptrdiff_t slide = vaddr - (uintptr_t)addr;
+            ptrdiff_t slide = (uintptr_t)addr - vaddr;
+
+            UPDATE_FIRST_SLIDE(slide)
+
             if (slide != 0) {
                 // we have to relocate the segment
                 for (auto& rel : seg.relocations()) {
                     if (rel.is_pc_relative()) {
-                        continue;
+                        throw 1;
                     }
 
                     if (rel.origin() == RELOCATION_ORIGINS::ORIGIN_DYLDINFO) {
@@ -230,12 +239,11 @@ MainPage::MainPage()
                         if (header.has(HEADER_FLAGS::MH_SPLIT_SEGS)) {
                             throw 1;
                         }
-                        // TODO: wrong - segment zero can have totally different slide!
-                        uint64_t relbase = unsigned(bin.segments()[0].virtual_address()) + slide;
+                        uint64_t relbase = unsigned(bin.segments()[0].virtual_address()) + first_slide;
 
-                        uint64_t reladdr = rel.address();
-                        if (rel.size() == 32 && relbase + reladdr <= (uint64_t)addr + vsize) {
-                            *(uint32_t *)(relbase + reladdr) += slide;
+                        uint64_t reladdr = unsigned(relbase + rel.address()) + slide;
+                        if (rel.size() == 32 && reladdr <= (uint64_t)addr + vsize) {
+                            *(uint32_t *)(reladdr) += slide;
                         }
                         else {
                             throw 1;
@@ -256,6 +264,8 @@ MainPage::MainPage()
             }
         }
     }
+
+#undef UPDATE_FIRST_SLIDE
 
     // TODO: remove
     auto lib = LoadPackagedLibrary(L"Foundation.dll", 0); // TODO: does this load library continuously? (it should, right?)
