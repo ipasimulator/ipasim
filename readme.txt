@@ -4,6 +4,9 @@ IPA Simulator
 TODO: add unit tests testing that overlapping memory_map_ptr gives errors
 TODO: maybe when calling .dll function from IPA (ARM) code, just change stack pointer to that of unicorn engine,
 remember and remove the return address, call the function and then change it back...
+TODO: what if there are callbacks passed from the ARM code into the x86 code?
+Well, just hook 'em (i.e., pass instead of them some middle layer).
+We can recognize function parameters that are callbacks simply by manually listing all of them (from the header files).
 
 ### How does it work?
 

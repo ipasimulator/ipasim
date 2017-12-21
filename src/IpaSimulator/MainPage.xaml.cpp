@@ -211,25 +211,31 @@ MainPage::MainPage()
         }
         else {
             // we allocate memory for the whole segment (which should be mapped as contiguous region of virtual memory)
-            // TODO: memory must be zeroed, does malloc do that?
+            // TODO: memory must be zeroed!
             void *addr = malloc(vsize);
+            auto& buff = seg.content();
+            memcpy(addr, buff.data(), vsize);
             uc_mem_map_ptr(uc, (uint64_t)addr, vsize, perms, addr);
-            ptrdiff_t delta = vaddr - (uintptr_t)addr;
-            if (delta != 0) {
+            ptrdiff_t slide = vaddr - (uintptr_t)addr;
+            if (slide != 0) {
                 // we have to relocate the segment
                 for (auto& rel : seg.relocations()) {
+                    if (rel.is_pc_relative()) {
+                        continue;
+                    }
+
                     if (rel.origin() == RELOCATION_ORIGINS::ORIGIN_DYLDINFO) {
-                        // finds base address for this relocation
+                        // find base address for this relocation
                         // (inspired by ImageLoaderMachOClassic::getRelocBase)
                         if (header.has(HEADER_FLAGS::MH_SPLIT_SEGS)) {
                             throw 1;
                         }
-                        // TODO.
+                        // TODO: wrong - segment zero can have totally different slide!
+                        uint64_t relbase = unsigned(bin.segments()[0].virtual_address()) + slide;
 
                         uint64_t reladdr = rel.address();
-                        if (rel.size() == 32) {
-
-
+                        if (rel.size() == 32 && relbase + reladdr <= (uint64_t)addr + vsize) {
+                            *(uint32_t *)(relbase + reladdr) += slide;
                         }
                         else {
                             throw 1;
