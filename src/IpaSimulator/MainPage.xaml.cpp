@@ -271,6 +271,27 @@ MainPage::MainPage()
 
 #undef UPDATE_FIRST_SLIDE
 
+    // bind imported symbols
+    for (auto& sym : bin.imported_symbols()) {
+        uint8_t symtype = sym.type();
+        if (symtype & MACHO_SYMBOL_TYPES::N_STAB) {
+            continue; // ignore debugging symbols
+        }
+        if (symtype & MACHO_SYMBOL_TYPES::N_PEXT ||
+            (symtype & MACHO_SYMBOL_TYPES::N_TYPE) != N_LIST_TYPES::N_UNDF) {
+            throw "unsupported symbol type";
+        }
+        if (symtype & MACHO_SYMBOL_TYPES::N_EXT) {
+            auto& binfo = sym.binding_info();
+            auto& lib = binfo.library();
+            string imp = lib.name();
+            // TODO: bind symbol from dll
+        }
+        else {
+            throw "unrecognized symbol type";
+        }
+    }
+
     // TODO: remove
     auto lib = LoadPackagedLibrary(L"Foundation.dll", 0); // TODO: does this load library continuously? (it should, right?)
     if (lib) {
