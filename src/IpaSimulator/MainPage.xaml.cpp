@@ -285,53 +285,77 @@ MainPage::MainPage()
 
 #undef UPDATE_FIRST_SLIDE
 
-    // bind imported symbols
-    for (auto& sym : bin.imported_symbols()) { // TODO: maybe foreach bindings?
-        uint8_t symtype = sym.type();
-        if (symtype & MACHO_SYMBOL_TYPES::N_STAB) {
-            continue; // ignore debugging symbols
-        }
-        if (symtype & MACHO_SYMBOL_TYPES::N_PEXT ||
-            (symtype & MACHO_SYMBOL_TYPES::N_TYPE) != N_LIST_TYPES::N_UNDF) {
-            throw "unsupported symbol type";
-        }
-        if (symtype & MACHO_SYMBOL_TYPES::N_EXT) {
-            auto& binfo = sym.binding_info();
-            auto& lib = binfo.library();
-            string imp = lib.name();
-            string sysprefix("/System/Library/Frameworks/");
-            if (imp.substr(0, sysprefix.length()) == sysprefix) {
-                string fwsuffix(".framework/");
-                size_t i = imp.find(fwsuffix);
-                string fwname = imp.substr(i + fwsuffix.length());
-                if (i != string::npos && imp.substr(sysprefix.length(), i - sysprefix.length()) == fwname) {
-                    auto winlib = LoadPackagedLibrary(s2ws(fwname + ".dll").c_str(), 0);
-                    if (!winlib) {
-                        throw "library " + imp + " couldn't be loaded as " + fwname + ".dll";
-                    }
-                    string n = sym.name();
-                    if (n.length() == 0 || n[0] != '_') {
-                        throw 1;
-                    }
-                    auto addr = GetProcAddress(winlib, n.substr(1).c_str());
-                    if (!addr) {
-                        throw 1;
-                    }
-                    
-                    // rewrite stub address with the found one
-                    // TODO.
-                }
-                else {
-                    throw 1;
-                }
+    // process bindings
+    for (auto& binfo : bin.dyld_info().bindings()) {
+        auto& lib = binfo.library();
+
+        // find .dll
+        string imp = lib.name();
+        string exp;
+        string sysprefix("/System/Library/Frameworks/");
+        if (imp.substr(0, sysprefix.length()) == sysprefix) {
+            string fwsuffix(".framework/");
+            size_t i = imp.find(fwsuffix);
+            string fwname = imp.substr(i + fwsuffix.length());
+            if (i != string::npos && imp.substr(sysprefix.length(), i - sysprefix.length()) == fwname) {
+                exp = fwname + ".dll";
             }
             else {
                 throw 1;
             }
         }
-        else {
-            throw "unrecognized symbol type";
+        else if (imp == "/usr/lib/libobjc.A.dylib") {
+            exp = "Foundation.dll";
+            // TODO: exp = "libobjc2.dll";
         }
+        else {
+            throw 1;
+        }
+
+        // load .dll
+        auto winlib = LoadPackagedLibrary(s2ws(exp).c_str(), 0);
+        if (!winlib) {
+            throw "library " + imp + " couldn't be loaded as " + exp;
+        }
+
+        // translate symbol name
+        // ---------------------
+        string n = binfo.symbol().name();
+
+        // remove leading underscore
+        if (n.length() == 0 || n[0] != '_') {
+            throw 1;
+        }
+        n = n.substr(1);
+
+        // translate class names
+        string cprefix("OBJC_CLASS_$_");
+        if (n.substr(0, cprefix.length()) == cprefix) {
+            n = "_OBJC_CLASS_" + n.substr(cprefix.length());
+        }
+
+        // TODO: instead of ignoring, set them to NULL or some catch-all handler (for functions)?
+        // ignore metaclasses
+        // TODO: or are they the objc_class_name things?
+        string mcprefix("OBJC_METACLASS_$_");
+        if (n.substr(0, mcprefix.length()) == mcprefix) {
+            continue;
+        }
+
+        // ignore non-existing symbols (it is observed that they are used only in exports, so it shouldn't matter)
+        if (n == "_objc_empty_cache") {
+            continue;
+        }
+        // ---------------------
+
+        // get symbol address
+        auto addr = GetProcAddress(winlib, n.c_str());
+        if (!addr) {
+            throw 1;
+        }
+
+        // rewrite stub address with the found one
+        // TODO.
     }
 
     // load libraries
