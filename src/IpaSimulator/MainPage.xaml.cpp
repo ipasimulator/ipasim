@@ -175,147 +175,174 @@ std::wstring s2ws(const std::string& s)
     return r;
 }
 
-MainPage::MainPage()
-{
-    InitializeComponent();
+class DynamicLoader {
+public:
+    DynamicLoader(unique_ptr<FatBinary>&& fat, const Binary& bin) : fat_(move(fat)), bin_(bin) {}
+    DynamicLoader(DynamicLoader&& dl) : fat_(move(dl.fat_)), bin_(dl.bin_) {}
+    ~DynamicLoader() = default;
 
-    // load test Mach-O binary
-    filesystem::path dir(ApplicationData::Current->TemporaryFolder->Path->Data());
-    filesystem::path file("test.ipa");
-    filesystem::path full = dir / file;
-    unique_ptr<FatBinary> fat(Parser::parse(full.str()));
-    Binary& bin = fat->at(0);
-
-    // check header info
-    auto& header = bin.header();
-    if (header.cpu_type() != CPU_TYPES::CPU_TYPE_ARM) {
-        throw 1;
+    static DynamicLoader create(const string& path) {
+        unique_ptr<FatBinary> fat(Parser::parse(path));
+        Binary& bin = fat->at(0); // TODO: select correct binary more intelligently
+        return DynamicLoader(move(fat), bin);
     }
+    void load(uc_engine *uc) {
+        // check header info
+        auto& header = bin_.header();
+        if (header.cpu_type() != CPU_TYPES::CPU_TYPE_ARM) {
+            throw 1;
+        }
 
-    // initialize unicorn engine
-    uc_engine *uc;
-    uc_err err;
-    err = uc_open(UC_ARCH_ARM, UC_MODE_ARM, &uc);
-    if (err) { // TODO: handle errors with some macro
-        throw 1;
-    }
-
-    ptrdiff_t first_slide; // slide of the first segment
-    bool was_first = false;
+        ptrdiff_t first_slide; // slide of the first segment
+        bool was_first = false;
 #define UPDATE_FIRST_SLIDE(val) if (!was_first) { was_first = true; first_slide = val; }
 
-    // load segments
-    for (auto& seg : bin.segments()) {
-        // convert protection
-        auto vmprot = seg.init_protection();
-        uc_prot perms = UC_PROT_NONE;
-        if (vmprot & VM_PROTECTIONS::VM_PROT_READ) {
-            perms |= UC_PROT_READ;
-        }
-        if (vmprot & VM_PROTECTIONS::VM_PROT_WRITE) {
-            perms |= UC_PROT_WRITE;
-        }
-        if (vmprot & VM_PROTECTIONS::VM_PROT_EXECUTE) {
-            perms |= UC_PROT_EXEC;
-        }
-
-        uint64_t vaddr = seg.virtual_address();
-        uint64_t vsize = seg.virtual_size();
-        // TODO: virtual address and size must be 4kB-aligned for uc_mem_map_ptr to work, are they always?
-
-        if (perms == UC_PROT_NONE) {
-            // no protection means we don't have to malloc, we just map it
-            uc_mem_map_ptr(uc, vaddr, vsize, perms, (void*)vaddr);
-
-            UPDATE_FIRST_SLIDE(0)
-        }
-        else {
-            // we allocate memory for the whole segment (which should be mapped as contiguous region of virtual memory)
-            void *addr = malloc(vsize);
-            auto& buff = seg.content();
-            memcpy(addr, buff.data(), buff.size());
-            uc_mem_map_ptr(uc, (uint64_t)addr, vsize, perms, addr);
-
-            // set the remaining memory to zeros
-            if (buff.size() < vsize) {
-                memset((uint8_t*)addr + buff.size(), 0, vsize - buff.size());
+        // load segments
+        for (auto& seg : bin_.segments()) {
+            // convert protection
+            auto vmprot = seg.init_protection();
+            uc_prot perms = UC_PROT_NONE;
+            if (vmprot & VM_PROTECTIONS::VM_PROT_READ) {
+                perms |= UC_PROT_READ;
+            }
+            if (vmprot & VM_PROTECTIONS::VM_PROT_WRITE) {
+                perms |= UC_PROT_WRITE;
+            }
+            if (vmprot & VM_PROTECTIONS::VM_PROT_EXECUTE) {
+                perms |= UC_PROT_EXEC;
             }
 
-            ptrdiff_t slide = (uintptr_t)addr - vaddr;
-            UPDATE_FIRST_SLIDE(slide)
+            uint64_t vaddr = seg.virtual_address();
+            uint64_t vsize = seg.virtual_size();
+            // TODO: virtual address and size must be 4kB-aligned for uc_mem_map_ptr to work, are they always?
 
-            if (slide != 0) {
-                // we have to relocate the segment
-                for (auto& rel : seg.relocations()) {
-                    if (rel.is_pc_relative()) {
-                        throw 1;
-                    }
+            if (perms == UC_PROT_NONE) {
+                // no protection means we don't have to malloc, we just map it
+                uc_mem_map_ptr(uc, vaddr, vsize, perms, (void*)vaddr);
 
-                    if (rel.origin() == RELOCATION_ORIGINS::ORIGIN_DYLDINFO) {
-                        // find base address for this relocation
-                        // (inspired by ImageLoaderMachOClassic::getRelocBase)
-                        if (header.has(HEADER_FLAGS::MH_SPLIT_SEGS)) {
-                            throw 1;
-                        }
-                        uint64_t relbase = unsigned(bin.segments()[0].virtual_address()) + first_slide;
+                UPDATE_FIRST_SLIDE(0)
+            }
+            else {
+                // we allocate memory for the whole segment (which should be mapped as contiguous region of virtual memory)
+                void *addr = malloc(vsize);
+                auto& buff = seg.content();
+                memcpy(addr, buff.data(), buff.size());
+                uc_mem_map_ptr(uc, (uint64_t)addr, vsize, perms, addr);
 
-                        uint64_t reladdr = unsigned(relbase + rel.address()) + slide;
-                        if (rel.size() == 32 && reladdr <= (uint64_t)addr + vsize) {
-                            *(uint32_t *)(reladdr) += slide;
-                        }
-                        else {
-                            throw 1;
-                        }
-                    }
-#if 0
-                    else if (rel.origin() == RELOCATION_ORIGINS::ORIGIN_RELOC_TABLE) {
-                        switch (rel.type()) {
-                        case ARM_RELOCATION::ARM_RELOC_VANILLA:
-                            break;
-                        }
-                    }
-#endif
-                    else {
-                        throw 1;
-                    }
+                // set the remaining memory to zeros
+                if (buff.size() < vsize) {
+                    memset((uint8_t*)addr + buff.size(), 0, vsize - buff.size());
                 }
+
+                ptrdiff_t slide = (uintptr_t)addr - vaddr;
+                UPDATE_FIRST_SLIDE(slide)
+
+                    if (slide != 0) {
+                        // we have to relocate the segment
+                        for (auto& rel : seg.relocations()) {
+                            if (rel.is_pc_relative()) {
+                                throw 1;
+                            }
+
+                            if (rel.origin() == RELOCATION_ORIGINS::ORIGIN_DYLDINFO) {
+                                // find base address for this relocation
+                                // (inspired by ImageLoaderMachOClassic::getRelocBase)
+                                if (header.has(HEADER_FLAGS::MH_SPLIT_SEGS)) {
+                                    throw 1;
+                                }
+                                uint64_t relbase = unsigned(bin_.segments()[0].virtual_address()) + first_slide;
+
+                                uint64_t reladdr = unsigned(relbase + rel.address()) + slide;
+                                if (rel.size() == 32 && reladdr <= (uint64_t)addr + vsize) {
+                                    *(uint32_t *)(reladdr) += slide;
+                                }
+                                else {
+                                    throw 1;
+                                }
+                            }
+#if 0
+                            else if (rel.origin() == RELOCATION_ORIGINS::ORIGIN_RELOC_TABLE) {
+                                switch (rel.type()) {
+                                case ARM_RELOCATION::ARM_RELOC_VANILLA:
+                                    break;
+                                }
+                            }
+#endif
+                            else {
+                                throw 1;
+                            }
+                        }
+                    }
             }
         }
-    }
 
 #undef UPDATE_FIRST_SLIDE
 
-    // process bindings
-    for (auto& binfo : bin.dyld_info().bindings()) {
-        auto& lib = binfo.library();
+        process_bindings();
 
-        // find .dll
-        string imp = lib.name();
-        string exp;
-        string sysprefix("/System/Library/Frameworks/");
-        if (imp.substr(0, sysprefix.length()) == sysprefix) {
-            string fwsuffix(".framework/");
-            size_t i = imp.find(fwsuffix);
-            string fwname = imp.substr(i + fwsuffix.length());
-            if (i != string::npos && imp.substr(sysprefix.length(), i - sysprefix.length()) == fwname) {
-                exp = fwname + ".dll";
+        // load libraries
+        for (auto& lib : bin_.libraries()) {
+            // translate name
+            auto imp = lib.name();
+            string exp;
+            if (imp == "/System/Library/Frameworks/Foundation.framework/Foundation") exp = "Foundation.dll";
+            //else throw 1;
+            // TODO: map library into the Unicorn Engine
+        }
+
+        // ensure we processed all commands
+        for (auto& c : bin_.commands()) {
+            auto type = c.command();
+            switch (type) {
+            case LOAD_COMMAND_TYPES::LC_SEGMENT: // segments
+                break;
+            case LOAD_COMMAND_TYPES::LC_DYLD_INFO:
+            case LOAD_COMMAND_TYPES::LC_DYLD_INFO_ONLY: // TODO.
+                break;
+            default: throw 1;
+            }
+        }
+    }
+private:
+    void process_bindings()
+    {
+        for (auto& binfo : bin_.dyld_info().bindings()) {
+            auto& lib = binfo.library();
+
+            // find .dll
+            string imp = lib.name();
+            string sysprefix("/System/Library/Frameworks/");
+            if (imp.substr(0, sysprefix.length()) == sysprefix) {
+                string fwsuffix(".framework/");
+                size_t i = imp.find(fwsuffix);
+                string fwname = imp.substr(i + fwsuffix.length());
+                if (i != string::npos && imp.substr(sysprefix.length(), i - sysprefix.length()) == fwname) {
+                    load_dll(binfo, fwname + ".dll");
+                }
+                else {
+                    throw 1;
+                }
+            }
+            else if (imp == "/usr/lib/libobjc.A.dylib") {
+                try_load_dll(binfo, "Foundation.dll") ||
+                    load_dll(binfo, "libobjc2.dll");
             }
             else {
                 throw 1;
             }
         }
-        else if (imp == "/usr/lib/libobjc.A.dylib") {
-            exp = "Foundation.dll";
-            // TODO: exp = "libobjc2.dll";
-        }
-        else {
+    }
+    bool load_dll(const BindingInfo& binfo, const string& name) {
+        if (!try_load_dll(binfo, name)) {
             throw 1;
         }
-
+        return true;
+    }
+    bool try_load_dll(const BindingInfo& binfo, const string& name) {
         // load .dll
-        auto winlib = LoadPackagedLibrary(s2ws(exp).c_str(), 0);
+        auto winlib = LoadPackagedLibrary(s2ws(name).c_str(), 0);
         if (!winlib) {
-            throw "library " + imp + " couldn't be loaded as " + exp;
+            throw "library " + name + " couldn't be loaded";
         }
 
         // translate symbol name
@@ -339,45 +366,46 @@ MainPage::MainPage()
         // TODO: or are they the objc_class_name things?
         string mcprefix("OBJC_METACLASS_$_");
         if (n.substr(0, mcprefix.length()) == mcprefix) {
-            continue;
+            return true;
         }
 
         // ignore non-existing symbols (it is observed that they are used only in exports, so it shouldn't matter)
         if (n == "_objc_empty_cache") {
-            continue;
+            return true;
         }
         // ---------------------
 
         // get symbol address
         auto addr = GetProcAddress(winlib, n.c_str());
         if (!addr) {
-            throw 1;
+            return false;
         }
 
         // rewrite stub address with the found one
         // TODO.
     }
 
-    // load libraries
-    for (auto& lib : bin.libraries()) {
-        // translate name
-        auto imp = lib.name();
-        string exp;
-        if (imp == "/System/Library/Frameworks/Foundation.framework/Foundation") exp = "Foundation.dll";
-        //else throw 1;
-        // TODO: map library into the Unicorn Engine
+    unique_ptr<FatBinary> fat_;
+    const Binary& bin_;
+};
+
+MainPage::MainPage()
+{
+    InitializeComponent();
+
+    // load test Mach-O binary
+    filesystem::path dir(ApplicationData::Current->TemporaryFolder->Path->Data());
+    filesystem::path file("test.ipa");
+    filesystem::path full = dir / file;
+    DynamicLoader dl = DynamicLoader::create(full.str());
+
+    // initialize unicorn engine
+    uc_engine *uc;
+    uc_err err;
+    err = uc_open(UC_ARCH_ARM, UC_MODE_ARM, &uc);
+    if (err) { // TODO: handle these errors with some macro
+        throw 1;
     }
 
-    // ensure we processed all commands
-    for (auto& c : bin.commands()) {
-        auto type = c.command();
-        switch (type) {
-        case LOAD_COMMAND_TYPES::LC_SEGMENT: // segments
-            break;
-        case LOAD_COMMAND_TYPES::LC_DYLD_INFO:
-        case LOAD_COMMAND_TYPES::LC_DYLD_INFO_ONLY: // TODO.
-            break;
-        default: throw 1;
-        }
-    }
+    dl.load(uc);
 }
