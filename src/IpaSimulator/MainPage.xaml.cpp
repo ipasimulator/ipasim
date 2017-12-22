@@ -153,6 +153,7 @@ static void test_thumb(void)
 }
 #endif
 
+// from https://stackoverflow.com/a/23152590/9080566
 template<class T> inline T operator~ (T a) { return (T)~(int)a; }
 template<class T> inline T operator| (T a, T b) { return (T)((int)a | (int)b); }
 template<class T> inline T operator& (T a, T b) { return (T)((int)a & (int)b); }
@@ -160,6 +161,19 @@ template<class T> inline T operator^ (T a, T b) { return (T)((int)a ^ (int)b); }
 template<class T> inline T& operator|= (T& a, T b) { return (T&)((int&)a |= (int)b); }
 template<class T> inline T& operator&= (T& a, T b) { return (T&)((int&)a &= (int)b); }
 template<class T> inline T& operator^= (T& a, T b) { return (T&)((int&)a ^= (int)b); }
+
+// from https://stackoverflow.com/a/27296/9080566
+std::wstring s2ws(const std::string& s)
+{
+    int len;
+    int slength = (int)s.length() + 1;
+    len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0);
+    wchar_t* buf = new wchar_t[len];
+    MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, buf, len);
+    std::wstring r(buf);
+    delete[] buf;
+    return r;
+}
 
 MainPage::MainPage()
 {
@@ -272,7 +286,7 @@ MainPage::MainPage()
 #undef UPDATE_FIRST_SLIDE
 
     // bind imported symbols
-    for (auto& sym : bin.imported_symbols()) {
+    for (auto& sym : bin.imported_symbols()) { // TODO: maybe foreach bindings?
         uint8_t symtype = sym.type();
         if (symtype & MACHO_SYMBOL_TYPES::N_STAB) {
             continue; // ignore debugging symbols
@@ -285,18 +299,39 @@ MainPage::MainPage()
             auto& binfo = sym.binding_info();
             auto& lib = binfo.library();
             string imp = lib.name();
-            // TODO: bind symbol from dll
+            string sysprefix("/System/Library/Frameworks/");
+            if (imp.substr(0, sysprefix.length()) == sysprefix) {
+                string fwsuffix(".framework/");
+                size_t i = imp.find(fwsuffix);
+                string fwname = imp.substr(i + fwsuffix.length());
+                if (i != string::npos && imp.substr(sysprefix.length(), i - sysprefix.length()) == fwname) {
+                    auto winlib = LoadPackagedLibrary(s2ws(fwname + ".dll").c_str(), 0);
+                    if (!winlib) {
+                        throw "library " + imp + " couldn't be loaded as " + fwname + ".dll";
+                    }
+                    string n = sym.name();
+                    if (n.length() == 0 || n[0] != '_') {
+                        throw 1;
+                    }
+                    auto addr = GetProcAddress(winlib, n.substr(1).c_str());
+                    if (!addr) {
+                        throw 1;
+                    }
+                    
+                    // rewrite stub address with the found one
+                    // TODO.
+                }
+                else {
+                    throw 1;
+                }
+            }
+            else {
+                throw 1;
+            }
         }
         else {
             throw "unrecognized symbol type";
         }
-    }
-
-    // TODO: remove
-    auto lib = LoadPackagedLibrary(L"Foundation.dll", 0); // TODO: does this load library continuously? (it should, right?)
-    if (lib) {
-        auto addr = GetProcAddress(lib, "_OBJC_CLASS_NSIndexPath");
-        FreeLibrary(lib);
     }
 
     // load libraries
@@ -306,7 +341,7 @@ MainPage::MainPage()
         string exp;
         if (imp == "/System/Library/Frameworks/Foundation.framework/Foundation") exp = "Foundation.dll";
         //else throw 1;
-        // TODO: what to do here?
+        // TODO: map library into the Unicorn Engine
     }
 
     // ensure we processed all commands
