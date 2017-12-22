@@ -317,7 +317,13 @@ private:
                 size_t i = imp.find(fwsuffix);
                 string fwname = imp.substr(i + fwsuffix.length());
                 if (i != string::npos && imp.substr(sysprefix.length(), i - sysprefix.length()) == fwname) {
-                    load_dll(binfo, fwname + ".dll");
+                    if (fwname == "CoreFoundation") {
+                        try_load_dll(binfo, "CoreFoundation.dll") ||
+                            load_dll(binfo, "Foundation.dll");
+                    }
+                    else {
+                        load_dll(binfo, fwname + ".dll");
+                    }
                 }
                 else {
                     throw 1;
@@ -327,11 +333,17 @@ private:
                 try_load_dll(binfo, "Foundation.dll") ||
                     load_dll(binfo, "libobjc2.dll");
             }
+            else if (imp == "/usr/lib/libSystem.B.dylib") {
+                try_load_dll(binfo, "libobjc2.dll") ||
+                    try_load_dll(binfo, "libdispatch.dll") ||
+                    load_dll(binfo, "ucrtbased.dll");
+            }
             else {
                 throw 1;
             }
         }
     }
+    // TODO: maybe make binfo also a local field
     bool load_dll(const BindingInfo& binfo, const string& name) {
         if (!try_load_dll(binfo, name)) {
             throw 1;
@@ -350,10 +362,9 @@ private:
         string n = binfo.symbol().name();
 
         // remove leading underscore
-        if (n.length() == 0 || n[0] != '_') {
-            throw 1;
+        if (n.length() != 0 && n[0] == '_') {
+            n = n.substr(1);
         }
-        n = n.substr(1);
 
         // translate class names
         string cprefix("OBJC_CLASS_$_");
@@ -371,6 +382,13 @@ private:
 
         // ignore non-existing symbols (it is observed that they are used only in exports, so it shouldn't matter)
         if (n == "_objc_empty_cache") {
+            return true;
+        }
+
+        // TODO: don't ignore these, implement them!
+        if (n == "objc_msgSendSuper2" ||
+            n == "dyld_stub_binder" ||
+            n == "__CFConstantStringClassReference") { // defined in CFInternal.h
             return true;
         }
         // ---------------------

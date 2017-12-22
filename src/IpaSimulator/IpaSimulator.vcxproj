@@ -216,6 +216,9 @@
     <None Include="..\..\packages\WinObjC.Frameworks.0.2.171110\build\deps\prebuilt\Universal Windows\$(PlatformShortName)\*.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\packages\WinObjC.Frameworks.UWP.Core.0.2.171110\build\deps\prebuilt\Universal Windows\$(PlatformShortName)\*.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="IpaSimulator_TemporaryKey.pfx" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
