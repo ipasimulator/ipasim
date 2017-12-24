@@ -189,7 +189,8 @@ public:
     void load(uc_engine *uc) {
         // check header info
         auto& header = bin_.header();
-        if (header.cpu_type() != CPU_TYPES::CPU_TYPE_ARM) {
+        if (header.cpu_type() != CPU_TYPES::CPU_TYPE_ARM ||
+            !canSegmentsSlide()) {
             throw 1;
         }
 
@@ -197,6 +198,7 @@ public:
         bool was_first = false;
 #define UPDATE_FIRST_SLIDE(val) if (!was_first) { was_first = true; first_slide = val; }
 
+        // TODO: in mach-o, segments must slide together (see ImageLoaderMachO::segmentsMustSlideTogether)
         // load segments
         for (auto& seg : bin_.segments()) {
             // convert protection
@@ -215,6 +217,7 @@ public:
             uint64_t vaddr = seg.virtual_address();
             uint64_t vsize = seg.virtual_size();
             // TODO: virtual address and size must be 4kB-aligned for uc_mem_map_ptr to work, are they always?
+            // TODO: segments should be virtual page aligned (so that's probably equal to the requirement above, that's good)
 
             if (perms == UC_PROT_NONE) {
                 // no protection means we don't have to malloc, we just map it
@@ -226,7 +229,7 @@ public:
                 // we allocate memory for the whole segment (which should be mapped as contiguous region of virtual memory)
                 void *addr = malloc(vsize);
                 auto& buff = seg.content();
-                memcpy(addr, buff.data(), buff.size());
+                memcpy(addr, buff.data(), buff.size()); // TODO: copy to the end of the allocated space if SG_HIGHVM flag is present
                 uc_mem_map_ptr(uc, (uint64_t)addr, vsize, perms, addr);
 
                 // set the remaining memory to zeros
@@ -253,6 +256,7 @@ public:
                                 uint64_t relbase = unsigned(bin_.segments()[0].virtual_address()) + first_slide;
 
                                 uint64_t reladdr = unsigned(relbase + rel.address()) + slide;
+                                // TODO: what if address reladdr points to different segment (with different slide)!?
                                 if (rel.size() == 32 && reladdr <= (uint64_t)addr + vsize) {
                                     *(uint32_t *)(reladdr) += slide;
                                 }
@@ -400,7 +404,19 @@ private:
         }
 
         // rewrite stub address with the found one
-        // TODO.
+        if (binfo.binding_class() != BINDING_CLASS::BIND_CLASS_STANDARD ||
+            binfo.binding_type() != BIND_TYPES::BIND_TYPE_POINTER ||
+            binfo.addend()) {
+            throw 1;
+        }
+        binfo.address(); // TODO: do something with it!
+    }
+    // inspired by ImageLoaderMachO::segmentsCanSlide
+    bool canSegmentsSlide() {
+        auto ftype = bin_.header().file_type();
+        return ftype == FILE_TYPES::MH_DYLIB ||
+            ftype == FILE_TYPES::MH_BUNDLE ||
+            (ftype == FILE_TYPES::MH_EXECUTE && bin_.is_pie());
     }
 
     unique_ptr<FatBinary> fat_;
