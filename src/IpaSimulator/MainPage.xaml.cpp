@@ -175,6 +175,8 @@ std::wstring s2ws(const std::string& s)
     return r;
 }
 
+#define UC(arg) if (arg) { throw 1; }
+
 class DynamicLoader {
 public:
     DynamicLoader(unique_ptr<FatBinary>&& fat, const Binary& bin, uc_engine *uc) : fat_(move(fat)), bin_(bin), uc_(uc) {}
@@ -247,7 +249,10 @@ private:
             }
         }
 
-        uintptr_t addr = (uintptr_t)malloc(highAddr_ - lowAddr_);
+        uintptr_t addr = (uintptr_t)_aligned_malloc(highAddr_ - lowAddr_, 4096);
+        if (!addr) {
+            throw 1;
+        }
         slide_ = addr - lowAddr_;
     }
     // inspired by ImageLoaderMachO::mapSegments
@@ -272,12 +277,12 @@ private:
 
             if (perms == UC_PROT_NONE) {
                 // no protection means we don't have to copy any data, we just map it
-                uc_mem_map_ptr(uc_, vaddr_, vsize_, perms, mem); // TODO: handle uc_err
+                UC(uc_mem_map_ptr(uc_, vaddr_, vsize_, perms, mem))
             }
             else {
                 auto& buff = seg.content();
                 memcpy(mem, buff.data(), buff.size()); // TODO: copy to the end of the allocated space if SG_HIGHVM flag is present
-                uc_mem_map_ptr(uc_, vaddr_, vsize_, perms, mem); // TODO: handle uc_err
+                UC(uc_mem_map_ptr(uc_, vaddr_, vsize_, perms, mem))
 
                 // set the remaining memory to zeros
                 if (buff.size() < vsize_) {
@@ -445,11 +450,7 @@ MainPage::MainPage()
 
     // initialize unicorn engine
     uc_engine *uc;
-    uc_err err;
-    err = uc_open(UC_ARCH_ARM, UC_MODE_ARM, &uc);
-    if (err) { // TODO: handle these errors with some macro
-        throw 1;
-    }
+    UC(uc_open(UC_ARCH_ARM, UC_MODE_ARM, &uc))
 
     // load test Mach-O binary
     filesystem::path dir(ApplicationData::Current->TemporaryFolder->Path->Data());
