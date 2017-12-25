@@ -10,6 +10,7 @@
 #include <sstream>
 #include <unicorn/unicorn.h>
 #include <memory>
+#include <map>
 
 using namespace IpaSimulator;
 using namespace Platform;
@@ -179,8 +180,8 @@ std::wstring s2ws(const std::string& s)
 
 class DynamicLoader {
 public:
-    DynamicLoader(unique_ptr<FatBinary>&& fat, const Binary& bin, uc_engine *uc) : fat_(move(fat)), bin_(bin), uc_(uc) {}
-    DynamicLoader(DynamicLoader&& dl) : fat_(move(dl.fat_)), bin_(dl.bin_), uc_(dl.uc_) {}
+    DynamicLoader(unique_ptr<FatBinary>&& fat, const Binary& bin, uc_engine *uc) : fat_(move(fat)), bin_(bin), uc_(uc), libs_() {}
+    DynamicLoader(DynamicLoader&& dl) : fat_(move(dl.fat_)), bin_(dl.bin_), uc_(dl.uc_), libs_(dl.libs_) {}
     ~DynamicLoader() = default;
 
     static DynamicLoader create(const string& path, uc_engine *uc) {
@@ -202,14 +203,11 @@ public:
 
         process_bindings();
 
-        // load libraries
-        for (auto& lib : bin_.libraries()) {
-            // translate name
-            auto imp = lib.name();
-            string exp;
-            if (imp == "/System/Library/Frameworks/Foundation.framework/Foundation") exp = "Foundation.dll";
-            //else throw 1;
-            // TODO: map library into the Unicorn Engine
+        // map libraries into the Unicorn Engine
+        for (auto& lib : libs_) {
+            uint64_t libLow = lib.second.first & (-4096);
+            uint64_t libHigh = (lib.second.second + 4096) & (-4096);
+            UC(uc_mem_map_ptr(uc_, libLow, libHigh - libLow, UC_PROT_READ | UC_PROT_WRITE, (void *)libLow))
         }
 
         // ensure we processed all commands
@@ -416,6 +414,20 @@ private:
             return false;
         }
 
+        uint64_t iaddr = (uint64_t)addr;
+        auto lib = libs_.find(name);
+        if (lib == libs_.end()) {
+            libs_[name] = make_pair(iaddr, iaddr);
+        }
+        else {
+            if (lib->second.first > iaddr) {
+                lib->second.first = iaddr;
+            }
+            if (lib->second.second > iaddr) {
+                lib->second.second = iaddr;
+            }
+        }
+
         // rewrite stub address with the found one
         bind_to((intptr_t)addr);
     }
@@ -442,6 +454,7 @@ private:
     int64_t slide_;
     uint64_t vaddr_, vsize_;
     uint64_t lowAddr_, highAddr_;
+    map<string, pair<uint64_t, uint64_t>> libs_; // libraries' low and high addresses
 };
 
 MainPage::MainPage()
