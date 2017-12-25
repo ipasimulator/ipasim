@@ -189,6 +189,19 @@ public:
         Binary& bin = fat->at(0); // TODO: select correct binary more intelligently
         return DynamicLoader(move(fat), bin, uc);
     }
+    void execute() {
+        load();
+
+        // init stack
+        size_t stacksize = 8 * 1024 * 1024; // 8 MiB
+        void *stackmem = _aligned_malloc(stacksize, 4096);
+        UC(uc_mem_map_ptr(uc_, (uint64_t)stackmem, stacksize, UC_PROT_READ | UC_PROT_WRITE, stackmem))
+        UC(uc_reg_write(uc_, UC_ARM_REG_SP, &stackmem))
+
+        // TODO: push main's parameters to the stack
+
+        UC(uc_emu_start(uc_, bin_.entrypoint() + slide_, 0, 0, 0))
+    }
     void load() {
         // check header info
         auto& header = bin_.header();
@@ -210,6 +223,7 @@ public:
             uint64_t libHigh = (lib.second.second + 4096) & (-4096);
             UC(uc_mem_map_ptr(uc_, libLow, libHigh - libLow, UC_PROT_READ | UC_PROT_WRITE, (void *)libLow))
         }
+        libs_.clear();
     }
 private:
     // inspired by ImageLoaderMachO::assignSegmentAddresses
@@ -457,5 +471,7 @@ MainPage::MainPage()
     filesystem::path dir(ApplicationData::Current->TemporaryFolder->Path->Data());
     filesystem::path file("test.ipa");
     filesystem::path full = dir / file;
-    DynamicLoader::create(full.str(), uc).load();
+    DynamicLoader::create(full.str(), uc).execute();
+
+    UC(uc_close(uc))
 }
