@@ -192,7 +192,8 @@ public:
     void load() {
         // check header info
         auto& header = bin_.header();
-        if (header.cpu_type() != CPU_TYPES::CPU_TYPE_ARM ||
+        if (header.file_type() != FILE_TYPES::MH_EXECUTE ||
+            header.cpu_type() != CPU_TYPES::CPU_TYPE_ARM ||
             header.has(HEADER_FLAGS::MH_SPLIT_SEGS)) { // required by relocate_segment
             throw 1;
         }
@@ -208,19 +209,6 @@ public:
             uint64_t libLow = lib.second.first & (-4096);
             uint64_t libHigh = (lib.second.second + 4096) & (-4096);
             UC(uc_mem_map_ptr(uc_, libLow, libHigh - libLow, UC_PROT_READ | UC_PROT_WRITE, (void *)libLow))
-        }
-
-        // ensure we processed all commands
-        for (auto& c : bin_.commands()) {
-            auto type = c.command();
-            switch (type) {
-            case LOAD_COMMAND_TYPES::LC_SEGMENT: // segments
-                break;
-            case LOAD_COMMAND_TYPES::LC_DYLD_INFO:
-            case LOAD_COMMAND_TYPES::LC_DYLD_INFO_ONLY: // TODO.
-                break;
-            default: throw 1;
-            }
         }
     }
 private:
