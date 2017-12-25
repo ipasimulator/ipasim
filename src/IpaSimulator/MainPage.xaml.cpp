@@ -177,110 +177,26 @@ std::wstring s2ws(const std::string& s)
 
 class DynamicLoader {
 public:
-    DynamicLoader(unique_ptr<FatBinary>&& fat, const Binary& bin) : fat_(move(fat)), bin_(bin) {}
-    DynamicLoader(DynamicLoader&& dl) : fat_(move(dl.fat_)), bin_(dl.bin_) {}
+    DynamicLoader(unique_ptr<FatBinary>&& fat, const Binary& bin, uc_engine *uc) : fat_(move(fat)), bin_(bin), uc_(uc) {}
+    DynamicLoader(DynamicLoader&& dl) : fat_(move(dl.fat_)), bin_(dl.bin_), uc_(dl.uc_) {}
     ~DynamicLoader() = default;
 
-    static DynamicLoader create(const string& path) {
+    static DynamicLoader create(const string& path, uc_engine *uc) {
         unique_ptr<FatBinary> fat(Parser::parse(path));
         Binary& bin = fat->at(0); // TODO: select correct binary more intelligently
-        return DynamicLoader(move(fat), bin);
+        return DynamicLoader(move(fat), bin, uc);
     }
-    void load(uc_engine *uc) {
+    void load() {
         // check header info
         auto& header = bin_.header();
         if (header.cpu_type() != CPU_TYPES::CPU_TYPE_ARM ||
-            !canSegmentsSlide()) {
+            header.has(HEADER_FLAGS::MH_SPLIT_SEGS)) { // required by relocate_segment
             throw 1;
         }
 
-        ptrdiff_t first_slide; // slide of the first segment
-        bool was_first = false;
-#define UPDATE_FIRST_SLIDE(val) if (!was_first) { was_first = true; first_slide = val; }
+        compute_slide();
 
-        // TODO: in mach-o, segments must slide together (see ImageLoaderMachO::segmentsMustSlideTogether)
-        // load segments
-        for (auto& seg : bin_.segments()) {
-            // convert protection
-            auto vmprot = seg.init_protection();
-            uc_prot perms = UC_PROT_NONE;
-            if (vmprot & VM_PROTECTIONS::VM_PROT_READ) {
-                perms |= UC_PROT_READ;
-            }
-            if (vmprot & VM_PROTECTIONS::VM_PROT_WRITE) {
-                perms |= UC_PROT_WRITE;
-            }
-            if (vmprot & VM_PROTECTIONS::VM_PROT_EXECUTE) {
-                perms |= UC_PROT_EXEC;
-            }
-
-            uint64_t vaddr = seg.virtual_address();
-            uint64_t vsize = seg.virtual_size();
-            // TODO: virtual address and size must be 4kB-aligned for uc_mem_map_ptr to work, are they always?
-            // TODO: segments should be virtual page aligned (so that's probably equal to the requirement above, that's good)
-
-            if (perms == UC_PROT_NONE) {
-                // no protection means we don't have to malloc, we just map it
-                uc_mem_map_ptr(uc, vaddr, vsize, perms, (void*)vaddr);
-
-                UPDATE_FIRST_SLIDE(0)
-            }
-            else {
-                // we allocate memory for the whole segment (which should be mapped as contiguous region of virtual memory)
-                void *addr = malloc(vsize);
-                auto& buff = seg.content();
-                memcpy(addr, buff.data(), buff.size()); // TODO: copy to the end of the allocated space if SG_HIGHVM flag is present
-                uc_mem_map_ptr(uc, (uint64_t)addr, vsize, perms, addr);
-
-                // set the remaining memory to zeros
-                if (buff.size() < vsize) {
-                    memset((uint8_t*)addr + buff.size(), 0, vsize - buff.size());
-                }
-
-                ptrdiff_t slide = (uintptr_t)addr - vaddr;
-                UPDATE_FIRST_SLIDE(slide)
-
-                    if (slide != 0) {
-                        // we have to relocate the segment
-                        for (auto& rel : seg.relocations()) {
-                            if (rel.is_pc_relative()) {
-                                throw 1;
-                            }
-
-                            if (rel.origin() == RELOCATION_ORIGINS::ORIGIN_DYLDINFO) {
-                                // find base address for this relocation
-                                // (inspired by ImageLoaderMachOClassic::getRelocBase)
-                                if (header.has(HEADER_FLAGS::MH_SPLIT_SEGS)) {
-                                    throw 1;
-                                }
-                                uint64_t relbase = unsigned(bin_.segments()[0].virtual_address()) + first_slide;
-
-                                uint64_t reladdr = unsigned(relbase + rel.address()) + slide;
-                                // TODO: what if address reladdr points to different segment (with different slide)!?
-                                if (rel.size() == 32 && reladdr <= (uint64_t)addr + vsize) {
-                                    *(uint32_t *)(reladdr) += slide;
-                                }
-                                else {
-                                    throw 1;
-                                }
-                            }
-#if 0
-                            else if (rel.origin() == RELOCATION_ORIGINS::ORIGIN_RELOC_TABLE) {
-                                switch (rel.type()) {
-                                case ARM_RELOCATION::ARM_RELOC_VANILLA:
-                                    break;
-                                }
-                            }
-#endif
-                            else {
-                                throw 1;
-                            }
-                        }
-                    }
-            }
-        }
-
-#undef UPDATE_FIRST_SLIDE
+        load_segments();
 
         process_bindings();
 
@@ -308,9 +224,102 @@ public:
         }
     }
 private:
+    // inspired by ImageLoaderMachO::assignSegmentAddresses
+    void compute_slide() {
+        if (!canSegmentsSlide()) {
+            throw 1;
+        }
+
+        // note: in mach-o, segments must slide together (see ImageLoaderMachO::segmentsMustSlideTogether)
+        lowAddr_ = (uint64_t)(-1);
+        highAddr_ = 0;
+        for (auto& seg : bin_.segments()) {
+            uint64_t segLow = seg.virtual_address();
+            uint64_t segHigh = ((segLow + seg.virtual_size()) + 4095) & (-4096); // round to page size (as required by unicorn and what even dyld does)
+            if (segLow < highAddr_) {
+                throw "overlapping segments (after rounding to pagesize)";
+            }
+            if (segLow < lowAddr_) {
+                lowAddr_ = segLow;
+            }
+            if (segHigh > highAddr_) {
+                highAddr_ = segHigh;
+            }
+        }
+
+        uintptr_t addr = (uintptr_t)malloc(highAddr_ - lowAddr_);
+        slide_ = addr - lowAddr_;
+    }
+    // inspired by ImageLoaderMachO::mapSegments
+    void load_segments() {
+        for (auto& seg : bin_.segments()) {
+            // convert protection
+            auto vmprot = seg.init_protection();
+            uc_prot perms = UC_PROT_NONE;
+            if (vmprot & VM_PROTECTIONS::VM_PROT_READ) {
+                perms |= UC_PROT_READ;
+            }
+            if (vmprot & VM_PROTECTIONS::VM_PROT_WRITE) {
+                perms |= UC_PROT_WRITE;
+            }
+            if (vmprot & VM_PROTECTIONS::VM_PROT_EXECUTE) {
+                perms |= UC_PROT_EXEC;
+            }
+
+            vaddr_ = unsigned(seg.virtual_address()) + slide_;
+            uint8_t *mem = (uint8_t *)vaddr_; // emulated virtual address is actually equal to the "real" virtual address
+            vsize_ = seg.virtual_size();
+
+            if (perms == UC_PROT_NONE) {
+                // no protection means we don't have to copy any data, we just map it
+                uc_mem_map_ptr(uc_, vaddr_, vsize_, perms, mem); // TODO: handle uc_err
+            }
+            else {
+                auto& buff = seg.content();
+                memcpy(mem, buff.data(), buff.size()); // TODO: copy to the end of the allocated space if SG_HIGHVM flag is present
+                uc_mem_map_ptr(uc_, vaddr_, vsize_, perms, mem); // TODO: handle uc_err
+
+                // set the remaining memory to zeros
+                if (buff.size() < vsize_) {
+                    memset(mem + buff.size(), 0, vsize_ - buff.size());
+                }
+            }
+
+            if (slide_ != 0) {
+                relocate_segment(seg);
+            }
+        }
+    }
+    // inspired by ImageLoaderMachOClassic::rebase
+    void relocate_segment(const LIEF::MachO::SegmentCommand& seg) {
+        for (auto& rel : seg.relocations()) {
+            if (rel.is_pc_relative() || rel.origin() != RELOCATION_ORIGINS::ORIGIN_DYLDINFO ||
+                rel.size() != 32) {
+                throw 1;
+            }
+
+            // find base address for this relocation
+            // (inspired by ImageLoaderMachOClassic::getRelocBase)
+            uint64_t relbase = unsigned(lowAddr_) + slide_;
+
+            uint64_t reladdr = relbase + rel.address();
+            uint32_t *val = (uint32_t *)reladdr;
+            if (reladdr > vaddr_ + vsize_) {
+                throw "relocation target out of range";
+            }
+            *val = unsigned(*val) + slide_;
+        }
+    }
     void process_bindings()
     {
         for (auto& binfo : bin_.dyld_info().bindings()) {
+            binfo_ = &binfo;
+            if ((binfo_->binding_class() != BINDING_CLASS::BIND_CLASS_STANDARD &&
+                binfo_->binding_class() != BINDING_CLASS::BIND_CLASS_LAZY) ||
+                binfo_->binding_type() != BIND_TYPES::BIND_TYPE_POINTER ||
+                binfo_->addend()) {
+                throw 1;
+            }
             auto& lib = binfo.library();
 
             // find .dll
@@ -322,11 +331,11 @@ private:
                 string fwname = imp.substr(i + fwsuffix.length());
                 if (i != string::npos && imp.substr(sysprefix.length(), i - sysprefix.length()) == fwname) {
                     if (fwname == "CoreFoundation") {
-                        try_load_dll(binfo, "CoreFoundation.dll") ||
-                            load_dll(binfo, "Foundation.dll");
+                        try_load_dll("CoreFoundation.dll") ||
+                            load_dll("Foundation.dll");
                     }
                     else {
-                        load_dll(binfo, fwname + ".dll");
+                        load_dll(fwname + ".dll");
                     }
                 }
                 else {
@@ -334,27 +343,26 @@ private:
                 }
             }
             else if (imp == "/usr/lib/libobjc.A.dylib") {
-                try_load_dll(binfo, "Foundation.dll") ||
-                    load_dll(binfo, "libobjc2.dll");
+                try_load_dll("Foundation.dll") ||
+                    load_dll("libobjc2.dll");
             }
             else if (imp == "/usr/lib/libSystem.B.dylib") {
-                try_load_dll(binfo, "libobjc2.dll") ||
-                    try_load_dll(binfo, "libdispatch.dll") ||
-                    load_dll(binfo, "ucrtbased.dll");
+                try_load_dll("libobjc2.dll") ||
+                    try_load_dll("libdispatch.dll") ||
+                    load_dll("ucrtbased.dll");
             }
             else {
                 throw 1;
             }
         }
     }
-    // TODO: maybe make binfo also a local field
-    bool load_dll(const BindingInfo& binfo, const string& name) {
-        if (!try_load_dll(binfo, name)) {
+    bool load_dll(const string& name) {
+        if (!try_load_dll(name)) {
             throw 1;
         }
         return true;
     }
-    bool try_load_dll(const BindingInfo& binfo, const string& name) {
+    bool try_load_dll(const string& name) {
         // load .dll
         auto winlib = LoadPackagedLibrary(s2ws(name).c_str(), 0);
         if (!winlib) {
@@ -363,7 +371,7 @@ private:
 
         // translate symbol name
         // ---------------------
-        string n = binfo.symbol().name();
+        string n = binfo_->symbol().name();
 
         // remove leading underscore
         if (n.length() != 0 && n[0] == '_') {
@@ -404,12 +412,15 @@ private:
         }
 
         // rewrite stub address with the found one
-        if (binfo.binding_class() != BINDING_CLASS::BIND_CLASS_STANDARD ||
-            binfo.binding_type() != BIND_TYPES::BIND_TYPE_POINTER ||
-            binfo.addend()) {
-            throw 1;
+        bind_to((intptr_t)addr);
+    }
+    void bind_to(uintptr_t addr) {
+        uint64_t target = unsigned(binfo_->address()) + slide_;
+        if (target < unsigned(lowAddr_) + slide_ ||
+            target >= unsigned(highAddr_) + slide_) {
+            throw "binding target out of range";
         }
-        binfo.address(); // TODO: do something with it!
+        *((uint32_t *)target) = addr;
     }
     // inspired by ImageLoaderMachO::segmentsCanSlide
     bool canSegmentsSlide() {
@@ -421,17 +432,16 @@ private:
 
     unique_ptr<FatBinary> fat_;
     const Binary& bin_;
+    uc_engine *uc_;
+    const BindingInfo *binfo_;
+    int64_t slide_;
+    uint64_t vaddr_, vsize_;
+    uint64_t lowAddr_, highAddr_;
 };
 
 MainPage::MainPage()
 {
     InitializeComponent();
-
-    // load test Mach-O binary
-    filesystem::path dir(ApplicationData::Current->TemporaryFolder->Path->Data());
-    filesystem::path file("test.ipa");
-    filesystem::path full = dir / file;
-    DynamicLoader dl = DynamicLoader::create(full.str());
 
     // initialize unicorn engine
     uc_engine *uc;
@@ -441,5 +451,9 @@ MainPage::MainPage()
         throw 1;
     }
 
-    dl.load(uc);
+    // load test Mach-O binary
+    filesystem::path dir(ApplicationData::Current->TemporaryFolder->Path->Data());
+    filesystem::path file("test.ipa");
+    filesystem::path full = dir / file;
+    DynamicLoader::create(full.str(), uc).load();
 }
