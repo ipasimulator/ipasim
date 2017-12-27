@@ -192,15 +192,29 @@ public:
     void execute() {
         load();
 
+        // TODO: unload LIEF's data from memory as they are not needed anymore
+
         // init stack
         size_t stacksize = 8 * 1024 * 1024; // 8 MiB
         void *stackmem = _aligned_malloc(stacksize, 4096);
         UC(uc_mem_map_ptr(uc_, (uint64_t)stackmem, stacksize, UC_PROT_READ | UC_PROT_WRITE, stackmem))
-        UC(uc_reg_write(uc_, UC_ARM_REG_SP, &stackmem))
+        uint32_t stacktop = (uint32_t)stackmem + stacksize;
+        UC(uc_reg_write(uc_, UC_ARM_REG_SP, &stacktop))
 
         // TODO: push main's parameters to the stack
 
+        // debugging hooks
+        uc_hook hook;
+#if 0
+        UC(uc_hook_add(uc_, &hook, UC_HOOK_MEM_INVALID, hook_mem_invalid, this, 1, 0))
+        UC(uc_hook_add(uc_, &hook, UC_HOOK_CODE, hook_code, this, 1, 0))
+#endif
+
+        // start execution
         UC(uc_emu_start(uc_, bin_.entrypoint() + slide_, 0, 0, 0))
+
+        // cleanup
+        UC(uc_close(uc_))
     }
     void load() {
         // check header info
@@ -226,6 +240,16 @@ public:
         libs_.clear();
     }
 private:
+    static void hook_code(uc_engine *uc, uint64_t address, uint32_t size, void *user_data)
+    {
+        auto& dl = *(DynamicLoader *)user_data;
+        OutputDebugStringA(("executing at " + to_string(address - dl.slide_) + "\n").c_str());
+    }
+    static bool hook_mem_invalid(uc_engine *uc, uc_mem_type type, uint64_t address, int size, int64_t value, void *user_data)
+    {
+        OutputDebugStringA("invalid memory\n");
+        return false;
+    }
     // inspired by ImageLoaderMachO::assignSegmentAddresses
     void compute_slide() {
         if (!canSegmentsSlide()) {
