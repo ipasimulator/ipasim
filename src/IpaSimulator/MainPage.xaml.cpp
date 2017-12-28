@@ -198,17 +198,17 @@ public:
         size_t stacksize = 8 * 1024 * 1024; // 8 MiB
         void *stackmem = _aligned_malloc(stacksize, 4096);
         UC(uc_mem_map_ptr(uc_, (uint64_t)stackmem, stacksize, UC_PROT_READ | UC_PROT_WRITE, stackmem))
-        uint32_t stacktop = (uint32_t)stackmem + stacksize;
+        uint32_t stacktop = (uint32_t)stackmem + stacksize - 12; // 12 bytes for 3 null arguments to the main procedure
         UC(uc_reg_write(uc_, UC_ARM_REG_SP, &stacktop))
-
-        // TODO: push main's parameters to the stack
 
         // debugging hooks
         uc_hook hook;
-#if 0
+#ifdef DEBUG_HOOKS
         UC(uc_hook_add(uc_, &hook, UC_HOOK_MEM_INVALID, hook_mem_invalid, this, 1, 0))
         UC(uc_hook_add(uc_, &hook, UC_HOOK_CODE, hook_code, this, 1, 0))
 #endif
+        UC(uc_hook_add(uc_, &hook, UC_HOOK_MEM_FETCH_PROT, hook_mem_fetch_prot, this, 1, 0))
+            
 
         // start execution
         UC(uc_emu_start(uc_, bin_.entrypoint() + slide_, 0, 0, 0))
@@ -240,6 +240,7 @@ public:
         libs_.clear();
     }
 private:
+#ifdef DEBUG_HOOKS
     static void hook_code(uc_engine *uc, uint64_t address, uint32_t size, void *user_data)
     {
         auto& dl = *(DynamicLoader *)user_data;
@@ -249,6 +250,14 @@ private:
     {
         OutputDebugStringA("invalid memory\n");
         return false;
+    }
+#endif
+    static bool hook_mem_fetch_prot(uc_engine *uc, uc_mem_type type, uint64_t address, int size, int64_t value, void *user_data)
+    {
+        auto lib = LoadPackagedLibrary(L"libobjc2.dll", 0);
+        auto addr = GetProcAddress(lib, "objc_autoreleasePoolPush");
+        // TODO: beware, address can be addr - 1 if addr was odd!
+        return true;
     }
     // inspired by ImageLoaderMachO::assignSegmentAddresses
     void compute_slide() {
