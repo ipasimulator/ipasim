@@ -180,8 +180,8 @@ std::wstring s2ws(const std::string& s)
 
 class DynamicLoader {
 public:
-    DynamicLoader(unique_ptr<FatBinary>&& fat, const Binary& bin, uc_engine *uc) : fat_(move(fat)), bin_(bin), uc_(uc), libs_() {}
-    DynamicLoader(DynamicLoader&& dl) : fat_(move(dl.fat_)), bin_(dl.bin_), uc_(dl.uc_), libs_(dl.libs_) {}
+    DynamicLoader(unique_ptr<FatBinary>&& fat, const Binary& bin, uc_engine *uc) : fat_(move(fat)), bin_(bin), uc_(uc), libs_(), odd_addrs_() {}
+    DynamicLoader(DynamicLoader&& dl) : fat_(move(dl.fat_)), bin_(move(dl.bin_)), uc_(dl.uc_), libs_(move(dl.libs_)), odd_addrs_(move(dl.odd_addrs_)) {}
     ~DynamicLoader() = default;
 
     static DynamicLoader create(const string& path, uc_engine *uc) {
@@ -203,12 +203,11 @@ public:
 
         // debugging hooks
         uc_hook hook;
+//#define DEBUG_HOOKS
 #ifdef DEBUG_HOOKS
-        UC(uc_hook_add(uc_, &hook, UC_HOOK_MEM_INVALID, hook_mem_invalid, this, 1, 0))
         UC(uc_hook_add(uc_, &hook, UC_HOOK_CODE, hook_code, this, 1, 0))
 #endif
         UC(uc_hook_add(uc_, &hook, UC_HOOK_MEM_FETCH_PROT, hook_mem_fetch_prot, this, 1, 0))
-            
 
         // start execution
         UC(uc_emu_start(uc_, bin_.entrypoint() + slide_, 0, 0, 0))
@@ -244,19 +243,30 @@ private:
     static void hook_code(uc_engine *uc, uint64_t address, uint32_t size, void *user_data)
     {
         auto& dl = *(DynamicLoader *)user_data;
-        OutputDebugStringA(("executing at " + to_string(address - dl.slide_) + "\n").c_str());
-    }
-    static bool hook_mem_invalid(uc_engine *uc, uc_mem_type type, uint64_t address, int size, int64_t value, void *user_data)
-    {
-        OutputDebugStringA("invalid memory\n");
-        return false;
+        OutputDebugStringA("executing at ");
+        OutputDebugStringA(to_string(address - dl.slide_).c_str());
+        uint32_t reg;
+        UC(uc_reg_read(dl.uc_, UC_ARM_REG_PC, &reg))
+        OutputDebugStringA(" PC = ");
+        OutputDebugStringA(to_string(reg - dl.slide_).c_str());
+        UC(uc_reg_read(dl.uc_, UC_ARM_REG_R12, &reg))
+        OutputDebugStringA(" R12 = ");
+        OutputDebugStringA(to_string(reg).c_str());
+        OutputDebugStringA(" (");
+        OutputDebugStringA(to_string(reg - dl.slide_).c_str());
+        OutputDebugStringA(")\n");
     }
 #endif
     static bool hook_mem_fetch_prot(uc_engine *uc, uc_mem_type type, uint64_t address, int size, int64_t value, void *user_data)
     {
-        auto lib = LoadPackagedLibrary(L"libobjc2.dll", 0);
-        auto addr = GetProcAddress(lib, "objc_autoreleasePoolPush");
-        // TODO: beware, address can be addr - 1 if addr was odd!
+        auto& dl = *(DynamicLoader *)user_data;
+
+        // fix odd address
+        if (dl.odd_addrs_.count(address)) {
+            ++address;
+        }
+
+        // TODO: convert calling convention and jump to address
         return true;
     }
     // inspired by ImageLoaderMachO::assignSegmentAddresses
@@ -450,6 +460,10 @@ private:
         }
 
         uint64_t iaddr = (uint64_t)addr;
+        if (iaddr % 2) {
+            odd_addrs_.insert(iaddr - 1);
+        }
+
         auto lib = libs_.find(name);
         if (lib == libs_.end()) {
             libs_[name] = make_pair(iaddr, iaddr);
@@ -490,6 +504,7 @@ private:
     uint64_t vaddr_, vsize_;
     uint64_t lowAddr_, highAddr_;
     map<string, pair<uint64_t, uint64_t>> libs_; // libraries' low and high addresses
+    set<uint64_t> odd_addrs_; // all bound addresses that are odd, but inserted decremented by 1 (so even)
 };
 
 MainPage::MainPage()
