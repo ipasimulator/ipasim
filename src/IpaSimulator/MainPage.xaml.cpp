@@ -462,6 +462,7 @@ private:
         uint64_t iaddr = (uint64_t)addr;
         if (iaddr % 2) {
             odd_addrs_.insert(iaddr - 1);
+            // TODO: maybe also check that there are no (iaddr-1) values bound to avoid ambiguity
         }
 
         auto lib = libs_.find(name);

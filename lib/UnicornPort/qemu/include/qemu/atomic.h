@@ -110,7 +110,12 @@ void _ReadWriteBarrier(void);
  * be overkill for smp_wmb() and smp_rmb().
  */
 #ifndef smp_mb
+# ifdef _MSC_VER
+ // TODO: fix me!!!
+# define smp_mb()    //__sync_synchronize()
+# else
 #define smp_mb()    __sync_synchronize()
+# endif
 #endif
 
 #ifndef smp_wmb
