@@ -257,16 +257,47 @@ private:
         OutputDebugStringA(")\n");
     }
 #endif
+    // this function sets registers and stack to the emulated ones and just calls the target
+    __declspec(naked) static void asm_exec(uint32_t *r0, uint32_t *r1, uint32_t *r2, uint32_t *r3, uint32_t sp, uint32_t address)
+    {
+        __asm {
+        }
+    }
     static bool hook_mem_fetch_prot(uc_engine *uc, uc_mem_type type, uint64_t address, int size, int64_t value, void *user_data)
     {
         auto& dl = *(DynamicLoader *)user_data;
 
         // fix odd address
+        // TODO: don't do this on ARM host
         if (dl.odd_addrs_.count(address)) {
             ++address;
         }
 
-        // TODO: convert calling convention and jump to address
+        // read emulated registers
+#define READ_REG(num) uint32_t r##num; UC(uc_reg_read(dl.uc_, UC_ARM_REG_R##num, &r##num))
+
+        READ_REG(0)
+        READ_REG(1)
+        READ_REG(2)
+        READ_REG(3)
+        READ_REG(13)
+#undef READ_REG
+
+        // execute target function using emulated cpu's context
+        // TODO: this works only on ARM host for now!
+        asm_exec(&r0, &r1, &r2, &r3, r13, address);
+
+        // set result registers
+#define WRITE_REG(num) UC(uc_reg_write(dl.uc_, UC_ARM_REG_R0, &r0))
+
+        WRITE_REG(0)
+        WRITE_REG(1)
+        WRITE_REG(2)
+        WRITE_REG(3)
+#undef WRITE_REG
+
+        // TODO: set EP to R14's value to return!
+
         return true;
     }
     // inspired by ImageLoaderMachO::assignSegmentAddresses
