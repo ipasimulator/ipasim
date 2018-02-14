@@ -3,9 +3,11 @@
 ## How does it work
 
 It's *dynamic*, i.e., arbitrary apps (`.ipa` files) can be loaded at run-time.
-First, the binary file is loaded into memory. If it contains a position-independent code, it can be loaded anywhere into memory, otherwise, it should be loaded into the exact place it requires (that is not implemented yet, but theoretically could be in the future, since the program's memory is only its own, so it should be able to allocate memory wherever it wants).
+First, the binary file is loaded into memory.
+If it contains a position-independent code, it can be loaded anywhere into memory, otherwise, it should be loaded into the exact place it requires (that is not implemented yet, but theoretically could be in the future, since the program's memory is only its own, so it should be able to allocate memory wherever it wants).
 Then, code relocations may be needed (there's nothing special to these, it's just shifting absolute addresses by the relocation offset).
-All the memory with code is also mapped into the emulator (flagged as executable), of course. The CPU's virtual addresses and the emulator's virtual addresses should match for simplicity (since there's no reason why they couldn't match).
+All the memory with code is also mapped into the emulator (flagged as executable), of course.
+The CPU's virtual addresses and the emulator's virtual addresses should match for simplicity (since there's no reason why they couldn't match).
 
 Now the important phase: binding external symbols.
 The bridge (iOS to UWP) `.dll`s are dynamically loaded (only those needed) when the `.ipa` is loaded (it could even be delayed until the symbol is used for the first time).
@@ -20,3 +22,6 @@ All calls to those external symbols are then handled *semantically*.
 That means that the handler is aware about the meanings of the functions' parameters.
 If they are pointers to memory, they might need to be translated (if there is that one more indirection layer discussed above).
 If they are callbacks (or structures containing callbacks or whatever), they need to be replaced by special handlers that will start emulator when called.
+
+This semantical handling is based on an external map (a database file) of symbol names and structured data about them (mainly their signatures).
+This map is built from the bridge's `.hpp` files at compile-time.
