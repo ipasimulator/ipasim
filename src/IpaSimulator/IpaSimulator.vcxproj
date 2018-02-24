@@ -107,7 +107,7 @@
       <PreprocessorDefinitions>NOMINMAX;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions);ARM_HOST</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(ProjectDir)..\..\prebuilt\LLVMARMCodeGen.lib;$(ProjectDir)..\..\ARM\Debug\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\ARM\Debug\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\..\deps\llvm\build\arm\Debug\lib\LLVMARMCodeGen.lib;$(ProjectDir)..\..\ARM\Debug\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\ARM\Debug\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
