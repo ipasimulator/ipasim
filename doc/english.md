@@ -1,5 +1,22 @@
 # IPA Simulator
 
+## How to build (on 64-bit Windows with Visual Studio 2017)
+
+1. Checkout the repository and make sure submodules are checked out as well.
+2. Install `cmake` and make sure it's in your `PATH` environment variable.
+3. Run the following commands:
+   ```cmd
+   cd deps\llvm
+   mkdir build && cd build
+   mkdir win32 && cd win32
+   cmake -G "Visual Studio 15" -DLLVM_TARGETS_TO_BUILD="ARM" -DLLVM_EXTERNAL_PROJECTS="clang" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\clang" -Thost=x64 ..\..
+   cd ..
+   mkdir arm && cd arm
+   cmake -G "Visual Studio 15 ARM" -DLLVM_TARGETS_TO_BUILD="ARM" -DLLVM_EXTERNAL_PROJECTS="clang" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\clang" -DLLVM_TABLEGEN="<full path to source directory>\deps\llvm\build\win32\Release\bin\llvm-tblgen.exe" -Thost=x64 ..\..
+   ```
+   **TODO: path to `clang` probably doesn't work like that.**
+4. If projects were successfully generated, you can open the `IPASimulator.sln`.
+
 ## How does it work
 
 It's *dynamic*, i.e., arbitrary apps (`.ipa` files) can be loaded at run-time.

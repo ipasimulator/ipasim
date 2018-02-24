@@ -101,22 +101,22 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\lib\UnicornPort;$(ProjectDir)..\..\lib\LiefPort;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4453;28204;4146</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\clang\include;$(ProjectDir)..\..\deps\llvm\build\arm\include;$(ProjectDir)..\..\deps\llvm\include;$(ProjectDir)..\..\lib\UnicornPort;$(ProjectDir)..\..\lib\LiefPort;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>iso646.h</ForcedIncludeFiles>
-      <PreprocessorDefinitions>ARM_HOST;_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions);ARM_HOST</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(ProjectDir)..\..\ARM\Debug\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\ARM\Debug\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\..\prebuilt\LLVMARMCodeGen.lib;$(ProjectDir)..\..\ARM\Debug\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\ARM\Debug\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <ClCompile>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\lib\UnicornPort;$(ProjectDir)..\..\lib\LiefPort;$(ProjectDir);$(GeneratedFilesDir);$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4453;28204;4146</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\clang\include;$(ProjectDir)..\..\deps\llvm\build\arm\include;$(ProjectDir)..\..\deps\llvm\include;$(ProjectDir)..\..\lib\UnicornPort;$(ProjectDir)..\..\lib\LiefPort;$(ProjectDir);$(GeneratedFilesDir);$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>iso646.h</ForcedIncludeFiles>
-      <PreprocessorDefinitions>ARM_HOST;_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions);ARM_HOST</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(ProjectDir)..\..\ARM\Release\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\ARM\Release\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -125,10 +125,10 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\lib\UnicornPort;$(ProjectDir)..\..\lib\LiefPort;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4453;28204;4146</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\clang\include;$(ProjectDir)..\..\deps\llvm\build\arm\include;$(ProjectDir)..\..\deps\llvm\include;$(ProjectDir)..\..\lib\UnicornPort;$(ProjectDir)..\..\lib\LiefPort;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>iso646.h</ForcedIncludeFiles>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(ProjectDir)..\..\Debug\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\Debug\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -137,10 +137,10 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\lib\UnicornPort;$(ProjectDir)..\..\lib\LiefPort;$(ProjectDir);$(GeneratedFilesDir);$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4453;28204;4146</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\clang\include;$(ProjectDir)..\..\deps\llvm\build\arm\include;$(ProjectDir)..\..\deps\llvm\include;$(ProjectDir)..\..\lib\UnicornPort;$(ProjectDir)..\..\lib\LiefPort;$(ProjectDir);$(GeneratedFilesDir);$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>iso646.h</ForcedIncludeFiles>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(ProjectDir)..\..\Release\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\Release\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -149,10 +149,10 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\lib\UnicornPort;$(ProjectDir)..\..\lib\LiefPort;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4453;28204;4146</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\clang\include;$(ProjectDir)..\..\deps\llvm\build\arm\include;$(ProjectDir)..\..\deps\llvm\include;$(ProjectDir)..\..\lib\UnicornPort;$(ProjectDir)..\..\lib\LiefPort;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>iso646.h</ForcedIncludeFiles>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(ProjectDir)..\..\x64\Debug\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\x64\Debug\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -161,10 +161,10 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
-      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\lib\UnicornPort;$(ProjectDir)..\..\lib\LiefPort;$(ProjectDir);$(GeneratedFilesDir);$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4453;28204;4146</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\clang\include;$(ProjectDir)..\..\deps\llvm\build\arm\include;$(ProjectDir)..\..\deps\llvm\include;$(ProjectDir)..\..\lib\UnicornPort;$(ProjectDir)..\..\lib\LiefPort;$(ProjectDir);$(GeneratedFilesDir);$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>iso646.h</ForcedIncludeFiles>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>$(ProjectDir)..\..\x64\Release\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\x64\Release\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
