@@ -1,0 +1,8 @@
+[submodule "deps/llvm"]
+	path = deps/llvm
+	url = https://git.llvm.org/git/llvm.git/
+	branch = release_50
+[submodule "deps/clang"]
+	path = deps/clang
+	url = https://git.llvm.org/git/clang.git/
+	branch = release_50

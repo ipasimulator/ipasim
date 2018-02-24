@@ -7,6 +7,8 @@ remember and remove the return address, call the function and then change it bac
 TODO: what if there are callbacks passed from the ARM code into the x86 code?
 Well, just hook 'em (i.e., pass instead of them some middle layer).
 We can recognize function parameters that are callbacks simply by manually listing all of them (from the header files).
+TODO: rename /lib/ to /deps/.
+TODO: include LIEF and Unicorn as submodules in /deps/ and add only .vcxproj files to /src/.
 
 ### How does it work?
 
