@@ -521,6 +521,7 @@ private:
 
         // rewrite stub address with the found one
         bind_to((intptr_t)addr);
+        return true;
     }
     void bind_to(uintptr_t addr) {
         uint64_t target = unsigned(binfo_->address()) + slide_;
