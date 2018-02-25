@@ -1,5 +1,11 @@
 # IPA Simulator
 
+## Projects organization
+
+Projects inside the `Library/LLVM/ARM` solution folder are simply all projects from the generated `deps/llvm/build/arm/LLVM.sln`.
+Similarly projects inside the `Library/LLVM/Win32` folder.
+All of these were added simply by selecting the `.sln` file in the `Add Existing Project...` dialog in Visual Studio.
+
 ## How to build (on 64-bit Windows with Visual Studio 2017)
 
 1. Checkout the repository and make sure submodules are checked out as well.

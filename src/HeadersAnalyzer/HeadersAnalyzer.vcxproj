@@ -95,6 +95,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\deps\llvm\build\win32\$(Configuration)\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -110,6 +112,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\deps\llvm\build\win32\$(Configuration)\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -129,6 +133,8 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\deps\llvm\build\win32\$(Configuration)\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -148,14 +154,112 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\deps\llvm\build\win32\$(Configuration)\lib\</AdditionalLibraryDirectories>
+      <AdditionalDependencies>mincore.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="HeadersAnalyzer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\BinaryFormat\LLVMBinaryFormat.vcxproj">
+      <Project>{62e56e02-edba-3366-844c-5fa5039bfceb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Bitcode\Reader\LLVMBitReader.vcxproj">
+      <Project>{9816317d-97b9-3353-a543-51e67745b877}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\IR\LLVMCore.vcxproj">
+      <Project>{9c3ff3e8-3d5a-3e51-98eb-2a1c7bb797de}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\MC\LLVMMC.vcxproj">
+      <Project>{7b9e56d6-609f-34c3-a430-6eb3e442361a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\MC\MCParser\LLVMMCParser.vcxproj">
+      <Project>{85e8d9ca-5332-3f10-a336-f89a5e9b0ebd}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Option\LLVMOption.vcxproj">
+      <Project>{e42b641e-1b3e-34d4-8dce-ed4d0b83c4a6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\ProfileData\LLVMProfileData.vcxproj">
+      <Project>{440fd662-e1e9-3160-a59d-9b423d25fa13}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Support\LLVMSupport.vcxproj">
+      <Project>{d13dbe12-3a5b-3b41-a9e2-46019d320ff1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Analysis\clangAnalysis.vcxproj">
+      <Project>{a9dbb940-af7e-3539-a2fd-f23c2b55eea9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\ARCMigrate\clangARCMigrate.vcxproj">
+      <Project>{c99d6536-cb2a-3046-b49b-c14a0332f232}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\ASTMatchers\clangASTMatchers.vcxproj">
+      <Project>{7a4660f8-bdc4-310b-a269-dc2dde540307}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\ASTMatchers\Dynamic\clangDynamicASTMatchers.vcxproj">
+      <Project>{4716e6e5-1207-383d-bf4d-2a35d65e129d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\AST\clangAST.vcxproj">
+      <Project>{0f05a7f2-db27-32e5-9acf-21d104ff1c27}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Basic\clangBasic.vcxproj">
+      <Project>{c3b1fc88-645b-3322-8108-d46a63ab2a12}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\CodeGen\clangCodeGen.vcxproj">
+      <Project>{773a3153-be03-3ce9-9b93-dd088ce02f27}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Driver\clangDriver.vcxproj">
+      <Project>{c25cf5a4-48c3-3b49-aa77-3a95fb1307fe}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Edit\clangEdit.vcxproj">
+      <Project>{6ce1d006-6d1e-3823-8b55-558d93617bec}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Format\clangFormat.vcxproj">
+      <Project>{0f71d9f0-2b62-35a0-a12c-e9bbb5d83331}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\FrontendTool\clangFrontendTool.vcxproj">
+      <Project>{560ab822-f572-3c9a-8633-73ee55437639}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Frontend\clangFrontend.vcxproj">
+      <Project>{91427a7c-f61c-32b9-9841-7498064c7087}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Frontend\Rewrite\clangRewriteFrontend.vcxproj">
+      <Project>{fdfaeebc-9bdd-33ca-88a9-a380414464dc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Index\clangIndex.vcxproj">
+      <Project>{6930b8df-0f19-39e8-9125-dcb74900510f}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Lex\clangLex.vcxproj">
       <Project>{abe16a02-27ce-39a8-b68f-60b69bd6e030}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Parse\clangParse.vcxproj">
+      <Project>{f0a59a13-ebfb-3bd5-b3cd-189a7f700067}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Rewrite\clangRewrite.vcxproj">
+      <Project>{c58da9e5-9912-32e7-ae3a-7a4bf5f7e4d7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Sema\clangSema.vcxproj">
+      <Project>{e0335395-e91c-34c9-9561-de8b3c26d611}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Serialization\clangSerialization.vcxproj">
+      <Project>{4c83fae1-be60-3d02-bf86-f0fef84b5adc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\StaticAnalyzer\Checkers\clangStaticAnalyzerCheckers.vcxproj">
+      <Project>{17c5348d-c333-3127-a734-c56e5ec02c7c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\StaticAnalyzer\Core\clangStaticAnalyzerCore.vcxproj">
+      <Project>{43ad290b-f602-337f-824a-5578d8469242}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\StaticAnalyzer\Frontend\clangStaticAnalyzerFrontend.vcxproj">
+      <Project>{452e316d-89d4-3822-b96f-0c68ce2fbbd4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Tooling\clangTooling.vcxproj">
+      <Project>{c1b03f4c-42a9-387b-bbf4-f2b9899ea422}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Tooling\Core\clangToolingCore.vcxproj">
+      <Project>{fa41e65e-dddd-3e3b-82e8-9f4db9f2bd00}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Tooling\Refactoring\clangToolingRefactor.vcxproj">
+      <Project>{bc3b3ba9-5d92-3bf3-a658-2331cb3abf67}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
