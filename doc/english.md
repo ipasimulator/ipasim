@@ -14,6 +14,7 @@
    mkdir arm && cd arm
    cmake -G "Visual Studio 15 ARM" -DLLVM_TARGETS_TO_BUILD="ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\..\clang" -DLLVM_TABLEGEN="<full path to source directory>\deps\llvm\build\win32\Release\bin\llvm-tblgen.exe" -Thost=x64 ..\..
    ```
+   **TODO: probably remove the `-Thost=x64` option and allow only 32-bit Windows for tooling/compilation and ARM + 32-bit Windows for running the app.**
 4. If projects were successfully generated, you can open the `IPASimulator.sln`.
 
 ## How does it work
