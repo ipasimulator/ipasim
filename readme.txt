@@ -9,6 +9,8 @@ Well, just hook 'em (i.e., pass instead of them some middle layer).
 We can recognize function parameters that are callbacks simply by manually listing all of them (from the header files).
 TODO: rename /lib/ to /deps/.
 TODO: include LIEF and Unicorn as submodules in /deps/ and add only .vcxproj files to /src/.
+TODO: add README.md files to more folders (and remove this readme.txt file).
+TODO: allow only Debug and Release configurations and Win32 and ARM platforms.
 
 ### How does it work?
 
