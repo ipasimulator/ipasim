@@ -11,6 +11,10 @@ TODO: rename /lib/ to /deps/.
 TODO: include LIEF and Unicorn as submodules in /deps/ and add only .vcxproj files to /src/.
 TODO: add README.md files to more folders (and remove this readme.txt file).
 TODO: allow only Debug and Release configurations and Win32 and ARM platforms.
+TODO: is LiefPort still necessary? clang lib should be enough.
+TODO: is UnicornPort still necessary? Maybe LLVM could be emulated. Or at least interpreted on ARM (with relocations and so on provided by llvm).
+TODO: maybe use clang to link Mach-O app with WinObjC .dlls at compile-time (or even runtime) for ARM.
+TODO: also, llvm should contain some dynamic linker, which we should definitely use instead of our own code.
 
 ### How does it work?
 
