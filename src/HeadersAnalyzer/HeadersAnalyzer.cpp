@@ -8,7 +8,6 @@
 #include <clang/Lex/PreprocessorOptions.h>
 #include <clang/Parse/ParseAST.h>
 #include <clang/AST/ASTContext.h>
-#include <clang/Frontend/TextDiagnosticPrinter.h>
 
 using namespace clang;
 using namespace frontend;
@@ -20,6 +19,7 @@ int main()
 
     CompilerInstance ci;
     ci.createDiagnostics();
+    ci.getDiagnostics().setIgnoreAllWarnings(true);
 
     //ci.getHeaderSearchOpts().Sysroot = "C:/Users/Jones/Files/Projects/IPASimulator/deps/headers/iPhoneOS11.1.sdk/";
     ci.getHeaderSearchOpts().AddPath("C:/Users/Jones/Files/Projects/IPASimulator/deps/headers/iPhoneOS11.1.sdk/System/Library/Frameworks/", IncludeDirGroup::Angled, /*IsFramework*/ true, /*IgnoreSysRoot*/ false);
@@ -28,28 +28,27 @@ int main()
     //ci.getHeaderSearchOpts().ResourceDir = "C:/Users/Jones/Files/Projects/IPASimulator/deps/clang/lib/Headers/";
 
     auto targetOpts = make_shared<TargetOptions>();
-    targetOpts->Triple = "armv7-apple-darwin"; // TODO: just a wild guess
+    targetOpts->Triple = "arm-apple-darwin"; // TODO: just a wild guess
     ci.setTarget(TargetInfo::CreateTargetInfo(ci.getDiagnostics(), targetOpts)); // TODO: TargetInfo* should be deleted when not needed anymore
 
     ci.createFileManager();
     ci.createSourceManager(ci.getFileManager());
 
+    ci.getInvocation().setLangDefaults(ci.getLangOpts(), InputKind::ObjC, ci.getTarget().getTriple(), ci.getPreprocessorOpts());
+    ci.getLangOpts().Blocks = 1;
+
     //ci.getPreprocessorOpts().UsePredefines = false;
     ci.createPreprocessor(TranslationUnitKind::TU_Complete);
-
-    CompilerInvocation::setLangDefaults(ci.getLangOpts(), InputKind::ObjC, ci.getTarget().getTriple(), ci.getPreprocessorOpts());
 
     ci.setASTConsumer(make_unique<ASTConsumer>());
     ci.createASTContext();
     ci.createSema(TranslationUnitKind::TU_Complete, nullptr);
 
-    ci.getDiagnosticClient().BeginSourceFile(ci.getLangOpts(), &ci.getPreprocessor());
-
     const auto file = ci.getFileManager().getFile("C:/Users/Jones/Files/Projects/IPASimulator/deps/headers/iPhoneOS11.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/Foundation.h");
     ci.getSourceManager().setMainFileID(ci.getSourceManager().createFileID(file, SourceLocation(), SrcMgr::C_User));
-    ParseAST(ci.getSema());
-    ci.getASTContext().Idents.PrintStats();
 
+    ci.getDiagnosticClient().BeginSourceFile(ci.getLangOpts(), &ci.getPreprocessor());
+    ParseAST(ci.getSema(), /*PrintStats*/ true, /*SkipFunctionBodies*/ true);
     ci.getDiagnosticClient().EndSourceFile();
 
     return 0;
