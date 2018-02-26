@@ -1,0 +1,14 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: F9545E09-11C1-3F3A-8472-5D395A6D0A66', 'armv7s: C542F0FC-B76A-32B7-9CD3-5E5CAFA204A5', 
+                   'arm64: 145C845D-2584-3F13-9892-F74DF79A22AD' ]
+platform:        ios
+install-name:    /usr/lib/libETLEFSDumpDynamic.dylib
+current-version: 0
+compatibility-version: 0
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ _ETLEFSDUmpCopyCrashLocationDetails, _ETLEFSDumpCopyCrashHeaderDetails, 
+                       _ETLEFSDumpCopySoftwareVersion, _ETLEFSDumpInfoFree, _ETLEFSDumpInterpret ]
+...

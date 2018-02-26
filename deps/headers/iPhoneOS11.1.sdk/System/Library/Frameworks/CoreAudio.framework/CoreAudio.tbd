@@ -1,0 +1,57 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: 351F3CBC-522F-3042-9E51-BA2452A8EB31', 'armv7s: F96E3729-D788-3359-8A6A-A0093C7554B5', 
+                   'arm64: A030DFAC-7881-3931-8304-B30C0900BD30' ]
+platform:        ios
+install-name:    /System/Library/Frameworks/CoreAudio.framework/CoreAudio
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s ]
+    symbols:         [ _IOAudio2Transformer_AddInputBufferReadyProc, _IOAudio2Transformer_AddOutputBufferReadyProc, 
+                       _IOAudio2Transformer_AddPropertyListener, _IOAudio2Transformer_Close, 
+                       _IOAudio2Transformer_CopyBufferReadyRunLoopSources, _IOAudio2Transformer_CopyCommonRunLoopSource, 
+                       _IOAudio2Transformer_Create, _IOAudio2Transformer_DequeueInputBuffer, 
+                       _IOAudio2Transformer_DequeueOutputBuffer, _IOAudio2Transformer_Destroy, 
+                       _IOAudio2Transformer_EnqueueInputBuffer, _IOAudio2Transformer_EnqueueOutputBuffer, 
+                       _IOAudio2Transformer_Flush, _IOAudio2Transformer_GetNumberAvailableInputBuffers, 
+                       _IOAudio2Transformer_GetNumberAvailableOutputBuffers, _IOAudio2Transformer_GetPropertyData, 
+                       _IOAudio2Transformer_GetPropertyDataSize, _IOAudio2Transformer_HasProperty, 
+                       _IOAudio2Transformer_IsPropertySettable, _IOAudio2Transformer_Open, 
+                       _IOAudio2Transformer_RemoveInputBufferReadyProc, _IOAudio2Transformer_RemoveOutputBufferReadyProc, 
+                       _IOAudio2Transformer_RemovePropertyListener, _IOAudio2Transformer_Reset, 
+                       _IOAudio2Transformer_SetPropertyData, _IOAudio2Transformer_Start, 
+                       _IOAudio2Transformer_Stop, _IOAudio2_ASBDFromDictionary, _IOAudio2_ASRDFromDictionary, 
+                       _IOAudio2_DictionaryFromASBD, _IOStreamAudioBufferGetControlBuffer, 
+                       _IOStreamAudioBufferGetControlBufferLength, _IOStreamAudioBufferGetDataBuffer, 
+                       _IOStreamAudioBufferGetDataBufferCapacity, _IOStreamAudioBufferGetDataBufferLength ]
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ _AudioConvertHostTimeToNanos, _AudioConvertNanosToHostTime, 
+                       _AudioDeviceAddIOProc, _AudioDeviceAddPropertyListener, _AudioDeviceCreateIOProcID, 
+                       _AudioDeviceCreateIOProcIDWithBlock, _AudioDeviceCreateIOProcIDWithClockedBlock, 
+                       _AudioDeviceCreateIOProcIDWithClockedProc, _AudioDeviceDestroyIOProcID, 
+                       _AudioDeviceDuck, _AudioDeviceEnterMode, _AudioDeviceExitMode, 
+                       _AudioDeviceGetCurrentTime, _AudioDeviceGetNearestStartTime, 
+                       _AudioDeviceGetProperty, _AudioDeviceGetPropertyInfo, _AudioDeviceRead, 
+                       _AudioDeviceRemoveIOProc, _AudioDeviceRemovePropertyListener, 
+                       _AudioDeviceRun, _AudioDeviceSetProperty, _AudioDeviceStart, 
+                       _AudioDeviceStartAtTime, _AudioDeviceStop, _AudioDeviceTranslateTime, 
+                       _AudioDeviceWrite, _AudioGetCurrentHostTime, _AudioGetHostClockFrequency, 
+                       _AudioGetHostClockMinimumTimeDelta, _AudioHardwareAddPropertyListener, 
+                       _AudioHardwareAddRunLoopSource, _AudioHardwareBeMaster, _AudioHardwareClaimAudioDeviceID, 
+                       _AudioHardwareClaimAudioStreamID, _AudioHardwareCreateAggregateDevice, 
+                       _AudioHardwareDestroyAggregateDevice, _AudioHardwareDevicePropertyChanged, 
+                       _AudioHardwareDevicesCreated, _AudioHardwareDevicesDied, _AudioHardwareGetProperty, 
+                       _AudioHardwareGetPropertyInfo, _AudioHardwareRemovePropertyListener, 
+                       _AudioHardwareRemoveRunLoopSource, _AudioHardwareSetProperty, 
+                       _AudioHardwareStreamPropertyChanged, _AudioHardwareStreamsCreated, 
+                       _AudioHardwareStreamsDied, _AudioHardwareUnload, _AudioObjectAddPropertyListener, 
+                       _AudioObjectAddPropertyListenerBlock, _AudioObjectAddPropertyListenerInternal, 
+                       _AudioObjectCreate, _AudioObjectExists, _AudioObjectGetPropertyData, 
+                       _AudioObjectGetPropertyDataSize, _AudioObjectHasProperty, 
+                       _AudioObjectIsOnListenerThread, _AudioObjectIsPropertySettable, 
+                       _AudioObjectPropertiesChanged, _AudioObjectRemovePropertyListener, 
+                       _AudioObjectRemovePropertyListenerBlock, _AudioObjectSetPropertyData, 
+                       _AudioObjectShow, _AudioObjectsPublishedAndDied, _AudioStreamAddPropertyListener, 
+                       _AudioStreamGetProperty, _AudioStreamGetPropertyInfo, _AudioStreamRemovePropertyListener, 
+                       _AudioStreamSetProperty ]
+...

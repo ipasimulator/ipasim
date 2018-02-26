@@ -1,0 +1,52 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: 4EE8EF01-51AA-3EFE-B4AA-69DD5E1CB97E', 'armv7s: F8DEFD1C-A4BD-3A5B-B325-1DAFB41728B6', 
+                   'arm64: 96122A8F-BC57-377E-8D59-4B1C697715BA' ]
+platform:        ios
+install-name:    /usr/lib/libIOAccessoryManager.dylib
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ _IOAccesoryManagerGetDigitalIDAccessoryVersionInfo, _IOAccesoryManagerGetDigitalIDInterfaceDeviceInfo, 
+                       _IOAccessoryEAInterfaceCopyDeviceDockType, _IOAccessoryEAInterfaceCopyDeviceFirmwareRevision, 
+                       _IOAccessoryEAInterfaceCopyDeviceHardwareRevision, _IOAccessoryEAInterfaceCopyDeviceModelNumber, 
+                       _IOAccessoryEAInterfaceCopyDeviceName, _IOAccessoryEAInterfaceCopyDeviceSerialNumber, 
+                       _IOAccessoryEAInterfaceCopyDeviceVendorName, _IOAccessoryEAInterfaceCopyProtocolString, 
+                       _IOAccessoryEAInterfaceGetTransportType, _IOAccessoryEAInterfaceReceiveData, 
+                       _IOAccessoryEAInterfaceRegisterReceiveCallback, _IOAccessoryEAInterfaceSendData, 
+                       _IOAccessoryIDBusAssertBusReset, _IOAccessoryIDBusCancelTransfer, 
+                       _IOAccessoryIDBusGetMaxTransfer, _IOAccessoryIDBusGetServiceWithManagerPrimaryPort, 
+                       _IOAccessoryIDBusSendBreak, _IOAccessoryIDBusSendBusReset, 
+                       _IOAccessoryIDBusTransferData, _IOAccessoryManagerAllowFeatures, 
+                       _IOAccessoryManagerChallengeCryptoDock9Pin, _IOAccessoryManagerCheckPinVoltage, 
+                       _IOAccessoryManagerClearUSBCurrentLimitMaximum, _IOAccessoryManagerConfigureGoldbondMode, 
+                       _IOAccessoryManagerConfigurePower, _IOAccessoryManagerConfigurePowerLowVoltageSelect, 
+                       _IOAccessoryManagerConfigureUSBMode, _IOAccessoryManagerCopyDeviceInfo, 
+                       _IOAccessoryManagerEnableUSBHostMode, _IOAccessoryManagerForceUSBConnectActive, 
+                       _IOAccessoryManagerGetAccessoryID, _IOAccessoryManagerGetActivePowerMode, 
+                       _IOAccessoryManagerGetBatteryPackMode, _IOAccessoryManagerGetDigitalID, 
+                       _IOAccessoryManagerGetLdcmParams, _IOAccessoryManagerGetPowerDuringSleep, 
+                       _IOAccessoryManagerGetPowerMode, _IOAccessoryManagerGetPrimaryPort, 
+                       _IOAccessoryManagerGetServiceWithPrimaryPort, _IOAccessoryManagerGetType, 
+                       _IOAccessoryManagerGetUSBChargingVoltage, _IOAccessoryManagerGetUSBConnectType, 
+                       _IOAccessoryManagerGetUSBCurrentLimit, _IOAccessoryManagerGetUSBCurrentLimitBase, 
+                       _IOAccessoryManagerGetUSBCurrentLimitMaximum, _IOAccessoryManagerGetUSBCurrentLimitOffset, 
+                       _IOAccessoryManagerGetUpstreamPrimaryPort, _IOAccessoryManagerGetUpstreamService, 
+                       _IOAccessoryManagerOverrideDPDNBTConfig, _IOAccessoryManagerOverrideDPDNConfig, 
+                       _IOAccessoryManagerOverrideDetect, _IOAccessoryManagerOverrideDetectClear, 
+                       _IOAccessoryManagerOverrideDigitalID, _IOAccessoryManagerPowerDuringSleepIsSupported, 
+                       _IOAccessoryManagerPowerModeCurrentLimit, _IOAccessoryManagerPowerModeIsSupported, 
+                       _IOAccessoryManagerRequestAccessoryPowerOff, _IOAccessoryManagerRequestLdcmMeasurement, 
+                       _IOAccessoryManagerRestoreUSBCurrentLimitBase, _IOAccessoryManagerRevokeFeatures, 
+                       _IOAccessoryManagerRevokeHighCurrentPower, _IOAccessoryManagerSetAccessoryRequestedCurrent, 
+                       _IOAccessoryManagerSetAccessoryUsedCurrent, _IOAccessoryManagerSetAttachStyle, 
+                       _IOAccessoryManagerSetBatteryPackMode, _IOAccessoryManagerSetGoldbondMode, 
+                       _IOAccessoryManagerSetPowerDuringSleep, _IOAccessoryManagerSetUSBCurrentLimitBase, 
+                       _IOAccessoryManagerSetUSBCurrentLimitMaximum, _IOAccessoryManagerSetUSBCurrentOffset, 
+                       _IOAccessoryManagerSetUSBPowerIgnore, _IOAccessoryManagerSetVoltageDetected, 
+                       _IOAccessoryPortCreateRunLoopSource, _IOAccessoryPortGetManagerPrimaryPort, 
+                       _IOAccessoryPortGetManagerService, _IOAccessoryPortGetPort, 
+                       _IOAccessoryPortGetServiceWithPort, _IOAccessoryPortGetTransportType, 
+                       _IOAccessoryPortSetUSBRoleSwitchMask, _IOAccessoryPortTransmitData, 
+                       _IOAccessoryPortWaitSendDone ]
+...

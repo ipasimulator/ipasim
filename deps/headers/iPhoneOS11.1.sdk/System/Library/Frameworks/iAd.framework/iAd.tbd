@@ -1,0 +1,49 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: 3DC31F48-413E-34B1-A12F-D0EB1BCEB4C9', 'armv7s: 8DB7A18D-7D7E-341D-8A41-C3D7532BE433', 
+                   'arm64: 4DD477E1-DC48-3756-B25C-523F0710AF62' ]
+platform:        ios
+install-name:    /System/Library/Frameworks/iAd.framework/iAd
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s ]
+    symbols:         [ _kADPolicyEngineHeartbeatTokenChangedNotification ]
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ _ADBannerContentSizeIdentifier320x50, _ADBannerContentSizeIdentifier480x32, 
+                       _ADBannerContentSizeIdentifierLandscape, _ADBannerContentSizeIdentifierPortrait, 
+                       _ADCanStealControllerForCreativeType, _ADClampedBannerSize, 
+                       _ADClassicMode, _ADClearLocationPermissionCache, _ADClientErrorDomain, 
+                       _ADClientSegmentDataErrorDomain, _ADConvertScreenRectToUIOrientation, 
+                       _ADCreateCGImageRefFromSurface, _ADCreateScreenImageWithOrientation, 
+                       _ADCreativeTypeHasView, _ADCreativeTypeShouldCycle, _ADCreativeTypeSkipsVisibilityCheck, 
+                       _ADCreativeViewErrorDomain, _ADDeviceDescription, _ADErrorDomain, 
+                       _ADFrameForInterstitialWithClampedSize, _ADLandscapeBannerSize, 
+                       _ADMakeRectilinear, _ADMaximumControllersForCreativeType, 
+                       _ADPortraitBannerSize, _ADPresentingViewControllerForView, 
+                       _ADPrivacyViewControllerErrorDomain, _ADRectIsValidForPopoverPresentation, 
+                       _ADSanitizedErrorForError, _ADSubscriptionEventInfoAdamIDKey, 
+                       _ADSubscriptionEventInfoCurrencyKey, _ADSubscriptionEventInfoPriceKey, 
+                       _ADViewControllerForView, __ADInternalAdTypeForPublicAdType, 
+                       __ADPaddedImageFromImage, __UIApplicationHasNewsClientEntitlement, 
+                       _kADPolicyEngineTestStationDescriptionsComputedNotification, 
+                       _kADViewDefaultHeight ]
+    objc-classes:    [ _ADAdActionPublicAttributes, _ADAdImpressionPublicAttributes, 
+                       _ADAdSpace, _ADAdSpaceConfiguration, _ADAdSpaceEventInfo, 
+                       _ADBannerView, _ADCanonicalRequest, _ADCircularCountdownView, 
+                       _ADClient, _ADContentProxyAttributes, _ADContext, _ADCountdownButton, 
+                       _ADCreativeController, _ADDimmerView, _ADInterstitialAd, _ADInterstitialAdPresentationViewController, 
+                       _ADInterstitialView, _ADLockScreenManager, _ADMRAIDAction, 
+                       _ADNSURLSessionDemultiplexer, _ADNSURLSessionDemultiplexerManager, 
+                       _ADNSURLSessionTaskInfo, _ADOptInManager, _ADPlayer, _ADPolicyEngine, 
+                       _ADPrerollBottomBar, _ADPrerollButton, _ADPrerollController, 
+                       _ADPrerollSlider, _ADPrerollTopBar, _ADPrerollView, _ADPrivacyButton, 
+                       _ADPrivacyRemoteViewController, _ADPrivacyViewController, 
+                       _ADProgressView, _ADRemoteActionViewController, _ADSession, 
+                       _ADSoftLinking, _ADSubscriptionEvent, _ADTVInterstitialMediaViewController, 
+                       _ADTVMediaButton, _ADTVMediaControlsView, _ADTVMediaControlsViewController, 
+                       _ADTVMediaCountdownView, _ADTVMediaSkipView, _ADTVPrerollController, 
+                       _ADTVPrerollVideoView, _ADTapGestureRecognizer, _ADTapGestureTimer, 
+                       _ADVolumeSlider, _ADWebView, _ADWebViewActionViewController, 
+                       _ADWebViewManager, _ADWebViewURLProxyProtocol, __ADPolicyEngineEvent, 
+                       __ADUIViewControllerAdController ]
+...

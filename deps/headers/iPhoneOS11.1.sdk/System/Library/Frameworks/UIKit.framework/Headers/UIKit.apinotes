@@ -1,0 +1,956 @@
+#
+# Swift 3 specific notes are at the end of the file.
+# The following are notes applicable to Swift 3 and Swift 4.
+#
+---
+Name: UIKit
+Classes:
+- Name: UIBezierPath
+  Methods:
+  - Selector: 'reversing'
+    SwiftName: 'reversed'
+    MethodKind: Instance
+- Name: UIPrintInfo
+  Methods:
+  - Selector: printInfo
+    MethodKind: Class
+    SwiftName: 'printInfo()'
+- Name: UIPrintInteractionController
+  Properties:
+  - Name: 'sharedPrintController'
+    SwiftName: shared
+- Name: NSLayoutAnchor
+  Methods:
+  - Selector: 'constraintEqualToAnchor:'
+    SwiftName: constraint(equalTo:)
+    MethodKind: Instance
+  - Selector: 'constraintGreaterThanOrEqualToAnchor:'
+    SwiftName: constraint(greaterThanOrEqualTo:)
+    MethodKind: Instance
+  - Selector: 'constraintLessThanOrEqualToAnchor:'
+    SwiftName: constraint(lessThanOrEqualTo:)
+    MethodKind: Instance
+  - Selector: 'constraintEqualToAnchor:constant:'
+    SwiftName: constraint(equalTo:constant:)
+    MethodKind: Instance
+  - Selector: 'constraintGreaterThanOrEqualToAnchor:constant:'
+    SwiftName: constraint(greaterThanOrEqualTo:constant:)
+    MethodKind: Instance
+  - Selector: 'constraintLessThanOrEqualToAnchor:constant:'
+    SwiftName: constraint(lessThanOrEqualTo:constant:)
+    MethodKind: Instance
+- Name: NSLayoutXAxisAnchor
+  Methods:
+  - Selector: 'constraintEqualToSystemSpacingAfterAnchor:multiplier:'
+    SwiftName: constraintEqualToSystemSpacingAfter(_:multiplier:)
+    MethodKind: Instance
+  - Selector: 'constraintGreaterThanOrEqualToSystemSpacingAfterAnchor:multiplier:'
+    SwiftName: constraintGreaterThanOrEqualToSystemSpacingAfter(_:multiplier:)
+    MethodKind: Instance
+  - Selector: 'constraintLessThanOrEqualToSystemSpacingAfterAnchor:multiplier:'
+    SwiftName: constraintLessThanOrEqualToSystemSpacingAfter(_:multiplier:)
+    MethodKind: Instance
+- Name: NSLayoutYAxisAnchor
+  Methods:
+  - Selector: 'constraintEqualToSystemSpacingBelowAnchor:multiplier:'
+    SwiftName: constraintEqualToSystemSpacingBelow(_:multiplier:)
+    MethodKind: Instance
+  - Selector: 'constraintGreaterThanOrEqualToSystemSpacingBelowAnchor:multiplier:'
+    SwiftName: constraintGreaterThanOrEqualToSystemSpacingBelow(_:multiplier:)
+    MethodKind: Instance
+  - Selector: 'constraintLessThanOrEqualToSystemSpacingBelowAnchor:multiplier:'
+    SwiftName: constraintLessThanOrEqualToSystemSpacingBelow(_:multiplier:)
+    MethodKind: Instance
+- Name: NSLayoutDimension
+  Methods:
+  - Selector: 'constraintEqualToConstant:'
+    SwiftName: constraint(equalToConstant:)
+    MethodKind: Instance
+  - Selector: 'constraintGreaterThanOrEqualToConstant:'
+    SwiftName: constraint(greaterThanOrEqualToConstant:)
+    MethodKind: Instance
+  - Selector: 'constraintLessThanOrEqualToConstant:'
+    SwiftName: constraint(lessThanOrEqualToConstant:)
+    MethodKind: Instance
+  - Selector: 'constraintEqualToAnchor:multiplier:'
+    SwiftName: constraint(equalTo:multiplier:)
+    MethodKind: Instance
+  - Selector: 'constraintGreaterThanOrEqualToAnchor:multiplier:'
+    SwiftName: constraint(greaterThanOrEqualTo:multiplier:)
+    MethodKind: Instance
+  - Selector: 'constraintLessThanOrEqualToAnchor:multiplier:'
+    SwiftName: constraint(lessThanOrEqualTo:multiplier:)
+    MethodKind: Instance
+  - Selector: 'constraintEqualToAnchor:multiplier:constant:'
+    SwiftName: constraint(equalTo:multiplier:constant:)
+    MethodKind: Instance
+  - Selector: 'constraintGreaterThanOrEqualToAnchor:multiplier:constant:'
+    SwiftName: constraint(greaterThanOrEqualTo:multiplier:constant:)
+    MethodKind: Instance
+  - Selector: 'constraintLessThanOrEqualToAnchor:multiplier:constant:'
+    SwiftName: constraint(lessThanOrEqualTo:multiplier:constant:)
+    MethodKind: Instance
+- Name: NSLayoutConstraint
+  Properties:
+  - Name: firstItem
+    Nullability: O
+- Name: NSLayoutManager
+  Methods:
+  - Selector: 'getGlyphsInRange:glyphs:properties:characterIndexes:bidiLevels:'
+    SwiftName: getGlyphs(in:glyphs:properties:characterIndexes:bidiLevels:)
+    MethodKind: Instance
+  - Selector: 'textContainerForGlyphAtIndex:effectiveRange:'
+    SwiftName: textContainer(forGlyphAt:effectiveRange:)
+    MethodKind: Instance
+  - Selector: 'textContainerForGlyphAtIndex:effectiveRange:withoutAdditionalLayout:'
+    SwiftName: textContainer(forGlyphAt:effectiveRange:withoutAdditionalLayout:)
+    MethodKind: Instance
+  - Selector: 'lineFragmentRectForGlyphAtIndex:effectiveRange:'
+    SwiftName: lineFragmentRect(forGlyphAt:effectiveRange:)
+    MethodKind: Instance
+  - Selector: 'lineFragmentRectForGlyphAtIndex:effectiveRange:withoutAdditionalLayout:'
+    SwiftName: lineFragmentRect(forGlyphAt:effectiveRange:withoutAdditionalLayout:)
+    MethodKind: Instance
+  - Selector: 'lineFragmentUsedRectForGlyphAtIndex:effectiveRange:'
+    SwiftName: lineFragmentUsedRect(forGlyphAt:effectiveRange:)
+    MethodKind: Instance
+  - Selector: 'lineFragmentUsedRectForGlyphAtIndex:effectiveRange:withoutAdditionalLayout:'
+    SwiftName: lineFragmentUsedRect(forGlyphAt:effectiveRange:withoutAdditionalLayout:)
+    MethodKind: Instance
+  - Selector: 'locationForGlyphAtIndex:'
+    SwiftName: location(forGlyphAt:)
+    MethodKind: Instance
+  - Selector: 'notShownAttributeForGlyphAtIndex:'
+    SwiftName: notShownAttribute(forGlyphAt:)
+    MethodKind: Instance
+  - Selector: 'drawsOutsideLineFragmentForGlyphAtIndex:'
+    SwiftName: drawsOutsideLineFragment(forGlyphAt:)
+    MethodKind: Instance
+  - Selector: 'attachmentSizeForGlyphAtIndex:'
+    SwiftName: attachmentSize(forGlyphAt:)
+    MethodKind: Instance
+  - Selector: 'truncatedGlyphRangeInLineFragmentForGlyphAtIndex:'
+    SwiftName: truncatedGlyphRange(inLineFragmentForGlyphAt:)
+    MethodKind: Instance
+  - Selector: 'getLineFragmentInsertionPointsForCharacterAtIndex:alternatePositions:inDisplayOrder:positions:characterIndexes:'
+    SwiftName: getLineFragmentInsertionPoints(forCharacterAt:alternatePositions:inDisplayOrder:positions:characterIndexes:)
+    MethodKind: Instance
+- Name: NSString
+  Methods:
+  - Selector: 'sizeWithAttributes:'
+    SwiftName: size(withAttributes:)
+    MethodKind: Instance
+- Name: UIApplication
+  Methods:
+  - Selector: 'openURL:'
+    SwiftName: openURL(_:)
+    MethodKind: Instance
+  - Selector: 'canOpenURL:'
+    SwiftName: canOpenURL(_:)
+    MethodKind: Instance
+  - Selector: 'sendEvent:'
+    SwiftName: sendEvent(_:)
+    MethodKind: Instance
+  - Selector: 'registerForRemoteNotificationTypes:'
+    SwiftName: registerForRemoteNotifications(matching:)
+    MethodKind: Instance
+  - Selector: 'cancelLocalNotification:'
+    SwiftName: cancelLocalNotification(_:)
+    MethodKind: Instance
+  - Selector: 'registerUserNotificationSettings:'
+    SwiftName: registerUserNotificationSettings(_:)
+    MethodKind: Instance
+- Name: NSIndexPath
+  Methods:
+  - Selector: 'indexPathForItem:inSection:'
+    SwiftName: init(item:section:)
+    MethodKind: Class
+  - Selector: 'indexPathForRow:inSection:'
+    SwiftName: init(row:section:)
+    MethodKind: Class
+- Name: UICollisionBehavior
+  Methods:
+  - Selector: 'setTranslatesReferenceBoundsIntoBoundaryWithInsets:'
+    SwiftName: setTranslatesReferenceBoundsIntoBoundary(with:)
+    MethodKind: Instance
+- Name: UIControl
+  Methods:
+  - Selector: 'beginTrackingWithTouch:withEvent:'
+    SwiftName: beginTracking(_:with:)
+    MethodKind: Instance
+  - Selector: 'continueTrackingWithTouch:withEvent:'
+    SwiftName: continueTracking(_:with:)
+    MethodKind: Instance
+  - Selector: 'endTrackingWithTouch:withEvent:'
+    SwiftName: endTracking(_:with:)
+    MethodKind: Instance
+- Name: UIFieldBehavior
+  Methods:
+  - Selector: 'radialGravityFieldWithPosition:'
+    SwiftName: radialGravityField(position:)
+    MethodKind: Class
+  - Selector: 'linearGravityFieldWithVector:'
+    SwiftName: linearGravityField(direction:)
+    MethodKind: Class
+  - Selector: 'velocityFieldWithVector:'
+    SwiftName: velocityField(direction:)
+    MethodKind: Class
+  - Selector: 'noiseFieldWithSmoothness:animationSpeed:'
+    SwiftName: noiseField(smoothness:animationSpeed:)
+    MethodKind: Class
+  - Selector: 'turbulenceFieldWithSmoothness:animationSpeed:'
+    SwiftName: turbulenceField(smoothness:animationSpeed:)
+    MethodKind: Class
+- Name: UIFontMetrics
+  Methods:
+  - Selector: 'scaledValueForValue:compatibleWithTraitCollection:'
+    SwiftName: scaledValue(for:compatibleWith:)
+    MethodKind: Instance
+  - Selector: 'scaledValueForValue:'
+    SwiftName: scaledValue(for:)
+    MethodKind: Instance
+- Name: UIImageAsset
+  Methods:
+  - Selector: 'unregisterImageWithTraitCollection:'
+    SwiftName: unregister(imageWith:)
+    MethodKind: Instance
+- Name: UILocalizedIndexedCollation
+  Methods:
+  - Selector: 'sectionForSectionIndexTitleAtIndex:'
+    SwiftName: section(forSectionIndexTitle:)
+    MethodKind: Instance
+- Name: UINavigationBar
+  Methods:
+  - Selector: 'pushNavigationItem:animated:'
+    SwiftName: pushItem(_:animated:)
+    MethodKind: Instance
+  - Selector: 'popNavigationItemAnimated:'
+    SwiftName: popItem(animated:)
+    MethodKind: Instance
+- Name: UINavigationController
+  Methods:
+  - Selector: 'popToViewController:animated:'
+    SwiftName: popToViewController(_:animated:)
+    MethodKind: Instance
+- Name: UIPageControl
+  Methods:
+  - Selector: 'sizeForNumberOfPages:'
+    SwiftName: size(forNumberOfPages:)
+    MethodKind: Instance
+- Name: UIPasteboard
+  Properties:
+  - Name: pasteboardTypes
+    SwiftName: types
+  Methods:
+  - Selector: 'containsPasteboardTypes:'
+    SwiftName: contains(pasteboardTypes:)
+    MethodKind: Instance
+  - Selector: 'pasteboardTypesForItemSet:'
+    SwiftName: types(forItemSet:)
+    MethodKind: Instance
+  - Selector: 'containsPasteboardTypes:inItemSet:'
+    SwiftName: contains(pasteboardTypes:inItemSet:)
+    MethodKind: Instance
+- Name: UIPopoverController
+  Properties:
+  - Name: popoverContentSize
+    SwiftName: contentSize
+  - Name: isPopoverVisible
+    SwiftName: isVisible
+  - Name: popoverArrowDirection
+    SwiftName: arrowDirection
+  - Name: popoverLayoutMargins
+    SwiftName: layoutMargins
+  - Name: popoverBackgroundViewClass
+    SwiftName: backgroundViewClass
+  Methods:
+  - Selector: 'setPopoverContentSize:animated:'
+    SwiftName: setContentSize(_:animated:)
+    MethodKind: Instance
+  - Selector: 'presentPopoverFromRect:inView:permittedArrowDirections:animated:'
+    SwiftName: present(from:in:permittedArrowDirections:animated:)
+    MethodKind: Instance
+  - Selector: 'presentPopoverFromBarButtonItem:permittedArrowDirections:animated:'
+    SwiftName: present(from:permittedArrowDirections:animated:)
+    MethodKind: Instance
+  - Selector: 'dismissPopoverAnimated:'
+    SwiftName: dismiss(animated:)
+    MethodKind: Instance
+- Name: UIScrollView
+  Methods:
+  - Selector: 'touchesShouldBegin:withEvent:inContentView:'
+    SwiftName: touchesShouldBegin(_:with:in:)
+    MethodKind: Instance
+  - Selector: 'touchesShouldCancelInContentView:'
+    SwiftName: touchesShouldCancel(in:)
+    MethodKind: Instance
+- Name: UIStoryboardSegue
+  Properties:
+  - Name: sourceViewController
+    SwiftName: source
+  - Name: destinationViewController
+    SwiftName: destination
+- Name: UIStoryboardUnwindSegueSource
+  Properties:
+  - Name: sourceViewController
+    SwiftName: source
+- Name: UITextDragPreviewRenderer
+  Methods:
+  - Selector: 'adjustFirstLineRect:bodyRect:lastLineRect:textOrigin:'
+    SwiftName: adjust(firstLineRect:bodyRect:lastLineRect:textOrigin:)
+    MethodKind: Instance
+- Name: UIUserNotificationSettings
+  Methods:
+  - Selector: 'settingsForTypes:categories:'
+    SwiftName: init(types:categories:)
+    MethodKind: Class
+- Name: UIView
+  Methods:
+  - Selector: 'willMoveToWindow:'
+    SwiftName: willMove(toWindow:)
+    MethodKind: Instance
+  - Selector: 'viewWithTag:'
+    SwiftName: viewWithTag(_:)
+    MethodKind: Instance
+  - Selector: 'setNeedsDisplayInRect:'
+    SwiftName: setNeedsDisplay(_:)
+    MethodKind: Instance
+- Name: UIViewController
+  Properties:
+  - Name: presentedViewController
+    SwiftName: presentedViewController
+  - Name: presentingViewController
+    SwiftName: presentingViewController
+- Name: UIVibrancyEffect
+  Methods:
+  - Selector: 'effectForBlurEffect:'
+    SwiftName: init(blurEffect:)
+    MethodKind: Class
+- Name: UIWindow
+  Properties:
+  - Name: isKeyWindow
+    SwiftName: isKey
+  Methods:
+  - Selector: becomeKeyWindow
+    SwiftName: becomeKey()
+    MethodKind: Instance
+  - Selector: resignKeyWindow
+    SwiftName: resignKey()
+    MethodKind: Instance
+  - Selector: makeKeyWindow
+    SwiftName: makeKey()
+    MethodKind: Instance
+  - Selector: 'sendEvent:'
+    SwiftName: sendEvent(_:)
+    MethodKind: Instance
+- Name: UIGraphicsImageRendererFormat
+  Methods:
+  - Selector: 'formatForTraitCollection:'
+    SwiftName: init(for:)
+    MethodKind: Class
+- Name: UIDropProposal
+  Methods:
+  - Selector: 'initWithDropOperation:'
+    SwiftName: 'init(operation:)'
+    MethodKind: Instance
+- Name: UICollectionViewDropProposal
+  Methods:
+  - Selector: 'initWithDropOperation:intent:'
+    SwiftName: 'init(operation:intent:)'
+    MethodKind: Instance
+- Name: UITableViewDropProposal
+  Methods:
+  - Selector: 'initWithDropOperation:intent:'
+    SwiftName: 'init(operation:intent:)'
+    MethodKind: Instance
+- Name: UIPasteConfiguration
+  Methods:
+  - Selector: 'addTypeIdentifiersForAcceptingClass:'
+    SwiftName: 'addTypeIdentifiers(forAccepting:)'
+    MethodKind: Instance
+  - Selector: 'initWithTypeIdentifiersForAcceptingClass:'
+    MethodKind: Instance
+    SwiftName: 'init(forAccepting:)'
+- Name: UIFocusSystem
+  Methods:
+  - Selector: 'environment:containsEnvironment:'
+    MethodKind: Class
+    Availability: nonswift
+Protocols:
+- Name: UIAppearance
+  Methods:
+  - Selector: 'appearanceWhenContainedInInstancesOfClasses:'
+    SwiftName: 'appearance(whenContainedInInstancesOf:)'
+    MethodKind: Class
+  - Selector: 'appearanceForTraitCollection:'
+    SwiftName: 'appearance(for:)'
+    MethodKind: Class
+  - Selector: 'appearanceForTraitCollection:whenContainedInInstancesOfClasses:'
+    SwiftName: 'appearance(for:whenContainedInInstancesOf:)'
+    MethodKind: Class
+- Name: UIActivityItemSource
+  Methods:
+  - Selector: 'activityViewController:itemForActivityType:'
+    MethodKind: Instance
+    Parameters:
+    - Position: 0
+      Nullability: N
+    - Position: 1
+      Nullability: O
+- Name: UIBarPositioningDelegate
+  Methods:
+  - Selector: 'positionForBar:'
+    SwiftName: position(for:)
+    MethodKind: Instance
+- Name: UIDocumentInteractionControllerDelegate
+  Methods:
+  - Selector: 'documentInteractionControllerViewControllerForPreview:'
+    SwiftName: documentInteractionControllerViewControllerForPreview(_:)
+    MethodKind: Instance
+  - Selector: 'documentInteractionControllerRectForPreview:'
+    SwiftName: documentInteractionControllerRectForPreview(_:)
+    MethodKind: Instance
+  - Selector: 'documentInteractionControllerViewForPreview:'
+    SwiftName: documentInteractionControllerViewForPreview(_:)
+    MethodKind: Instance
+  - Selector: 'documentInteractionControllerWillPresentOpenInMenu:'
+    SwiftName: documentInteractionControllerWillPresentOpenInMenu(_:)
+    MethodKind: Instance
+  - Selector: 'documentInteractionControllerDidDismissOpenInMenu:'
+    SwiftName: documentInteractionControllerDidDismissOpenInMenu(_:)
+    MethodKind: Instance
+- Name: UIDragInteractionDelegate
+  Methods:
+  - Selector: 'dragInteraction:previewForLiftingItem:session:'
+    SwiftName: 'dragInteraction(_:previewForLifting:session:)'
+    MethodKind: Instance
+  - Selector: 'dragInteraction:willAnimateLiftWithAnimator:session:'
+    SwiftName: 'dragInteraction(_:willAnimateLiftWith:session:)'
+    MethodKind: Instance
+  - Selector: 'dragInteraction:item:willAnimateCancelWithAnimator:'
+    SwiftName: 'dragInteraction(_:item:willAnimateCancelWith:)'
+    MethodKind: Instance
+- Name: UIDropInteractionDelegate
+  Methods:
+  - Selector: 'dropInteraction:item:willAnimateDropWithAnimator:'
+    SwiftName: 'dropInteraction(_:item:willAnimateDropWith:)'
+    MethodKind: Instance
+- Name: UINavigationControllerDelegate
+  Methods:
+  - Selector: 'navigationControllerPreferredInterfaceOrientationForPresentation:'
+    SwiftName: navigationControllerPreferredInterfaceOrientationForPresentation(_:)
+    MethodKind: Instance
+  - Selector: 'navigationController:interactionControllerForAnimationController:'
+    SwiftName: navigationController(_:interactionControllerFor:)
+    MethodKind: Instance
+- Name: UIPageViewControllerDelegate
+  Methods:
+  - Selector: 'pageViewControllerPreferredInterfaceOrientationForPresentation:'
+    SwiftName: pageViewControllerPreferredInterfaceOrientationForPresentation(_:)
+    MethodKind: Instance
+- Name: UIPasteConfigurationSupporting
+  Methods:
+  - Selector: 'pasteItemProviders:'
+    SwiftName: paste(itemProviders:)
+    MethodKind: Instance
+- Name: UIPopoverPresentationControllerDelegate
+  Methods:
+  - Selector: 'prepareForPopoverPresentation:'
+    SwiftName: prepareForPopoverPresentation(_:)
+    MethodKind: Instance
+- Name: UIScrollViewDelegate
+  Methods:
+  - Selector: 'scrollViewShouldScrollToTop:'
+    SwiftName: scrollViewShouldScrollToTop(_:)
+    MethodKind: Instance
+  - Selector: 'scrollViewDidScrollToTop:'
+    SwiftName: scrollViewDidScrollToTop(_:)
+    MethodKind: Instance
+- Name: UISearchControllerDelegate
+  Methods:
+  - Selector: 'willPresentSearchController:'
+    SwiftName: willPresentSearchController(_:)
+    MethodKind: Instance
+  - Selector: 'didPresentSearchController:'
+    SwiftName: didPresentSearchController(_:)
+    MethodKind: Instance
+  - Selector: 'willDismissSearchController:'
+    SwiftName: willDismissSearchController(_:)
+    MethodKind: Instance
+  - Selector: 'didDismissSearchController:'
+    SwiftName: didDismissSearchController(_:)
+    MethodKind: Instance
+  - Selector: 'presentSearchController:'
+    SwiftName: presentSearchController(_:)
+    MethodKind: Instance
+- Name: UISplitViewControllerDelegate
+  Methods:
+  - Selector: 'splitViewController:showDetailViewController:sender:'
+    SwiftName: splitViewController(_:showDetail:sender:)
+    MethodKind: Instance
+  - Selector: 'splitViewController:collapseSecondaryViewController:ontoPrimaryViewController:'
+    SwiftName: splitViewController(_:collapseSecondary:onto:)
+    MethodKind: Instance
+  - Selector: 'splitViewController:separateSecondaryViewControllerFromPrimaryViewController:'
+    SwiftName: splitViewController(_:separateSecondaryFrom:)
+    MethodKind: Instance
+  - Selector: 'splitViewControllerPreferredInterfaceOrientationForPresentation:'
+    SwiftName: splitViewControllerPreferredInterfaceOrientationForPresentation(_:)
+    MethodKind: Instance
+  - Selector: 'splitViewController:willShowViewController:invalidatingBarButtonItem:'
+    SwiftName: splitViewController(_:willShow:invalidating:)
+    MethodKind: Instance
+- Name: UITabBarControllerDelegate
+  Methods:
+  - Selector: 'tabBarControllerPreferredInterfaceOrientationForPresentation:'
+    SwiftName: tabBarControllerPreferredInterfaceOrientationForPresentation(_:)
+    MethodKind: Instance
+  - Selector: 'tabBarController:interactionControllerForAnimationController:'
+    SwiftName: tabBarController(_:interactionControllerFor:)
+    MethodKind: Instance
+- Name: UITextPasteItem
+  Methods:
+  - Selector: 'setStringResult:'
+    SwiftName: setResult(string:)
+    MethodKind: Instance
+  - Selector: 'setAttributedStringResult:'
+    SwiftName: setResult(attributedString:)
+    MethodKind: Instance
+  - Selector: 'setAttachmentResult:'
+    SwiftName: setResult(attachment:)
+    MethodKind: Instance
+- Name: UIViewControllerAnimatedTransitioning
+  Methods:
+  - Selector: 'transitionDuration:'
+    SwiftName: 'transitionDuration(using:)'
+    MethodKind: Instance
+  - Selector: 'animateTransition:'
+    SwiftName: 'animateTransition(using:)'
+    MethodKind: Instance
+  - Selector: 'interruptibleAnimatorForTransition:'
+    SwiftName: 'interruptibleAnimator(using:)'
+    MethodKind: Instance
+- Name: UIViewControllerTransitioningDelegate
+  Methods:
+  - Selector: 'animationControllerForPresentedController:presentingController:sourceController:'
+    SwiftName: 'animationController(forPresented:presenting:source:)'
+    MethodKind: Instance
+  - Selector: 'animationControllerForDismissedController:'
+    SwiftName: 'animationController(forDismissed:)'
+    MethodKind: Instance
+  - Selector: 'interactionControllerForPresentation:'
+    SwiftName: 'interactionControllerForPresentation(using:)'
+    MethodKind: Instance
+  - Selector: 'interactionControllerForDismissal:'
+    SwiftName: 'interactionControllerForDismissal(using:)'
+    MethodKind: Instance
+  - Selector: 'presentationControllerForPresentedViewController:presentingViewController:sourceViewController:'
+    SwiftName: 'presentationController(forPresented:presenting:source:)'
+    MethodKind: Instance
+- Name: UITextDragDelegate
+  Methods:
+  - Selector: 'textDraggableView:willAnimateLiftWithAnimator:session:'
+    SwiftName: 'textDraggableView(_:willAnimateLiftWith:session:)'
+    MethodKind: Instance
+Tags:
+- Name: NSTextLayoutOrientation
+  SwiftName: NSLayoutManager.TextLayoutOrientation
+- Name: NSGlyphProperty
+  SwiftName: NSLayoutManager.GlyphProperty
+- Name: NSControlCharacterAction
+  SwiftName: NSLayoutManager.ControlCharacterAction
+- Name: NSTypesetterBehavior
+  SwiftName: NSLayoutManager.TypesetterBehavior
+Typedefs:
+- Name: NSAttributedStringDocumentAttributeKey
+  SwiftName: NSAttributedString.DocumentAttributeKey
+- Name: NSAttributedStringDocumentReadingOptionKey
+  SwiftName: NSAttributedString.DocumentReadingOptionKey
+- Name: NSAttributedStringDocumentType
+  SwiftName: NSAttributedString.DocumentType
+- Name: NSTextEffectStyle
+  SwiftName: NSAttributedString.TextEffectStyle
+- Name: NSTextLayoutSectionKey
+  SwiftName: NSAttributedString.TextLayoutSectionKey
+- Name: NSTextTabOptionKey
+  SwiftName: NSTextTab.OptionKey
+- Name: UIFontDescriptorAttributeName
+  SwiftName: UIFontDescriptor.AttributeName
+- Name: UIFontDescriptorTraitKey
+  SwiftName: UIFontDescriptor.TraitKey
+- Name: UIFontDescriptorFeatureKey
+  SwiftName: UIFontDescriptor.FeatureKey
+- Name: UIFontWeight
+  SwiftName: UIFont.Weight
+Enumerators:
+- Name: NSLayoutFormatDirectionLeadingToTrailing
+  SwiftName: directionLeadingToTrailing
+- Name: UIViewAnimationOptionCurveEaseInOut
+  SwiftName: curveEaseInOut
+- Name: UIViewKeyframeAnimationOptionCalculationModeLinear
+  SwiftName: calculationModeLinear
+- Name: UIControlStateNormal
+  SwiftName: normal
+- Name: UIDocumentStateNormal
+  SwiftName: normal
+- Name: UIPrinterJobTypeUnknown
+  SwiftName: unknown
+- Name: UIUserInterfaceIdiomTV
+  SwiftName: tv
+- Name: UITextDragOptionStripTextColorFromPreviews
+  SwiftName: stripTextColorFromPreviews
+Globals:
+- Name: NSDirectionalEdgeInsetsZero
+  SwiftName: NSDirectionalEdgeInsets.zero
+- Name: UIStackViewSpacingUseDefault
+  SwiftName: UIStackView.spacingUseDefault
+- Name: UIStackViewSpacingUseSystem
+  SwiftName: UIStackView.spacingUseSystem
+- Name: NSFontAttributeName
+  SwiftName: font
+- Name: NSParagraphStyleAttributeName
+  SwiftName: paragraphStyle
+- Name: NSForegroundColorAttributeName
+  SwiftName: foregroundColor
+- Name: NSBackgroundColorAttributeName
+  SwiftName: backgroundColor
+- Name: NSLigatureAttributeName
+  SwiftName: ligature
+- Name: NSKernAttributeName
+  SwiftName: kern
+- Name: NSStrikethroughStyleAttributeName
+  SwiftName: strikethroughStyle
+- Name: NSUnderlineStyleAttributeName
+  SwiftName: underlineStyle
+- Name: NSStrokeColorAttributeName
+  SwiftName: strokeColor
+- Name: NSStrokeWidthAttributeName
+  SwiftName: strokeWidth 
+- Name: NSShadowAttributeName
+  SwiftName: shadow
+- Name: NSTextEffectAttributeName
+  SwiftName: textEffect 
+- Name: NSAttachmentAttributeName
+  SwiftName: attachment 
+- Name: NSLinkAttributeName
+  SwiftName: link 
+- Name: NSBaselineOffsetAttributeName
+  SwiftName: baselineOffset
+- Name: NSUnderlineColorAttributeName
+  SwiftName: underlineColor
+- Name: NSStrikethroughColorAttributeName
+  SwiftName: strikethroughColor
+- Name: NSObliquenessAttributeName
+  SwiftName: obliqueness
+- Name: NSExpansionAttributeName
+  SwiftName: expansion
+- Name: NSWritingDirectionAttributeName
+  SwiftName: writingDirection
+- Name: NSVerticalGlyphFormAttributeName
+  SwiftName: verticalGlyphForm
+- Name: NSPlainTextDocumentType
+  SwiftName: plain
+- Name: NSRTFTextDocumentType
+  SwiftName: rtf
+- Name: NSRTFDTextDocumentType
+  SwiftName: rtfd
+- Name: NSHTMLTextDocumentType
+  SwiftName: html
+- Name: NSDocumentTypeDocumentAttribute
+  SwiftName: documentType
+- Name: NSCharacterEncodingDocumentAttribute
+  SwiftName: characterEncoding
+- Name: NSDefaultAttributesDocumentAttribute
+  SwiftName: defaultAttributes
+- Name: NSPaperSizeDocumentAttribute
+  SwiftName: paperSize
+- Name: NSViewSizeDocumentAttribute
+  SwiftName: viewSize
+- Name: NSViewZoomDocumentAttribute
+  SwiftName: viewZoom
+- Name: NSViewModeDocumentAttribute
+  SwiftName: viewMode
+- Name: NSReadOnlyDocumentAttribute
+  SwiftName: readOnly
+- Name: NSBackgroundColorDocumentAttribute
+  SwiftName: backgroundColor
+- Name: NSHyphenationFactorDocumentAttribute
+  SwiftName: hyphenationFactor
+- Name: NSDefaultTabIntervalDocumentAttribute
+  SwiftName: defaultTabInterval
+- Name: NSTextLayoutSectionsAttribute
+  SwiftName: textLayoutSections
+- Name: NSTabColumnTerminatorsAttributeName
+  SwiftName: columnTerminators
+- Name: NSTextEffectLetterpressStyle
+  SwiftName: letterpressStyle
+- Name: NSPaperMarginDocumentAttribute 
+  SwiftName: paperMargin
+- Name: NSDocumentTypeDocumentOption
+  SwiftName: documentType
+- Name: NSDefaultAttributesDocumentOption
+  SwiftName: defaultAttributes
+- Name: NSCharacterEncodingDocumentOption
+  SwiftName: characterEncoding
+- Name: UIFontDescriptorFamilyAttribute
+  SwiftName: family
+- Name: UIFontDescriptorNameAttribute
+  SwiftName: name
+- Name: UIFontDescriptorFaceAttribute
+  SwiftName: face
+- Name: UIFontDescriptorSizeAttribute
+  SwiftName: size
+- Name: UIFontDescriptorVisibleNameAttribute
+  SwiftName: visibleName
+- Name: UIFontDescriptorMatrixAttribute
+  SwiftName: matrix
+- Name: UIFontDescriptorCharacterSetAttribute
+  SwiftName: characterSet
+- Name: UIFontDescriptorCascadeListAttribute
+  SwiftName: cascadeList
+- Name: UIFontDescriptorTraitsAttribute
+  SwiftName: traits
+- Name: UIFontDescriptorFixedAdvanceAttribute
+  SwiftName: fixedAdvance
+- Name: UIFontDescriptorFeatureSettingsAttribute
+  SwiftName: featureSettings
+- Name: UIFontDescriptorTextStyleAttribute
+  SwiftName: textStyle
+- Name: UIFontSymbolicTrait
+  SwiftName: symbolic
+- Name: UIFontWeightTrait
+  SwiftName: weight
+- Name: UIFontWidthTrait
+  SwiftName: width
+- Name: UIFontSlantTrait
+  SwiftName: slant
+- Name: UIFontFeatureTypeIdentifierKey
+  SwiftName: featureIdentifier
+- Name: UIFontFeatureSelectorIdentifierKey
+  SwiftName: typeIdentifier
+- Name: UIFontWeightUltraLight
+  SwiftName: ultraLight
+- Name: UIFontWeightThin
+  SwiftName: thin
+- Name: UIFontWeightLight
+  SwiftName: light
+- Name: UIFontWeightRegular
+  SwiftName: regular
+- Name: UIFontWeightMedium
+  SwiftName: medium
+- Name: UIFontWeightSemibold
+  SwiftName: semibold
+- Name: UIFontWeightBold
+  SwiftName: bold
+- Name: UIFontWeightHeavy
+  SwiftName: heavy
+- Name: UIFontWeightBlack
+  SwiftName: black
+Functions:
+- Name: NSDirectionalEdgeInsetsMake
+  Availability: nonswift
+- Name: NSDirectionalEdgeInsetsEqualToDirectionalEdgeInsets
+  Availability: nonswift
+#
+# Swift 3 specific conversions
+#
+SwiftVersions:
+- Version: 3
+  Classes:
+  - Name: NSLayoutConstraint
+    Properties:
+    - Name: firstItem
+      Nullability: U
+  - Name: UIKeyCommand
+    Properties:
+    - Name: input
+      Nullability: N
+  - Name: NSString
+    Methods:
+    - Selector: 'sizeWithAttributes:'
+      SwiftName: size(attributes:)
+      MethodKind: Instance
+  Protocols:
+  - Name: UIActivityItemSource
+    Methods:
+    - Selector: 'activityViewController:itemForActivityType:'
+      MethodKind: Instance
+      Parameters:
+      - Position: 0
+        Nullability: N
+      - Position: 1
+        Nullability: N
+  Tags:
+  - Name: NSTextLayoutOrientation
+    SwiftName: NSTextLayoutOrientation
+  - Name: NSGlyphProperty
+    SwiftName: NSGlyphProperty
+  - Name: NSControlCharacterAction
+    SwiftName: NSControlCharacterAction
+  - Name: NSTypesetterBehavior
+    SwiftName: NSTypesetterBehavior
+  Typedefs:
+  - Name: NSAttributedStringDocumentAttributeKey
+    SwiftWrapper: none
+  - Name: NSAttributedStringDocumentType
+    SwiftWrapper: none
+  - Name: NSTextLayoutSectionKey
+    SwiftWrapper: none
+  - Name: NSTextEffectStyle
+    SwiftWrapper: none
+  - Name: NSTextTabOptionKey
+    SwiftWrapper: none
+  - Name: NSAttributedStringDocumentReadingOptionKey
+    SwiftWrapper: none
+    Availability: nonswift
+  - Name: UIFontDescriptorAttributeName
+    SwiftWrapper: none
+  - Name: UIFontDescriptorTraitKey
+    SwiftWrapper: none
+  - Name: UIFontDescriptorFeatureKey
+    SwiftWrapper: none
+  - Name: UIFontWeight
+    SwiftWrapper: none
+  - Name: UILayoutPriority
+    SwiftWrapper: none
+  Globals:
+  - Name: NSFontAttributeName
+    SwiftName: NSFontAttributeName
+  - Name: NSParagraphStyleAttributeName
+    SwiftName: NSParagraphStyleAttributeName
+  - Name: NSForegroundColorAttributeName
+    SwiftName: NSForegroundColorAttributeName
+  - Name: NSBackgroundColorAttributeName
+    SwiftName: NSBackgroundColorAttributeName
+  - Name: NSLigatureAttributeName
+    SwiftName: NSLigatureAttributeName
+  - Name: NSKernAttributeName
+    SwiftName: NSKernAttributeName
+  - Name: NSStrikethroughStyleAttributeName
+    SwiftName: NSStrikethroughStyleAttributeName
+  - Name: NSUnderlineStyleAttributeName 
+    SwiftName: NSUnderlineStyleAttributeName
+  - Name: NSStrokeColorAttributeName 
+    SwiftName: NSStrokeColorAttributeName
+  - Name: NSStrokeWidthAttributeName
+    SwiftName: NSStrokeWidthAttributeName
+  - Name: NSShadowAttributeName 
+    SwiftName: NSShadowAttributeName 
+  - Name: NSTextEffectAttributeName
+    SwiftName: NSTextEffectAttributeName 
+  - Name: NSAttachmentAttributeName
+    SwiftName: NSAttachmentAttributeName
+  - Name: NSLinkAttributeName 
+    SwiftName: NSLinkAttributeName
+  - Name: NSBaselineOffsetAttributeName
+    SwiftName: NSBaselineOffsetAttributeName
+  - Name: NSUnderlineColorAttributeName
+    SwiftName: NSUnderlineColorAttributeName
+  - Name: NSStrikethroughColorAttributeName
+    SwiftName: NSStrikethroughColorAttributeName
+  - Name: NSObliquenessAttributeName
+    SwiftName: NSObliquenessAttributeName
+  - Name: NSExpansionAttributeName
+    SwiftName: NSExpansionAttributeName
+  - Name: NSWritingDirectionAttributeName
+    SwiftName: NSWritingDirectionAttributeName
+  - Name: NSVerticalGlyphFormAttributeName 
+    SwiftName: NSVerticalGlyphFormAttributeName
+  - Name: NSPlainTextDocumentType 
+    SwiftName: NSPlainTextDocumentType
+  - Name: NSRTFTextDocumentType 
+    SwiftName: NSRTFTextDocumentType
+  - Name: NSRTFDTextDocumentType 
+    SwiftName: NSRTFDTextDocumentType
+  - Name: NSHTMLTextDocumentType 
+    SwiftName: NSHTMLTextDocumentType
+  - Name: NSDocumentTypeDocumentAttribute 
+    SwiftName: NSDocumentTypeDocumentAttribute
+  - Name: NSCharacterEncodingDocumentAttribute 
+    SwiftName: NSCharacterEncodingDocumentAttribute
+  - Name: NSDefaultAttributesDocumentAttribute 
+    SwiftName: NSDefaultAttributesDocumentAttribute
+  - Name: NSPaperSizeDocumentAttribute
+    SwiftName: NSPaperSizeDocumentAttribute
+  - Name: NSViewSizeDocumentAttribute
+    SwiftName: NSViewSizeDocumentAttribute
+  - Name: NSViewZoomDocumentAttribute
+    SwiftName: NSViewZoomDocumentAttribute
+  - Name: NSViewModeDocumentAttribute
+    SwiftName: NSViewModeDocumentAttribute
+  - Name: NSReadOnlyDocumentAttribute
+    SwiftName: NSReadOnlyDocumentAttribute
+  - Name: NSBackgroundColorDocumentAttribute
+    SwiftName: NSBackgroundColorDocumentAttribute
+  - Name: NSHyphenationFactorDocumentAttribute
+    SwiftName: NSHyphenationFactorDocumentAttribute
+  - Name: NSDefaultTabIntervalDocumentAttribute
+    SwiftName: NSDefaultTabIntervalDocumentAttribute
+  - Name: NSTextLayoutSectionsAttribute
+    SwiftName: NSTextLayoutSectionsAttribute
+  - Name: NSTabColumnTerminatorsAttributeName
+    SwiftName: NSTabColumnTerminatorsAttributeName
+  - Name: NSTextEffectLetterpressStyle
+    SwiftName: NSTextEffectLetterpressStyle
+  - Name: NSPaperMarginDocumentAttribute 
+    SwiftName: NSPaperMarginDocumentAttribute
+  - Name: NSDocumentTypeDocumentOption
+    Availability: nonswift
+  - Name: NSDefaultAttributesDocumentOption
+    Availability: nonswift
+  - Name: NSCharacterEncodingDocumentOption
+    Availability: nonswift
+  - Name: UIFontDescriptorFamilyAttribute
+    SwiftName: UIFontDescriptorFamilyAttribute
+  - Name: UIFontDescriptorNameAttribute
+    SwiftName: UIFontDescriptorNameAttribute
+  - Name: UIFontDescriptorFaceAttribute
+    SwiftName: UIFontDescriptorFaceAttribute
+  - Name: UIFontDescriptorSizeAttribute
+    SwiftName: UIFontDescriptorSizeAttribute
+  - Name: UIFontDescriptorVisibleNameAttribute
+    SwiftName: UIFontDescriptorVisibleNameAttribute
+  - Name: UIFontDescriptorMatrixAttribute
+    SwiftName: UIFontDescriptorMatrixAttribute
+  - Name: UIFontDescriptorCharacterSetAttribute
+    SwiftName: UIFontDescriptorCharacterSetAttribute
+  - Name: UIFontDescriptorCascadeListAttribute
+    SwiftName: UIFontDescriptorCascadeListAttribute
+  - Name: UIFontDescriptorTraitsAttribute
+    SwiftName: UIFontDescriptorTraitsAttribute
+  - Name: UIFontDescriptorFixedAdvanceAttribute
+    SwiftName: UIFontDescriptorFixedAdvanceAttribute
+  - Name: UIFontDescriptorFeatureSettingsAttribute
+    SwiftName: UIFontDescriptorFeatureSettingsAttribute
+  - Name: UIFontDescriptorTextStyleAttribute
+    SwiftName: UIFontDescriptorTextStyleAttribute
+  - Name: UIFontSymbolicTrait
+    SwiftName: UIFontSymbolicTrait
+  - Name: UIFontWeightTrait
+    SwiftName: UIFontWeightTrait
+  - Name: UIFontWidthTrait
+    SwiftName: UIFontWidthTrait
+  - Name: UIFontSlantTrait
+    SwiftName: UIFontSlantTrait
+  - Name: UIFontFeatureTypeIdentifierKey
+    SwiftName: UIFontFeatureTypeIdentifierKey
+  - Name: UIFontFeatureSelectorIdentifierKey
+    SwiftName: UIFontFeatureSelectorIdentifierKey
+  - Name: UIFontWeightUltraLight
+    SwiftName: UIFontWeightUltraLight
+  - Name: UIFontWeightThin
+    SwiftName: UIFontWeightThin
+  - Name: UIFontWeightLight
+    SwiftName: UIFontWeightLight
+  - Name: UIFontWeightRegular
+    SwiftName: UIFontWeightRegular
+  - Name: UIFontWeightMedium
+    SwiftName: UIFontWeightMedium
+  - Name: UIFontWeightSemibold
+    SwiftName: UIFontWeightSemibold
+  - Name: UIFontWeightBold
+    SwiftName: UIFontWeightBold
+  - Name: UIFontWeightHeavy
+    SwiftName: UIFontWeightHeavy
+  - Name: UIFontWeightBlack
+    SwiftName: UIFontWeightBlack

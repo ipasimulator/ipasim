@@ -1,0 +1,51 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: B3E97D21-0435-32D1-B1E7-59DD2CAC0192', 'armv7s: AEB13D85-97A1-37D7-8E99-3C1661B09B0D', 
+                   'arm64: EC0F0F99-00E4-34CB-A31A-C1BEF980673D' ]
+platform:        ios
+install-name:    /usr/lib/IOABPLib.dylib
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s ]
+    symbols:         [ __ZN10IOABPClass10writeAsyncEPKvmPFvPviS2_ES2_, __ZN10IOABPClass12readRegisterEmPvPm, 
+                       __ZN10IOABPClass12setAsyncPortEv, __ZN10IOABPClass14sendImageAsyncEPKvmPFvPviS2_S2_ES2_, 
+                       __ZN10IOABPClass4readEPvPm, __ZN10IOABPClass5startEPKcP11__CFRunLoopU13block_pointerFvjES5_U13block_pointerFv12abpErrorTypemiE, 
+                       __ZN10IOABPClass5writeEPKvm, __ZN10IOABPClass9readAsyncEPvmPFvS0_iS0_ES0_, 
+                       __ZN10IOABPClass9sendImageEPKvmPm, __ZN17IOABPControlClass10loggerTuneEmmPvS0_, 
+                       __ZN17IOABPControlClass12setAsyncPortEv, __ZN17IOABPControlClass13readLogsAsyncEPvmbPFvS0_iS0_ES0_, 
+                       __ZN17IOABPControlClass21getLastKnownBootStageEPm, __ZN17IOABPControlClass24getLogInternalBufferSizeEPm ]
+  - archs:           [ arm64 ]
+    symbols:         [ __ZN10IOABPClass10writeAsyncEPKvjPFvPviS2_ES2_, __ZN10IOABPClass12readRegisterEjPvPj, 
+                       __ZN10IOABPClass14sendImageAsyncEPKvjPFvPviS2_S2_ES2_, __ZN10IOABPClass4readEPvPj, 
+                       __ZN10IOABPClass5startEPKcP11__CFRunLoopU13block_pointerFvjES5_U13block_pointerFv12abpErrorTypejiE, 
+                       __ZN10IOABPClass5writeEPKvj, __ZN10IOABPClass9readAsyncEPvjPFvS0_iS0_ES0_, 
+                       __ZN10IOABPClass9sendImageEPKvjPj, __ZN17IOABPControlClass10loggerTuneEjjPvS0_, 
+                       __ZN17IOABPControlClass13readLogsAsyncEPvjbPFvS0_iS0_ES0_, 
+                       __ZN17IOABPControlClass21getLastKnownBootStageEPj, __ZN17IOABPControlClass24getLogInternalBufferSizeEPj ]
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ __Z21getABPDirectionString12abpDirection, __Z21getABPErrorTypeString12abpErrorType, 
+                       __Z21getABPLinkStateString12abpLinkState, __Z24getABPAERErrorTypeString15abpAERErrorType, 
+                       __Z24getABPBHIRegistersString15abpBHIRegisters, __Z24getABPBTIRegistersString15abpBTIRegisters, 
+                       __ZN10IOABPClass14clearIteratorsEv, __ZN10IOABPClass14interfaceAddedEPvj, 
+                       __ZN10IOABPClass16interfaceRemovedEPvj, __ZN10IOABPClass17abortChannelAsyncE12abpDirectionPFvPviES1_, 
+                       __ZN10IOABPClass17startChannelAsyncE12abpDirectionPFvPviES1_, 
+                       __ZN10IOABPClass19setNotificationPortEv, __ZN10IOABPClass20notificationCallbackEPvjjS0_, 
+                       __ZN10IOABPClass20notificationFunctionEjjPv, __ZN10IOABPClass21clearNotificationPortEv, 
+                       __ZN10IOABPClass22interfaceAddedInternalERKj, __ZN10IOABPClass24interfaceRemovedInternalERKj, 
+                       __ZN10IOABPClass25interfaceAddedInternal_nlERKj, __ZN10IOABPClass25setUpNotificationCallbackEj, 
+                       __ZN10IOABPClass27cleanUpNotificationCallbackEv, __ZN10IOABPClass27interfaceRemovedInternal_nlERKj, 
+                       __ZN10IOABPClass4openEj, __ZN10IOABPClass4stopEP16dispatch_group_s, 
+                       __ZN10IOABPClass5closeEv, __ZN10IOABPClass7open_nlEj, __ZN10IOABPClass8close_nlEv, 
+                       __ZN10IOABPClassC1Ev, __ZN10IOABPClassC2Ev, __ZN10IOABPClassD1Ev, 
+                       __ZN10IOABPClassD2Ev, __ZN17IOABPControlClass19setNotificationPortEv, 
+                       __ZN17IOABPControlClass21clearNotificationPortEv, __ZN17IOABPControlClass23generalInterestCallbackEPvjjS0_, 
+                       __ZN17IOABPControlClass23generalInterestFunctionEjPv, __ZN17IOABPControlClass24setEventNotificationPortEv, 
+                       __ZN17IOABPControlClass25registerEventNotificationEP11__CFRunLoopU13block_pointerFv12abpErrorTypePvS3_E, 
+                       __ZN17IOABPControlClass26clearEventNotificationPortEv, __ZN17IOABPControlClass27deregisterEventNotificationEP16dispatch_group_s, 
+                       __ZN17IOABPControlClass30deregisterEventNotification_nlEP16dispatch_group_s, 
+                       __ZN17IOABPControlClass4openEP11__CFRunLoop, __ZN17IOABPControlClass4stopEv, 
+                       __ZN17IOABPControlClass5closeEv, __ZN17IOABPControlClass5startEv, 
+                       __ZN17IOABPControlClass7open_nlEP11__CFRunLoop, __ZN17IOABPControlClass8close_nlEv, 
+                       __ZN17IOABPControlClassC1Ev, __ZN17IOABPControlClassC2Ev, 
+                       __ZN17IOABPControlClassD1Ev, __ZN17IOABPControlClassD2Ev ]
+...

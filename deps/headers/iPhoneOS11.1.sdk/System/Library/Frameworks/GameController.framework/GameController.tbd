@@ -1,0 +1,30 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: A755BFBC-122A-385A-8D91-3512007D9429', 'armv7s: 1E8ED2B3-039C-3B2F-ACCF-437D9FD65379', 
+                   'arm64: BB8B2D75-8E56-3AD8-9FF0-4001844D1008' ]
+platform:        ios
+install-name:    /System/Library/Frameworks/GameController.framework/GameController
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ _GCApplicationSupportsBackgroundInput, _GCCommonGetPreferencesBooleanValue, 
+                       _GCControllerDidConnectNotification, _GCControllerDidDisconnectNotification, 
+                       _GCControllerManagerInit, _GCControllerManagerInitXPC, _GCExtendedGamepadSnapShotDataV100FromNSData, 
+                       _GCGamepadSnapShotDataV100FromNSData, _GCMicroGamepadSnapShotDataV100FromNSData, 
+                       _NSDataFromGCExtendedGamepadSnapShotDataV100, _NSDataFromGCGamepadSnapShotDataV100, 
+                       _NSDataFromGCMicroGamepadSnapShotDataV100, __GCHIDEventCallback, 
+                       _clamp, _kGCCommonFullPreferencesPath, _kGCCommonPreferencesUser, 
+                       _threadRunLoopSourceCallback ]
+    objc-classes:    [ _GCController, _GCControllerAxisInput, _GCControllerButtonInput, 
+                       _GCControllerCBDelegate, _GCControllerDirectionPad, _GCControllerElement, 
+                       _GCControllerMBDelegate, _GCControllerSFDelegate, _GCEventViewController, 
+                       _GCExtendedGamepad, _GCExtendedGamepadSnapshot, _GCGamepad, 
+                       _GCGamepadSnapshot, _GCMicroGamepad, _GCMicroGamepadSnapshot, 
+                       _GCMotion, __GCCControllerHIDServiceInfo, __GCController, 
+                       __GCControllerManager, __GCMicroGamepadSnapshot ]
+    objc-ivars:      [ _GCControllerCBDelegate._centralManager, _GCControllerCBDelegate._completionHandler, 
+                       _GCControllerCBDelegate._connectedPeripherals, _GCControllerCBDelegate._foundPeripherals, 
+                       _GCControllerMBDelegate._discoveryAgent, _GCControllerMBDelegate._pairingAgent, 
+                       _GCControllerMBDelegate._session, _GCControllerMBDelegate._timer, 
+                       _GCControllerSFDelegate._activity ]
+...

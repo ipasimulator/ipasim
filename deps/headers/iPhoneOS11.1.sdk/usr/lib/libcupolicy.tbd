@@ -1,0 +1,24 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: 02FE4EE0-2AD8-392A-82C0-2B2968496356', 'armv7s: B7C116E6-BE1E-3571-8B56-0690CC899C67', 
+                   'arm64: 1859D2D8-0DFD-3BAF-B759-0DCCEF63C205' ]
+platform:        ios
+install-name:    /usr/lib/libcupolicy.dylib
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s ]
+    symbols:         [ __ZN30cellular_usage_policy_client_sC1Ev, __ZN30cellular_usage_policy_client_sC2Ev, 
+                       _cellular_usage_policy_copy_datausage_blacklist, _cellular_usage_policy_copy_for_bundle, 
+                       _cellular_usage_policy_create_client, _cellular_usage_policy_destroy_client, 
+                       _cellular_usage_policy_get_bundle_from_policy, _cellular_usage_policy_get_data_allowed_from_policy, 
+                       _cellular_usage_policy_is_data_allowed_for_bundle, _cellular_usage_policy_set_changed_handler ]
+  - archs:           [ arm64 ]
+    symbols:         [ __ZN29network_usage_policy_client_sC1Ev, __ZN29network_usage_policy_client_sC2Ev ]
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ _network_usage_policy_create_client, _network_usage_policy_destroy_client, 
+                       _network_usage_policy_get_WiFi_data_allowed_from_policy, _network_usage_policy_get_bundle_from_policy, 
+                       _network_usage_policy_get_cell_data_allowed_from_policy, _network_usage_policy_get_datausage_policies, 
+                       _network_usage_policy_get_first_use_flow_performed_from_policy, 
+                       _network_usage_policy_get_for_bundle, _network_usage_policy_set_changed_handler, 
+                       _perform_first_network_use_flow ]
+...

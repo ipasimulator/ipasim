@@ -1,0 +1,20 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: 0C3B04A0-1A55-30B0-AB91-3A0B9BEF56DD', 'armv7s: D4CAF16C-69D0-39B8-B429-9F601E12A448', 
+                   'arm64: 27943604-6311-3244-BB02-03F484A7083B' ]
+platform:        ios
+install-name:    /usr/lib/libsandbox.1.dylib
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s ]
+    symbols:         [ _sandbox_set_trace_path ]
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ _SANDBOX_BUILD_ID, _sandbox_apply, _sandbox_apply_container, 
+                       _sandbox_compile_entitlements, _sandbox_compile_file, _sandbox_compile_named, 
+                       _sandbox_compile_string, _sandbox_container_paths_iterate_items, 
+                       _sandbox_create_params, _sandbox_free_params, _sandbox_free_profile, 
+                       _sandbox_inspect_pid, _sandbox_inspect_smemory, _sandbox_set_param, 
+                       _sandbox_set_user_state_item, _sandbox_user_state_item_buffer_create, 
+                       _sandbox_user_state_item_buffer_destroy, _sandbox_user_state_item_buffer_send, 
+                       _sandbox_user_state_iterate_items ]
+...

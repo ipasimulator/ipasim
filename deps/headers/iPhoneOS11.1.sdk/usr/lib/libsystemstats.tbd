@@ -1,0 +1,25 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: 0382E9E7-DD46-347D-B74D-635F646D0F44', 'armv7s: 709D285A-20E5-3163-9C4A-3608DF975C1F', 
+                   'arm64: ADDBAC4D-EE03-37A7-BC56-0DA135DC6698' ]
+platform:        ios
+install-name:    /usr/lib/libsystemstats.dylib
+current-version: 403.20.2
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ __systemstats_boot, __systemstats_copy_cookie_path, __systemstats_enumerate_files, 
+                       __systemstats_get_file_stats, __systemstats_get_system_version, 
+                       __systemstats_read_current_build, __systemstats_read_uuid, 
+                       __systemstats_read_uuid_from_cookie_path, __systemstats_save_current_boot_uuid, 
+                       __systemstats_stream_create, __systemstats_writers, _absolute_time_to_absolute_milliseconds, 
+                       _get_microstackshots_from_files, _now_in_absolute_milliseconds, 
+                       _now_in_continuous_milliseconds, _now_in_wall_milliseconds, 
+                       _systemstats_create_record, _systemstats_dispose_record, _systemstats_foreach_micro, 
+                       _systemstats_get_microstackshots, _systemstats_gettimeofday, 
+                       _systemstats_insert_and_dispose_subrecord, _systemstats_mach_absolute_time, 
+                       _systemstats_mach_continuous_time, _systemstats_stream_delete, 
+                       _systemstats_stream_flush, _systemstats_stream_get_attr, _systemstats_unlink_if_present, 
+                       _systemstats_write_and_dispose_record, _systemstats_write_checkpoint, 
+                       _systemstats_write_microstackshot ]
+...

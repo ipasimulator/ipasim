@@ -1,0 +1,25 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: 178CBDBF-7D2D-3CE6-A02D-E41083BA9F28', 'armv7s: BD8160EF-7BDA-33A6-B96D-7856D9A6D54B', 
+                   'arm64: C3BCAC83-8809-3214-B14E-918EAD768B8B' ]
+platform:        ios
+install-name:    /usr/lib/libsp.dylib
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ ___crashreporter_info__, ___crashreporter_info_buff__, __bsd_log_spd, 
+                       _kSPDEventNameInit, _kSPDStreamName, _spd_checkin_socket, 
+                       _spd_checkout_all_sockets, _spd_checkout_socket, _spd_client_checkin_socket, 
+                       _spd_client_checkout_all_sockets, _spd_client_checkout_socket, 
+                       _spd_client_create, _spd_client_destroy, _spd_client_session_create, 
+                       _spd_client_session_destroy, _spd_client_session_queue, _spd_client_session_set_callbacks, 
+                       _spd_client_session_set_dispatch_queue, _spd_client_start_monitoring_all_sockets, 
+                       _spd_client_start_monitoring_all_sockets_for_pid, _spd_client_start_monitoring_socket, 
+                       _spd_client_stop_monitoring_all_sockets, _spd_client_stop_monitoring_all_sockets_for_pid, 
+                       _spd_client_stop_monitoring_socket, _spd_deregister_for_notifications, 
+                       _spd_key_connection, _spd_key_msg_type, _spd_key_pid, _spd_key_result, 
+                       _spd_key_sdk_version, _spd_key_socket, _spd_key_uuid, _spd_register_for_notifications, 
+                       _spd_start_monitoring_all_sockets, _spd_start_monitoring_all_sockets_for_pid, 
+                       _spd_start_monitoring_socket, _spd_stop_monitoring_all_sockets, 
+                       _spd_stop_monitoring_all_sockets_for_pid, _spd_stop_monitoring_socket ]
+...

@@ -1,0 +1,11 @@
+---
+Name: IdentityLookup
+Classes:
+- Name: ILMessageFilterExtensionContext
+  Methods:
+  - Selector: 'deferQueryRequestToNetworkWithCompletion:'
+    SwiftName: deferQueryRequestToNetwork(completion:)
+    MethodKind: Instance
+Tags:
+- Name: ILMessageFilterError
+  NSErrorDomain: ILMessageFilterErrorDomain

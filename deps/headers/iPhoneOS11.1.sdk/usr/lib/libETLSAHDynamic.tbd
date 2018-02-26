@@ -1,0 +1,27 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: BA33AE5F-2209-318F-A920-64E1AA178908', 'armv7s: 6D6A1DD2-DBCC-389F-97EC-A0A8AF44B35B', 
+                   'arm64: 9E2D588E-6411-3E91-97A7-678963537B0A' ]
+platform:        ios
+install-name:    /usr/lib/libETLSAHDynamic.dylib
+current-version: 0
+compatibility-version: 0
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ _ETLSAHCommandCreateDone, _ETLSAHCommandCreateHelloResponse, 
+                       _ETLSAHCommandCreateHelloResponseExt, _ETLSAHCommandCreateMaverickEraseResponse, 
+                       _ETLSAHCommandCreateMaverickHashResponse, _ETLSAHCommandCreateMaverickRootManifestResponse, 
+                       _ETLSAHCommandCreateMemoryRead, _ETLSAHCommandCreateReset, 
+                       _ETLSAHCommandCreateSwitchMode, _ETLSAHCommandExecuteCreate, 
+                       _ETLSAHCommandExecuteDataCreate, _ETLSAHCommandExecuteParseResponse, 
+                       _ETLSAHCommandMaverickParseEnd, _ETLSAHCommandParseChipID, 
+                       _ETLSAHCommandParseCommandReady, _ETLSAHCommandParseDoneResponse, 
+                       _ETLSAHCommandParseEndOfImageTransfer, _ETLSAHCommandParseHello, 
+                       _ETLSAHCommandParseMaverickEraseQuery, _ETLSAHCommandParseMaverickRootManifestQuery, 
+                       _ETLSAHCommandParseMaverickSendHashesQuery, _ETLSAHCommandParseMemoryDebug, 
+                       _ETLSAHCommandParseReadData, _ETLSAHCommandParseResetResponse, 
+                       _ETLSAHCommandReceive, _ETLSAHCommandSend, _ETLSAHGetDebugRecordCount, 
+                       _ETLSAHGetDebugTable, _ETLSAHGetRecordEx, _ETLSAHModeAsString, 
+                       _ETLSAHSendReadData ]
+...

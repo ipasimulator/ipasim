@@ -1,0 +1,28 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: EA3C807D-AA56-33F5-9C2E-ECEA5006CFF5', 'armv7s: 30980F04-FB7B-3835-ACB6-943F24FBC931', 
+                   'arm64: 8A7D4704-F236-3832-8CB1-5C26018052C3' ]
+platform:        ios
+install-name:    /usr/lib/libz.1.dylib
+current-version: 1.2.11
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ _adler32, _adler32_combine, _adler32_z, _compress, _compress2, 
+                       _compressBound, _crc32, _crc32_combine, _crc32_z, _deflate, 
+                       _deflateBound, _deflateCopy, _deflateEnd, _deflateGetDictionary, 
+                       _deflateInit2_, _deflateInit_, _deflateParams, _deflatePending, 
+                       _deflatePrime, _deflateReset, _deflateResetKeep, _deflateSetDictionary, 
+                       _deflateSetHeader, _deflateTune, _get_crc_table, _gzbuffer, 
+                       _gzclearerr, _gzclose, _gzclose_r, _gzclose_w, _gzdirect, 
+                       _gzdopen, _gzeof, _gzerror, _gzflush, _gzfread, _gzfwrite, 
+                       _gzgetc, _gzgetc_, _gzgets, _gzoffset, _gzopen, _gzprintf, 
+                       _gzputc, _gzputs, _gzread, _gzrewind, _gzseek, _gzsetparams, 
+                       _gztell, _gzungetc, _gzvprintf, _gzwrite, _inflate, _inflateBack, 
+                       _inflateBackEnd, _inflateBackInit_, _inflateCopy, _inflateEnd, 
+                       _inflateGetDictionary, _inflateGetHeader, _inflateInit2_, 
+                       _inflateInit_, _inflateMark, _inflatePrime, _inflateReset, 
+                       _inflateReset2, _inflateResetKeep, _inflateSetDictionary, 
+                       _inflateSync, _inflateSyncPoint, _inflateUndermine, _inflateValidate, 
+                       _uncompress, _uncompress2, _zError, _zlibCompileFlags, _zlibVersion ]
+...

@@ -1,0 +1,31 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: 00000000-0000-0000-0000-000000000000', 'armv7s: 00000000-0000-0000-0000-000000000000', 
+                   'arm64: FA171C46-A371-3359-9DBA-B0826A9C07D2' ]
+platform:        ios
+install-name:    /usr/lib/libParallelCompression.dylib
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ _BXDiff5, _BXPatch5, _BXPatch5InPlace, _BXPatchFile, _CachePatch, 
+                       _DirectoryDiff, _DirectoryPatch, _ISparseArchiveStreamCreate, 
+                       _ISparseArchiveStreamDestroy, _ISparseArchiveStreamRead, _PCompressFilter, 
+                       _PackagePatch, _ParallelArchiveExtract, _ParallelArchiveGenerateBOM, 
+                       _ParallelArchiveGenerateMSUBOM, _ParallelArchiveGetPayloadSize, 
+                       _ParallelArchiveOLDWriterAddEntry, _ParallelArchiveOLDWriterCreate, 
+                       _ParallelArchiveOLDWriterDestroy, _ParallelArchiveRead, _ParallelArchiveReadMetadata, 
+                       _ParallelArchiveSearch, _ParallelArchiveSort, _ParallelArchiveVerifyDir, 
+                       _ParallelArchiveWriteDirContents, _ParallelArchiveWriteEntryData, 
+                       _ParallelArchiveWriteEntryHeader, _ParallelArchiveWriterCreate, 
+                       _ParallelArchiveWriterDestroy, _ParallelCompressionDecode, 
+                       _ParallelCompressionEncode, _ParallelCompressionEnterThreadErrorContext, 
+                       _ParallelCompressionFileClose, _ParallelCompressionFileOpen, 
+                       _ParallelCompressionFileRead, _ParallelCompressionFileSeek, 
+                       _ParallelCompressionFileWrite, _ParallelCompressionGetCompressedSize, 
+                       _ParallelCompressionIStreamAbort, _ParallelCompressionIStreamCreate, 
+                       _ParallelCompressionIStreamDestroy, _ParallelCompressionIStreamRead, 
+                       _ParallelCompressionLeaveThreadErrorContext, _ParallelCompressionOStreamAbort, 
+                       _ParallelCompressionOStreamCreate, _ParallelCompressionOStreamDestroy, 
+                       _ParallelCompressionOStreamWrite, _ParallelCompressionUpdateError, 
+                       _ParallelCompressionUpdateWarning ]
+...

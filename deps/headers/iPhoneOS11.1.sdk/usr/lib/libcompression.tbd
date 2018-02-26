@@ -1,0 +1,17 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: C341E2AC-5852-3ED3-A360-25D1134C92F9', 'armv7s: 468257E5-1A73-3A8B-9492-B0BBB9E9826A', 
+                   'arm64: 45F8251C-28E0-3C5B-9044-53E2C91C355D' ]
+platform:        ios
+install-name:    /usr/lib/libcompression.dylib
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ _compression_decode_buffer, _compression_decode_scratch_buffer_size, 
+                       _compression_encode_buffer, _compression_encode_scratch_buffer_size, 
+                       _compression_stream_build_shared_dict, _compression_stream_destroy, 
+                       _compression_stream_get_state_size, _compression_stream_identify_algorithm, 
+                       _compression_stream_init, _compression_stream_init_with_options, 
+                       _compression_stream_is_state_valid, _compression_stream_op_data_size, 
+                       _compression_stream_process ]
+...

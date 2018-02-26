@@ -1,0 +1,33 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: E04D5FBD-1347-316D-B833-3BCA22A97732', 'armv7s: ECD50C20-2298-3493-9ADA-A9348F4881B4', 
+                   'arm64: 5AA6A852-3420-3545-881E-4B89B50DDF9A' ]
+platform:        ios
+install-name:    /usr/lib/libETLDMCDynamic.dylib
+current-version: 0
+compatibility-version: 0
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s ]
+    weak-def-symbols: [ __ZTINSt3__115basic_stringbufIcNS_11char_traitsIcEENS_9allocatorIcEEEE, 
+                        __ZTINSt3__119basic_ostringstreamIcNS_11char_traitsIcEENS_9allocatorIcEEEE, 
+                        __ZTSNSt3__115basic_stringbufIcNS_11char_traitsIcEENS_9allocatorIcEEEE, 
+                        __ZTSNSt3__119basic_ostringstreamIcNS_11char_traitsIcEENS_9allocatorIcEEEE ]
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ _ETLDMCAppend, _ETLDMCCreateFromFile, _ETLDMCCreateViewFromFile, 
+                       _ETLDMCEventGetNumRanges, _ETLDMCEventGetRange, _ETLDMCFileName, 
+                       _ETLDMCFree, _ETLDMCGetMatchingFileName, _ETLDMCGetMatchingFileNameAndType, 
+                       _ETLDMCGetMatchingKeyword, _ETLDMCKeyword, _ETLDMCLoadEventRangesFromEventsArray, 
+                       _ETLDMCLogFilter, _ETLDMCLogGetDefaultFilters, _ETLDMCLogGetEnabledEquipIDs, 
+                       _ETLDMCLogGetMask, _ETLDMCMerge, _ETLDMCMessageGetNumRanges, 
+                       _ETLDMCMessageGetRangeAndMasks, _ETLDMCParserCountTokens, 
+                       _ETLDMCParserGetToken, _ETLDMCParserInit, _ETLDMCParserReset, 
+                       _ETLDMCUtilCountRangesInMaskArray, _ETLDMCViewCopyMasksToMaskArray, 
+                       _ETLDMCViewFree, _ETLDMCViewGetAsString, _ETLDMCViewLoadMessagesFromMaskArray, 
+                       _ETLDMCViewMerge, _ETLDMCViewMergeInto, __ETLDMCAllocate, 
+                       __ETLDMCGetView, __Z20ETLDMCDebugGetEventsP17__ETLDMCHandleTag10ETLDMCView, 
+                       __Z22ETLDMCDebugGetLogCodesP17__ETLDMCHandleTag10ETLDMCViewb, 
+                       __Z24ETLDMCDebugGetEventRangePK13ETLEVENTRange, __Z26ETLDMCDebugGetMessageMasksP17__ETLDMCHandleTag10ETLDMCView, 
+                       __Z26ETLDMCDebugGetMessageRangePK26ETLMESSAGESubsystemIDRange, 
+                       __Z26ETLDMCDebugGetViewAsString10ETLDMCView, _kDMCFilesMap ]
+...

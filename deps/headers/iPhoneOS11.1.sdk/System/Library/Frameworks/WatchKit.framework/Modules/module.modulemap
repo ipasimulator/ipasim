@@ -1,0 +1,6 @@
+framework module WatchKit {
+  umbrella header "WatchKit.h"
+
+  export *
+  module * { export * }
+}

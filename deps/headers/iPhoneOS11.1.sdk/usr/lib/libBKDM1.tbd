@@ -1,0 +1,63 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: 00000000-0000-0000-0000-000000000000', 'armv7s: 00000000-0000-0000-0000-000000000000', 
+                   'arm64: BB0B095F-A9E2-3AF6-A943-D10A6AF8C43C' ]
+platform:        ios
+install-name:    /usr/lib/libBKDM1.dylib
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ _BKDMInitialize, _BKDMTerminate, _CatacombPathForFile, _ComponentSetInit, 
+                       _ComponentSetRelease, _ComponentSetUpdate, _ConvertTransToNodeArea, 
+                       _ConvertVectorForGUI, _FindRectangleForComponent, _GenerateMatchTemplateTopology, 
+                       _GenerateTemplateTopology, _LoadDataFromCatacomb, _MCDMExtractMessageData, 
+                       _RemoveFileFromCatacomb, _SBDisplayEvent, _SBDisplayEventBioLogInfo, 
+                       _SBFingerTouchEvent, _SBFingerTouchEventBioLogInfo, _SBFreeEventList, 
+                       _SBInitialize, _SBInitializeBioLogInfo, _SBLockEvent, _SBLockEventBioLogInfo, 
+                       _SBPowerEvent, _SBPowerEventBioLogInfo, _SBRemoveTemplateEvent, 
+                       _SBRemoveTemplateEventBioLogInfo, _SBSetLogVerbosity, _SBSetLogVerbosityBioLogInfo, 
+                       _SBStartBioOperation, _SBStartBioOperationBioLogInfo, _SBStatus, 
+                       _SBStatusBioLogInfo, _SBStopBioOperation, _SBStopBioOperationBioLogInfo, 
+                       _SBTemplateUpdateEvent, _SBTemplateUpdateEventBioLogInfo, 
+                       _SBTerminate, _SBTerminateBioLogInfo, _SBTimeZoneChangeEvent, 
+                       _SBTimeZoneChangeEventBioLogInfo, _SaveDataToCatacomb, ___BuildFullPath, 
+                       ___DeblockedFileIO, ___FileIsProtectionClassD, ___GetCatacombDirectoryPath, 
+                       ___GetUUIDFileName, ___osLog, ___osLogInternal, ___templatesExistAtBoot, 
+                       _check_finger_touch_structure, _check_memory_manager, _check_template_update_structure, 
+                       _check_timestamp, _closeConnection, _crc32ansi, _deviceExists, 
+                       _diffTimeStamps, _getLocalEEPROMCalibrationData, _kBioLockoutRecordSecureDataKey, 
+                       _kBioLockoutRecordVersionKey, _kBioOpParamEnrollOptions, _kBioOpParamEnrollType, 
+                       _kBioOpParamEnrollUserID, _kBioOpParamFdetOptions, _kBioOpParamMatchFilter, 
+                       _kBioOpParamMatchOptions, _kBioOpParamMatchPreArm, _kBioOpParamsMatchFilterHB, 
+                       _kBioOpParamsMatchUnlockUserID, _kCatacombCurrentDateKey, 
+                       _kCatacombEnrollmentCountKey, _kCatacombIdentityListKey, _kCatacombSecureDataKey, 
+                       _kCatacombTemplateListKey, _kCatacombUserIDKey, _kCatacombUserKeybagUUIDKey, 
+                       _kCatacombUserUUIDKey, _kCatacombVersionKey, _kCoreauthdBundleIdentifier, 
+                       _kPurpleBuddyBundleIdentifier, _kSpringBoardBundleIdentifier, 
+                       _logQueueLabel, _memdump, _mesaScanningStateNotificationCallback, 
+                       _mobileKeyBagLockStatusNotificationCallback, _openConnection, 
+                       _powerSourceInterestNotification, _powerSourceInterestNotificationCallback, 
+                       _readData, _sbQueueLabel, _serialize, _writeData ]
+    objc-classes:    [ _ADEvent, _ADStorage, _BKCatacomb, _BLHelper, _BLTemplateList, 
+                       _BLTimeBox, _BioLog, _BioLogBase, _BiometricKitDStatistics, 
+                       _BiometricKitXPCServerMesa, _SB, _SBBase, _SBFingerTouch, 
+                       _TemplateInfo ]
+    objc-ivars:      [ _BioLogBase._chargerConnected, _BioLogBase._compact, _BioLogBase._compactOSLogOnly, 
+                       _BioLogBase._fileAttributes, _BioLogBase._fileAttributesProtected, 
+                       _BioLogBase._fileNameFormatter, _BioLogBase._fingerStateCaptureCounter, 
+                       _BioLogBase._imageCommentString, _BioLogBase._lastLogMessage, 
+                       _BioLogBase._lastLogMessageRepeated, _BioLogBase._lastLogWriteException, 
+                       _BioLogBase._lastMatchedIdentity, _BioLogBase._lastStatusESDRecovery, 
+                       _BioLogBase._logDetails, _BioLogBase._logFile, _BioLogBase._logFilePath, 
+                       _BioLogBase._logPath, _BioLogBase._logStartDate, _BioLogBase._loggingType, 
+                       _BioLogBase._mesaScanningStateNotification, _BioLogBase._milisecondsFormatter, 
+                       _BioLogBase._mode, _BioLogBase._notificationPort, _BioLogBase._osLog, 
+                       _BioLogBase._powerSourceNotification, _BioLogBase._radarPromptLock, 
+                       _BioLogBase._rootPath, _BioLogBase._server, _BioLogBase._templateList, 
+                       _BioLogBase._timeBox, _BioLogBase._timeZoneFormatter, _BioLogBase._timestampFormatter, 
+                       _SBBase._bioOperationQueue, _SBBase._buttonDown, _SBBase._buttonEventCache, 
+                       _SBBase._chargerConnected, _SBBase._fingerOnInLockout, _SBBase._fingerOnSensor, 
+                       _SBBase._fingerTouchCounter, _SBBase._fingerTouchQueue, _SBBase._nButtonCacheEvents, 
+                       _SBBase._notificationPort, _SBBase._operationModePause, _SBBase._powerSourceNotification, 
+                       _SBBase._sbContext, _SBBase._server, _SBBase._timeBox, _SBBase._wakeOnMenuPin ]
+...

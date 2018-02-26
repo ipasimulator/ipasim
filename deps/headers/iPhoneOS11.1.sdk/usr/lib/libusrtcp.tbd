@@ -1,0 +1,13 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: 00000000-0000-0000-0000-000000000000', 'armv7s: 00000000-0000-0000-0000-000000000000', 
+                   'arm64: C518B32F-CBC9-3BBE-ADEB-31B791BD7075' ]
+platform:        ios
+install-name:    /usr/lib/libusrtcp.dylib
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ _in6_pseudo, _in_adjust_cksum, _in_finalize_cksum, _in_pseudo, 
+                       _inet_cksum, _nw_protocol_sfotcp_identifier, _nw_protocol_tcp_identifier, 
+                       _tcp_next_mtu ]
+...

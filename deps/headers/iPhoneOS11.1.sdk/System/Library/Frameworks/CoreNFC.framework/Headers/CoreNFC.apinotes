@@ -1,0 +1,16 @@
+Name: CoreNFC
+Protocols:
+  - Name: NFCISO15693Tag
+    Methods:
+      - Selector: "sendCustomCommandWithConfiguration:completionHandler:"
+        MethodKind: Instance
+        SwiftName: "sendCustomCommand(commandConfiguration:completionHandler:)"
+      - Selector: "readMultipleBlocksWithConfiguration:completionHandler:"
+        MethodKind: Instance
+        SwiftName: "readMultipleBlock(readConfiguration:completionHandler:)"
+  - Name: NFCReaderSession
+    Properties:
+    Methods:
+      - Selector: "invalidateSession"
+        MethodKind: Instance
+        SwiftName: "invalidate()"

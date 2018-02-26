@@ -1,0 +1,16 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: 00000000-0000-0000-0000-000000000000', 'armv7s: 00000000-0000-0000-0000-000000000000', 
+                   'arm64: E0E2DEB2-E5ED-35DF-BE32-869461834429' ]
+platform:        ios
+install-name:    /usr/lib/libeasyperf.dylib
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ _ep_create_session, _ep_session_begin, _ep_session_config_with_argstr, 
+                       _ep_session_create, _ep_session_destroy, _ep_session_end, 
+                       _ep_session_getopts, _ep_session_process, _ep_session_set_perfdata_file, 
+                       _ep_session_set_procname, _ep_session_set_procpid, _ep_session_set_project_baseline, 
+                       _ep_session_set_testname, _ep_session_setopts, _excodeForErrnum, 
+                       _processArgs, _run_easyperf ]
+...

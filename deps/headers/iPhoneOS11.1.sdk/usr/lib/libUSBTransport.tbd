@@ -1,0 +1,33 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: 00000000-0000-0000-0000-000000000000', 'armv7s: 00000000-0000-0000-0000-000000000000', 
+                   'arm64: A582B608-B0DF-3644-9C61-AFD6F0CBB3C8' ]
+platform:        ios
+install-name:    /usr/lib/libUSBTransport.dylib
+objc-constraint: none
+exports:         
+  - archs:           [ arm64 ]
+    symbols:         [ __ZN3usb9transport14deviceRecovery10resetErrorEv, __ZN3usb9transport14deviceRecovery12addLogServerERKNSt3__110shared_ptrIN3ctu9LogServerEEE, 
+                       __ZN3usb9transport14deviceRecovery15removeLogServerERKNSt3__110shared_ptrIN3ctu9LogServerEEE, 
+                       __ZN3usb9transport14deviceRecovery4stopEv, __ZN3usb9transport14deviceRecovery6createERKNS1_10parametersE, 
+                       __ZN3usb9transport14deviceRecoveryD1Ev, __ZN3usb9transport14deviceRecoveryD2Ev, 
+                       __ZN3usb9transport6system11logSnapshotEv, __ZN3usb9transport6system12addLogServerERKNSt3__110shared_ptrIN3ctu9LogServerEEE, 
+                       __ZN3usb9transport6system15removeLogServerERKNSt3__110shared_ptrIN3ctu9LogServerEEE, 
+                       __ZN3usb9transport6system21create_default_globalEv, __ZN3usb9transport6systemD1Ev, 
+                       __ZN3usb9transport6systemD2Ev, __ZN3usb9transport9interface10setAutoZLPEb, 
+                       __ZN3usb9transport9interface11logSnapshotEv, __ZN3usb9transport9interface14lockConnectionEv, 
+                       __ZN3usb9transport9interface16unlockConnectionEv, __ZN3usb9transport9interface20setDefaultParametersERNS1_10parametersE, 
+                       __ZN3usb9transport9interface4readEPvmjU13block_pointerFvimE, 
+                       __ZN3usb9transport9interface4stopEv, __ZN3usb9transport9interface5writeEPKvmjU13block_pointerFvimE, 
+                       __ZN3usb9transport9interface6createERKNS1_10parametersE, __ZN3usb9transport9interface7getInfoEU13block_pointerFvRKNS1_4infoEE, 
+                       __ZN3usb9transport9interface8readSyncEPvmjRm, __ZN3usb9transport9interface9abortReadEv, 
+                       __ZN3usb9transport9interface9writeSyncEPKvmjRm, __ZN3usb9transport9interfaceD1Ev, 
+                       __ZN3usb9transport9interfaceD2Ev, __ZN3usb9transport9logWriter13configureSizeEj, 
+                       __ZN3usb9transport9logWriter6createERKNSt3__112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEESA_j, 
+                       __ZN3usb9transport9logWriter8snapshotERKNSt3__112basic_stringIcNS2_11char_traitsIcEENS2_9allocatorIcEEEE, 
+                       __ZN3usb9transport9logWriterD0Ev, __ZN3usb9transport9logWriterD1Ev, 
+                       __ZN3usb9transport9logWriterD2Ev ]
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ _TelephonyBasebandUSBTransportCreate, _TelephonyBasebandUSBTransportInitParameters, 
+                       _USBTransportStatusToString, _kUSBTransportConfigNoZLP, _kUSBTransportConfigVendorIdAndProductId ]
+...

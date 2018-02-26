@@ -1,0 +1,10 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: 00000000-0000-0000-0000-000000000000', 'armv7s: 00000000-0000-0000-0000-000000000000', 
+                   'arm64: 0E808860-4052-37C2-901A-7938EDEEA22B' ]
+platform:        ios
+install-name:    /usr/lib/libapple_crypto.dylib
+current-version: 0
+compatibility-version: 0
+objc-constraint: none
+...

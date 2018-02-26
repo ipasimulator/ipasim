@@ -1,0 +1,14 @@
+--- !tapi-tbd-v2
+archs:           [ armv7, armv7s, arm64 ]
+uuids:           [ 'armv7: FD502260-A0EB-30E9-A646-6D3715961469', 'armv7s: C725F239-F6E2-3D5E-9BE2-B32B4C023592', 
+                   'arm64: EE054A95-1848-364A-B032-86981F568DF4' ]
+platform:        ios
+flags:           [ not_app_extension_safe ]
+install-name:    /usr/lib/libInFieldCollection.dylib
+current-version: 6.24.1
+compatibility-version: 0
+objc-constraint: none
+exports:         
+  - archs:           [ armv7, armv7s, arm64 ]
+    symbols:         [ _NAAP, _OMkZ6SHVXM, _ZshgJnRaSlwn, _vsPHbdGf ]
+...
