@@ -1,10 +1,24 @@
 # IPA Simulator
 
+This is not in any way a complete documentation, it's just a draft containing some ideas that I could forgot until the final documentation is written.
+
 ## Projects organization
 
 Projects inside the `Library/LLVM/ARM` solution folder are simply all projects from the generated `deps/llvm/build/arm/LLVM.sln`.
 Similarly projects inside the `Library/LLVM/Win32` folder.
 All of these were added simply by selecting the `.sln` file in the `Add Existing Project...` dialog in Visual Studio.
+
+## Updating dependencies
+
+There are some third-party dependencies that can be updated whenever new version comes out.
+A list of them follows.
+
+- `clang` and `llvm` (in `deps` folder) - just pull the latest *stable* version from the remote repository and then rebuild `IpaSimulator` (which doesn't use those libraries right now, but its dependent library, `HeadersAnalyzer`, does).
+- `WinObjC` (in `packages` folder) - just restore NuGet packages for the `IpaSimulator` project to get the latest `WinObjC` files (`.h` files used by `HeadersAnalyzer` and `.dll`s used by the very `IpaSimulator`).
+- `LiefPort` and `UnicornPort` (in `lib` folder) - not easy to update right now since there are lots of changes from the original version.
+  This should be easier in the future either by making them submodules or using `clang` libraries instead.
+- `iPhoneOS.sdk` (in `deps` folder) - just download the latest iPhone SDK and replace the contents of this folder with it.
+  Then rebuild `IpaSimulator` (which should in turn run `HeadersAnalyzer` that uses `.h` and other files from this SDK).
 
 ## How to build (on 64-bit Windows with Visual Studio 2017)
 
