@@ -8,10 +8,32 @@
 #include <clang/Lex/PreprocessorOptions.h>
 #include <clang/Parse/ParseAST.h>
 #include <clang/AST/ASTContext.h>
+#include <clang/AST/RecursiveASTVisitor.h>
 
 using namespace clang;
 using namespace frontend;
 using namespace std;
+
+class CustomASTVisitor : public RecursiveASTVisitor<CustomASTVisitor> {
+public:
+    bool VisitFunctionDecl(FunctionDecl *f) { // TODO: override
+        f->printName(llvm::outs());
+        llvm::outs() << "\n";
+        return true;
+    }
+};
+
+class CustomASTConsumer : public ASTConsumer {
+public:
+    bool HandleTopLevelDecl(DeclGroupRef d) override {
+        for (auto b : d) {
+            v_.TraverseDecl(b);
+        }
+        return true;
+    }
+private:
+    CustomASTVisitor v_;
+};
 
 int main()
 {
@@ -40,7 +62,7 @@ int main()
     //ci.getPreprocessorOpts().UsePredefines = false;
     ci.createPreprocessor(TranslationUnitKind::TU_Complete);
 
-    ci.setASTConsumer(make_unique<ASTConsumer>());
+    ci.setASTConsumer(make_unique<CustomASTConsumer>());
     ci.createASTContext();
     ci.createSema(TranslationUnitKind::TU_Complete, nullptr);
 
