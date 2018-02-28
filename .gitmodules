@@ -6,3 +6,6 @@
 	path = deps/clang
 	url = https://git.llvm.org/git/clang.git/
 	branch = release_50
+[submodule "deps/yaml-cpp"]
+	path = deps/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp.git
