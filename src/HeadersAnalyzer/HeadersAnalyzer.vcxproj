@@ -90,7 +90,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\clang\include;$(ProjectDir)..\..\deps\llvm\include;$(ProjectDir)..\..\deps\llvm\build\win32\include;$(ProjectDir)..\..\deps\llvm\build\win32\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\yaml-cpp\include;$(ProjectDir)..\..\deps\clang\include;$(ProjectDir)..\..\deps\llvm\include;$(ProjectDir)..\..\deps\llvm\build\win32\include;$(ProjectDir)..\..\deps\llvm\build\win32\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -107,7 +107,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\clang\include;$(ProjectDir)..\..\deps\llvm\include;$(ProjectDir)..\..\deps\llvm\build\win32\include;$(ProjectDir)..\..\deps\llvm\build\win32\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\yaml-cpp\include;$(ProjectDir)..\..\deps\clang\include;$(ProjectDir)..\..\deps\llvm\include;$(ProjectDir)..\..\deps\llvm\build\win32\include;$(ProjectDir)..\..\deps\llvm\build\win32\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,7 +126,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\clang\include;$(ProjectDir)..\..\deps\llvm\include;$(ProjectDir)..\..\deps\llvm\build\win32\include;$(ProjectDir)..\..\deps\llvm\build\win32\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\yaml-cpp\include;$(ProjectDir)..\..\deps\clang\include;$(ProjectDir)..\..\deps\llvm\include;$(ProjectDir)..\..\deps\llvm\build\win32\include;$(ProjectDir)..\..\deps\llvm\build\win32\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -147,7 +147,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\clang\include;$(ProjectDir)..\..\deps\llvm\include;$(ProjectDir)..\..\deps\llvm\build\win32\include;$(ProjectDir)..\..\deps\llvm\build\win32\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\yaml-cpp\include;$(ProjectDir)..\..\deps\clang\include;$(ProjectDir)..\..\deps\llvm\include;$(ProjectDir)..\..\deps\llvm\build\win32\include;$(ProjectDir)..\..\deps\llvm\build\win32\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -260,6 +260,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Tooling\Refactoring\clangToolingRefactor.vcxproj">
       <Project>{bc3b3ba9-5d92-3bf3-a658-2331cb3abf67}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\yaml-cpp\build\win32\yaml-cpp.vcxproj">
+      <Project>{6140452b-4b75-3a59-bf5d-afd1bdd0b56b}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

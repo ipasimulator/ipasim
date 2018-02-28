@@ -8,12 +8,16 @@ Projects inside the `Library/LLVM/ARM` solution folder are simply all projects f
 Similarly projects inside the `Library/LLVM/Win32` folder.
 All of these were added simply by selecting the `.sln` file in the `Add Existing Project...` dialog in Visual Studio.
 
+The same is true for projects inside the `Library/yaml-cpp` solution folder.
+
 ## Updating dependencies
 
 There are some third-party dependencies that can be updated whenever new version comes out.
 A list of them follows.
 
-- `clang` and `llvm` (in `deps` folder) - just pull the latest *stable* version from the remote repository and then rebuild `IpaSimulator` (which doesn't use those libraries right now, but its dependent library, `HeadersAnalyzer`, does).
+- `clang` and `llvm` (in `deps` folder) - just pull the latest *stable* version from the remote repository, run the `cmake` as described below and make sure no new projects were added nor any old projects removed (or re-add the whole solution as described above).
+  Then rebuild `IpaSimulator` (which doesn't use those libraries right now, but its dependent library, `HeadersAnalyzer`, does).
+- `yaml-cpp` - the same old story.
 - `WinObjC` (in `packages` folder) - just restore NuGet packages for the `IpaSimulator` project to get the latest `WinObjC` files (`.h` files used by `HeadersAnalyzer` and `.dll`s used by the very `IpaSimulator`).
 - `LiefPort` and `UnicornPort` (in `lib` folder) - not easy to update right now since there are lots of changes from the original version.
   This should be easier in the future either by making them submodules or using `clang` libraries instead.
@@ -33,6 +37,10 @@ A list of them follows.
    cd ..
    mkdir arm && cd arm
    cmake -G "Visual Studio 15 ARM" -DLLVM_TARGETS_TO_BUILD="ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\..\clang" -DLLVM_TABLEGEN="<full path to source directory>\deps\llvm\build\win32\Release\bin\llvm-tblgen.exe" -Thost=x64 ..\..
+   cd ..\..\yaml-cpp
+   mkdir build && cd build
+   mkdir win32 && cd win32
+   cmake -G "Visual Studio 15" -Thost=x64 ..\..
    ```
    **TODO: probably remove the `-Thost=x64` option and allow only 32-bit Windows for tooling/compilation and ARM + 32-bit Windows for running the app.**
 4. If projects were successfully generated, you can open the `IPASimulator.sln`.

@@ -9,6 +9,7 @@
 #include <clang/Parse/ParseAST.h>
 #include <clang/AST/ASTContext.h>
 #include <clang/AST/RecursiveASTVisitor.h>
+#include <yaml-cpp/yaml.h>
 
 using namespace clang;
 using namespace frontend;
@@ -17,8 +18,21 @@ using namespace std;
 class CustomASTVisitor : public RecursiveASTVisitor<CustomASTVisitor> {
 public:
     bool VisitFunctionDecl(FunctionDecl *f) { // TODO: override
+        // dump the function's name and location
         f->printName(llvm::outs());
+        llvm::outs() << " ";
+        f->getLocation().print(llvm::outs(), f->getASTContext().getSourceManager());
         llvm::outs() << "\n";
+
+        // TODO: check that the function is actually exported from the corresponding
+        // .dylib file (it's enough to check .tbd file inside the SDK which is simply
+        // a YAML)
+
+        // TODO: also check that the function has the same signature in WinObjC headers
+        // inside the (NuGet) packages folder
+
+        YAML::LoadFile("test.yaml");
+
         return true;
     }
 };
