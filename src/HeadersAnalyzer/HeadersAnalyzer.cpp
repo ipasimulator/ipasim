@@ -11,6 +11,7 @@
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/TargetRegistry.h>
+#include <llvm/Target/TargetLowering.h>
 #include <yaml-cpp/yaml.h>
 
 using namespace clang;
@@ -20,7 +21,9 @@ using namespace std;
 class HeadersAnalyzer {
 public:
     HeadersAnalyzer() {
+        llvm::InitializeAllTargetInfos();
         llvm::InitializeAllTargets();
+        llvm::InitializeAllTargetMCs();
     }
     void VisitFunction(FunctionDecl &f) {
         // dump the function's name and location
@@ -39,8 +42,13 @@ public:
 
         // generate code calling this function using Unicorn's state
         string err;
-        auto t = llvm::TargetRegistry::lookupTarget("arm-apple-darwin", err); // TODO: obviously, don't hardcode the Triple
-        llvm::outs() << t->getName() << " " << t->getShortDescription() << "\n";
+        auto tt = "arm-apple-darwin"; // TODO: obviously, don't hardcode the Triple
+        auto t = llvm::TargetRegistry::lookupTarget(tt, err);
+        assert(t && "target not found");
+        auto tm = t->createTargetMachine(tt, /*CPU*/ "generic", /*Features*/ "",
+            llvm::TargetOptions(), llvm::Optional<llvm::Reloc::Model>());
+        llvm::TargetLowering tl(*tm);
+        cout << "success" << endl;
     }
 };
 
@@ -52,7 +60,7 @@ public:
         return true;
     }
 private:
-    HeadersAnalyzer &ha_;
+    HeadersAnalyzer & ha_;
 };
 
 class CustomASTConsumer : public ASTConsumer {
