@@ -162,29 +162,176 @@
     <ClCompile Include="HeadersAnalyzer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Analysis\LLVMAnalysis.vcxproj">
+      <Project>{c5bf8be3-1356-3cef-a1b3-073d3e3f66f4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\AsmParser\LLVMAsmParser.vcxproj">
+      <Project>{11ced6c4-f817-3df9-a521-b593da96668f}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\deps\llvm\build\win32\lib\BinaryFormat\LLVMBinaryFormat.vcxproj">
       <Project>{62e56e02-edba-3366-844c-5fa5039bfceb}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Bitcode\Reader\LLVMBitReader.vcxproj">
       <Project>{9816317d-97b9-3353-a543-51e67745b877}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Bitcode\Writer\LLVMBitWriter.vcxproj">
+      <Project>{716bf43d-4544-318d-a908-f3cda1ddac0f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\CodeGen\AsmPrinter\LLVMAsmPrinter.vcxproj">
+      <Project>{f8230a59-2839-3719-8865-f92768af6198}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\CodeGen\GlobalISel\LLVMGlobalISel.vcxproj">
+      <Project>{29f59b49-cf3f-3415-bf7b-739869e952b9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\CodeGen\LLVMCodeGen.vcxproj">
+      <Project>{35d8aad5-ac8d-3591-a23b-f88b8592d952}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\CodeGen\MIRParser\LLVMMIRParser.vcxproj">
+      <Project>{def7bc13-d736-30f7-9934-e4877e06d526}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\CodeGen\SelectionDAG\LLVMSelectionDAG.vcxproj">
+      <Project>{80f46fb1-8ee3-3ef7-96ff-f54fd7db8261}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\DebugInfo\CodeView\LLVMDebugInfoCodeView.vcxproj">
+      <Project>{8ff17c32-2d5f-36c0-8da2-ab9b77d24419}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\DebugInfo\DWARF\LLVMDebugInfoDWARF.vcxproj">
+      <Project>{a7b0fdc4-6b3c-3663-b80e-7e9e633a49b4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\DebugInfo\MSF\LLVMDebugInfoMSF.vcxproj">
+      <Project>{f6554ede-f61c-3bac-bcbc-f80922bd3fb2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\DebugInfo\PDB\LLVMDebugInfoPDB.vcxproj">
+      <Project>{a4c5a433-ffb6-310a-9500-b66dde0cfc50}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\DebugInfo\Symbolize\LLVMSymbolize.vcxproj">
+      <Project>{5f205d73-6f90-356d-9a90-f0c07d574007}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Demangle\LLVMDemangle.vcxproj">
+      <Project>{395052b6-b4e0-3b51-b9f3-bc256734f1e7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\ExecutionEngine\Interpreter\LLVMInterpreter.vcxproj">
+      <Project>{44f0348d-5ec1-3d2b-9b2f-59b0b8c50795}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\ExecutionEngine\LLVMExecutionEngine.vcxproj">
+      <Project>{c6f0630d-fa9f-33ad-b79b-e28a9ff20f62}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\ExecutionEngine\MCJIT\LLVMMCJIT.vcxproj">
+      <Project>{c1fba47d-725c-3570-bdcb-be26fcdf8b8a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\ExecutionEngine\Orc\LLVMOrcJIT.vcxproj">
+      <Project>{8de1a7e8-766a-3f90-9e94-77453498e15f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\ExecutionEngine\RuntimeDyld\LLVMRuntimeDyld.vcxproj">
+      <Project>{b3aada2f-9260-31b2-b704-88245082c5db}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\IRReader\LLVMIRReader.vcxproj">
+      <Project>{ecd534c3-aacf-3aa0-80f8-8937ef97458f}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\deps\llvm\build\win32\lib\IR\LLVMCore.vcxproj">
       <Project>{9c3ff3e8-3d5a-3e51-98eb-2a1c7bb797de}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\LineEditor\LLVMLineEditor.vcxproj">
+      <Project>{61b6fedf-4bca-36a1-b0e3-933edc64bafb}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Linker\LLVMLinker.vcxproj">
+      <Project>{e87340ce-1b87-3144-bc90-4ff254aa93d4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\LTO\LLVMLTO.vcxproj">
+      <Project>{4280e4b4-2803-3fdb-9a58-8435339423b8}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\deps\llvm\build\win32\lib\MC\LLVMMC.vcxproj">
       <Project>{7b9e56d6-609f-34c3-a430-6eb3e442361a}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\MC\MCDisassembler\LLVMMCDisassembler.vcxproj">
+      <Project>{83cb6f23-7aae-36a9-b37d-3eee67ac2457}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\deps\llvm\build\win32\lib\MC\MCParser\LLVMMCParser.vcxproj">
       <Project>{85e8d9ca-5332-3f10-a336-f89a5e9b0ebd}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\ObjectYAML\LLVMObjectYAML.vcxproj">
+      <Project>{f9b707f6-5466-3d1f-8ad6-dafb5a58c060}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Object\LLVMObject.vcxproj">
+      <Project>{8d626954-a3bc-3290-87d8-57d693457031}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Option\LLVMOption.vcxproj">
       <Project>{e42b641e-1b3e-34d4-8dce-ed4d0b83c4a6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Passes\LLVMPasses.vcxproj">
+      <Project>{18d8b0d0-7ae1-315c-bdfe-3e2fdc59aa7c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\ProfileData\Coverage\LLVMCoverage.vcxproj">
+      <Project>{2ad7490c-214a-3baa-bc73-58cd0d2dd4e3}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\deps\llvm\build\win32\lib\ProfileData\LLVMProfileData.vcxproj">
       <Project>{440fd662-e1e9-3160-a59d-9b423d25fa13}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Support\LLVMSupport.vcxproj">
       <Project>{d13dbe12-3a5b-3b41-a9e2-46019d320ff1}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\TableGen\LLVMTableGen.vcxproj">
+      <Project>{87de545a-0116-3f5c-9291-9107402cc748}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Target\ARM\AsmParser\LLVMARMAsmParser.vcxproj">
+      <Project>{f5de9460-cbc0-32c4-bc48-56ccaf7aa94f}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Target\ARM\Disassembler\LLVMARMDisassembler.vcxproj">
+      <Project>{7f39502f-e17a-3d8c-ae0d-42b0b5c2d1ec}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Target\ARM\InstPrinter\LLVMARMAsmPrinter.vcxproj">
+      <Project>{a3abc62f-4051-3ed8-8a78-7f820bb4764b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Target\ARM\LLVMARMCodeGen.vcxproj">
+      <Project>{034bbc09-aa6d-323c-8292-9a437e90ea08}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Target\ARM\MCTargetDesc\LLVMARMDesc.vcxproj">
+      <Project>{0a347120-2765-307d-afa8-bcb44ad4e4c4}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Target\ARM\TargetInfo\LLVMARMInfo.vcxproj">
+      <Project>{9b4f7cd1-b3b7-322c-bdce-61d952c3bdde}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Target\LLVMTarget.vcxproj">
+      <Project>{0c12af2c-7ba7-317c-944e-5f36c1b1314c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Testing\Support\LLVMTestingSupport.vcxproj">
+      <Project>{02e56ff8-c2ae-300d-aa1c-8914dec71bf2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\ToolDrivers\llvm-dlltool\LLVMDlltoolDriver.vcxproj">
+      <Project>{7542211b-9a50-3362-9585-88b26c1395b6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\ToolDrivers\llvm-lib\LLVMLibDriver.vcxproj">
+      <Project>{4da6167e-807b-3d0b-9df9-b9ac49408bdc}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Transforms\Coroutines\LLVMCoroutines.vcxproj">
+      <Project>{f7738a2c-dbcc-3766-ba89-cb0578cdaa79}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Transforms\Hello\LLVMHello.vcxproj">
+      <Project>{4fd45cac-982a-386e-a4dd-58361c52bdc0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Transforms\InstCombine\LLVMInstCombine.vcxproj">
+      <Project>{24b7d471-3e3b-3dc9-a0ec-5e180d907360}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Transforms\Instrumentation\LLVMInstrumentation.vcxproj">
+      <Project>{dea87c24-aab8-3626-a574-78682cb1fc93}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Transforms\IPO\LLVMipo.vcxproj">
+      <Project>{e88d78de-d6a1-3285-85fb-c7ac56479c50}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Transforms\ObjCARC\LLVMObjCARCOpts.vcxproj">
+      <Project>{aadc2186-e368-3169-93e8-6d1717fed6e3}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Transforms\Scalar\LLVMScalarOpts.vcxproj">
+      <Project>{b33dbc51-91ea-39b2-a159-208e394936e7}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Transforms\Utils\LLVMTransformUtils.vcxproj">
+      <Project>{0729b08f-8b08-3849-b425-0811221e0be6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\Transforms\Vectorize\LLVMVectorize.vcxproj">
+      <Project>{e0281751-51ec-304d-9119-83a86074f3bf}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\lib\XRay\LLVMXRay.vcxproj">
+      <Project>{52ca8c38-6dcd-3d47-8378-c758946f9485}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Analysis\clangAnalysis.vcxproj">
       <Project>{a9dbb940-af7e-3539-a2fd-f23c2b55eea9}</Project>
@@ -260,6 +407,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\deps\llvm\build\win32\tools\clang\lib\Tooling\Refactoring\clangToolingRefactor.vcxproj">
       <Project>{bc3b3ba9-5d92-3bf3-a658-2331cb3abf67}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\deps\llvm\build\win32\utils\LLVMVisualizers\LLVMVisualizers.vcxproj">
+      <Project>{d344f4e6-70eb-3bc2-8763-9ce08089da36}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\deps\yaml-cpp\build\win32\yaml-cpp.vcxproj">
       <Project>{6140452b-4b75-3a59-bf5d-afd1bdd0b56b}</Project>

@@ -9,36 +9,55 @@
 #include <clang/Parse/ParseAST.h>
 #include <clang/AST/ASTContext.h>
 #include <clang/AST/RecursiveASTVisitor.h>
+#include <llvm/Support/TargetSelect.h>
+#include <llvm/Support/TargetRegistry.h>
 #include <yaml-cpp/yaml.h>
 
 using namespace clang;
 using namespace frontend;
 using namespace std;
 
-class CustomASTVisitor : public RecursiveASTVisitor<CustomASTVisitor> {
+class HeadersAnalyzer {
 public:
-    bool VisitFunctionDecl(FunctionDecl *f) { // TODO: override
+    HeadersAnalyzer() {
+        llvm::InitializeAllTargets();
+    }
+    void VisitFunction(FunctionDecl &f) {
         // dump the function's name and location
-        f->printName(llvm::outs());
+        f.printName(llvm::outs());
         llvm::outs() << " ";
-        f->getLocation().print(llvm::outs(), f->getASTContext().getSourceManager());
+        f.getLocation().print(llvm::outs(), f.getASTContext().getSourceManager());
         llvm::outs() << "\n";
 
         // TODO: check that the function is actually exported from the corresponding
         // .dylib file (it's enough to check .tbd file inside the SDK which is simply
         // a YAML)
+        //YAML::LoadFile("test.yaml");
 
         // TODO: also check that the function has the same signature in WinObjC headers
         // inside the (NuGet) packages folder
 
-        YAML::LoadFile("test.yaml");
+        // generate code calling this function using Unicorn's state
+        string err;
+        auto t = llvm::TargetRegistry::lookupTarget("arm-apple-darwin", err); // TODO: obviously, don't hardcode the Triple
+        llvm::outs() << t->getName() << " " << t->getShortDescription() << "\n";
+    }
+};
 
+class CustomASTVisitor : public RecursiveASTVisitor<CustomASTVisitor> {
+public:
+    CustomASTVisitor(HeadersAnalyzer &ha) : ha_(ha) {}
+    bool VisitFunctionDecl(FunctionDecl *f) { // TODO: override
+        ha_.VisitFunction(*f);
         return true;
     }
+private:
+    HeadersAnalyzer &ha_;
 };
 
 class CustomASTConsumer : public ASTConsumer {
 public:
+    CustomASTConsumer(HeadersAnalyzer &ha) : v_(ha) {}
     bool HandleTopLevelDecl(DeclGroupRef d) override {
         for (auto b : d) {
             v_.TraverseDecl(b);
@@ -51,7 +70,10 @@ private:
 
 int main()
 {
+    HeadersAnalyzer ha;
+
     // inspired by https://github.com/loarabia/Clang-tutorial/
+    // TODO: move this to a separate class
 
     CompilerInstance ci;
     ci.createDiagnostics();
@@ -76,7 +98,7 @@ int main()
     //ci.getPreprocessorOpts().UsePredefines = false;
     ci.createPreprocessor(TranslationUnitKind::TU_Complete);
 
-    ci.setASTConsumer(make_unique<CustomASTConsumer>());
+    ci.setASTConsumer(make_unique<CustomASTConsumer>(ha));
     ci.createASTContext();
     ci.createSema(TranslationUnitKind::TU_Complete, nullptr);
 
