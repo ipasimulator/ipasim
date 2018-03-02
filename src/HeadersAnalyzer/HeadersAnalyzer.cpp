@@ -9,9 +9,12 @@
 #include <clang/Parse/ParseAST.h>
 #include <clang/AST/ASTContext.h>
 #include <clang/AST/RecursiveASTVisitor.h>
+#include <clang/AST/GlobalDecl.h>
+#include <clang/CodeGen/ModuleBuilder.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/TargetRegistry.h>
 #include <llvm/Target/TargetLowering.h>
+#include <llvm/IR/LLVMContext.h>
 #include <yaml-cpp/yaml.h>
 
 using namespace clang;
@@ -20,10 +23,19 @@ using namespace std;
 
 class HeadersAnalyzer {
 public:
-    HeadersAnalyzer() {
+    HeadersAnalyzer(CompilerInstance &ci) : ci_(ci) {
         llvm::InitializeAllTargetInfos();
         llvm::InitializeAllTargets();
         llvm::InitializeAllTargetMCs();
+
+        cg_ = CreateLLVMCodeGen(ci_.getDiagnostics(), "", ci_.getHeaderSearchOpts(),
+            ci_.getPreprocessorOpts(), ci_.getCodeGenOpts(), ctx_); // TODO: this pointer must be deleted!
+    }
+    void Initialize() {
+        cg_->Initialize(ci_.getASTContext()); // TODO: just a wild guess, is it necessary?
+    }
+    void HandleTopLevelDecl(DeclGroupRef d) {
+        cg_->HandleTopLevelDecl(d);
     }
     void VisitFunction(FunctionDecl &f) {
         // dump the function's name and location
@@ -40,6 +52,10 @@ public:
         // TODO: also check that the function has the same signature in WinObjC headers
         // inside the (NuGet) packages folder
 
+        // generate LLVM IR from the declaration
+        auto func = cg_->GetAddrOfGlobal(GlobalDecl(&f), /*isForDefinition*/false);
+        auto ffunc = static_cast<llvm::Function *>(func);
+
         // generate code calling this function using Unicorn's state
         string err;
         auto tt = "arm-apple-darwin"; // TODO: obviously, don't hardcode the Triple
@@ -48,8 +64,16 @@ public:
         auto tm = t->createTargetMachine(tt, /*CPU*/ "generic", /*Features*/ "",
             llvm::TargetOptions(), llvm::Optional<llvm::Reloc::Model>());
         llvm::TargetLowering tl(*tm);
+        llvm::SelectionDAG dag(*tm, llvm::CodeGenOpt::Level::None); // TODO: this does not seem properly initialized, should we rather retrieve it from somewhere?
+        //dag.init()
+        llvm::TargetLowering::CallLoweringInfo cli(dag);
+        auto pair = tl.LowerCallTo(cli);
         cout << "success" << endl;
     }
+private:
+    llvm::LLVMContext ctx_;
+    CompilerInstance &ci_;
+    CodeGenerator *cg_;
 };
 
 class CustomASTVisitor : public RecursiveASTVisitor<CustomASTVisitor> {
@@ -65,8 +89,10 @@ private:
 
 class CustomASTConsumer : public ASTConsumer {
 public:
-    CustomASTConsumer(HeadersAnalyzer &ha) : v_(ha) {}
+    CustomASTConsumer(HeadersAnalyzer &ha) : v_(ha), ha_(ha) {}
     bool HandleTopLevelDecl(DeclGroupRef d) override {
+        ha_.HandleTopLevelDecl(d);
+        // TODO: move the following code into the HandleTopLevelDecl function
         for (auto b : d) {
             v_.TraverseDecl(b);
         }
@@ -74,12 +100,11 @@ public:
     }
 private:
     CustomASTVisitor v_;
+    HeadersAnalyzer &ha_;
 };
 
 int main()
 {
-    HeadersAnalyzer ha;
-
     // inspired by https://github.com/loarabia/Clang-tutorial/
     // TODO: move this to a separate class
 
@@ -106,8 +131,10 @@ int main()
     //ci.getPreprocessorOpts().UsePredefines = false;
     ci.createPreprocessor(TranslationUnitKind::TU_Complete);
 
+    HeadersAnalyzer ha(ci);
     ci.setASTConsumer(make_unique<CustomASTConsumer>(ha));
     ci.createASTContext();
+    ha.Initialize();
     ci.createSema(TranslationUnitKind::TU_Complete, nullptr);
 
     const auto file = ci.getFileManager().getFile("C:/Users/Jones/Files/Projects/IPASimulator/deps/headers/iPhoneOS11.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/Foundation.h");
