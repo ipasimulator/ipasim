@@ -16,10 +16,12 @@
 #include <llvm/CodeGen/GlobalISel/CallLowering.h>
 #include <llvm/CodeGen/CallingConvLower.h>
 #include <llvm/CodeGen/SelectionDAGISel.h>
+#include <llvm/CodeGen/TargetPassConfig.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/TargetRegistry.h>
 #include <llvm/Target/TargetLowering.h>
 #include <llvm/Target/TargetSubtargetInfo.h>
+#include <llvm/Transforms/IPO/PassManagerBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/PassManager.h>
 #include <llvm/IR/LegacyPassManager.h>
@@ -50,6 +52,7 @@ public:
     }
     void HandleTopLevelDecl(DeclGroupRef d) {
         cg_->HandleTopLevelDecl(d);
+        // TODO: maybe traverse declarations here and clear state of CodeGenerator somehow afterwards
     }
     void VisitFunction(FunctionDecl &f) {
         // dump the function's name and location
@@ -88,19 +91,31 @@ public:
         auto dag = static_cast<llvm::SelectionDAGISel *>(fp);
 
         // register with PassManager
+        llvm::PassManagerBuilder pmb;
         llvm::legacy::FunctionPassManager pm(ffunc->getParent());
-        pm.add(fp);
-        pm.doInitialization();
+        auto llvmTm = static_cast<llvm::LLVMTargetMachine *>(tm);
+        llvmTm->adjustPassManager(pmb);
+        pmb.populateFunctionPassManager(pm);
+        llvm::MCContext *mcc = nullptr;
+        llvm::SmallVector<char, 4096> buffer;
+        llvm::raw_svector_ostream os(buffer);
+        bool result = llvmTm->addPassesToEmitMC(pm, mcc, os);
+        //auto config = llvmTm->createPassConfig(pm);
+        //bool result = config->addInstSelector();
+        assert(result && "addPassesToEmitMC shouldn't fail");
 
-        // TODO: use pm.run()?
+        // lower func
+        pm.run(*ffunc);
 
+#if 0
         // create machine function
         auto &mmi = fp->getAnalysis<llvm::MachineModuleInfo>();
         auto &mf = mmi.getOrCreateMachineFunction(*ffunc);
 
         // lower function
-        bool result = dag->runOnMachineFunction(mf);
+        result = dag->runOnMachineFunction(mf);
         assert(result && "runOnMachineFunction shouldn't fail");
+#endif
 
 #if 0
         // get call lowering
