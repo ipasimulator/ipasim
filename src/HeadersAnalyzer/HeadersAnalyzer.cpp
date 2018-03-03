@@ -11,15 +11,29 @@
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/AST/GlobalDecl.h>
 #include <clang/CodeGen/ModuleBuilder.h>
+#include <llvm/Analysis/OptimizationDiagnosticInfo.h>
+#include <llvm/CodeGen/MachineModuleInfo.h>
+#include <llvm/CodeGen/GlobalISel/CallLowering.h>
+#include <llvm/CodeGen/CallingConvLower.h>
+#include <llvm/CodeGen/SelectionDAGISel.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/TargetRegistry.h>
 #include <llvm/Target/TargetLowering.h>
+#include <llvm/Target/TargetSubtargetInfo.h>
 #include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/PassManager.h>
+#include <llvm/IR/LegacyPassManager.h>
 #include <yaml-cpp/yaml.h>
 
 using namespace clang;
 using namespace frontend;
 using namespace std;
+
+// HACK: this should be included from llvm/Target/ARM/ARM.h instead
+namespace llvm {
+    class ARMBaseTargetMachine;
+    FunctionPass *createARMISelDag(ARMBaseTargetMachine &TM, CodeGenOpt::Level OptLevel);
+}
 
 class HeadersAnalyzer {
 public:
@@ -57,17 +71,62 @@ public:
         auto ffunc = static_cast<llvm::Function *>(func);
 
         // generate code calling this function using Unicorn's state
+
+        // retrieve target
         string err;
         auto tt = "arm-apple-darwin"; // TODO: obviously, don't hardcode the Triple
         auto t = llvm::TargetRegistry::lookupTarget(tt, err);
         assert(t && "target not found");
+
+        // create target machine
         auto tm = t->createTargetMachine(tt, /*CPU*/ "generic", /*Features*/ "",
             llvm::TargetOptions(), llvm::Optional<llvm::Reloc::Model>());
+        auto armTm = reinterpret_cast<llvm::ARMBaseTargetMachine *>(tm);
+
+        // create SelectionDAGISel
+        auto fp = llvm::createARMISelDag(*armTm, llvm::CodeGenOpt::Level::None);
+        auto dag = static_cast<llvm::SelectionDAGISel *>(fp);
+
+        // register with PassManager
+        llvm::legacy::FunctionPassManager pm(ffunc->getParent());
+        pm.add(fp);
+        pm.doInitialization();
+
+        // TODO: use pm.run()?
+
+        // create machine function
+        auto &mmi = fp->getAnalysis<llvm::MachineModuleInfo>();
+        auto &mf = mmi.getOrCreateMachineFunction(*ffunc);
+
+        // lower function
+        bool result = dag->runOnMachineFunction(mf);
+        assert(result && "runOnMachineFunction shouldn't fail");
+
+#if 0
+        // get call lowering
+        auto st = tm->getSubtargetImpl(*ffunc);
+        auto cl = st->getCallLowering();
+#endif
+
+#if 0
+        // lower call
         llvm::TargetLowering tl(*tm);
         llvm::SelectionDAG dag(*tm, llvm::CodeGenOpt::Level::None); // TODO: this does not seem properly initialized, should we rather retrieve it from somewhere?
-        //dag.init()
+        llvm::OptimizationRemarkEmitter ore(ffunc);
+        dag.init(mf, ore);
         llvm::TargetLowering::CallLoweringInfo cli(dag);
-        auto pair = tl.LowerCallTo(cli);
+        //cli.setCallee(ffunc->getCallingConv(), ffunc->getReturnType(), /**/SDValue());
+        auto pair = tl.LowerCallTo(cli); // TODO: maybe use FastISel.LowerCallTo, so that we don't have to create SelectionDAG...
+#endif
+
+#if 0
+        SmallVector<llvm::CCValAssign, 16> argLocs;
+        llvm::CCState cc(ffunc->getCallingConv(), ffunc->isVarArg(), mf, argLocs, ffunc->getContext());
+        
+        SmallVector<llvm::ISD::InputArg, 16> ins;
+        ins.push_back(llvm::ISD::InputArg()); // TODO: how to create InputArg?
+#endif
+
         cout << "success" << endl;
     }
 private:
