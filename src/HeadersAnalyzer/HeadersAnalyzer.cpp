@@ -27,6 +27,7 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/PassManager.h>
 #include <llvm/IR/LegacyPassManager.h>
+#include <llvm/../../lib/Target/ARM/ARMISelLowering.h>
 #include <yaml-cpp/yaml.h>
 
 using namespace clang;
@@ -155,6 +156,11 @@ public:
         f.getLocation().print(llvm::outs(), f.getASTContext().getSourceManager());
         llvm::outs() << "\n";
 
+        // dump funtion's type
+        auto ft = f.getFunctionType();
+        ft->dump(llvm::outs());
+        llvm::outs() << "\n";
+
         // TODO: check that the function is actually exported from the corresponding
         // .dylib file (it's enough to check .tbd file inside the SDK which is simply
         // a YAML)
@@ -179,10 +185,34 @@ public:
         auto tm = t->createTargetMachine(tt, /*CPU*/ "generic", /*Features*/ "",
             llvm::TargetOptions(), llvm::Optional<llvm::Reloc::Model>());
 
+#if 0
         // inspired by ARMCallLowering::lowerCall
-        auto tl = tm->getSubtargetImpl(*ffunc)->getTargetLowering();
+        auto st = tm->getSubtargetImpl(*ffunc);
+        auto tl = static_cast<const llvm::ARMTargetLowering *>(st->getTargetLowering());
         llvm::SmallVector<llvm::CallLowering::ArgInfo, 8> args;
-        // TODO: how to continue with this?
+        auto assignFn = tl->CCAssignFnForCall(ffunc->getCallingConv(), ffunc->isVarArg());
+        llvm::MachineIRBuilder mirb;
+        llvm::MachineModuleInfo mmi(tm);
+        auto &mf = mmi.getOrCreateMachineFunction(*ffunc);
+        CustomValueHandler handler(mirb, mf.getRegInfo(), assignFn);
+        // TODO: I'm stuck here
+#endif
+
+        // inspired by CallLowering::handleAssignments
+        auto st = tm->getSubtargetImpl(*ffunc);
+        auto tl = static_cast<const llvm::ARMTargetLowering *>(st->getTargetLowering());
+        auto assignFn = tl->CCAssignFnForCall(ffunc->getCallingConv(), ffunc->isVarArg());
+        llvm::MachineModuleInfo mmi(tm);
+        auto &mf = mmi.getOrCreateMachineFunction(*ffunc);
+        SmallVector<llvm::CCValAssign, 16> argLocs;
+        llvm::CCState cc(ffunc->getCallingConv(), ffunc->isVarArg(), mf, argLocs, ffunc->getContext());
+        unsigned i = 0;
+        for (auto &arg : ffunc->args()) {
+            // TODO: do what the ARMCallLowering::splitToValueTypes function does
+            auto vt = llvm::MVT::getVT(arg.getType());
+            bool result = assignFn(i, vt, vt, llvm::CCValAssign::LocInfo::Full, llvm::ISD::ArgFlagsTy(), cc);
+            cout << result << endl;
+        }
 
 #if 0
         // create SelectionDAGISel
