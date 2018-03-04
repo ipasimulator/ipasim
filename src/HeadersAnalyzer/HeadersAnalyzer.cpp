@@ -14,9 +14,11 @@
 #include <llvm/Analysis/OptimizationDiagnosticInfo.h>
 #include <llvm/CodeGen/MachineModuleInfo.h>
 #include <llvm/CodeGen/GlobalISel/CallLowering.h>
+#include <llvm/CodeGen/GlobalISel/MachineIRBuilder.h>
 #include <llvm/CodeGen/CallingConvLower.h>
 #include <llvm/CodeGen/SelectionDAGISel.h>
 #include <llvm/CodeGen/TargetPassConfig.h>
+#include <llvm/CodeGen/MachineRegisterInfo.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/TargetRegistry.h>
 #include <llvm/Target/TargetLowering.h>
@@ -36,6 +38,98 @@ namespace llvm {
     class ARMBaseTargetMachine;
     FunctionPass *createARMISelDag(ARMBaseTargetMachine &TM, CodeGenOpt::Level OptLevel);
 }
+
+// inspired by OutgoingValueHandler from ARMCallLowering.cpp
+// HACK: there is a lot of code copied right now
+class CustomValueHandler : public llvm::CallLowering::ValueHandler {
+public:
+    CustomValueHandler(llvm::MachineIRBuilder &mirb, llvm::MachineRegisterInfo &mri,
+        llvm::CCAssignFn *assignFn) : ValueHandler(mirb, mri, assignFn), StackSize(0) {}
+
+    unsigned getStackAddress(uint64_t Size, int64_t Offset, llvm::MachinePointerInfo &MPO) override {
+        assert((Size == 1 || Size == 2 || Size == 4 || Size == 8) && "Unsupported size");
+
+        llvm::LLT p0 = llvm::LLT::pointer(0, 32);
+        llvm::LLT s32 = llvm::LLT::scalar(32);
+        unsigned SPReg = MRI.createGenericVirtualRegister(p0);
+        //MIRBuilder.buildCopy(SPReg, ARM::SP);
+
+        unsigned OffsetReg = MRI.createGenericVirtualRegister(s32);
+        //MIRBuilder.buildConstant(OffsetReg, Offset);
+
+        unsigned AddrReg = MRI.createGenericVirtualRegister(p0);
+        //MIRBuilder.buildGEP(AddrReg, SPReg, OffsetReg);
+
+        MPO = llvm::MachinePointerInfo::getStack(MIRBuilder.getMF(), Offset);
+        return AddrReg;
+    }
+
+    void assignValueToReg(unsigned ValVReg, unsigned PhysReg, llvm::CCValAssign &VA) override {
+        assert(VA.isRegLoc() && "Value shouldn't be assigned to reg");
+        assert(VA.getLocReg() == PhysReg && "Assigning to the wrong reg?");
+
+        assert(VA.getValVT().getSizeInBits() <= 64 && "Unsupported value size");
+        assert(VA.getLocVT().getSizeInBits() <= 64 && "Unsupported location size");
+
+        unsigned ExtReg = extendRegister(ValVReg, VA);
+        MIRBuilder.buildCopy(PhysReg, ExtReg);
+        //MIB.addUse(PhysReg, RegState::Implicit);
+    }
+
+    void assignValueToAddress(unsigned ValVReg, unsigned Addr, uint64_t Size,
+        llvm::MachinePointerInfo &MPO, llvm::CCValAssign &VA) override {
+        assert((Size == 1 || Size == 2 || Size == 4 || Size == 8) && "Unsupported size");
+
+        unsigned ExtReg = extendRegister(ValVReg, VA);
+        auto MMO = MIRBuilder.getMF().getMachineMemOperand(
+            MPO, llvm::MachineMemOperand::MOStore, VA.getLocVT().getStoreSize(),
+            /* Alignment */ 0);
+        MIRBuilder.buildStore(ExtReg, Addr, *MMO);
+    }
+
+    unsigned assignCustomValue(const llvm::CallLowering::ArgInfo &Arg,
+        ArrayRef<llvm::CCValAssign> VAs) override {
+        llvm::CCValAssign VA = VAs[0];
+        assert(VA.needsCustom() && "Value doesn't need custom handling");
+        assert(VA.getValVT() == llvm::MVT::f64 && "Unsupported type");
+
+        llvm::CCValAssign NextVA = VAs[1];
+        assert(NextVA.needsCustom() && "Value doesn't need custom handling");
+        assert(NextVA.getValVT() == llvm::MVT::f64 && "Unsupported type");
+
+        assert(VA.getValNo() == NextVA.getValNo() &&
+            "Values belong to different arguments");
+
+        assert(VA.isRegLoc() && "Value should be in reg");
+        assert(NextVA.isRegLoc() && "Value should be in reg");
+
+        unsigned NewRegs[] = { MRI.createGenericVirtualRegister(llvm::LLT::scalar(32)),
+            MRI.createGenericVirtualRegister(llvm::LLT::scalar(32)) };
+        MIRBuilder.buildUnmerge(NewRegs, Arg.Reg);
+
+        //bool IsLittle = MIRBuilder.getMF().getSubtarget<ARMSubtarget>().isLittle();
+        //if (!IsLittle)
+        //    std::swap(NewRegs[0], NewRegs[1]);
+
+        assignValueToReg(NewRegs[0], VA.getLocReg(), VA);
+        assignValueToReg(NewRegs[1], NextVA.getLocReg(), NextVA);
+
+        return 1;
+    }
+
+    bool assignArg(unsigned ValNo, llvm::MVT ValVT, llvm::MVT LocVT,
+        llvm::CCValAssign::LocInfo LocInfo,
+        const llvm::CallLowering::ArgInfo &Info, llvm::CCState &State) override {
+        if (AssignFn(ValNo, ValVT, LocVT, LocInfo, Info.Flags, State))
+            return true;
+
+        StackSize =
+            std::max(StackSize, static_cast<uint64_t>(State.getNextStackOffset()));
+        return false;
+    }
+
+    uint64_t StackSize;
+};
 
 class HeadersAnalyzer {
 public:
@@ -84,12 +178,20 @@ public:
         // create target machine
         auto tm = t->createTargetMachine(tt, /*CPU*/ "generic", /*Features*/ "",
             llvm::TargetOptions(), llvm::Optional<llvm::Reloc::Model>());
-        auto armTm = reinterpret_cast<llvm::ARMBaseTargetMachine *>(tm);
 
+        // inspired by ARMCallLowering::lowerCall
+        auto tl = tm->getSubtargetImpl(*ffunc)->getTargetLowering();
+        llvm::SmallVector<llvm::CallLowering::ArgInfo, 8> args;
+        // TODO: how to continue with this?
+
+#if 0
         // create SelectionDAGISel
+        auto armTm = reinterpret_cast<llvm::ARMBaseTargetMachine *>(tm);
         auto fp = llvm::createARMISelDag(*armTm, llvm::CodeGenOpt::Level::None);
         auto dag = static_cast<llvm::SelectionDAGISel *>(fp);
+#endif
 
+#if 0
         // register with PassManager
         llvm::PassManagerBuilder pmb;
         llvm::legacy::FunctionPassManager pm(ffunc->getParent());
@@ -102,10 +204,16 @@ public:
         bool result = llvmTm->addPassesToEmitMC(pm, mcc, os);
         //auto config = llvmTm->createPassConfig(pm);
         //bool result = config->addInstSelector();
-        assert(result && "addPassesToEmitMC shouldn't fail");
+        assert(result && "addPassesToEmitMC shouldn't fail"); // TODO: returning true probably means failure
 
+        // TODO: retrieve ARMISelDag pass from the PassManager and runOnMachineFunction it
+#endif
+
+#if 0
         // lower func
+        pm.doInitialization();
         pm.run(*ffunc);
+#endif
 
 #if 0
         // create machine function
@@ -137,7 +245,7 @@ public:
 #if 0
         SmallVector<llvm::CCValAssign, 16> argLocs;
         llvm::CCState cc(ffunc->getCallingConv(), ffunc->isVarArg(), mf, argLocs, ffunc->getContext());
-        
+
         SmallVector<llvm::ISD::InputArg, 16> ins;
         ins.push_back(llvm::ISD::InputArg()); // TODO: how to create InputArg?
 #endif
