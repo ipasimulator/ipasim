@@ -27,7 +27,7 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/PassManager.h>
 #include <llvm/IR/LegacyPassManager.h>
-#include <llvm/../../lib/Target/ARM/ARMISelLowering.h>
+#include <llvm/lib/Target/ARM/ARMISelLowering.h>
 #include <yaml-cpp/yaml.h>
 
 using namespace clang;
@@ -212,6 +212,7 @@ public:
             auto vt = llvm::MVT::getVT(arg.getType());
             bool result = assignFn(i, vt, vt, llvm::CCValAssign::LocInfo::Full, llvm::ISD::ArgFlagsTy(), cc);
             cout << result << endl;
+            ++i;
         }
 
 #if 0
