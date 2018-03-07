@@ -209,9 +209,12 @@ public:
         unsigned i = 0;
         for (auto &arg : ffunc->args()) {
             // TODO: do what the ARMCallLowering::splitToValueTypes function does
+            // TODO: isSupportedType inside ARMCallLowering returns false for i64,
+            // because it should be already lowered
+            // (see https://github.com/llvm-mirror/llvm/blob/f0eff632cbd02ce021942cd412a011a6fff8d9bd/lib/Target/ARM/ARMISelLowering.cpp#L3769)
             auto vt = llvm::MVT::getVT(arg.getType());
             bool result = assignFn(i, vt, vt, llvm::CCValAssign::LocInfo::Full, llvm::ISD::ArgFlagsTy(), cc);
-            cout << result << endl;
+            cout << result << endl; // true means failure
             ++i;
         }
 
@@ -262,6 +265,8 @@ public:
         auto cl = st->getCallLowering();
 #endif
 
+        // TODO: why this failed? It seems OK.
+        // Get inspiration in ARMTargetLowering::LowerFormalArguments.
 #if 0
         // lower call
         llvm::TargetLowering tl(*tm);
