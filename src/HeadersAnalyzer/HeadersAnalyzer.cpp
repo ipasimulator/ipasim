@@ -165,6 +165,7 @@ public:
         // .dylib file (it's enough to check .tbd file inside the SDK which is simply
         // a YAML)
         //YAML::LoadFile("test.yaml");
+        // TODO: maybe use LLVM YAML I/O library instead (http://llvm.org/docs/YamlIO.html)
 
         // TODO: also check that the function has the same signature in WinObjC headers
         // inside the (NuGet) packages folder
@@ -198,6 +199,7 @@ public:
         // TODO: I'm stuck here
 #endif
 
+#if 0
         // inspired by CallLowering::handleAssignments
         auto st = tm->getSubtargetImpl(*ffunc);
         auto tl = static_cast<const llvm::ARMTargetLowering *>(st->getTargetLowering());
@@ -217,6 +219,7 @@ public:
             cout << result << endl; // true means failure
             ++i;
         }
+#endif
 
 #if 0
         // create SelectionDAGISel
@@ -267,6 +270,7 @@ public:
 
         // TODO: why this failed? It seems OK.
         // Get inspiration in ARMTargetLowering::LowerFormalArguments.
+        // (For example, use CCInfo.AnalyzeFormalArguments.)
 #if 0
         // lower call
         llvm::TargetLowering tl(*tm);
@@ -276,6 +280,36 @@ public:
         llvm::TargetLowering::CallLoweringInfo cli(dag);
         //cli.setCallee(ffunc->getCallingConv(), ffunc->getReturnType(), /**/SDValue());
         auto pair = tl.LowerCallTo(cli); // TODO: maybe use FastISel.LowerCallTo, so that we don't have to create SelectionDAG...
+#endif
+
+#if 0
+        // Inspired by ARMTargetLowering::LowerFormalArguments.
+        // ====================================================
+
+        // Create MachineFunction.
+        // TODO: Is this the proper way to do it?
+        llvm::MachineModuleInfo mmi(tm);
+        auto &mf = mmi.getOrCreateMachineFunction(*ffunc);
+
+        // Create CCState.
+        SmallVector<llvm::CCValAssign, 16> argLocs;
+        llvm::CCState cc(ffunc->getCallingConv(), ffunc->isVarArg(), mf, argLocs, ffunc->getContext());
+
+        // Retrieve CCAssignFn.
+        auto st = tm->getSubtargetImpl(*ffunc);
+        auto tl = static_cast<const llvm::ARMTargetLowering *>(st->getTargetLowering());
+        auto assignFn = tl->CCAssignFnForCall(ffunc->getCallingConv(), ffunc->isVarArg());
+
+        // Analyze formal arguments.
+        SmallVector<llvm::ISD::InputArg, 16> ins;
+        cc.AnalyzeFormalArguments(ins, assignFn);
+        // TODO: This doesn't work, we need to fill ins somehow.
+
+        // ====================================================
+
+        // TODO: try to use https://llvm.org/docs/GlobalISel.html
+        // (instead of SelectionDAG and FastISel - https://llvm.org/docs/CodeGenerator.html).
+        // OK, that just emits IR, so it's not so useful.
 #endif
 
 #if 0

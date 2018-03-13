@@ -16,6 +16,7 @@ TODO: is UnicornPort still necessary? Maybe LLVM could be emulated. Or at least 
 TODO: maybe use clang to link Mach-O app with WinObjC .dlls at compile-time (or even runtime) for ARM.
 TODO: also, llvm should contain some dynamic linker, which we should definitely use instead of our own code.
 TODO: not all references of HeadersAnalyzer.vcxproj are probably necessary, clean them up.
+TODO: rename /doc/ to /docs/.
 
 ### How does it work?
 
