@@ -19,6 +19,7 @@
 #include <llvm/CodeGen/SelectionDAGISel.h>
 #include <llvm/CodeGen/TargetPassConfig.h>
 #include <llvm/CodeGen/MachineRegisterInfo.h>
+#include <llvm/CodeGen/SelectionDAGISel.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/TargetRegistry.h>
 #include <llvm/Target/TargetLowering.h>
@@ -27,8 +28,11 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/PassManager.h>
 #include <llvm/IR/LegacyPassManager.h>
-#include <llvm/lib/Target/ARM/ARMISelLowering.h>
 #include <yaml-cpp/yaml.h>
+
+// Private header files.
+#include <llvm/lib/Target/ARM/ARMISelLowering.h>
+#include <llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.h>
 
 using namespace clang;
 using namespace frontend;
@@ -281,6 +285,50 @@ public:
         //cli.setCallee(ffunc->getCallingConv(), ffunc->getReturnType(), /**/SDValue());
         auto pair = tl.LowerCallTo(cli); // TODO: maybe use FastISel.LowerCallTo, so that we don't have to create SelectionDAG...
 #endif
+
+        // =============================================
+
+        // Create SelectionDAGISel.
+        // TODO: Where is this done in LLVM? Is this properly initialized?
+        auto armTm = reinterpret_cast<llvm::ARMBaseTargetMachine *>(tm);
+        auto fp = llvm::createARMISelDag(*armTm, llvm::CodeGenOpt::Level::None); // ARMPassConfig::addInstSelector <- TargetPassConfig::addCoreISelPasses <- TargetPassConfig::addISelPasses <- addPassesToGenerateCode (LLVMTargetMachine.cpp) <- LLVMTargetMachine::addPassesToEmitFile or LLVMTargetMachine::addPassesToEmitMC
+        auto isel = static_cast<llvm::SelectionDAGISel *>(fp);
+        // TODO: isel is definitely not properly initialized, it doesn't have MachineFunction!
+        // TODO: We should probably run isel.runOnMachineFunction (or at least do the same initialization it does),
+        // but first find where it is done in LLVM to "inspire" by it.
+
+        // Create Callee.
+        // Inspired by SelectionDAGBuilder::visitInvoke.
+        llvm::SDValue callee(isel->SDB->getValue(ffunc));
+
+        // Create Args.
+        // Inspired by SelectionDAGBuilder::LowerCallTo.
+        llvm::TargetLowering::ArgListTy args;
+        args.reserve(ffunc->arg_size());
+        for (auto &arg : ffunc->args()) {
+            // Skip empty values.
+            if (arg.getType()->isEmptyTy()) { continue; }
+
+            llvm::TargetLowering::ArgListEntry entry;
+            entry.Node = isel->SDB->getValue(&arg);
+            entry.Ty = arg.getType();
+            args.push_back(entry);
+        }
+
+        // Create CallLoweringInfo.
+        // Inspired by SelectionDAGBuilder::LowerCallTo.
+        llvm::TargetLowering::CallLoweringInfo cli(*isel->CurDAG);
+        cli.setDebugLoc(isel->SDB->getCurSDLoc())
+            .setChain(isel->SDB->getRoot())
+            .setCallee(ffunc->getCallingConv(), ffunc->getReturnType(), callee, move(args))
+            .setTailCall(false) // TODO: Support tail calls (?)
+            .setConvergent(ffunc->isConvergent());
+
+        // Lower call.
+        // Inspired by SelectionDAGBuilder::lowerInvokable.
+        auto result = isel->TLI->LowerCallTo(cli);
+
+        // =============================================
 
 #if 0
         // Inspired by ARMTargetLowering::LowerFormalArguments.
