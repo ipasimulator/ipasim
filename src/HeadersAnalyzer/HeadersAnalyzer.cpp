@@ -7,6 +7,7 @@
 #include <clang/Basic/TargetInfo.h>
 #include <clang/Lex/PreprocessorOptions.h>
 #include <clang/Parse/ParseAST.h>
+#include <clang/AST/Type.h>
 #include <clang/AST/ASTContext.h>
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/AST/GlobalDecl.h>
@@ -160,7 +161,7 @@ public:
         f.getLocation().print(llvm::outs(), f.getASTContext().getSourceManager());
         llvm::outs() << "\n";
 
-        // dump funtion's type
+        // dump function's type
         auto ft = f.getFunctionType();
         ft->dump(llvm::outs());
         llvm::outs() << "\n";
@@ -174,7 +175,14 @@ public:
         // TODO: also check that the function has the same signature in WinObjC headers
         // inside the (NuGet) packages folder
 
-        // TODO: Simply assume arguments are in r0-r3 or on stack for starters...
+        // We will simply assume arguments are in r0-r3 or on stack for starters.
+
+        auto fpt = static_cast<const FunctionProtoType *>(ft);
+        for (auto &pt : fpt->param_types()) {
+            uint64_t size = ci_.getASTContext().getTypeSize(pt);
+            llvm::outs() << size << " ";
+        }
+        llvm::outs() << "\n";
 
 #if 0
         // generate LLVM IR from the declaration
