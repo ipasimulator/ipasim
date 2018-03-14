@@ -174,6 +174,9 @@ public:
         // TODO: also check that the function has the same signature in WinObjC headers
         // inside the (NuGet) packages folder
 
+        // TODO: Simply assume arguments are in r0-r3 or on stack for starters...
+
+#if 0
         // generate LLVM IR from the declaration
         auto func = cg_->GetAddrOfGlobal(GlobalDecl(&f), /*isForDefinition*/false);
         auto ffunc = static_cast<llvm::Function *>(func);
@@ -189,102 +192,6 @@ public:
         // create target machine
         auto tm = t->createTargetMachine(tt, /*CPU*/ "generic", /*Features*/ "",
             llvm::TargetOptions(), llvm::Optional<llvm::Reloc::Model>());
-
-#if 0
-        // inspired by ARMCallLowering::lowerCall
-        auto st = tm->getSubtargetImpl(*ffunc);
-        auto tl = static_cast<const llvm::ARMTargetLowering *>(st->getTargetLowering());
-        llvm::SmallVector<llvm::CallLowering::ArgInfo, 8> args;
-        auto assignFn = tl->CCAssignFnForCall(ffunc->getCallingConv(), ffunc->isVarArg());
-        llvm::MachineIRBuilder mirb;
-        llvm::MachineModuleInfo mmi(tm);
-        auto &mf = mmi.getOrCreateMachineFunction(*ffunc);
-        CustomValueHandler handler(mirb, mf.getRegInfo(), assignFn);
-        // TODO: I'm stuck here
-#endif
-
-#if 0
-        // inspired by CallLowering::handleAssignments
-        auto st = tm->getSubtargetImpl(*ffunc);
-        auto tl = static_cast<const llvm::ARMTargetLowering *>(st->getTargetLowering());
-        auto assignFn = tl->CCAssignFnForCall(ffunc->getCallingConv(), ffunc->isVarArg());
-        llvm::MachineModuleInfo mmi(tm);
-        auto &mf = mmi.getOrCreateMachineFunction(*ffunc);
-        SmallVector<llvm::CCValAssign, 16> argLocs;
-        llvm::CCState cc(ffunc->getCallingConv(), ffunc->isVarArg(), mf, argLocs, ffunc->getContext());
-        unsigned i = 0;
-        for (auto &arg : ffunc->args()) {
-            // TODO: do what the ARMCallLowering::splitToValueTypes function does
-            // TODO: isSupportedType inside ARMCallLowering returns false for i64,
-            // because it should be already lowered
-            // (see https://github.com/llvm-mirror/llvm/blob/f0eff632cbd02ce021942cd412a011a6fff8d9bd/lib/Target/ARM/ARMISelLowering.cpp#L3769)
-            auto vt = llvm::MVT::getVT(arg.getType());
-            bool result = assignFn(i, vt, vt, llvm::CCValAssign::LocInfo::Full, llvm::ISD::ArgFlagsTy(), cc);
-            cout << result << endl; // true means failure
-            ++i;
-        }
-#endif
-
-#if 0
-        // create SelectionDAGISel
-        auto armTm = reinterpret_cast<llvm::ARMBaseTargetMachine *>(tm);
-        auto fp = llvm::createARMISelDag(*armTm, llvm::CodeGenOpt::Level::None);
-        auto dag = static_cast<llvm::SelectionDAGISel *>(fp);
-#endif
-
-#if 0
-        // register with PassManager
-        llvm::PassManagerBuilder pmb;
-        llvm::legacy::FunctionPassManager pm(ffunc->getParent());
-        auto llvmTm = static_cast<llvm::LLVMTargetMachine *>(tm);
-        llvmTm->adjustPassManager(pmb);
-        pmb.populateFunctionPassManager(pm);
-        llvm::MCContext *mcc = nullptr;
-        llvm::SmallVector<char, 4096> buffer;
-        llvm::raw_svector_ostream os(buffer);
-        bool result = llvmTm->addPassesToEmitMC(pm, mcc, os);
-        //auto config = llvmTm->createPassConfig(pm);
-        //bool result = config->addInstSelector();
-        assert(result && "addPassesToEmitMC shouldn't fail"); // TODO: returning true probably means failure
-
-        // TODO: retrieve ARMISelDag pass from the PassManager and runOnMachineFunction it
-#endif
-
-#if 0
-        // lower func
-        pm.doInitialization();
-        pm.run(*ffunc);
-#endif
-
-#if 0
-        // create machine function
-        auto &mmi = fp->getAnalysis<llvm::MachineModuleInfo>();
-        auto &mf = mmi.getOrCreateMachineFunction(*ffunc);
-
-        // lower function
-        result = dag->runOnMachineFunction(mf);
-        assert(result && "runOnMachineFunction shouldn't fail");
-#endif
-
-#if 0
-        // get call lowering
-        auto st = tm->getSubtargetImpl(*ffunc);
-        auto cl = st->getCallLowering();
-#endif
-
-        // TODO: why this failed? It seems OK.
-        // Get inspiration in ARMTargetLowering::LowerFormalArguments.
-        // (For example, use CCInfo.AnalyzeFormalArguments.)
-#if 0
-        // lower call
-        llvm::TargetLowering tl(*tm);
-        llvm::SelectionDAG dag(*tm, llvm::CodeGenOpt::Level::None); // TODO: this does not seem properly initialized, should we rather retrieve it from somewhere?
-        llvm::OptimizationRemarkEmitter ore(ffunc);
-        dag.init(mf, ore);
-        llvm::TargetLowering::CallLoweringInfo cli(dag);
-        //cli.setCallee(ffunc->getCallingConv(), ffunc->getReturnType(), /**/SDValue());
-        auto pair = tl.LowerCallTo(cli); // TODO: maybe use FastISel.LowerCallTo, so that we don't have to create SelectionDAG...
-#endif
 
         // =============================================
 
@@ -329,46 +236,7 @@ public:
         auto result = isel->TLI->LowerCallTo(cli);
 
         // =============================================
-
-#if 0
-        // Inspired by ARMTargetLowering::LowerFormalArguments.
-        // ====================================================
-
-        // Create MachineFunction.
-        // TODO: Is this the proper way to do it?
-        llvm::MachineModuleInfo mmi(tm);
-        auto &mf = mmi.getOrCreateMachineFunction(*ffunc);
-
-        // Create CCState.
-        SmallVector<llvm::CCValAssign, 16> argLocs;
-        llvm::CCState cc(ffunc->getCallingConv(), ffunc->isVarArg(), mf, argLocs, ffunc->getContext());
-
-        // Retrieve CCAssignFn.
-        auto st = tm->getSubtargetImpl(*ffunc);
-        auto tl = static_cast<const llvm::ARMTargetLowering *>(st->getTargetLowering());
-        auto assignFn = tl->CCAssignFnForCall(ffunc->getCallingConv(), ffunc->isVarArg());
-
-        // Analyze formal arguments.
-        SmallVector<llvm::ISD::InputArg, 16> ins;
-        cc.AnalyzeFormalArguments(ins, assignFn);
-        // TODO: This doesn't work, we need to fill ins somehow.
-
-        // ====================================================
-
-        // TODO: try to use https://llvm.org/docs/GlobalISel.html
-        // (instead of SelectionDAG and FastISel - https://llvm.org/docs/CodeGenerator.html).
-        // OK, that just emits IR, so it's not so useful.
 #endif
-
-#if 0
-        SmallVector<llvm::CCValAssign, 16> argLocs;
-        llvm::CCState cc(ffunc->getCallingConv(), ffunc->isVarArg(), mf, argLocs, ffunc->getContext());
-
-        SmallVector<llvm::ISD::InputArg, 16> ins;
-        ins.push_back(llvm::ISD::InputArg()); // TODO: how to create InputArg?
-#endif
-
-        cout << "success" << endl;
     }
 private:
     llvm::LLVMContext ctx_;
