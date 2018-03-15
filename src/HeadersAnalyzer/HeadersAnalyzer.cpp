@@ -39,104 +39,6 @@ using namespace clang;
 using namespace frontend;
 using namespace std;
 
-// HACK: this should be included from llvm/Target/ARM/ARM.h instead
-namespace llvm {
-    class ARMBaseTargetMachine;
-    FunctionPass *createARMISelDag(ARMBaseTargetMachine &TM, CodeGenOpt::Level OptLevel);
-}
-
-// inspired by OutgoingValueHandler from ARMCallLowering.cpp
-// HACK: there is a lot of code copied right now
-class CustomValueHandler : public llvm::CallLowering::ValueHandler {
-public:
-    CustomValueHandler(llvm::MachineIRBuilder &mirb, llvm::MachineRegisterInfo &mri,
-        llvm::CCAssignFn *assignFn) : ValueHandler(mirb, mri, assignFn), StackSize(0) {}
-
-    unsigned getStackAddress(uint64_t Size, int64_t Offset, llvm::MachinePointerInfo &MPO) override {
-        assert((Size == 1 || Size == 2 || Size == 4 || Size == 8) && "Unsupported size");
-
-        llvm::LLT p0 = llvm::LLT::pointer(0, 32);
-        llvm::LLT s32 = llvm::LLT::scalar(32);
-        unsigned SPReg = MRI.createGenericVirtualRegister(p0);
-        //MIRBuilder.buildCopy(SPReg, ARM::SP);
-
-        unsigned OffsetReg = MRI.createGenericVirtualRegister(s32);
-        //MIRBuilder.buildConstant(OffsetReg, Offset);
-
-        unsigned AddrReg = MRI.createGenericVirtualRegister(p0);
-        //MIRBuilder.buildGEP(AddrReg, SPReg, OffsetReg);
-
-        MPO = llvm::MachinePointerInfo::getStack(MIRBuilder.getMF(), Offset);
-        return AddrReg;
-    }
-
-    void assignValueToReg(unsigned ValVReg, unsigned PhysReg, llvm::CCValAssign &VA) override {
-        assert(VA.isRegLoc() && "Value shouldn't be assigned to reg");
-        assert(VA.getLocReg() == PhysReg && "Assigning to the wrong reg?");
-
-        assert(VA.getValVT().getSizeInBits() <= 64 && "Unsupported value size");
-        assert(VA.getLocVT().getSizeInBits() <= 64 && "Unsupported location size");
-
-        unsigned ExtReg = extendRegister(ValVReg, VA);
-        MIRBuilder.buildCopy(PhysReg, ExtReg);
-        //MIB.addUse(PhysReg, RegState::Implicit);
-    }
-
-    void assignValueToAddress(unsigned ValVReg, unsigned Addr, uint64_t Size,
-        llvm::MachinePointerInfo &MPO, llvm::CCValAssign &VA) override {
-        assert((Size == 1 || Size == 2 || Size == 4 || Size == 8) && "Unsupported size");
-
-        unsigned ExtReg = extendRegister(ValVReg, VA);
-        auto MMO = MIRBuilder.getMF().getMachineMemOperand(
-            MPO, llvm::MachineMemOperand::MOStore, VA.getLocVT().getStoreSize(),
-            /* Alignment */ 0);
-        MIRBuilder.buildStore(ExtReg, Addr, *MMO);
-    }
-
-    unsigned assignCustomValue(const llvm::CallLowering::ArgInfo &Arg,
-        ArrayRef<llvm::CCValAssign> VAs) override {
-        llvm::CCValAssign VA = VAs[0];
-        assert(VA.needsCustom() && "Value doesn't need custom handling");
-        assert(VA.getValVT() == llvm::MVT::f64 && "Unsupported type");
-
-        llvm::CCValAssign NextVA = VAs[1];
-        assert(NextVA.needsCustom() && "Value doesn't need custom handling");
-        assert(NextVA.getValVT() == llvm::MVT::f64 && "Unsupported type");
-
-        assert(VA.getValNo() == NextVA.getValNo() &&
-            "Values belong to different arguments");
-
-        assert(VA.isRegLoc() && "Value should be in reg");
-        assert(NextVA.isRegLoc() && "Value should be in reg");
-
-        unsigned NewRegs[] = { MRI.createGenericVirtualRegister(llvm::LLT::scalar(32)),
-            MRI.createGenericVirtualRegister(llvm::LLT::scalar(32)) };
-        MIRBuilder.buildUnmerge(NewRegs, Arg.Reg);
-
-        //bool IsLittle = MIRBuilder.getMF().getSubtarget<ARMSubtarget>().isLittle();
-        //if (!IsLittle)
-        //    std::swap(NewRegs[0], NewRegs[1]);
-
-        assignValueToReg(NewRegs[0], VA.getLocReg(), VA);
-        assignValueToReg(NewRegs[1], NextVA.getLocReg(), NextVA);
-
-        return 1;
-    }
-
-    bool assignArg(unsigned ValNo, llvm::MVT ValVT, llvm::MVT LocVT,
-        llvm::CCValAssign::LocInfo LocInfo,
-        const llvm::CallLowering::ArgInfo &Info, llvm::CCState &State) override {
-        if (AssignFn(ValNo, ValVT, LocVT, LocInfo, Info.Flags, State))
-            return true;
-
-        StackSize =
-            std::max(StackSize, static_cast<uint64_t>(State.getNextStackOffset()));
-        return false;
-    }
-
-    uint64_t StackSize;
-};
-
 class HeadersAnalyzer {
 public:
     HeadersAnalyzer(CompilerInstance &ci) : ci_(ci) {
@@ -176,13 +78,31 @@ public:
         // inside the (NuGet) packages folder
 
         // We will simply assume arguments are in r0-r3 or on stack for starters.
+        // Inspired by /res/IHI0042F_aapcs.pdf (AAPCS), section 5.5 Parameter Passing.
 
+        uint8_t r = 0; // register offset (AAPCS's NCRN)
+        uint64_t s = 0; // stack offset (relative AAPCS's NSAA)
+
+        llvm::outs() << f.getName() << "(";
         auto fpt = static_cast<const FunctionProtoType *>(ft);
         for (auto &pt : fpt->param_types()) {
-            uint64_t size = ci_.getASTContext().getTypeSize(pt);
-            llvm::outs() << size << " ";
+            auto bytes = toBytes(ci_.getASTContext().getTypeSize(pt));
+
+            // Cast to the correct type.
+            llvm::outs() << "(" << pt.getAsString() << ")";
+
+            if (r == 4) {
+                // We used all the registers, this argument is on the stack.
+                llvm::outs() << "STACK(" << to_string(s) << ", " << to_string(bytes) << ")";
+                s += bytes;
+            }
+            else {
+                assert(bytes <= 4 && "we can only handle max. 32-byte-long data for now");
+                llvm::outs() << "REG(" << to_string(r) << ")"; 
+                ++r;
+            }
         }
-        llvm::outs() << "\n";
+        llvm::outs() << ");\n\n";
 
 #if 0
         // generate LLVM IR from the declaration
@@ -250,6 +170,11 @@ private:
     llvm::LLVMContext ctx_;
     CompilerInstance &ci_;
     CodeGenerator *cg_;
+
+    uint64_t toBytes(uint64_t bits) {
+        assert(bits % 8 == 0 && "integral bytes expected");
+        return bits / 8;
+    }
 };
 
 class CustomASTVisitor : public RecursiveASTVisitor<CustomASTVisitor> {
