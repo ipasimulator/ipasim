@@ -88,39 +88,34 @@ public:
         for (auto &pt : fpt->param_types()) {
             uint64_t bytes = toBytes(ci_.getASTContext().getTypeSize(pt));
 
-            llvm::outs() << "auto arg" << to_string(i) << " = ";
+            /* #define ARG(i,t) uint8_t a##i[sizeof(t)]; uint32_t *p##i = reinterpret_cast<uint32_t *>(&a##i); uint8_t *c##i = reinterpret_cast<uint8_t *>(&a##i); t *v##i = reinterpret_cast<t *>(&a##i); */
 
-            // TODO: reinterpret_casting won't work, choose a different approach.
+            llvm::outs() << "ARG(" << to_string(i) << ", " << pt.getAsString() << ")\n";
 
+            // Copy data from registers and/or stack into the argument.
             if (r == 4) {
                 // We used all the registers, this argument is on the stack.
-                // TODO: r13 is the SP, use it.
-                llvm::outs() << "reinterpret_cast<" << pt.getAsString() << ">(" << "STACK(" << to_string(s) << ", " << to_string(bytes) << "))";
+                // Note that r13 is the stack pointer.
+                // TODO: Handle unicorn errors.
+                llvm::outs() << "uc_mem_read(uc, r13, c" << to_string(i) << " + " << to_string(s) << ", " << to_string(bytes) << ");\n";
                 s += bytes;
             }
             else {
                 assert(bytes > 0 && "non-trivial type expected");
                 assert(bytes <= 64 && "we can only handle max. 64-byte-long data for now");
 
-                uint32_t numParens = (bytes - 1) / 4;
-                for (uint32_t x = 0; x != numParens; ++x) {
-                    llvm::outs() << "(";
-                }
                 for (;;) {
-                    // Cast every register to the correct type.
-                    llvm::outs() << "reinterpret_cast<" << pt.getAsString() << ">(r" << to_string(r) << ")";
+                    llvm::outs() << "p" << to_string(i) << "[" << to_string(r) << "] = r" << to_string(r) << ";\n";
                     ++r;
 
                     if (bytes <= 4) { break; }
                     bytes -= 4;
-                    llvm::outs() << " << 32) | ";
                 }
             }
 
-            llvm::outs() << "\n";
             ++i;
         }
-        // TODO: Call the function with arg0,...,argN.
+        // TODO: Call the function with *v0,...,*vN.
         llvm::outs() << "\n\n";
 
 #if 0
