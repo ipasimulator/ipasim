@@ -83,26 +83,45 @@ public:
         uint8_t r = 0; // register offset (AAPCS's NCRN)
         uint64_t s = 0; // stack offset (relative AAPCS's NSAA)
 
-        llvm::outs() << f.getName() << "(";
         auto fpt = static_cast<const FunctionProtoType *>(ft);
+        uint32_t i = 0;
         for (auto &pt : fpt->param_types()) {
-            auto bytes = toBytes(ci_.getASTContext().getTypeSize(pt));
+            uint64_t bytes = toBytes(ci_.getASTContext().getTypeSize(pt));
 
-            // Cast to the correct type.
-            llvm::outs() << "(" << pt.getAsString() << ")";
+            llvm::outs() << "auto arg" << to_string(i) << " = ";
+
+            // TODO: reinterpret_casting won't work, choose a different approach.
 
             if (r == 4) {
                 // We used all the registers, this argument is on the stack.
-                llvm::outs() << "STACK(" << to_string(s) << ", " << to_string(bytes) << ")";
+                // TODO: r13 is the SP, use it.
+                llvm::outs() << "reinterpret_cast<" << pt.getAsString() << ">(" << "STACK(" << to_string(s) << ", " << to_string(bytes) << "))";
                 s += bytes;
             }
             else {
-                assert(bytes <= 4 && "we can only handle max. 32-byte-long data for now");
-                llvm::outs() << "REG(" << to_string(r) << ")"; 
-                ++r;
+                assert(bytes > 0 && "non-trivial type expected");
+                assert(bytes <= 64 && "we can only handle max. 64-byte-long data for now");
+
+                uint32_t numParens = (bytes - 1) / 4;
+                for (uint32_t x = 0; x != numParens; ++x) {
+                    llvm::outs() << "(";
+                }
+                for (;;) {
+                    // Cast every register to the correct type.
+                    llvm::outs() << "reinterpret_cast<" << pt.getAsString() << ">(r" << to_string(r) << ")";
+                    ++r;
+
+                    if (bytes <= 4) { break; }
+                    bytes -= 4;
+                    llvm::outs() << " << 32) | ";
+                }
             }
+
+            llvm::outs() << "\n";
+            ++i;
         }
-        llvm::outs() << ");\n\n";
+        // TODO: Call the function with arg0,...,argN.
+        llvm::outs() << "\n\n";
 
 #if 0
         // generate LLVM IR from the declaration
@@ -172,7 +191,7 @@ private:
     CodeGenerator *cg_;
 
     uint64_t toBytes(uint64_t bits) {
-        assert(bits % 8 == 0 && "integral bytes expected");
+        assert(bits % 8 == 0 && "whole bytes expected");
         return bits / 8;
     }
 };
