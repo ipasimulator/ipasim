@@ -278,6 +278,7 @@ private:
 		READ_REG(2)
 		READ_REG(3)
 		READ_REG(13)
+		READ_REG(14)
 #undef READ_REG
 
 		// execute target function using emulated cpu's context
@@ -295,7 +296,8 @@ private:
         WRITE_REG(3)
 #undef WRITE_REG
 
-        // TODO: set EP to R14's value to return!
+        // Move R14 (LR) value to R15 (PC) to return.
+		UC(uc_reg_write(uc, UC_ARM_REG_R15, &r14))
 
         return true;
     }
