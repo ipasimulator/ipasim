@@ -2,6 +2,7 @@
 //
 
 #include <iostream>
+#include <fstream>
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Basic/TargetOptions.h>
 #include <clang/Basic/TargetInfo.h>
@@ -12,6 +13,7 @@
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/AST/GlobalDecl.h>
 #include <clang/CodeGen/ModuleBuilder.h>
+#include <llvm/Demangle/Demangle.h>
 #include <yaml-cpp/yaml.h>
 
 using namespace clang;
@@ -20,10 +22,16 @@ using namespace std;
 
 class HeadersAnalyzer {
 public:
-    HeadersAnalyzer(CompilerInstance &ci) : ci_(ci) {}
+    HeadersAnalyzer(CompilerInstance &ci, set<string> imports) : ci_(ci), imports_(imports) {}
     void Initialize() {}
     void HandleTopLevelDecl(DeclGroupRef d) {}
     void VisitFunction(FunctionDecl &f) {
+        string name = f.getNameAsString();
+
+        // Skip functions that do not interest us.
+        // HACK: This is here for this prototype version only.
+        if (!imports_.count(name)) { return; }
+
         // TODO: check that the function is actually exported from the corresponding
         // .dylib file (it's enough to check .tbd file inside the SDK which is simply
         // a YAML)
@@ -33,7 +41,7 @@ public:
         // TODO: also check that the function has the same signature in WinObjC headers
         // inside the (NuGet) packages folder
 
-        cout << "if (name == \"" << f.getNameAsString() << "\") {" << endl;
+        cout << "if (name == \"" << name << "\") {" << endl;
 
         // We will simply assume arguments are in r0-r3 or on stack for starters.
         // Inspired by /res/IHI0042F_aapcs.pdf (AAPCS), section 5.5 Parameter Passing.
@@ -90,7 +98,8 @@ public:
         cout << "}" << endl;
     }
 private:
-    CompilerInstance &ci_;
+    CompilerInstance & ci_;
+    set<string> imports_;
 
     uint64_t toBytes(uint64_t bits) {
         assert(bits % 8 == 0 && "whole bytes expected");
@@ -127,6 +136,28 @@ private:
 
 int main()
 {
+    // Get a set of functions we only want to analyze.
+    // HACK: This is here for this prototype version only.
+    set<string> imports;
+    {
+        fstream importsFile("C:/Users/Jones/Files/Projects/IPASimulator/Debug/imports.txt");
+        for (string line; getline(importsFile, line);) {
+            // Demangle the imported name.
+            char *buf = new char[line.length()];
+            size_t n;
+            int status;
+            buf = llvm::itaniumDemangle(line.c_str(), buf, &n, &status);
+            if (status) {
+                // Could not demangle the name.
+                imports.insert(move(line));
+            }
+            else {
+                imports.insert(string(buf, n));
+            }
+            delete[] buf; // TODO: This is not exception-safe.
+        }
+    }
+
     // inspired by https://github.com/loarabia/Clang-tutorial/
     // TODO: move this to a separate class
 
@@ -153,7 +184,7 @@ int main()
     //ci.getPreprocessorOpts().UsePredefines = false;
     ci.createPreprocessor(TranslationUnitKind::TU_Complete);
 
-    HeadersAnalyzer ha(ci);
+    HeadersAnalyzer ha(ci, move(imports));
     ci.setASTConsumer(make_unique<CustomASTConsumer>(ha));
     ci.createASTContext();
     ha.Initialize();
