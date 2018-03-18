@@ -74,6 +74,7 @@ public:
                 // Note that r13 is the stack pointer.
                 // TODO: Handle unicorn errors.
                 // TODO: Encapsulate this into a macro.
+                // TODO: Maybe read the memory at the SP directly.
                 output_ << "uc_mem_read(uc, r13, c" << to_string(i) << " + " << to_string(s) << ", " << to_string(bytes) << ");" << endl;
                 s += bytes;
             }

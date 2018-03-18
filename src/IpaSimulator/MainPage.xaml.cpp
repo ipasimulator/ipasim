@@ -271,7 +271,7 @@ private:
 #endif
 
         // read emulated registers
-#define READ_REG(num) uint32_t r##num; UC(uc_reg_read(dl.uc_, UC_ARM_REG_R##num, &r##num))
+#define READ_REG(num) uint32_t r##num; UC(uc_reg_read(uc, UC_ARM_REG_R##num, &r##num))
 
 		READ_REG(0)
 		READ_REG(1)
@@ -281,10 +281,10 @@ private:
 #undef READ_REG
 
 		// execute target function using emulated cpu's context
-		invokes::invoke(uc, address, r0, r1, r2, r3, r13);
+		invokes::invoke(uc, address, dl.funcs_[address], r0, r1, r2, r3, r13);
 
         // set result registers
-#define WRITE_REG(num) UC(uc_reg_write(dl.uc_, UC_ARM_REG_R0, &r0))
+#define WRITE_REG(num) UC(uc_reg_write(uc, UC_ARM_REG_R##num, &r##num))
 
         WRITE_REG(0)
         WRITE_REG(1)
@@ -492,6 +492,9 @@ private:
             // TODO: maybe also check that there are no (iaddr-1) values bound to avoid ambiguity
         }
 
+		// Remember the function's name.
+		funcs_[iaddr] = name;
+
         auto lib = libs_.find(name);
         if (lib == libs_.end()) {
             libs_[name] = make_pair(iaddr, iaddr);
@@ -534,6 +537,7 @@ private:
     uint64_t lowAddr_, highAddr_;
     map<string, pair<uint64_t, uint64_t>> libs_; // libraries' low and high addresses
     set<uint64_t> odd_addrs_; // all bound addresses that are odd, but inserted decremented by 1 (so even)
+	map<uint64_t, string> funcs_; // map from function addresses to their names
 };
 
 MainPage::MainPage()
