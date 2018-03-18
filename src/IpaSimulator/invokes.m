@@ -2,7 +2,7 @@
 
 #include "pch.h"
 #include "invokes.h"
-#include "headers.inc"
+#include "headers.inc" // headers used by the generated code
 
 void invokes::invoke(uc_engine *uc, uint32_t address, uint32_t &r0, uint32_t &r1, uint32_t &r2, uint32_t &r3, uint32_t r13) {
 	// Define macros used by the generated code.
@@ -13,5 +13,7 @@ void invokes::invoke(uc_engine *uc, uint32_t address, uint32_t &r0, uint32_t &r1
 #define RET(x) auto ret = x; \
 	uint32_t *pret = reinterpret_cast<uint32_t *>(&ret);
 
+	// Include the generated code.
 #include "invokes.inc"
+	else { throw "function name not recognized"; }
 }
