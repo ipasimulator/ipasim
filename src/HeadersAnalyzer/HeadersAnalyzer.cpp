@@ -22,7 +22,7 @@ using namespace std;
 
 class HeadersAnalyzer {
 public:
-    HeadersAnalyzer(CompilerInstance &ci, set<string> imports) : ci_(ci), imports_(imports) {}
+    HeadersAnalyzer(CompilerInstance &ci, set<string> imports) : ci_(ci), imports_(imports), after_first_(false) {}
     void Initialize() {}
     void HandleTopLevelDecl(DeclGroupRef d) {}
     void VisitFunction(FunctionDecl &f) {
@@ -33,6 +33,10 @@ public:
         // TODO: It should be deterministic whether there is a leading underscore or not.
         if (!imports_.count(name) && !imports_.count("_" + name)) { return; }
 
+        // We cannot handle varargs functions for now.
+        // TODO: Handle varargs functions.
+        if (f.isVariadic()) { return; }
+
         // TODO: check that the function is actually exported from the corresponding
         // .dylib file (it's enough to check .tbd file inside the SDK which is simply
         // a YAML)
@@ -42,6 +46,12 @@ public:
         // TODO: also check that the function has the same signature in WinObjC headers
         // inside the (NuGet) packages folder
 
+        if (after_first_) {
+            cout << "else ";
+        }
+        else {
+            after_first_ = true;
+        }
         cout << "if (name == \"" << name << "\") {" << endl;
 
         // We will simply assume arguments are in r0-r3 or on stack for starters.
@@ -86,19 +96,35 @@ public:
 
         // Call the function through a function pointer saved in argument named "address".
         auto pt = ci_.getASTContext().getPointerType(QualType(fpt, 0)); // TODO: How to properly create QualType?
+        if (!fpt->getReturnType()->isVoidType()) { cout << "RET("; }
         cout << "reinterpret_cast<" << pt.getAsString() << ">(address)(";
         for (i = 0; i != fpt->getNumParams(); ++i) {
             if (i != 0) { cout << ", "; }
             cout << "*v" << to_string(i);
         }
+        if (!fpt->getReturnType()->isVoidType()) { cout << ")"; }
         cout << ");" << endl;
 
-        // TODO: Handle the return address.
-        cout << "return;" << endl;
+        // Handle the return value.
+        if (!fpt->getReturnType()->isVoidType()) {
+            r = 0;
+            uint64_t bytes = toBytes(ci_.getASTContext().getTypeSize(fpt->getReturnType()));
+            assert(bytes > 0 && "non-trivial return type expected");
+            assert(bytes <= 64 && "we can only handle max. 64-byte-long data for now");
+
+            for (;;) {
+                cout << "r" << to_string(r) << " = retp[" << to_string(r) << "];" << endl;
+                ++r;
+
+                if (bytes <= 4) { break; }
+                bytes -= 4;
+            }
+        }
 
         cout << "}" << endl;
     }
 private:
+    bool after_first_;
     CompilerInstance & ci_;
     set<string> imports_;
 
@@ -186,7 +212,7 @@ int main()
     ci.getSourceManager().setMainFileID(ci.getSourceManager().createFileID(file, SourceLocation(), SrcMgr::C_User));
 
     ci.getDiagnosticClient().BeginSourceFile(ci.getLangOpts(), &ci.getPreprocessor());
-    ParseAST(ci.getSema(), /*PrintStats*/ true, /*SkipFunctionBodies*/ true);
+    ParseAST(ci.getSema(), /*PrintStats*/ false, /*SkipFunctionBodies*/ true);
     ci.getDiagnosticClient().EndSourceFile();
 
     return 0;
