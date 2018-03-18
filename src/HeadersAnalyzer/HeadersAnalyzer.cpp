@@ -66,8 +66,6 @@ public:
         for (auto &pt : fpt->param_types()) {
             uint64_t bytes = toBytes(ci_.getASTContext().getTypeSize(pt));
 
-            /* #define ARG(i,t) uint8_t a##i[sizeof(t)]; uint32_t *p##i = reinterpret_cast<uint32_t *>(&a##i); uint8_t *c##i = reinterpret_cast<uint8_t *>(&a##i); t *v##i = reinterpret_cast<t *>(&a##i); */
-
             output_ << "ARG(" << to_string(i) << ", " << pt.getAsString() << ")" << endl;
 
             // Copy data from registers and/or stack into the argument.

@@ -22,7 +22,7 @@
     <ClCompile Include="App.xaml.cpp" />
     <ClCompile Include="MainPage.xaml.cpp" />
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="invokes.cpp">
+    <ClCompile Include="invokes.m">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
