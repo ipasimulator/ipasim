@@ -107,7 +107,8 @@
       <PreprocessorDefinitions>NOMINMAX;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions);ARM_HOST</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(ProjectDir)..\..\deps\llvm\build\arm\Debug\lib\LLVMARMCodeGen.lib;$(ProjectDir)..\..\ARM\Debug\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\ARM\Debug\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>invokes.obj;$(ProjectDir)..\..\deps\llvm\build\arm\Debug\lib\LLVMARMCodeGen.lib;$(ProjectDir)..\..\ARM\Debug\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\ARM\Debug\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
@@ -119,7 +120,8 @@
       <PreprocessorDefinitions>NOMINMAX;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions);ARM_HOST</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(ProjectDir)..\..\ARM\Release\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\ARM\Release\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>invokes.obj;$(ProjectDir)..\..\ARM\Release\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\ARM\Release\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -131,7 +133,8 @@
       <PreprocessorDefinitions>NOMINMAX;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(ProjectDir)..\..\Debug\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\Debug\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>invokes.obj;$(ProjectDir)..\..\Debug\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\Debug\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -143,7 +146,8 @@
       <PreprocessorDefinitions>NOMINMAX;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(ProjectDir)..\..\Release\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\Release\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>invokes.obj;$(ProjectDir)..\..\Release\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\Release\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -155,7 +159,8 @@
       <PreprocessorDefinitions>NOMINMAX;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(ProjectDir)..\..\x64\Debug\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\x64\Debug\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>invokes.obj;$(ProjectDir)..\..\x64\Debug\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\x64\Debug\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -167,7 +172,8 @@
       <PreprocessorDefinitions>NOMINMAX;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;_UNICODE;UNICODE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(ProjectDir)..\..\x64\Release\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\x64\Release\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>invokes.obj;$(ProjectDir)..\..\x64\Release\UnicornPort\UnicornPort.lib;$(ProjectDir)..\..\x64\Release\LiefPort\LiefPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -237,7 +243,14 @@
     <ClCompile Include="App.xaml.cpp">
       <DependentUpon>App.xaml</DependentUpon>
     </ClCompile>
-    <ClCompile Include="invokes.mm" />
+    <ClCompile Include="invokes.mm">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="MainPage.xaml.cpp">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </ClCompile>

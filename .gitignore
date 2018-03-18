@@ -245,3 +245,4 @@ ModelManifest.xml
 Generated Files/
 /doc/*.pdf
 /out/
+/lib/invokes.*

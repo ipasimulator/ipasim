@@ -281,7 +281,10 @@ private:
 #undef READ_REG
 
 		// execute target function using emulated cpu's context
-		invokes::invoke(uc, address, dl.funcs_[address], r0, r1, r2, r3, r13);
+		auto &name = dl.funcs_[address];
+		if (!invokes::invoke(uc, address, name.c_str(), r0, r1, r2, r3, r13)) {
+			throw "unrecognized function name";
+		}
 
         // set result registers
 #define WRITE_REG(num) UC(uc_reg_write(uc, UC_ARM_REG_R##num, &r##num))
@@ -493,7 +496,7 @@ private:
         }
 
 		// Remember the function's name.
-		funcs_[iaddr] = name;
+		funcs_[iaddr] = n;
 
         auto lib = libs_.find(name);
         if (lib == libs_.end()) {
