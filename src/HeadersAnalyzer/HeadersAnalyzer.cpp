@@ -97,6 +97,7 @@ public:
                 // We used all the registers, this argument is on the stack.
                 // Note that r13 is the stack pointer.
                 // TODO: Handle unicorn errors.
+                // TODO: Encapsulate this into a macro.
                 llvm::outs() << "uc_mem_read(uc, r13, c" << to_string(i) << " + " << to_string(s) << ", " << to_string(bytes) << ");\n";
                 s += bytes;
             }
@@ -115,7 +116,18 @@ public:
 
             ++i;
         }
-        // TODO: Call the function with *v0,...,*vN.
+
+        // Call the function through a function pointer saved in argument named "address".
+        auto pt = ci_.getASTContext().getPointerType(QualType(ft, 0)); // TODO: How to properly create QualType?
+        llvm::outs() << "reinterpret_cast<" << pt.getAsString() << ">(address)(";
+        for (i = 0; i != fpt->getNumParams(); ++i) {
+            if (i != 0) { llvm::outs() << ", "; }
+            llvm::outs() << "*v" << to_string(i);
+        }
+        llvm::outs() << ");";
+
+        // TODO: Handle the return address.
+
         llvm::outs() << "\n\n";
 
 #if 0
