@@ -213,7 +213,7 @@ int main()
     ci.createSema(TranslationUnitKind::TU_Complete, nullptr);
 
     string headerPath = "C:/Users/Jones/Files/Projects/IPASimulator/deps/headers/iPhoneOS11.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/Foundation.h";
-    headers << "#include \"" << headerPath << "\";" << endl;
+    headers << "#include \"" << headerPath << "\"" << endl;
     const auto file = ci.getFileManager().getFile(headerPath);
     ci.getSourceManager().setMainFileID(ci.getSourceManager().createFileID(file, SourceLocation(), SrcMgr::C_User));
 

@@ -5,6 +5,7 @@
 
 #include "pch.h"
 #include "MainPage.xaml.h"
+#include "invokes.h"
 #include <LIEF/LIEF.hpp>
 #include <LIEF/filesystem/filesystem.h>
 #include <sstream>
@@ -178,15 +179,6 @@ std::wstring s2ws(const std::string& s)
 
 #define UC(arg) if (arg) { throw 1; }
 
-#ifdef ARM_HOST
-// this function sets registers and stack to the emulated ones and just calls the target
-__declspec(naked) void asm_exec(uint32_t *r0, uint32_t *r1, uint32_t *r2, uint32_t *r3, uint32_t sp, uint32_t address)
-{
-    //__asm {
-    //}
-}
-#endif
-
 class DynamicLoader {
 public:
     DynamicLoader(unique_ptr<FatBinary>&& fat, const Binary& bin, uc_engine *uc) : fat_(move(fat)), bin_(bin), uc_(uc), libs_(), odd_addrs_() {}
@@ -272,7 +264,7 @@ private:
 
 #ifndef ARM_HOST
         // fix odd address
-        // TODO: don't even populate odd_addrs_ on non-ARM host
+        // TODO: don't even populate odd_addrs_ on ARM host
         if (dl.odd_addrs_.count(address)) {
             ++address;
         }
@@ -281,18 +273,15 @@ private:
         // read emulated registers
 #define READ_REG(num) uint32_t r##num; UC(uc_reg_read(dl.uc_, UC_ARM_REG_R##num, &r##num))
 
-        READ_REG(0)
-        READ_REG(1)
-        READ_REG(2)
-        READ_REG(3)
-        READ_REG(13)
+		READ_REG(0)
+		READ_REG(1)
+		READ_REG(2)
+		READ_REG(3)
+		READ_REG(13)
 #undef READ_REG
 
-        // execute target function using emulated cpu's context
-        // TODO: this works only on ARM host for now!
-#ifdef ARM_HOST
-        asm_exec(&r0, &r1, &r2, &r3, r13, address);
-#endif
+		// execute target function using emulated cpu's context
+		invokes::invoke(uc, address, r0, r1, r2, r3, r13);
 
         // set result registers
 #define WRITE_REG(num) UC(uc_reg_write(dl.uc_, UC_ARM_REG_R0, &r0))
