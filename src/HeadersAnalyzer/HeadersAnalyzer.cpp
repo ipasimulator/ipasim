@@ -15,6 +15,7 @@
 #include <clang/CodeGen/ModuleBuilder.h>
 #include <llvm/Demangle/Demangle.h>
 #include <yaml-cpp/yaml.h>
+#include <vector>
 
 using namespace clang;
 using namespace frontend;
@@ -22,7 +23,7 @@ using namespace std;
 
 class HeadersAnalyzer {
 public:
-    HeadersAnalyzer(CompilerInstance &ci, set<string> imports, ostream &output) : ci_(ci), imports_(imports),
+    HeadersAnalyzer(CompilerInstance &ci, set<string> &imports, ostream &output) : ci_(ci), imports_(imports),
         after_first_(false), output_(output) {}
     void Initialize() {}
     void HandleTopLevelDecl(DeclGroupRef d) {}
@@ -126,7 +127,7 @@ public:
 private:
     bool after_first_;
     CompilerInstance &ci_;
-    set<string> imports_;
+    set<string> &imports_;
     ostream &output_;
 
     uint64_t toBytes(uint64_t bits) {
@@ -177,48 +178,54 @@ int main()
         }
     }
 
-    // inspired by https://github.com/loarabia/Clang-tutorial/
-    // TODO: move this to a separate class
-
-    CompilerInstance ci;
-    ci.createDiagnostics();
-    ci.getDiagnostics().setIgnoreAllWarnings(true);
-
-    //ci.getHeaderSearchOpts().Sysroot = "C:/Users/Jones/Files/Projects/IPASimulator/deps/headers/iPhoneOS11.1.sdk/";
-    ci.getHeaderSearchOpts().AddPath("C:/Users/Jones/Files/Projects/IPASimulator/deps/headers/iPhoneOS11.1.sdk/System/Library/Frameworks/", IncludeDirGroup::Angled, /*IsFramework*/ true, /*IgnoreSysRoot*/ false);
-    ci.getHeaderSearchOpts().AddPath("C:/Users/Jones/Files/Projects/IPASimulator/deps/headers/iPhoneOS11.1.sdk/usr/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
-    ci.getHeaderSearchOpts().AddPath("C:/Users/Jones/Files/Projects/IPASimulator/deps/clang/lib/Headers/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
-    //ci.getHeaderSearchOpts().ResourceDir = "C:/Users/Jones/Files/Projects/IPASimulator/deps/clang/lib/Headers/";
-
-    auto targetOpts = make_shared<TargetOptions>();
-    targetOpts->Triple = "arm-apple-darwin"; // TODO: just a wild guess
-    ci.setTarget(TargetInfo::CreateTargetInfo(ci.getDiagnostics(), targetOpts)); // TODO: TargetInfo* should be deleted when not needed anymore
-
-    ci.createFileManager();
-    ci.createSourceManager(ci.getFileManager());
-
-    ci.getInvocation().setLangDefaults(ci.getLangOpts(), InputKind::ObjC, ci.getTarget().getTriple(), ci.getPreprocessorOpts());
-    ci.getLangOpts().Blocks = 1;
-
-    //ci.getPreprocessorOpts().UsePredefines = false;
-    ci.createPreprocessor(TranslationUnitKind::TU_Complete);
-
     fstream invokes("C:/Users/Jones/Files/Projects/IPASimulator/out/invokes.inc");
     fstream headers("C:/Users/Jones/Files/Projects/IPASimulator/out/headers.inc");
-    HeadersAnalyzer ha(ci, move(imports), invokes);
-    ci.setASTConsumer(make_unique<CustomASTConsumer>(ha));
-    ci.createASTContext();
-    ha.Initialize();
-    ci.createSema(TranslationUnitKind::TU_Complete, nullptr);
+    vector<string> headerPaths{
+        "C:/Users/Jones/Files/Projects/IPASimulator/deps/headers/iPhoneOS11.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/Foundation.h",
+        "C:/Users/Jones/Files/Projects/IPASimulator/packages/WinObjC.Language.0.2.171110/build/include/objc/objc-arc.h"
+    };
 
-    string headerPath = "C:/Users/Jones/Files/Projects/IPASimulator/deps/headers/iPhoneOS11.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/Foundation.h";
-    headers << "#include \"" << headerPath << "\"" << endl;
-    const auto file = ci.getFileManager().getFile(headerPath);
-    ci.getSourceManager().setMainFileID(ci.getSourceManager().createFileID(file, SourceLocation(), SrcMgr::C_User));
+    for (auto &headerPath : headerPaths) {
+        headers << "#include \"" << headerPath << "\"" << endl;
 
-    ci.getDiagnosticClient().BeginSourceFile(ci.getLangOpts(), &ci.getPreprocessor());
-    ParseAST(ci.getSema(), /*PrintStats*/ false, /*SkipFunctionBodies*/ true);
-    ci.getDiagnosticClient().EndSourceFile();
+        // inspired by https://github.com/loarabia/Clang-tutorial/
+        // TODO: move this to a separate class
+
+        CompilerInstance ci;
+        ci.createDiagnostics();
+        ci.getDiagnostics().setIgnoreAllWarnings(true);
+
+        //ci.getHeaderSearchOpts().Sysroot = "C:/Users/Jones/Files/Projects/IPASimulator/deps/headers/iPhoneOS11.1.sdk/";
+        ci.getHeaderSearchOpts().AddPath("C:/Users/Jones/Files/Projects/IPASimulator/deps/headers/iPhoneOS11.1.sdk/System/Library/Frameworks/", IncludeDirGroup::Angled, /*IsFramework*/ true, /*IgnoreSysRoot*/ false);
+        ci.getHeaderSearchOpts().AddPath("C:/Users/Jones/Files/Projects/IPASimulator/deps/headers/iPhoneOS11.1.sdk/usr/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
+        ci.getHeaderSearchOpts().AddPath("C:/Users/Jones/Files/Projects/IPASimulator/deps/clang/lib/Headers/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
+        //ci.getHeaderSearchOpts().ResourceDir = "C:/Users/Jones/Files/Projects/IPASimulator/deps/clang/lib/Headers/";
+
+        auto targetOpts = make_shared<TargetOptions>();
+        targetOpts->Triple = "arm-apple-darwin"; // TODO: just a wild guess
+        ci.setTarget(TargetInfo::CreateTargetInfo(ci.getDiagnostics(), targetOpts)); // TODO: TargetInfo* should be deleted when not needed anymore
+
+        ci.createFileManager();
+        ci.createSourceManager(ci.getFileManager());
+
+        ci.getInvocation().setLangDefaults(ci.getLangOpts(), InputKind::ObjC, ci.getTarget().getTriple(), ci.getPreprocessorOpts());
+        ci.getLangOpts().Blocks = 1;
+
+        //ci.getPreprocessorOpts().UsePredefines = false;
+        ci.createPreprocessor(TranslationUnitKind::TU_Complete);
+        HeadersAnalyzer ha(ci, imports, invokes);
+        ci.setASTConsumer(make_unique<CustomASTConsumer>(ha));
+        ci.createASTContext();
+        ha.Initialize();
+        ci.createSema(TranslationUnitKind::TU_Complete, nullptr);
+
+        const auto file = ci.getFileManager().getFile(headerPath);
+        ci.getSourceManager().setMainFileID(ci.getSourceManager().createFileID(file, SourceLocation(), SrcMgr::C_User));
+
+        ci.getDiagnosticClient().BeginSourceFile(ci.getLangOpts(), &ci.getPreprocessor());
+        ParseAST(ci.getSema(), /*PrintStats*/ false, /*SkipFunctionBodies*/ true);
+        ci.getDiagnosticClient().EndSourceFile();
+    }
 
     return 0;
 }
