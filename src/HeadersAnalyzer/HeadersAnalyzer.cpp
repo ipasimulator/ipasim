@@ -22,7 +22,8 @@ using namespace std;
 
 class HeadersAnalyzer {
 public:
-    HeadersAnalyzer(CompilerInstance &ci, set<string> imports) : ci_(ci), imports_(imports), after_first_(false) {}
+    HeadersAnalyzer(CompilerInstance &ci, set<string> imports, ostream &output) : ci_(ci), imports_(imports),
+        after_first_(false), output_(output) {}
     void Initialize() {}
     void HandleTopLevelDecl(DeclGroupRef d) {}
     void VisitFunction(FunctionDecl &f) {
@@ -47,12 +48,12 @@ public:
         // inside the (NuGet) packages folder
 
         if (after_first_) {
-            cout << "else ";
+            output_ << "else ";
         }
         else {
             after_first_ = true;
         }
-        cout << "if (name == \"" << name << "\") {" << endl;
+        output_ << "if (name == \"" << name << "\") {" << endl;
 
         // We will simply assume arguments are in r0-r3 or on stack for starters.
         // Inspired by /res/IHI0042F_aapcs.pdf (AAPCS), section 5.5 Parameter Passing.
@@ -67,7 +68,7 @@ public:
 
             /* #define ARG(i,t) uint8_t a##i[sizeof(t)]; uint32_t *p##i = reinterpret_cast<uint32_t *>(&a##i); uint8_t *c##i = reinterpret_cast<uint8_t *>(&a##i); t *v##i = reinterpret_cast<t *>(&a##i); */
 
-            cout << "ARG(" << to_string(i) << ", " << pt.getAsString() << ")" << endl;
+            output_ << "ARG(" << to_string(i) << ", " << pt.getAsString() << ")" << endl;
 
             // Copy data from registers and/or stack into the argument.
             if (r == 4) {
@@ -75,7 +76,7 @@ public:
                 // Note that r13 is the stack pointer.
                 // TODO: Handle unicorn errors.
                 // TODO: Encapsulate this into a macro.
-                cout << "uc_mem_read(uc, r13, c" << to_string(i) << " + " << to_string(s) << ", " << to_string(bytes) << ");" << endl;
+                output_ << "uc_mem_read(uc, r13, c" << to_string(i) << " + " << to_string(s) << ", " << to_string(bytes) << ");" << endl;
                 s += bytes;
             }
             else {
@@ -83,7 +84,7 @@ public:
                 assert(bytes <= 64 && "we can only handle max. 64-byte-long data for now");
 
                 for (;;) {
-                    cout << "p" << to_string(i) << "[" << to_string(r) << "] = r" << to_string(r) << ";" << endl;
+                    output_ << "p" << to_string(i) << "[" << to_string(r) << "] = r" << to_string(r) << ";" << endl;
                     ++r;
 
                     if (bytes <= 4) { break; }
@@ -96,14 +97,14 @@ public:
 
         // Call the function through a function pointer saved in argument named "address".
         auto pt = ci_.getASTContext().getPointerType(QualType(fpt, 0)); // TODO: How to properly create QualType?
-        if (!fpt->getReturnType()->isVoidType()) { cout << "RET("; }
-        cout << "reinterpret_cast<" << pt.getAsString() << ">(address)(";
+        if (!fpt->getReturnType()->isVoidType()) { output_ << "RET("; }
+        output_ << "reinterpret_cast<" << pt.getAsString() << ">(address)(";
         for (i = 0; i != fpt->getNumParams(); ++i) {
-            if (i != 0) { cout << ", "; }
-            cout << "*v" << to_string(i);
+            if (i != 0) { output_ << ", "; }
+            output_ << "*v" << to_string(i);
         }
-        if (!fpt->getReturnType()->isVoidType()) { cout << ")"; }
-        cout << ");" << endl;
+        if (!fpt->getReturnType()->isVoidType()) { output_ << ")"; }
+        output_ << ");" << endl;
 
         // Handle the return value.
         if (!fpt->getReturnType()->isVoidType()) {
@@ -113,7 +114,7 @@ public:
             assert(bytes <= 64 && "we can only handle max. 64-byte-long data for now");
 
             for (;;) {
-                cout << "r" << to_string(r) << " = retp[" << to_string(r) << "];" << endl;
+                output_ << "r" << to_string(r) << " = retp[" << to_string(r) << "];" << endl;
                 ++r;
 
                 if (bytes <= 4) { break; }
@@ -121,12 +122,13 @@ public:
             }
         }
 
-        cout << "}" << endl;
+        output_ << "}" << endl;
     }
 private:
     bool after_first_;
-    CompilerInstance & ci_;
+    CompilerInstance &ci_;
     set<string> imports_;
+    ostream &output_;
 
     uint64_t toBytes(uint64_t bits) {
         assert(bits % 8 == 0 && "whole bytes expected");
@@ -202,13 +204,17 @@ int main()
     //ci.getPreprocessorOpts().UsePredefines = false;
     ci.createPreprocessor(TranslationUnitKind::TU_Complete);
 
-    HeadersAnalyzer ha(ci, move(imports));
+    fstream invokes("C:/Users/Jones/Files/Projects/IPASimulator/out/invokes.inc");
+    fstream headers("C:/Users/Jones/Files/Projects/IPASimulator/out/headers.inc");
+    HeadersAnalyzer ha(ci, move(imports), invokes);
     ci.setASTConsumer(make_unique<CustomASTConsumer>(ha));
     ci.createASTContext();
     ha.Initialize();
     ci.createSema(TranslationUnitKind::TU_Complete, nullptr);
 
-    const auto file = ci.getFileManager().getFile("C:/Users/Jones/Files/Projects/IPASimulator/deps/headers/iPhoneOS11.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/Foundation.h");
+    string headerPath = "C:/Users/Jones/Files/Projects/IPASimulator/deps/headers/iPhoneOS11.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/Foundation.h";
+    headers << "#include \"" << headerPath << "\";" << endl;
+    const auto file = ci.getFileManager().getFile(headerPath);
     ci.getSourceManager().setMainFileID(ci.getSourceManager().createFileID(file, SourceLocation(), SrcMgr::C_User));
 
     ci.getDiagnosticClient().BeginSourceFile(ci.getLangOpts(), &ci.getPreprocessor());
