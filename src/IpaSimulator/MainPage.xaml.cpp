@@ -11,7 +11,6 @@
 #include <unicorn/unicorn.h>
 #include <memory>
 #include <map>
-#include <llvm/CodeGen/CallingConvLower.h>
 
 using namespace IpaSimulator;
 using namespace Platform;
@@ -270,8 +269,6 @@ private:
     static bool hook_mem_fetch_prot(uc_engine *uc, uc_mem_type type, uint64_t address, int size, int64_t value, void *user_data)
     {
         auto& dl = *(DynamicLoader *)user_data;
-
-        llvm::CallingConv::ID cc(llvm::CallingConv::ARM_AAPCS);
 
 #ifndef ARM_HOST
         // fix odd address
