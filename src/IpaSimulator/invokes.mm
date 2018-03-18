@@ -4,6 +4,7 @@
 // objconv -fpe32 -nr:__ZN7invokes6invokeEP9uc_structyPKcRjS4_S4_S4_j:?invoke@invokes@@SA_NPAUuc_struct@@_KPBDAAI333I@Z invokes.o invokes.obj
 // TODO: Either automatize this, or compile with HeadersAnalyzer.
 
+#include <cstring>
 #include "invokes.h"
 #include "headers.inc" // headers used by the generated code
 

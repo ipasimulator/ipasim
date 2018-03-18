@@ -54,7 +54,7 @@ public:
         else {
             after_first_ = true;
         }
-        output_ << "if (name == \"" << name << "\") {" << endl;
+        output_ << "if (!std::strcmp(name, \"" << name << "\")) {" << endl;
 
         // We will simply assume arguments are in r0-r3 or on stack for starters.
         // Inspired by /res/IHI0042F_aapcs.pdf (AAPCS), section 5.5 Parameter Passing.
