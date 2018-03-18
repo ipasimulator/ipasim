@@ -30,7 +30,8 @@ public:
 
         // Skip functions that do not interest us.
         // HACK: This is here for this prototype version only.
-        if (!imports_.count(name)) { return; }
+        // TODO: It should be deterministic whether there is a leading underscore or not.
+        if (!imports_.count(name) && !imports_.count("_" + name)) { return; }
 
         // TODO: check that the function is actually exported from the corresponding
         // .dylib file (it's enough to check .tbd file inside the SDK which is simply
@@ -142,19 +143,10 @@ int main()
     {
         fstream importsFile("C:/Users/Jones/Files/Projects/IPASimulator/Debug/imports.txt");
         for (string line; getline(importsFile, line);) {
-            // Demangle the imported name.
-            char *buf = new char[line.length()];
-            size_t n;
-            int status;
-            buf = llvm::itaniumDemangle(line.c_str(), buf, &n, &status);
-            if (status) {
-                // Could not demangle the name.
-                imports.insert(move(line));
-            }
-            else {
-                imports.insert(string(buf, n));
-            }
-            delete[] buf; // TODO: This is not exception-safe.
+            // Skip empty lines.
+            if (line.empty()) { continue; }
+
+            imports.insert(move(line));
         }
     }
 
