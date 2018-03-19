@@ -37,7 +37,10 @@ public:
 
         // We cannot handle varargs functions for now.
         // TODO: Handle varargs functions.
-        if (f.isVariadic()) { return; }
+        if (f.isVariadic()) {
+            cerr << "vararg function found: " << name << endl;
+            return;
+        }
 
         // TODO: check that the function is actually exported from the corresponding
         // .dylib file (it's enough to check .tbd file inside the SDK which is simply
@@ -182,11 +185,13 @@ int main()
     fstream headers("C:/Users/Jones/Files/Projects/IPASimulator/out/headers.inc");
     vector<string> headerPaths{
         "C:/Users/Jones/Files/Projects/IPASimulator/deps/headers/iPhoneOS11.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/Foundation.h",
-        "C:/Users/Jones/Files/Projects/IPASimulator/packages/WinObjC.Language.0.2.171110/build/include/objc/objc-arc.h"
+        "C:/Users/Jones/Files/Projects/IPASimulator/packages/WinObjC.Language.0.2.171110/build/include/objc/objc-arc.h",
+        "C:/Users/Jones/Files/Projects/IPASimulator/deps/headers/iPhoneOS11.1.sdk/usr/include/objc/message.h"
     };
 
     for (auto &headerPath : headerPaths) {
         headers << "#include \"" << headerPath << "\"" << endl;
+        cout << headerPath << endl;
 
         // inspired by https://github.com/loarabia/Clang-tutorial/
         // TODO: move this to a separate class
