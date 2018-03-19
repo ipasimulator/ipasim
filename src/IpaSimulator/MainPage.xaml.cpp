@@ -302,7 +302,41 @@ private:
 
 			// Here, we implement the second variant.
 
-			OutputDebugStringA(reinterpret_cast<const char *>(r1));
+			// TODO: Move these structures to separate .h file (or include an existing one).
+			// HACK: These structures were copied from IDA.
+			typedef void __objc2_meth_list;
+			typedef void __objc2_prot_list;
+			typedef void __objc2_ivar_list;
+			typedef void __objc2_prop_list;
+			struct __objc2_class_ro
+			{
+				uint32_t flags;
+				uint32_t ivar_base_start;
+				uint32_t ivar_base_size;
+				//uint32_t reserved;
+				void *ivar_lyt;
+				char *name;
+				__objc2_meth_list *base_meths;
+				__objc2_prot_list *base_prots;
+				__objc2_ivar_list *ivars;
+				void *weak_ivar_lyt;
+				__objc2_prop_list *base_props;
+			};
+			struct __objc2_class
+			{
+				__objc2_class *isa;
+				__objc2_class *superclass;
+				void *cache;
+				void *vtable;
+				__objc2_class_ro *info;
+			};
+			// ===
+			typedef struct objc_object {
+				__objc2_class *isa;
+			} *id;
+
+			//OutputDebugStringA(reinterpret_cast<const char *>(r1));
+			OutputDebugStringA(reinterpret_cast<id>(r0)->isa->info->name);
 		}
 
 		// execute target function using emulated cpu's context
