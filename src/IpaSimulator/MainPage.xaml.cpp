@@ -357,6 +357,8 @@ private:
 				}
 			}
 			cout << "Not found!" << endl;
+
+			// TODO: A big problem found - the .ipa uses the new ObjC runtime, but WinObjC uses the old one!
 		}
 
 		// execute target function using emulated cpu's context
