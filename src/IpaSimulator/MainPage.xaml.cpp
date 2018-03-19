@@ -293,14 +293,16 @@ private:
 			// NOTE: This function shouldn't actually be called as variadic (see its docs),
 			// so we don't do that.
 
-			// TODO: Alternative to the below code would be dynamically determining
+			// There are two ways how to do this.
+			// One option is to use HeadersAnalyzer to generate proxy code for every
+			// Objective-C method and just call the correct proxy (selected by the selector "op").
+			// Alternative to the above is dynamically determining
 			// what the method's parameter types are and then dynamically invoking
 			// objc_msgSend via libffi.
 
-			// HACK: In the following code, we assume that the selector "op" is a string
-			// (containing the name of the method being called).
+			// Here, we implement the second variant.
 
-
+			OutputDebugStringA(reinterpret_cast<const char *>(r1));
 		}
 
 		// execute target function using emulated cpu's context
