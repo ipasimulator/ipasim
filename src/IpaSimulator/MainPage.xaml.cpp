@@ -281,8 +281,29 @@ private:
 		READ_REG(14)
 #undef READ_REG
 
-		// execute target function using emulated cpu's context
+		// TODO: Don't branch by name (it's slow), use numbers instead.
 		auto &name = dl.funcs_[address];
+
+		// For variadic functions, we need to semantically analyze some of its arguments
+		// to determine what the whole called signature looks like.
+		if (name == "objc_msgSend") {
+			// First argument is a pointer to the target instance (can be null).
+			// Second argument is an op selector. That's usually just a pointer to a string
+			// containing the method's name.
+			// NOTE: This function shouldn't actually be called as variadic (see its docs),
+			// so we don't do that.
+
+			// TODO: Alternative to the below code would be dynamically determining
+			// what the method's parameter types are and then dynamically invoking
+			// objc_msgSend via libffi.
+
+			// HACK: In the following code, we assume that the selector "op" is a string
+			// (containing the name of the method being called).
+
+
+		}
+
+		// execute target function using emulated cpu's context
 		if (!invokes::invoke(uc, address, name.c_str(), r0, r1, r2, r3, r13)) {
 			throw "unrecognized function name";
 		}
