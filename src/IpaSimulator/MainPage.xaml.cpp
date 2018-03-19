@@ -358,7 +358,11 @@ private:
 			}
 			cout << "Not found!" << endl;
 
-			// TODO: A big problem found - the .ipa uses the new ObjC runtime, but WinObjC uses the old one!
+			// TODO: A big problem found - the .ipa uses the NeXT ObjC runtime, but WinObjC uses the GNUstep one!
+            // How to solve it? Well, we could build WinObjC with some ObjC runtime binary compatible
+            // with the Apple's runtime (NeXT-family runtime). Clang actually can generate the runtime
+            // structures, so we would only need to implement the methods (and we could inspire by Apple's
+            // source code here). See also clang's abstract class CGObjCRuntime.
 		}
 
 		// execute target function using emulated cpu's context
