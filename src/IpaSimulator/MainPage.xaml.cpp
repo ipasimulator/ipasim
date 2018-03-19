@@ -336,7 +336,9 @@ private:
 			} *id;
 
 			//OutputDebugStringA(reinterpret_cast<const char *>(r1));
-			OutputDebugStringA(reinterpret_cast<id>(r0)->isa->info->name);
+			//OutputDebugStringA(reinterpret_cast<id>(r0)->isa->info->name);
+			// TODO: Bug in the dyld - fields that were NULL (0) in the binary are now equal to slide!
+			OutputDebugStringA(to_string(reinterpret_cast<uint32_t>(reinterpret_cast<id>(r0)->isa->info->base_meths) - dl.slide_).c_str());
 		}
 
 		// execute target function using emulated cpu's context
