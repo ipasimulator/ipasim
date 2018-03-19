@@ -304,12 +304,19 @@ private:
 
 			// TODO: Move these structures to separate .h file (or include an existing one).
 			// HACK: These structures were copied from IDA.
-			typedef void __objc2_meth_list;
+			struct __objc2_meth_list {
+				uint32_t entrysize;
+				uint32_t count;
+			};
+			struct __objc2_meth {
+				char *name;
+				char *types;
+				void *imp;
+			};
 			typedef void __objc2_prot_list;
 			typedef void __objc2_ivar_list;
 			typedef void __objc2_prop_list;
-			struct __objc2_class_ro
-			{
+			struct __objc2_class_ro {
 				uint32_t flags;
 				uint32_t ivar_base_start;
 				uint32_t ivar_base_size;
@@ -322,8 +329,7 @@ private:
 				void *weak_ivar_lyt;
 				__objc2_prop_list *base_props;
 			};
-			struct __objc2_class
-			{
+			struct __objc2_class {
 				__objc2_class *isa;
 				__objc2_class *superclass;
 				void *cache;
@@ -335,10 +341,22 @@ private:
 				__objc2_class *isa;
 			} *id;
 
-			//OutputDebugStringA(reinterpret_cast<const char *>(r1));
-			//OutputDebugStringA(reinterpret_cast<id>(r0)->isa->info->name);
-			// TODO: Bug in the dyld - fields that were NULL (0) in the binary are now equal to slide!
-			OutputDebugStringA(to_string(reinterpret_cast<uint32_t>(reinterpret_cast<id>(r0)->isa->info->base_meths) - dl.slide_).c_str());
+			auto obj = reinterpret_cast<id>(r0);
+			auto sel = reinterpret_cast<char *>(r1);
+			for (auto isa = obj->isa; reinterpret_cast<uint32_t>(isa) != dl.slide_; isa = isa->superclass) {
+				auto meths = isa->info->base_meths;
+				// TODO: Bug in the dyld - fields that were NULL (0) in the binary are now equal to slide!
+				if (reinterpret_cast<uint32_t>(meths) != dl.slide_) {
+					// Try to find the method.
+					auto meth_arr = reinterpret_cast<__objc2_meth *>(meths + 1);
+					for (uint32_t i = 0; i != meths->count; ++i) {
+						if (!std::strcmp(meth_arr[i].name, sel)) {
+							cout << "Found!" << endl;
+						}
+					}
+				}
+			}
+			cout << "Not found!" << endl;
 		}
 
 		// execute target function using emulated cpu's context
