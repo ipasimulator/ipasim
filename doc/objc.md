@@ -13,6 +13,14 @@ So, the only option we see here is to recompile WinObjC with a different runtime
 - Modular Objective-C Run-Time Library
   - Source code: [GitHub](https://github.com/charlieMonroe/modular-objc-run-time)
   - Master thesis: [Local copy](../res/modular-objc.pdf), [CUNI repository](https://is.cuni.cz/webapps/zzp/detail/116510/29583005/)
+- ObjFW
+  - It contains an Objective-C runtime reimplementation.
+  - Source code: [Official GitHub mirror](https://github.com/Midar/objfw)
+- Magenta project
+  - Info: [Official website](http://crna.cc/cat/open-source), [OSnews article](http://www.osnews.com/story/26060/Magenta_implements_Darwin_BSD_on_top_of_the_Linux_kernel), [Maemo.org thread](https://talk.maemo.org/showthread.php?t=84803)
+  - Source code: [Archive.org](https://web.archive.org/web/20120625011212/http://crna.cc:80/magenta_source.html)
+- mulle-objc
+  - Info: [Official website](https://mulle-objc.github.io/)
 
 **TODO: Add more.**
 
