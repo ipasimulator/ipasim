@@ -38,3 +38,8 @@ All of these projects are mostly for building the runtime on macOS, though.
 And the others can build only the old runtime for Win32 (which is what even Apple was doing for Safari on Windows, so it is supported in the source code).
 But we want the new runtime because that's the one used in iPhones.
 So we just take all these projects as merely an inspiration for our own Objective-C runtime written from scratch with only one goal - to be binary compatible with the new Apple's runtime.
+
+### Inspiration
+
+Our code is inspired by the Apple's runtime source code, version 723.
+We want it to be binary-compatible with the new runtime, so that's like `__OBJC2__` was defined.
