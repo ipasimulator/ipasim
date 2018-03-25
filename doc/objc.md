@@ -12,11 +12,13 @@ So, the only option we see here is to recompile WinObjC with a different runtime
   - Documentation: [Official](https://developer.apple.com/documentation/objectivec/objective_c_runtime?language=objc)
 - Modular Objective-C Run-Time Library
   - Source code: [GitHub](https://github.com/charlieMonroe/modular-objc-run-time)
-  - Master Thesis: [Local copy](../res/modular-objc.pdf), [CUNI repository](https://is.cuni.cz/webapps/zzp/detail/116510/29583005/)
+  - Master thesis: [Local copy](../res/modular-objc.pdf), [CUNI repository](https://is.cuni.cz/webapps/zzp/detail/116510/29583005/)
 
 **TODO: Add more.**
 
 ## Porting the Apple's runtime
+
+### Related work
 
 One cool thing to do would be to just take the source code for Apple's Objective-C runtime and compile it for Windows.
 Links to projects that try to do that follow.
@@ -31,3 +33,8 @@ Links to projects that try to do that follow.
   - [StackOverflow] [Explanation of the repository](https://stackoverflow.com/questions/23469738/debugging-objc4-532-2-on-os-x-10-9)
 - [GitHub] [oneofai's buildable fork](https://github.com/oneofai/objc4)
 - [GitHub] [Mirror of objc4 with added comments](https://github.com/xuhong1105/objc4-680)
+
+All of these projects are mostly for building the runtime on macOS, though.
+And the others can build only the old runtime for Win32 (which is what even Apple was doing for Safari on Windows, so it is supported in the source code).
+But we want the new runtime because that's the one used in iPhones.
+So we just take all these projects as merely an inspiration for our own Objective-C runtime written from scratch with only one goal - to be binary compatible with the new Apple's runtime.
