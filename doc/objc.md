@@ -11,7 +11,8 @@ So, the only option we see here is to recompile WinObjC with a different runtime
   - Source code: [Official](https://opensource.apple.com/source/objc4/), [Tarballs](https://opensource.apple.com/tarballs/objc4/), [GitHub mirror](https://github.com/opensource-apple/objc4) (not updated so often)
   - Documentation: [Official](https://developer.apple.com/documentation/objectivec/objective_c_runtime?language=objc)
 - Modular Objective-C Run-Time Library
-  - Master Thesis: [Local copy](../res/modular-objc.pdf)
+  - Source code: [GitHub](https://github.com/charlieMonroe/modular-objc-run-time)
+  - Master Thesis: [Local copy](../res/modular-objc.pdf), [CUNI repository](https://is.cuni.cz/webapps/zzp/detail/116510/29583005/)
 
 **TODO: Add more.**
 
