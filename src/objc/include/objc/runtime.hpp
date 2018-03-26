@@ -8,7 +8,7 @@ class objc_object;
 
 using Class = objc_class * ;
 using id = objc_object * ;
-using SEL = struct objc_selector * ;
+using SEL = struct objc_selector *;
 using IMP = void(*)(void /* id, SEL, ... */);
 
 union isa_t
@@ -61,6 +61,30 @@ class ivar_list_t : public entsize_list_tt<ivar_t, ivar_list_t, 0> {};
 
 class property_list_t : public entsize_list_tt<property_t, property_list_t, 0> {};
 
+class protocol_t : public objc_object {
+public:
+    const char *mangledName;
+    class protocol_list_t *protocols;
+    method_list_t *instanceMethods;
+    method_list_t *classMethods;
+    method_list_t *optionalInstanceMethods;
+    method_list_t *optionalClassMethods;
+    property_list_t *instanceProperties;
+    uint32_t size;
+    uint32_t flags;
+    const char **_extendedMethodTypes;
+    const char *_demangledName;
+    property_list_t *_classProperties;
+};
+
+using protocol_ref_t = uintptr_t;
+
+class protocol_list_t {
+public:
+    uintptr_t count;
+    protocol_ref_t list[0];
+};
+
 template <typename Element, typename List>
 class list_array_tt {
 private:
@@ -94,7 +118,7 @@ public:
     const uint8_t *ivarLayout;
     const char *name;
     method_list_t *baseMethodList;
-    uintptr_t baseProtocols; // TODO: Wrong type.
+    protocol_list_t *baseProtocols;
     const ivar_list_t *ivars;
     const uint8_t *weakIvarLayout;
     property_list_t *baseProperties;
@@ -118,7 +142,7 @@ private:
     uintptr_t bits;
 };
 
-class objc_class : objc_object {
+class objc_class : public objc_object {
 private:
     Class superclass;
     uint64_t cache; // TODO: Wrong type.
