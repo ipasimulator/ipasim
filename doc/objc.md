@@ -67,3 +67,7 @@ Our code is inspired by the Apple's runtime source code, version 723.
 We want it to be binary-compatible with the new runtime, so that's like `__OBJC2__` was defined.
 
 The other projects listed above can be also useful for inspiration.
+
+### Comments
+
+Since lots of the code is copied from Apple's sources, we copy comments from there, as well, prefixing them with `[Apple]`.
