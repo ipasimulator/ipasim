@@ -214,4 +214,4 @@ private:
     class_data_bits_t bits; // [Apple] class_rw_t * plus custom rr/alloc flags
 };
 
-#endif
+#endif // _H_OBJC_RUNTIME

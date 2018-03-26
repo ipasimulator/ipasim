@@ -8,15 +8,24 @@
     <Filter Include="Header Files">
       <UniqueIdentifier>{c61a0727-20b0-4cae-8cde-68e0635477b3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{04bdf6e2-e119-4ca4-808d-4602b5008ff4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="sel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="include\objc\runtime.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\objc\objc.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
