@@ -146,6 +146,8 @@ class method_array_t : public list_array_tt<method_t, method_list_t> {};
 
 class property_array_t : public list_array_tt<property_t, property_list_t> {};
 
+class protocol_array_t : public list_array_tt<protocol_ref_t, protocol_list_t> {};
+
 class class_ro_t {
 public:
     uint32_t flags;
@@ -169,9 +171,9 @@ public:
     uint32_t flags;
     uint32_t version;
     const class_ro_t *ro;
-    uintptr_t methods; // TODO: Wrong type.
-    uintptr_t properties; // TODO: Wrong type.
-    uintptr_t protocols; // TODO: Wrong type.
+    method_array_t methods;
+    property_array_t properties;
+    protocol_array_t protocols;
     Class firstSubclass;
     Class nextSiblingClass;
     char *demangledName;
@@ -183,12 +185,32 @@ private:
     uintptr_t bits;
 };
 
+#if __LP64__
+using mask_t = uint32_t; // [Apple] x86_64 & arm64 asm are less efficient with 16-bits
+#else
+using mask_t = uint16_t;
+#endif
+
+using cache_key_t = uintptr_t;
+
+class bucket_t {
+private:
+    cache_key_t _key;
+    IMP _imp;
+};
+
+class cache_t {
+public:
+    bucket_t *_buckets;
+    mask_t _mask;
+    mask_t _occupied;
+};
+
 class objc_class : public objc_object {
 private:
     // [Apple] Class ISA;
     Class superclass;
-    uint64_t cache; // [Apple] formerly cache pointer and vtable
-                    // TODO: Wrong type.
+    cache_t cache; // [Apple] formerly cache pointer and vtable
     class_data_bits_t bits; // [Apple] class_rw_t * plus custom rr/alloc flags
 };
 
