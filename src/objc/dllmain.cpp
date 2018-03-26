@@ -1,4 +1,5 @@
 ﻿#include "pch.h"
+#include "objc/runtime.hpp" // TODO: Just for testing that it compiles.
 
 BOOL APIENTRY DllMain(HMODULE /* hModule */, DWORD ul_reason_for_call, LPVOID /* lpReserved */)
 {

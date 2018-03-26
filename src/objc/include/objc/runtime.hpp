@@ -8,6 +8,8 @@ class objc_object;
 
 using Class = objc_class * ;
 using id = objc_object * ;
+using SEL = struct objc_selector * ;
+using IMP = void(*)(void /* id, SEL, ... */);
 
 union isa_t
 {
@@ -20,8 +22,69 @@ union isa_t
 
 class objc_object {
 private:
-    isa_t isa_;
+    isa_t isa;
 };
+
+class method_t {
+public:
+    SEL name;
+    const char *types;
+    IMP imp;
+};
+
+class ivar_t {
+public:
+    int32_t * offset;
+    const char *name;
+    const char *type;
+    uint32_t alignment_raw;
+    uint32_t size;
+};
+
+class property_t {
+public:
+    const char *name;
+    const char *attributes;
+};
+
+template <typename Element, typename List, uint32_t FlagMask>
+class entsize_list_tt {
+public:
+    uint32_t entsizeAndFlags;
+    uint32_t count;
+    Element first;
+};
+
+class method_list_t : public entsize_list_tt<method_t, method_list_t, 0x3> {};
+
+class ivar_list_t : public entsize_list_tt<ivar_t, ivar_list_t, 0> {};
+
+class property_list_t : public entsize_list_tt<property_t, property_list_t, 0> {};
+
+template <typename Element, typename List>
+class list_array_tt {
+private:
+    struct array_t {
+        uint32_t count;
+        List* lists[0];
+
+        static size_t byteSize(uint32_t count) {
+            return sizeof(array_t) + count * sizeof(lists[0]);
+        }
+        size_t byteSize() {
+            return byteSize(count);
+        }
+    };
+
+    union {
+        List* list;
+        uintptr_t arrayAndFlag;
+    };
+};
+
+class method_array_t : public list_array_tt<method_t, method_list_t> {};
+
+class property_array_t : public list_array_tt<property_t, property_list_t> {};
 
 class class_ro_t {
 public:
@@ -30,11 +93,11 @@ public:
     uint32_t instanceSize;
     const uint8_t *ivarLayout;
     const char *name;
-    uintptr_t baseMethodList; // TODO: Wrong type.
+    method_list_t *baseMethodList;
     uintptr_t baseProtocols; // TODO: Wrong type.
-    uintptr_t ivars; // TODO: Wrong type.
+    const ivar_list_t *ivars;
     const uint8_t *weakIvarLayout;
-    uintptr_t baseProperties; // TODO: Wrong type.
+    property_list_t *baseProperties;
 };
 
 class class_rw_t {
@@ -52,13 +115,13 @@ public:
 
 class class_data_bits_t {
 private:
-    uintptr_t bits_;
+    uintptr_t bits;
 };
 
 class objc_class : objc_object {
 private:
-    Class superclass_;
-    uint64_t cache_; // TODO: Wrong type.
+    Class superclass;
+    uint64_t cache; // TODO: Wrong type.
 };
 
 #endif
