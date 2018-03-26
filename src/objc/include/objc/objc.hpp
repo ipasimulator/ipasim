@@ -1,7 +1,7 @@
 #ifndef _H_OBJC_OBJC
 #define _H_OBJC_OBJC
 
-#include "objc/runtime.hpp"
+#include "objc/runtime.hpp" // for SEL
 
 // TODO: Move these macro definitions to some api.hpp file as Apple does.
 #define OBJC_EXPORT extern "C" __declspec(dllexport)
@@ -16,6 +16,21 @@
 * [Apple] @return A C string indicating the name of the selector.
 */
 OBJC_EXPORT const char * _Nonnull sel_getName(SEL _Nonnull sel)
+	OBJC_AVAILABLE(10.0, 2.0, 9.0, 1.0, 2.0);
+
+/**
+* [Apple] Registers a method with the Objective-C runtime system, maps the method
+* [Apple] name to a selector, and returns the selector value.
+* [Apple] 
+* [Apple] @param str A pointer to a C string. Pass the name of the method you wish to register.
+* [Apple] 
+* [Apple] @return A pointer of type SEL specifying the selector for the named method.
+* [Apple] 
+* [Apple] @note You must register a method name with the Objective-C runtime system to obtain the
+* [Apple]  method’s selector before you can add the method to a class definition. If the method name
+* [Apple]  has already been registered, this function simply returns the selector.
+*/
+OBJC_EXPORT SEL _Nonnull sel_registerName(const char * _Nonnull str)
 	OBJC_AVAILABLE(10.0, 2.0, 9.0, 1.0, 2.0);
 
 #endif // _H_OBJC_OBJC
