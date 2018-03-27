@@ -71,3 +71,9 @@ The other projects listed above can be also useful for inspiration.
 ### Comments
 
 Since lots of the code is copied from Apple's sources, we copy comments from there, as well, prefixing them with `[Apple]`.
+Changes from the Apple's source should be well documented and comments documenting them are prefixed with `CHANGE:`.
+
+### Threading
+
+To ease porting from Apple's sources, which use `pthreads` APIs for threading, we use `pthreads-win32` wrapper library.
+More specifically, we use the `pthreadVC2.dll`, i.e. the one that doesn't use structured exceptions (since iOS's `pthreads` most likely don't do that either **TODO: Verify!**) and is for MSVC compiler.
