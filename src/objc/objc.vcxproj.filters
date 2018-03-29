@@ -28,5 +28,8 @@
     <ClInclude Include="include\objc\objc.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\objc\locks.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

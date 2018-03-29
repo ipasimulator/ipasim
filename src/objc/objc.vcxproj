@@ -194,6 +194,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\objc\locks.hpp" />
     <ClInclude Include="include\objc\objc.hpp" />
     <ClInclude Include="include\objc\runtime.hpp" />
     <ClInclude Include="pch.h" />
