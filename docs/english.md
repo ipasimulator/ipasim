@@ -23,12 +23,14 @@ A list of them follows.
   This should be easier in the future either by making them submodules or using `clang` libraries instead.
 - `iPhoneOS.sdk` (in `deps` folder) - just download the latest iPhone SDK and replace the contents of this folder with it.
   Then rebuild `IpaSimulator` (which should in turn run `HeadersAnalyzer` that uses `.h` and other files from this SDK).
+- `pthreads.2` - just extract the latest `pthreads-w32-*-*-*-release.zip` from [pthreads-win32's ftp](ftp://sourceware.org/pub/pthreads-win32).
 
 ## How to build (on 64-bit Windows with Visual Studio 2017)
 
 1. Checkout the repository and make sure submodules are checked out as well.
 2. Install `cmake` and make sure it's in your `PATH` environment variable.
 3. Run the following commands:
+
    ```cmd
    cd deps\llvm
    mkdir build && cd build
@@ -42,6 +44,7 @@ A list of them follows.
    mkdir win32 && cd win32
    cmake -G "Visual Studio 15" -Thost=x64 ..\..
    ```
+
    **TODO: probably remove the `-Thost=x64` option and allow only 32-bit Windows for tooling/compilation and ARM + 32-bit Windows for running the app.**
 4. If projects were successfully generated, you can open the `IPASimulator.sln`.
 

@@ -11,3 +11,4 @@ And usually when there is more than one sentence, only the first is on the first
 
 - [objc] - Objective-C runtime library (`/src/objc/`).
 - [docs] - Documentation (`/docs/`).
+- [deps] - 3rd-party dependencies (`/deps/`).
