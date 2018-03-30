@@ -1,5 +1,4 @@
-#include "pch.h"
-
+#include <windows.h> // for DllMain
 // TODO: These are here just for testing that it compiles.
 #include "objc/runtime.hpp"
 #include "objc/locks.hpp"
