@@ -1,5 +1,5 @@
-#ifndef _H_OBJC_RUNTIME
-#define _H_OBJC_RUNTIME
+#ifndef OBJC_RUNTIME_H
+#define OBJC_RUNTIME_H
 
 #include <stdint.h> // for int types
 
@@ -214,4 +214,4 @@ private:
     class_data_bits_t bits; // [Apple] class_rw_t * plus custom rr/alloc flags
 };
 
-#endif // _H_OBJC_RUNTIME
+#endif // OBJC_RUNTIME_H

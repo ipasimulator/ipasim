@@ -1,5 +1,5 @@
-#ifndef _H_OBJC_LOCKS
-#define _H_OBJC_LOCKS
+#ifndef OBJC_LOCKS_H
+#define OBJC_LOCKS_H
 
 #include <pthread.h>
 
@@ -39,4 +39,4 @@ using rwlock_t = rwlock_tt<LOCKDEBUG>;
 
 extern rwlock_t selLock;
 
-#endif // _H_OBJC_LOCKS
+#endif // OBJC_LOCKS_H
