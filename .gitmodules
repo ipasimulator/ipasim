@@ -9,3 +9,7 @@
 [submodule "deps/yaml-cpp"]
 	path = deps/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
+[submodule "deps/objc4"]
+	path = deps/objc4
+	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/objc4
+	branch = port
