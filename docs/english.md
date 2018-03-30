@@ -25,6 +25,10 @@ A list of them follows.
   Then rebuild `IpaSimulator` (which should in turn run `HeadersAnalyzer` that uses `.h` and other files from this SDK).
 - `pthreads.2` - just extract the latest `pthreads-w32-*-*-*-release.zip` from [pthreads-win32's ftp](ftp://sourceware.org/pub/pthreads-win32).
   Then make sure that `/src/pthread/pthread.vcxproj` is still valid (i.e., changes made to `/deps/pthreads.2/Makefile` and `/deps/pthreads.2/config.h` are reflected in the `.vcxproj`).
+- `objc4` - just extract the latest tarball from [the official Apple's repository](https://opensource.apple.com/tarballs/objc4/).
+  Currently extracted version is `objc4-723`.
+  Then make sure that `/src/objc/objc.vcxproj` is still valid.
+  See [documentation of the objc port](objc.md) for more details.
 
 ## How to build (on 64-bit Windows with Visual Studio 2017)
 
