@@ -30,6 +30,8 @@ A list of them follows.
   Then make sure that `/src/objc/objc.vcxproj` is still valid.
   See [documentation of the objc port](objc.md) for more details.
 
+> For dependencies included as git submodules, [Atlassian blog post](https://www.atlassian.com/blog/git/git-submodules-workflows-tips) with some tips for working with git submodules might be useful.
+
 ## How to build (on 64-bit Windows with Visual Studio 2017)
 
 1. Checkout the repository and make sure submodules are checked out as well.
