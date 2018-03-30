@@ -13,6 +13,42 @@ protected:
 	~nocopy_t() {}
 };
 
+template <bool Debug> class rwlock_tt;
+
+#if DEBUG
+#   define LOCKDEBUG 1
+#else
+#	define LOCKDEBUG 0
+#endif
+
+using rwlock_t = rwlock_tt<LOCKDEBUG>;
+
+// CHANGE: "extern" keyword was removed from these definitions,
+// since it was most likely redundant.
+void lockdebug_remember_rwlock(rwlock_tt<true> *lock);
+void lockdebug_rwlock_read(rwlock_tt<true> *lock);
+void lockdebug_rwlock_try_read_success(rwlock_tt<true> *lock);
+void lockdebug_rwlock_unlock_read(rwlock_tt<true> *lock);
+void lockdebug_rwlock_write(rwlock_tt<true> *lock);
+void lockdebug_rwlock_try_write_success(rwlock_tt<true> *lock);
+void lockdebug_rwlock_unlock_write(rwlock_tt<true> *lock);
+void lockdebug_rwlock_assert_reading(rwlock_tt<true> *lock);
+void lockdebug_rwlock_assert_writing(rwlock_tt<true> *lock);
+void lockdebug_rwlock_assert_locked(rwlock_tt<true> *lock);
+void lockdebug_rwlock_assert_unlocked(rwlock_tt<true> *lock);
+
+static inline void lockdebug_remember_rwlock(rwlock_tt<false> *) { }
+static inline void lockdebug_rwlock_read(rwlock_tt<false> *) { }
+static inline void lockdebug_rwlock_try_read_success(rwlock_tt<false> *) { }
+static inline void lockdebug_rwlock_unlock_read(rwlock_tt<false> *) { }
+static inline void lockdebug_rwlock_write(rwlock_tt<false> *) { }
+static inline void lockdebug_rwlock_try_write_success(rwlock_tt<false> *) { }
+static inline void lockdebug_rwlock_unlock_write(rwlock_tt<false> *) { }
+static inline void lockdebug_rwlock_assert_reading(rwlock_tt<false> *) { }
+static inline void lockdebug_rwlock_assert_writing(rwlock_tt<false> *) { }
+static inline void lockdebug_rwlock_assert_locked(rwlock_tt<false> *) { }
+static inline void lockdebug_rwlock_assert_unlocked(rwlock_tt<false> *) { }
+
 struct fork_unsafe_lock_t { };
 
 template <bool Debug>
@@ -26,14 +62,6 @@ public:
 	rwlock_tt(const fork_unsafe_lock_t unsafe)
 		: mLock(PTHREAD_RWLOCK_INITIALIZER) {}
 };
-
-#if DEBUG
-#   define LOCKDEBUG 1
-#else
-#	define LOCKDEBUG 0
-#endif
-
-using rwlock_t = rwlock_tt<LOCKDEBUG>;
 
 // [Apple] Declarations of all locks used in the runtime.
 

@@ -17,6 +17,9 @@
     <ClCompile Include="sel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="locks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\objc\runtime.hpp">

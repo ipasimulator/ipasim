@@ -206,6 +206,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="locks.cpp" />
     <ClCompile Include="sel.cpp" />
   </ItemGroup>
   <ItemGroup>
