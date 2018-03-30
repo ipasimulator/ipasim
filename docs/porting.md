@@ -27,3 +27,7 @@ So, an alternative and better approach is to create an UWP `.dll` project in Vis
 
 When porting code by copying it (or cloning from a remote repository, etc.), we add comments prefixed with `[port]` to indicate that those are our comments.
 And all changes to the source code are described by nearby comments prefixed with `[port] CHANGE:`.
+
+**TODO: Maybe we shouldn't ever change the original source code directly, but rather create a new branch in a repository containing just the dependency, then making the changes in this separate branch and adding it as a submodule.
+This way, we could easily update the dependency by pulling changes into the branch with the original code and then merging it with the branch containing the changes.
+Still, comments explaining those changes should be added, though.**
