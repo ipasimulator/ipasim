@@ -82,6 +82,9 @@
     <ClCompile Include="..\..\deps\pthreads.2\tsd.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="stubs.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\deps\pthreads.2\config.h">
@@ -103,6 +106,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\deps\pthreads.2\sched.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stubs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

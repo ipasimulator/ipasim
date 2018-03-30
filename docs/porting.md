@@ -22,3 +22,8 @@ Also, if the library actually calls something that's not supported on UWP, some 
 ## Creating UWP `.dll` project
 
 So, an alternative and better approach is to create an UWP `.dll` project in Visual Studio, adding the original source code files into it and finally creating our own stub functions which will do what makes sense for our application.
+
+## Comments in code
+
+When porting code by copying it (or cloning from a remote repository, etc.), we add comments prefixed with `[port]` to indicate that those are our comments.
+And all changes to the source code are described by nearby comments prefixed with `[port] CHANGE:`.

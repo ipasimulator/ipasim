@@ -36,6 +36,7 @@
 
 #include "pthread.h"
 #include "implement.h"
+#include "stubs.h" // [port] CHANGE: Added.
 
 /*
  * Handle to quserex.dll 
