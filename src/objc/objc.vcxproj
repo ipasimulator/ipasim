@@ -200,15 +200,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\objc\locks.hpp" />
-    <ClInclude Include="include\objc\maptable.hpp" />
-    <ClInclude Include="include\objc\objc.hpp" />
-    <ClInclude Include="include\objc\runtime.hpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="locks.cpp" />
-    <ClCompile Include="sel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\pthread\pthread.vcxproj">
