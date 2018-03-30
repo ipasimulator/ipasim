@@ -1,6 +1,6 @@
 # Porting
 
-This document contains general notes on porting (since there is a lot of porting in this project).
+This document contains general notes about porting Windows libraries to UWP (Universal Windows Platform), since there is a lot of such porting in this project.
 
 ## Using native `.dll`s in UWP apps
 
