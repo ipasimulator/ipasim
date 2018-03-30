@@ -61,6 +61,90 @@ public:
 	}
 	rwlock_tt(const fork_unsafe_lock_t unsafe)
 		: mLock(PTHREAD_RWLOCK_INITIALIZER) {}
+
+	void read()
+	{
+		lockdebug_rwlock_read(this);
+
+		qosStartOverride();
+		int err = pthread_rwlock_rdlock(&mLock);
+		if (err) _objc_fatal("pthread_rwlock_rdlock failed (%d)", err);
+	}
+	void unlockRead()
+	{
+		lockdebug_rwlock_unlock_read(this);
+
+		int err = pthread_rwlock_unlock(&mLock);
+		if (err) _objc_fatal("pthread_rwlock_unlock failed (%d)", err);
+		qosEndOverride();
+	}
+	bool tryRead()
+	{
+		qosStartOverride();
+		int err = pthread_rwlock_tryrdlock(&mLock);
+		if (err == 0) {
+			lockdebug_rwlock_try_read_success(this);
+			return true;
+		}
+		else if (err == EBUSY) {
+			qosEndOverride();
+			return false;
+		}
+		else {
+			_objc_fatal("pthread_rwlock_tryrdlock failed (%d)", err);
+		}
+	}
+	void write()
+	{
+		lockdebug_rwlock_write(this);
+
+		qosStartOverride();
+		int err = pthread_rwlock_wrlock(&mLock);
+		if (err) _objc_fatal("pthread_rwlock_wrlock failed (%d)", err);
+	}
+	void unlockWrite()
+	{
+		lockdebug_rwlock_unlock_write(this);
+
+		int err = pthread_rwlock_unlock(&mLock);
+		if (err) _objc_fatal("pthread_rwlock_unlock failed (%d)", err);
+		qosEndOverride();
+	}
+	bool tryWrite()
+	{
+		qosStartOverride();
+		int err = pthread_rwlock_trywrlock(&mLock);
+		if (err == 0) {
+			lockdebug_rwlock_try_write_success(this);
+			return true;
+		}
+		else if (err == EBUSY) {
+			qosEndOverride();
+			return false;
+		}
+		else {
+			_objc_fatal("pthread_rwlock_trywrlock failed (%d)", err);
+		}
+	}
+	void forceReset()
+	{
+		lockdebug_rwlock_unlock_write(this);
+
+		bzero(&mLock, sizeof(mLock));
+		mLock = pthread_rwlock_t PTHREAD_RWLOCK_INITIALIZER;
+	}
+	void assertReading() {
+		lockdebug_rwlock_assert_reading(this);
+	}
+	void assertWriting() {
+		lockdebug_rwlock_assert_writing(this);
+	}
+	void assertLocked() {
+		lockdebug_rwlock_assert_locked(this);
+	}
+	void assertUnlocked() {
+		lockdebug_rwlock_assert_unlocked(this);
+	}
 };
 
 // [Apple] Declarations of all locks used in the runtime.

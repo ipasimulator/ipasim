@@ -201,6 +201,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\objc\locks.hpp" />
+    <ClInclude Include="include\objc\maptable.hpp" />
     <ClInclude Include="include\objc\objc.hpp" />
     <ClInclude Include="include\objc\runtime.hpp" />
   </ItemGroup>
