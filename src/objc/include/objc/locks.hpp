@@ -13,6 +13,8 @@ protected:
 	~nocopy_t() {}
 };
 
+struct fork_unsafe_lock_t { };
+
 template <bool Debug>
 class rwlock_tt : nocopy_t {
 private:
