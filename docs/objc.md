@@ -77,3 +77,10 @@ Changes from the Apple's source should be well documented and comments documenti
 
 To ease porting from Apple's sources, which use `pthreads` APIs for threading, we use `pthreads-win32` wrapper library.
 More specifically, we use the `pthreadVC2.dll`, i.e. the one that doesn't use structured exceptions (since iOS's `pthreads` most likely don't do that either **TODO: Verify!**) and is for MSVC compiler.
+
+## Porting Apple's runtime
+
+Now, we are trying to build the Apple's source code directly for UWP.
+Currently on x86, we build it against the MacOSX SDK (`/deps/headers/MacOS*.sdk/`), but there's also an alternative - to build it against the iPhoneSimulator SDK.
+Although, there shouldn't be much difference, because the Objective-C runtime shouldn't depend on anything platform specific in those headers.
+**TODO: Decide properly what SDK should we build against.**
