@@ -246,3 +246,7 @@ Generated Files/
 /docs/*.pdf
 /out/
 /lib/invokes.*
+/deps/headers/MacOSX*.sdk/usr/share
+/deps/headers/MacOSX*.sdk/**/*.o
+/deps/headers/MacOSX*.sdk/**/*.a
+/deps/headers/MacOSX*.sdk/**/*.tbd

@@ -21,8 +21,10 @@ A list of them follows.
 - `WinObjC` (in `packages` folder) - just restore NuGet packages for the `IpaSimulator` project to get the latest `WinObjC` files (`.h` files used by `HeadersAnalyzer` and `.dll`s used by the very `IpaSimulator`).
 - `LiefPort` and `UnicornPort` (in `lib` folder) - not easy to update right now since there are lots of changes from the original version.
   This should be easier in the future either by making them submodules or using `clang` libraries instead.
-- `iPhoneOS.sdk` (in `deps` folder) - just download the latest iPhone SDK and replace the contents of this folder with it.
+- `iPhoneOS*.sdk` and `MacOSX*.sdk` (in `deps` folder) - just download the latest SDK and replace the contents of this folder with it.
+  See [`README.md` file there](../deps/headers/README.md) for more information.
   Then rebuild `IpaSimulator` (which should in turn run `HeadersAnalyzer` that uses `.h` and other files from this SDK).
+  And rebuild `objc` port (which uses `.h` files from this SDK).
 - `pthreads.2` - just extract the latest `pthreads-w32-*-*-*-release.zip` from [pthreads-win32's ftp](ftp://sourceware.org/pub/pthreads-win32).
   Then make sure that `/src/pthread/pthread.vcxproj` is still valid (i.e., changes made to `/deps/pthreads.2/Makefile` and `/deps/pthreads.2/config.h` are reflected in the `.vcxproj`).
 - `objc4` - just pull the latest commit of the `port` branch of the submodule.
