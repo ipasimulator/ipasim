@@ -125,8 +125,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\;$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TARGET_OS_IPHONE;_WINT_T;_INTPTR_T;_UINTPTR_T;__OBJC2__;TARGET_OS_IPHONE;HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;TARGET_CPU_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -138,8 +138,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\;$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TARGET_OS_IPHONE;_WINT_T;_INTPTR_T;_UINTPTR_T;__OBJC2__;TARGET_OS_IPHONE;HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;TARGET_CPU_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -151,8 +151,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\;$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TARGET_OS_IPHONE;_WINT_T;_INTPTR_T;_UINTPTR_T;__OBJC2__;TARGET_OS_IPHONE;HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;TARGET_CPU_ARM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -164,8 +164,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\;$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TARGET_OS_IPHONE;_WINT_T;_INTPTR_T;_UINTPTR_T;__OBJC2__;TARGET_OS_IPHONE;HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;TARGET_CPU_ARM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -177,8 +177,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\;$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TARGET_OS_IPHONE;_WINT_T;_INTPTR_T;_UINTPTR_T;__OBJC2__;TARGET_OS_IPHONE;HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -190,8 +190,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\;$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>TARGET_OS_IPHONE;_WINT_T;_INTPTR_T;_UINTPTR_T;__OBJC2__;TARGET_OS_IPHONE;HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -208,13 +208,27 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\deps\objc4\runtime\a1a2-blocktramps-arm.s" />
-    <ClCompile Include="..\..\deps\objc4\runtime\a1a2-blocktramps-arm64.s" />
-    <ClCompile Include="..\..\deps\objc4\runtime\a1a2-blocktramps-i386.s" />
-    <ClCompile Include="..\..\deps\objc4\runtime\a1a2-blocktramps-x86_64.s" />
-    <ClCompile Include="..\..\deps\objc4\runtime\a2a3-blocktramps-arm.s" />
-    <ClCompile Include="..\..\deps\objc4\runtime\a2a3-blocktramps-i386.s" />
-    <ClCompile Include="..\..\deps\objc4\runtime\a2a3-blocktramps-x86_64.s" />
+    <None Include="..\..\deps\objc4\runtime\a1a2-blocktramps-arm.s">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\deps\objc4\runtime\a1a2-blocktramps-arm64.s">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\deps\objc4\runtime\a1a2-blocktramps-i386.s">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\deps\objc4\runtime\a1a2-blocktramps-x86_64.s">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\deps\objc4\runtime\a2a3-blocktramps-arm.s">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\deps\objc4\runtime\a2a3-blocktramps-i386.s">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\deps\objc4\runtime\a2a3-blocktramps-x86_64.s">
+      <FileType>Document</FileType>
+    </None>
     <ClCompile Include="..\..\deps\objc4\runtime\hashtable2.mm" />
     <ClCompile Include="..\..\deps\objc4\runtime\maptable.mm" />
     <ClCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-arm.s" />
