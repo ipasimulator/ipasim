@@ -42,35 +42,35 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v141_clang_c2</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -206,6 +206,60 @@
     <ProjectReference Include="..\pthread\pthread.vcxproj">
       <Project>{ffdb4f09-216b-4777-b9ea-8637aee3f384}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\deps\objc4\runtime\a1a2-blocktramps-arm.s" />
+    <ClCompile Include="..\..\deps\objc4\runtime\a1a2-blocktramps-arm64.s" />
+    <ClCompile Include="..\..\deps\objc4\runtime\a1a2-blocktramps-i386.s" />
+    <ClCompile Include="..\..\deps\objc4\runtime\a1a2-blocktramps-x86_64.s" />
+    <ClCompile Include="..\..\deps\objc4\runtime\a2a3-blocktramps-arm.s" />
+    <ClCompile Include="..\..\deps\objc4\runtime\a2a3-blocktramps-i386.s" />
+    <ClCompile Include="..\..\deps\objc4\runtime\a2a3-blocktramps-x86_64.s" />
+    <ClCompile Include="..\..\deps\objc4\runtime\hashtable2.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\maptable.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-arm.s" />
+    <ClCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-arm64.s" />
+    <ClCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-i386.s" />
+    <ClCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-simulator-i386.s" />
+    <ClCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-simulator-x86_64.s" />
+    <ClCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-x86_64.s" />
+    <ClCompile Include="..\..\deps\objc4\runtime\NSObject.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-accessors.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-auto.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-block-trampolines.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-cache-old.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-cache.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-class-old.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-class.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-errors.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-exception.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-file-old.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-file.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-initialize.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-layout.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-load.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-loadmethod.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-lockdebug.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-opt.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-os.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-probes.d" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-references.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-runtime-new.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-runtime-old.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-runtime.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-sel-old.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-sel-set.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-sel-table.s" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-sel.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-sync.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-typeencoding.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\objc-weak.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\Object.mm" />
+    <ClCompile Include="..\..\deps\objc4\runtime\OldClasses.subproj\List.m" />
+    <ClCompile Include="..\..\deps\objc4\runtime\Protocol.mm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\deps\objc4\runtime\objc-config.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
