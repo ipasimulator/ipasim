@@ -129,7 +129,8 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__;TARGET_OS_IPHONE;TARGET_CPU_X86</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;TARGET_CPU_X86</PreprocessorDefinitions>
+      <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -139,7 +140,8 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__;TARGET_OS_IPHONE;TARGET_CPU_X86</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;TARGET_CPU_X86</PreprocessorDefinitions>
+      <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
@@ -149,7 +151,8 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__;TARGET_OS_IPHONE;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;</PreprocessorDefinitions>
+      <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
@@ -159,7 +162,8 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__;TARGET_OS_IPHONE;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;</PreprocessorDefinitions>
+      <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -169,7 +173,8 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__;TARGET_OS_IPHONE;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;</PreprocessorDefinitions>
+      <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -179,7 +184,8 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__;TARGET_OS_IPHONE;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;</PreprocessorDefinitions>
+      <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

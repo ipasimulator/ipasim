@@ -84,3 +84,9 @@ Now, we are trying to build the Apple's source code directly for UWP.
 Currently on x86, we build it against the MacOSX SDK (`/deps/headers/MacOS*.sdk/`), but there's also an alternative - to build it against the iPhoneSimulator SDK.
 Although, there shouldn't be much difference, because the Objective-C runtime shouldn't depend on anything platform specific in those headers.
 **TODO: Decide properly what SDK should we build against.**
+
+### Preprocessor definitions
+
+- `TARGET_OS_*` and `TARGET_CPU_*` - see `TargetConditionals.h` in MacOSX SDK for more information about these.
+  The apps we are trying to emulate are iPhone apps, so we are defining `TARGET_OS_IOS` while building the `objc` runtime to simulate that environment.
+- `__OBJC2__` - we are building the new runtime (which is the only one available on iPhones anyway).
