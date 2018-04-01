@@ -83,6 +83,7 @@ More specifically, we use the `pthreadVC2.dll`, i.e. the one that doesn't use st
 Now, we are trying to build the Apple's source code directly for UWP.
 **TODO: If porting the Apple's runtime is the approach we choose, delete or incorporate the docs above.
 Or better - leave it there as an option that we didn't choose after all.**
+**TODO: Maybe extract from Starboard SDK information about how to build this using just clang and then use (c)make or something like that.**
 
 ### Building against a SDK
 
@@ -100,3 +101,9 @@ But we haven't tried the opposite (i.e., including everything from the MacOSX SD
 - `TARGET_OS_*` and `TARGET_CPU_*` - see `TargetConditionals.h` in MacOSX SDK for more information about these.
   The apps we are trying to emulate are iPhone apps, so we are defining `TARGET_OS_IOS` while building the `objc` runtime to simulate that environment.
 - `__OBJC2__` - we are building the new runtime (which is the only one available on iPhones anyway).
+
+### Proxy `#include`s
+
+Because we definitely don't want to include the whole MacOSX SDK (for example, `<stdio.h>` and similar should be included from MSVC instead) but some header files are actually needed (they usually just contain macros, so it's safe to include them), we added proxy `.h` files.
+These just `#include` the correct `.h` from MacOSX SDK, or sometimes don't do anything, if we don't need the `.h` actually (it was probably included through some other `.h` file).
+Also, only the safe `.h` files are proxied this way, so it's ensured that nothing else is included from the MacOSX SDK.

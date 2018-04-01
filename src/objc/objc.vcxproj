@@ -130,7 +130,7 @@
     </Link>
     <ClangCompile>
       <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;TARGET_CPU_X86</PreprocessorDefinitions>
-      <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
+      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -141,7 +141,7 @@
     </Link>
     <ClangCompile>
       <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;TARGET_CPU_X86</PreprocessorDefinitions>
-      <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
+      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
@@ -152,7 +152,7 @@
     </Link>
     <ClangCompile>
       <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;</PreprocessorDefinitions>
-      <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
+      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
@@ -163,7 +163,7 @@
     </Link>
     <ClangCompile>
       <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;</PreprocessorDefinitions>
-      <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
+      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -174,7 +174,7 @@
     </Link>
     <ClangCompile>
       <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;</PreprocessorDefinitions>
-      <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
+      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -185,7 +185,7 @@
     </Link>
     <ClangCompile>
       <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;</PreprocessorDefinitions>
-      <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
+      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -349,6 +349,23 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\deps\objc4\runtime\objc-config.h" />
+    <ClInclude Include="Availability.h" />
+    <ClInclude Include="AvailabilityInternal.h" />
+    <ClInclude Include="AvailabilityMacros.h" />
+    <ClInclude Include="include\architecture\byte_order.h" />
+    <ClInclude Include="include\i386\_types.h" />
+    <ClInclude Include="include\mach-o\loader.h" />
+    <ClInclude Include="include\mach\boolean.h" />
+    <ClInclude Include="include\mach\i386\boolean.h" />
+    <ClInclude Include="include\mach\i386\vm_param.h" />
+    <ClInclude Include="include\mach\i386\vm_types.h" />
+    <ClInclude Include="include\mach\machine.h" />
+    <ClInclude Include="include\mach\machine\boolean.h" />
+    <ClInclude Include="include\mach\machine\thread_status.h" />
+    <ClInclude Include="include\mach\machine\vm_types.h" />
+    <ClInclude Include="include\mach\vm_prot.h" />
+    <ClInclude Include="include\mach\vm_types.h" />
+    <ClInclude Include="TargetConditionals.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -11,10 +11,79 @@
     <Filter Include="Source Files">
       <UniqueIdentifier>{04bdf6e2-e119-4ca4-808d-4602b5008ff4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\mach-o">
+      <UniqueIdentifier>{0edc6a6e-96b7-4426-9c72-8fad7cf7f899}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\mach">
+      <UniqueIdentifier>{ecae3af2-c240-4f1e-9829-8e4485c39b91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\mach\machine">
+      <UniqueIdentifier>{a2c2e8d9-9a7e-45f1-98db-ee91886bed4f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\mach\i386">
+      <UniqueIdentifier>{28d64c3b-51b4-45ec-8ad7-f6ae98f1ce29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\i386">
+      <UniqueIdentifier>{88909078-7d41-450a-be3b-967846f562e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\architecture">
+      <UniqueIdentifier>{6118407f-4da6-4d35-a9cc-ab5049c7713e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\deps\objc4\runtime\objc-config.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TargetConditionals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Availability.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AvailabilityInternal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AvailabilityMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mach-o\loader.h">
+      <Filter>Header Files\mach-o</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mach\machine.h">
+      <Filter>Header Files\mach</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mach\vm_types.h">
+      <Filter>Header Files\mach</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mach\machine\vm_types.h">
+      <Filter>Header Files\mach\machine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mach\i386\vm_types.h">
+      <Filter>Header Files\mach\i386</Filter>
+    </ClInclude>
+    <ClInclude Include="include\i386\_types.h">
+      <Filter>Header Files\i386</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mach\i386\vm_param.h">
+      <Filter>Header Files\mach\i386</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mach\boolean.h">
+      <Filter>Header Files\mach</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mach\machine\boolean.h">
+      <Filter>Header Files\mach\machine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mach\i386\boolean.h">
+      <Filter>Header Files\mach\i386</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mach\vm_prot.h">
+      <Filter>Header Files\mach</Filter>
+    </ClInclude>
+    <ClInclude Include="include\mach\machine\thread_status.h">
+      <Filter>Header Files\mach\machine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\architecture\byte_order.h">
+      <Filter>Header Files\architecture</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
