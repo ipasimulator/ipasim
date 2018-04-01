@@ -81,12 +81,22 @@ More specifically, we use the `pthreadVC2.dll`, i.e. the one that doesn't use st
 ## Porting Apple's runtime
 
 Now, we are trying to build the Apple's source code directly for UWP.
+**TODO: If porting the Apple's runtime is the approach we choose, delete or incorporate the docs above.
+Or better - leave it there as an option that we didn't choose after all.**
+
+### Building against a SDK
+
 Currently on x86, we build it against the MacOSX SDK (`/deps/headers/MacOS*.sdk/`), but there's also an alternative - to build it against the iPhoneSimulator SDK.
 Although, there shouldn't be much difference, because the Objective-C runtime shouldn't depend on anything platform specific in those headers.
 **TODO: Decide properly what SDK should we build against.**
 
+Our approach now is to try including as little of the SDK as possible.
+We include the standard C++ things from MSVC instead, since we are building the library for UWP and the MacOSX SDK could use some Darwin-specifig things.
+But we haven't tried the opposite (i.e., including everything from the MacOSX SDK and not using the MSVC SDKs at all) yet, it might be cool as well.
+
 ### Preprocessor definitions
 
+- `OBJC_PORT` - see [general notes about porting](porting.md) for more information.
 - `TARGET_OS_*` and `TARGET_CPU_*` - see `TargetConditionals.h` in MacOSX SDK for more information about these.
   The apps we are trying to emulate are iPhone apps, so we are defining `TARGET_OS_IOS` while building the `objc` runtime to simulate that environment.
 - `__OBJC2__` - we are building the new runtime (which is the only one available on iPhones anyway).

@@ -129,7 +129,7 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;TARGET_CPU_X86</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;TARGET_CPU_X86</PreprocessorDefinitions>
       <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
@@ -140,7 +140,7 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;TARGET_CPU_X86</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;TARGET_CPU_X86</PreprocessorDefinitions>
       <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
@@ -151,7 +151,7 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;</PreprocessorDefinitions>
       <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
@@ -162,7 +162,7 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;</PreprocessorDefinitions>
       <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
@@ -173,7 +173,7 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;</PreprocessorDefinitions>
       <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
@@ -184,7 +184,7 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;</PreprocessorDefinitions>
       <IncludePaths>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
