@@ -19,6 +19,7 @@ A list of them follows.
   Then rebuild `IpaSimulator` (which doesn't use those libraries right now, but its dependent library, `HeadersAnalyzer`, does).
 - `yaml-cpp` - the same old story.
 - `WinObjC` (in `packages` folder) - just restore NuGet packages for the `IpaSimulator` project to get the latest `WinObjC` files (`.h` files used by `HeadersAnalyzer` and `.dll`s used by the very `IpaSimulator`).
+  Also, the `objc` project uses `/packages/WinObjC.Language.0.2.171110/build/msvc/starboard-sdk.props` build customization, so it needs to be updated to the new version.
 - `LiefPort` and `UnicornPort` (in `lib` folder) - not easy to update right now since there are lots of changes from the original version.
   This should be easier in the future either by making them submodules or using `clang` libraries instead.
 - `iPhoneOS*.sdk` and `MacOSX*.sdk` (in `deps` folder) - just download the latest SDK and replace the contents of this folder with it.

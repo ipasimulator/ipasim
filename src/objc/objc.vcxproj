@@ -42,38 +42,39 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141_clang_c2</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141_clang_c2</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141_clang_c2</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141_clang_c2</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141_clang_c2</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v141_clang_c2</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="..\..\packages\WinObjC.Language.0.2.171110\build\msvc\starboard-sdk.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -122,85 +123,69 @@
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\;$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TARGET_OS_IPHONE;_WINT_T;_INTPTR_T;_UINTPTR_T;__OBJC2__;TARGET_OS_IPHONE;HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;TARGET_CPU_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
+    <ClangCompile>
+      <PreprocessorDefinitions>__OBJC2__;TARGET_OS_IPHONE;TARGET_CPU_X86</PreprocessorDefinitions>
+    </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\;$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TARGET_OS_IPHONE;_WINT_T;_INTPTR_T;_UINTPTR_T;__OBJC2__;TARGET_OS_IPHONE;HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;TARGET_CPU_X86;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
+    <ClangCompile>
+      <PreprocessorDefinitions>__OBJC2__;TARGET_OS_IPHONE;TARGET_CPU_X86</PreprocessorDefinitions>
+    </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
-    <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\;$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TARGET_OS_IPHONE;_WINT_T;_INTPTR_T;_UINTPTR_T;__OBJC2__;TARGET_OS_IPHONE;HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;TARGET_CPU_ARM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
+    <ClangCompile>
+      <PreprocessorDefinitions>__OBJC2__;TARGET_OS_IPHONE;</PreprocessorDefinitions>
+    </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
-    <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\;$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TARGET_OS_IPHONE;_WINT_T;_INTPTR_T;_UINTPTR_T;__OBJC2__;TARGET_OS_IPHONE;HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;TARGET_CPU_ARM;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
+    <ClangCompile>
+      <PreprocessorDefinitions>__OBJC2__;TARGET_OS_IPHONE;</PreprocessorDefinitions>
+    </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\;$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TARGET_OS_IPHONE;_WINT_T;_INTPTR_T;_UINTPTR_T;__OBJC2__;TARGET_OS_IPHONE;HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
+    <ClangCompile>
+      <PreprocessorDefinitions>__OBJC2__;TARGET_OS_IPHONE;</PreprocessorDefinitions>
+    </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\deps\headers\MacOSX10.13.sdk\usr\include\;$(ProjectDir)..\..\deps\pthreads.2\;$(ProjectDir)..\pthread\;$(ProjectDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>TARGET_OS_IPHONE;_WINT_T;_INTPTR_T;_UINTPTR_T;__OBJC2__;TARGET_OS_IPHONE;HAVE_STRUCT_TIMESPEC;WIN32_LEAN_AND_MEAN;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
+    <ClangCompile>
+      <PreprocessorDefinitions>__OBJC2__;TARGET_OS_IPHONE;</PreprocessorDefinitions>
+    </ClangCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="dllmain.cpp" />
+    <ClangCompile Include="dllmain.cpp">
+      <FileType>Document</FileType>
+    </ClangCompile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\pthread\pthread.vcxproj">
@@ -208,74 +193,159 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\deps\objc4\runtime\a1a2-blocktramps-arm.s">
+    <ClangCompile Include="..\..\deps\objc4\runtime\a1a2-blocktramps-arm.s">
       <FileType>Document</FileType>
-    </None>
-    <None Include="..\..\deps\objc4\runtime\a1a2-blocktramps-arm64.s">
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\a1a2-blocktramps-arm64.s">
       <FileType>Document</FileType>
-    </None>
-    <None Include="..\..\deps\objc4\runtime\a1a2-blocktramps-i386.s">
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\a1a2-blocktramps-i386.s">
       <FileType>Document</FileType>
-    </None>
-    <None Include="..\..\deps\objc4\runtime\a1a2-blocktramps-x86_64.s">
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\a1a2-blocktramps-x86_64.s">
       <FileType>Document</FileType>
-    </None>
-    <None Include="..\..\deps\objc4\runtime\a2a3-blocktramps-arm.s">
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\a2a3-blocktramps-arm.s">
       <FileType>Document</FileType>
-    </None>
-    <None Include="..\..\deps\objc4\runtime\a2a3-blocktramps-i386.s">
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\a2a3-blocktramps-i386.s">
       <FileType>Document</FileType>
-    </None>
-    <None Include="..\..\deps\objc4\runtime\a2a3-blocktramps-x86_64.s">
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\a2a3-blocktramps-x86_64.s">
       <FileType>Document</FileType>
-    </None>
-    <ClCompile Include="..\..\deps\objc4\runtime\hashtable2.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\maptable.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-arm.s" />
-    <ClCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-arm64.s" />
-    <ClCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-i386.s" />
-    <ClCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-simulator-i386.s" />
-    <ClCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-simulator-x86_64.s" />
-    <ClCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-x86_64.s" />
-    <ClCompile Include="..\..\deps\objc4\runtime\NSObject.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-accessors.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-auto.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-block-trampolines.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-cache-old.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-cache.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-class-old.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-class.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-errors.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-exception.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-file-old.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-file.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-initialize.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-layout.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-load.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-loadmethod.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-lockdebug.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-opt.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-os.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-probes.d" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-references.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-runtime-new.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-runtime-old.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-runtime.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-sel-old.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-sel-set.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-sel-table.s" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-sel.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-sync.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-typeencoding.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\objc-weak.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\Object.mm" />
-    <ClCompile Include="..\..\deps\objc4\runtime\OldClasses.subproj\List.m" />
-    <ClCompile Include="..\..\deps\objc4\runtime\Protocol.mm" />
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\hashtable2.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\maptable.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-arm.s">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-arm64.s">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-i386.s">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-simulator-i386.s">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-simulator-x86_64.s">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\Messengers.subproj\objc-msg-x86_64.s">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\NSObject.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-accessors.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-auto.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-block-trampolines.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-cache-old.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-cache.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-class-old.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-class.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-errors.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-exception.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-file-old.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-file.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-initialize.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-layout.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-load.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-loadmethod.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-lockdebug.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-opt.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-os.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-probes.d">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-references.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-runtime-new.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-runtime-old.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-runtime.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-sel-old.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-sel-set.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-sel-table.s">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-sel.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-sync.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-typeencoding.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\objc-weak.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\Object.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\OldClasses.subproj\List.m">
+      <FileType>Document</FileType>
+    </ClangCompile>
+    <ClangCompile Include="..\..\deps\objc4\runtime\Protocol.mm">
+      <FileType>Document</FileType>
+    </ClangCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\deps\objc4\runtime\objc-config.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\..\packages\WinObjC.Language.0.2.171110\build\msvc\starboard-sdk.targets" />
   </ImportGroup>
 </Project>
