@@ -129,8 +129,8 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;TARGET_CPU_X86</PreprocessorDefinitions>
-      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\</IncludePaths>
+      <PreprocessorDefinitions>HAVE_STRUCT_TIMESPEC;__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;TARGET_CPU_X86</PreprocessorDefinitions>
+      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\;$(ProjectDir)..\..\deps\pthreads.2\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -140,8 +140,8 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;TARGET_CPU_X86</PreprocessorDefinitions>
-      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\</IncludePaths>
+      <PreprocessorDefinitions>HAVE_STRUCT_TIMESPEC;__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;TARGET_CPU_X86</PreprocessorDefinitions>
+      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\;$(ProjectDir)..\..\deps\pthreads.2\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm'">
@@ -151,8 +151,8 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;</PreprocessorDefinitions>
-      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\</IncludePaths>
+      <PreprocessorDefinitions>HAVE_STRUCT_TIMESPEC;__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;</PreprocessorDefinitions>
+      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\;$(ProjectDir)..\..\deps\pthreads.2\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm'">
@@ -162,8 +162,8 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;</PreprocessorDefinitions>
-      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\</IncludePaths>
+      <PreprocessorDefinitions>HAVE_STRUCT_TIMESPEC;__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;</PreprocessorDefinitions>
+      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\;$(ProjectDir)..\..\deps\pthreads.2\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -173,8 +173,8 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;</PreprocessorDefinitions>
-      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\</IncludePaths>
+      <PreprocessorDefinitions>HAVE_STRUCT_TIMESPEC;__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;</PreprocessorDefinitions>
+      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\;$(ProjectDir)..\..\deps\pthreads.2\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -184,8 +184,8 @@
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
     </Link>
     <ClangCompile>
-      <PreprocessorDefinitions>__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;</PreprocessorDefinitions>
-      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\</IncludePaths>
+      <PreprocessorDefinitions>HAVE_STRUCT_TIMESPEC;__OBJC2__=1;TARGET_OS_MAC;TARGET_OS_IPHONE;TARGET_OS_IOS;OBJC_PORT;</PreprocessorDefinitions>
+      <IncludePaths>$(ProjectDir)include\;$(ProjectDir)..\..\deps\headers\;$(ProjectDir)..\..\deps\pthreads.2\</IncludePaths>
     </ClangCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

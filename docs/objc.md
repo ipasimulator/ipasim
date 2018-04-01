@@ -101,6 +101,7 @@ But we haven't tried the opposite (i.e., including everything from the MacOSX SD
 - `TARGET_OS_*` and `TARGET_CPU_*` - see `TargetConditionals.h` in MacOSX SDK for more information about these.
   The apps we are trying to emulate are iPhone apps, so we are defining `TARGET_OS_IOS` while building the `objc` runtime to simulate that environment.
 - `__OBJC2__` - we are building the new runtime (which is the only one available on iPhones anyway).
+- `HAVE_STRUCT_TIMESPEC` - needed for `<pthread.h>` from the pthreads-win32 library.
 
 ### Proxy `#include`s
 
