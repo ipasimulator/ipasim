@@ -91,8 +91,8 @@ Although, there shouldn't be much difference, because the Objective-C runtime sh
 **TODO: Decide properly what SDK should we build against.**
 
 Our approach now is to try including as little of the SDK as possible.
-We include the standard C++ things from MSVC instead, since we are building the library for UWP and the MacOSX SDK could use some Darwin-specifig things.
-But we haven't tried the opposite (i.e., including everything from the MacOSX SDK and not using the MSVC SDKs at all) yet, it might be cool as well.
+We include the standard C++ things from MSVC instead, since we are building the library for UWP and the MacOSX SDK could use some Darwin-specific things.
+But we haven't tried the opposite (i.e., including everything from the MacOSX SDK and not using the MSVC SDKs at all) yet, it might be cool as well (although it seems unlikely to work because of the Darwin-specific things - see for example `stdio.h` in MacOSX SDK).
 
 ### Preprocessor definitions
 
