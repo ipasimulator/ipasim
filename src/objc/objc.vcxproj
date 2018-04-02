@@ -365,6 +365,8 @@
     <ClInclude Include="include\mach\machine\vm_types.h" />
     <ClInclude Include="include\mach\vm_prot.h" />
     <ClInclude Include="include\mach\vm_types.h" />
+    <ClInclude Include="include\System\machine\cpu_capabilities.h" />
+    <ClInclude Include="include\System\pthread_machdep.h" />
     <ClInclude Include="TargetConditionals.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

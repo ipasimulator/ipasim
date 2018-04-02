@@ -29,6 +29,12 @@
     <Filter Include="Header Files\architecture">
       <UniqueIdentifier>{6118407f-4da6-4d35-a9cc-ab5049c7713e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\System">
+      <UniqueIdentifier>{43b72514-542b-4615-aa4f-37e395852fb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\System\machine">
+      <UniqueIdentifier>{aec50768-2224-4344-a7e2-1f5522118ec1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\deps\objc4\runtime\objc-config.h">
@@ -84,6 +90,12 @@
     </ClInclude>
     <ClInclude Include="include\architecture\byte_order.h">
       <Filter>Header Files\architecture</Filter>
+    </ClInclude>
+    <ClInclude Include="include\System\pthread_machdep.h">
+      <Filter>Header Files\System</Filter>
+    </ClInclude>
+    <ClInclude Include="include\System\machine\cpu_capabilities.h">
+      <Filter>Header Files\System\machine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

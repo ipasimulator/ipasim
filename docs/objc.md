@@ -27,6 +27,9 @@ Links to some interesting projects related to this follow.
   - [StackOverflow] [Explanation of the repository](https://stackoverflow.com/questions/23469738/debugging-objc4-532-2-on-os-x-10-9)
 - [GitHub] [oneofai's buildable fork](https://github.com/oneofai/objc4)
 - [GitHub] [Mirror of objc4 with added comments](https://github.com/xuhong1105/objc4-680)
+- [GitHub] [ishepherdMiner's buildable fork](https://github.com/ishepherdMiner/objc4-709/tree/v1.0)
+  - [blog] [ishepherdMiner's blog post about `objc4-709`](http://www.iosugar.com/2017/05/05/objc-709-project-structures/)
+  - [blog] [ishepherdMiner's blog post about `objc4-706`](http://www.iosugar.com/2017/02/11/objc-706-project-structures/)
 
 Unfortunately, most of the projects above are for building the runtime on macOS.
 And the others can build only the old runtime for Win32 (which is what even Apple was doing for Safari on Windows, so it is supported in the source code).
@@ -108,3 +111,12 @@ But we haven't tried the opposite (i.e., including everything from the MacOSX SD
 Because we definitely don't want to include the whole MacOSX SDK (for example, `<stdio.h>` and similar should be included from MSVC instead) but some header files are actually needed (they usually just contain macros, so it's safe to include them), we added proxy `.h` files.
 These just `#include` the correct `.h` from MacOSX SDK, or sometimes don't do anything, if we don't need the `.h` actually (it was probably included through some other `.h` file).
 Also, only the safe `.h` files are proxied this way, so it's ensured that nothing else is included from the MacOSX SDK.
+
+### Non-SDK headers
+
+Some headers `#include`d by the Apple's `objc4` library are not part of the MacOSX SDK.
+Instead, they can be found in other Apple's libraries (downloadable from [its official repository](https://opensource.apple.com/tarballs/)).
+See also the list of 3rd-party `objc4` ports as these must include those headers as well.
+Below is list of those headers, where they are `#include`d and their original locations.
+
+- `<System/pthread_machdep.h>` (e.g. in `objc-os.h`) - from `Libc-825.40.1/pthreads/pthread_machdep.h`.
