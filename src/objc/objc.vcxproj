@@ -348,6 +348,7 @@
     </ClangCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\deps\apple-headers\Libc-825.40.1\pthreads\pthread_machdep.h" />
     <ClInclude Include="..\..\deps\objc4\runtime\objc-config.h" />
     <ClInclude Include="Availability.h" />
     <ClInclude Include="AvailabilityInternal.h" />

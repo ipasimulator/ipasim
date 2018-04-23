@@ -35,6 +35,12 @@
     <Filter Include="Header Files\System\machine">
       <UniqueIdentifier>{aec50768-2224-4344-a7e2-1f5522118ec1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Libc-825.40.1">
+      <UniqueIdentifier>{4e43b284-ea0f-487c-920a-45e3301dc38a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Libc-825.40.1\pthreads">
+      <UniqueIdentifier>{f84c2136-91c1-476f-8db8-f40ad66acb27}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\deps\objc4\runtime\objc-config.h">
@@ -96,6 +102,9 @@
     </ClInclude>
     <ClInclude Include="include\System\machine\cpu_capabilities.h">
       <Filter>Header Files\System\machine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\deps\apple-headers\Libc-825.40.1\pthreads\pthread_machdep.h">
+      <Filter>Header Files\Libc-825.40.1\pthreads</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
