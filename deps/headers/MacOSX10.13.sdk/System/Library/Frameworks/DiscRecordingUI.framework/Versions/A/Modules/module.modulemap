@@ -1,5 +1,0 @@
-framework module DiscRecordingUI [extern_c] {
-    umbrella header "DiscRecordingUI.h"
-    export *
-    module * { export * }
-}

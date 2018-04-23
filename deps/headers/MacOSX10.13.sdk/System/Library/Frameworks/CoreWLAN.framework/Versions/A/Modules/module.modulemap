@@ -1,5 +1,0 @@
-framework module CoreWLAN [extern_c] {
-    umbrella header "CoreWLAN.h"
-    export *
-    module * { export * }
-}

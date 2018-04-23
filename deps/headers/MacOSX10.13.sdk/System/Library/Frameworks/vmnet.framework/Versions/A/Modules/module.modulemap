@@ -1,5 +1,0 @@
-framework module vmnet [extern_c] {
-	umbrella header "vmnet.h"
-	export *
-	module * { export * }
-}
