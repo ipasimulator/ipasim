@@ -13,3 +13,6 @@
 	path = deps/objc4
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/objc4
 	branch = port
+[submodule "deps/apple-headers"]
+	path = deps/apple-headers
+	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/apple-headers
