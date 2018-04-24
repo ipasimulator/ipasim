@@ -350,10 +350,10 @@
   <ItemGroup>
     <ClInclude Include="..\..\deps\apple-headers\Libc-825.40.1\pthreads\pthread_machdep.h" />
     <ClInclude Include="..\..\deps\objc4\runtime\objc-config.h" />
-    <ClInclude Include="Availability.h" />
-    <ClInclude Include="AvailabilityInternal.h" />
-    <ClInclude Include="AvailabilityMacros.h" />
     <ClInclude Include="include\architecture\byte_order.h" />
+    <ClInclude Include="include\Availability.h" />
+    <ClInclude Include="include\AvailabilityInternal.h" />
+    <ClInclude Include="include\AvailabilityMacros.h" />
     <ClInclude Include="include\i386\_types.h" />
     <ClInclude Include="include\mach-o\loader.h" />
     <ClInclude Include="include\mach\boolean.h" />
@@ -366,9 +366,10 @@
     <ClInclude Include="include\mach\machine\vm_types.h" />
     <ClInclude Include="include\mach\vm_prot.h" />
     <ClInclude Include="include\mach\vm_types.h" />
+    <ClInclude Include="include\objc-shared-cache.h" />
     <ClInclude Include="include\System\machine\cpu_capabilities.h" />
     <ClInclude Include="include\System\pthread_machdep.h" />
-    <ClInclude Include="TargetConditionals.h" />
+    <ClInclude Include="include\TargetConditionals.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
