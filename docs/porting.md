@@ -26,7 +26,7 @@ So, an alternative and better approach is to create an UWP `.dll` project in Vis
 ## Comments in code
 
 When porting code by copying it (or cloning from a remote repository, etc.), we add comments prefixed with `[port]` to indicate that those are our comments.
-And all changes to the source code are described by nearby comments prefixed with `[port] CHANGE:`.
+And all changes to the source code are described by nearby comments prefixed with `[port] CHANGED:`.
 
 Also, in `C`-based code, there are `#ifdef`s around the changed code, so that the changes are only effective if some preprocessor definition is passed to the compiler (e.g., in `objc` library, this is `OBJC_PORT` definition).
 

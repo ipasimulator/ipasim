@@ -37,7 +37,7 @@
 #include "pthread.h"
 #include "implement.h"
 #include "context.h"
-#include "stubs.h" // [port] CHANGE: Added.
+#include "stubs.h" // [port] CHANGED: Added.
 
 static void
 ptw32_cancel_self (void)
