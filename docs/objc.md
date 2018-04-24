@@ -120,3 +120,9 @@ See also the list of 3rd-party `objc4` ports as these must include those headers
 Below is list of those headers, where they are `#include`d and their original locations.
 
 - `<System/pthread_machdep.h>` (e.g. in `objc-os.h`) - from `Libc-825.40.1/pthreads/pthread_machdep.h`.
+
+### Building with Clang directly
+
+Ideally, we would like to build this library with clang instead of Visual Studio (as it seems more appropriate and would be probably easier).
+Currently, we use Clang with Visual Studio, which is some old version, though, so there are some errors.
+To overcome them, just see the `Debug/objc.tlog/clang.command.*.log` files for information about what arguments to run clang with (but, of course, you need to first use Visual Studio to compile some files in order to generate this file).
