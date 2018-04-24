@@ -98,6 +98,10 @@ Our approach now is to try including as little of the SDK as possible.
 We include the standard C++ things from MSVC instead, since we are building the library for UWP and the MacOSX SDK could use some Darwin-specific things.
 But we haven't tried the opposite (i.e., including everything from the MacOSX SDK and not using the MSVC SDKs at all) yet, it might be cool as well (although it seems unlikely to work because of the Darwin-specific things - see for example `stdio.h` in MacOSX SDK).
 
+**TODO: Right now, we also depend on some headers from `packages/WinObjC.Language.0.2.171110/build/include/WOCStdLib/` and similar.
+We probably not want that, though.
+(Maybe we can only take inspiration there.)**
+
 ### Preprocessor definitions
 
 - `OBJC_PORT` - see [general notes about porting](porting.md) for more information.
@@ -126,3 +130,8 @@ Below is list of those headers, where they are `#include`d and their original lo
 Ideally, we would like to build this library with clang instead of Visual Studio (as it seems more appropriate and would be probably easier).
 Currently, we use Clang with Visual Studio, which is some old version, though, so there are some errors.
 To overcome them, just see the `Debug/objc.tlog/clang.command.*.log` files for information about what arguments to run clang with (but, of course, you need to first use Visual Studio to compile some files in order to generate this file).
+
+[C++/WinRT](https://docs.microsoft.com/en-us/windows/uwp/cpp-and-winrt-apis/index) seems as the thing we would want to build against.
+It's only header files, so it should be possible to use it from clang.
+On the other side, it's very new, so we could probably support only very new versions of Windows.
+But that's probably not a disadvantage, since with this we can port the `objc4` library fast and then worry about older versions later (or never, since it should be easy to update Windows 10).
