@@ -135,3 +135,5 @@ To overcome them, just see the `Debug/objc.tlog/clang.command.*.log` files for i
 It's only header files, so it should be possible to use it from clang.
 On the other side, it's very new, so we could probably support only very new versions of Windows.
 But that's probably not a disadvantage, since with this we can port the `objc4` library fast and then worry about older versions later (or never, since it should be easy to update Windows 10).
+
+> For more information about C++/WinRT, see also [Kenny Kerr's blog](https://kennykerr.ca/articles/) and [moderncpp.com](https://moderncpp.com/).
