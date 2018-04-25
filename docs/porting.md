@@ -25,6 +25,17 @@ So, an alternative and better approach is to create an UWP `.dll` project in Vis
 
 > For more information about UWP and `.dll`s, see [these Microsoft docs](https://docs.microsoft.com/en-us/cpp/cppcx/dlls-c-cx).
 > **TODO: Read and make use of it!**
+> > Also, this comment (which will probably be removed in the future) has some good information:
+> >
+> > Advice above to set WINAPI_FAMILY=WINAPI_PARTITION_APP is counter to winapifamily.h:
+> >
+> > ```cpp
+> > /*
+> >  * The WINAPI_FAMILY values of 0 and 1 are reserved to ensure that
+> >  * an error will occur if WINAPI_FAMILY is set to any
+> >  * WINAPI_PARTITION value (which must be 0 or 1, see below).
+> >  */
+> > ```
 
 ## Comments in code
 
