@@ -137,3 +137,5 @@ On the other side, it's very new, so we could probably support only very new ver
 But that's probably not a disadvantage, since with this we can port the `objc4` library fast and then worry about older versions later (or never, since it should be easy to update Windows 10).
 
 > For more information about C++/WinRT, see also [Kenny Kerr's blog](https://kennykerr.ca/articles/) and [moderncpp.com](https://moderncpp.com/).
+
+**TODO: Try `-###` option to see what SDK we really build against.**
