@@ -62,6 +62,7 @@ It contains an Objective-C runtime reimplementation.
 - Not actually a runtime, but it's a notable exception and there is currently no better place for this.
 - Xamarin.iOS is just a .NET wrapper around the Apple's Objective-C runtime.
   And [documentation about its internals](https://docs.microsoft.com/en-us/xamarin/ios/internals/) could be useful for us.
+  For example, the [section about application startup](https://docs.microsoft.com/en-us/xamarin/ios/internals/architecture#application-launch) has useful information about how iOS apps starts, which surely is something our application needs to be aware of.
 
 **TODO: Add more.**
 
