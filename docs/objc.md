@@ -57,6 +57,12 @@ It contains an Objective-C runtime reimplementation.
 
 - Info: [Official website](https://mulle-objc.github.io/)
 
+### Xamarin.iOS
+
+- Not actually a runtime, but it's a notable exception and there is currently no better place for this.
+- Xamarin.iOS is just a .NET wrapper around the Apple's Objective-C runtime.
+  And [documentation about its internals](https://docs.microsoft.com/en-us/xamarin/ios/internals/) could be useful for us.
+
 **TODO: Add more.**
 
 ## Our runtime
