@@ -1,0 +1,92 @@
+% !TEX TS-program = pdflatex
+% !TEX encoding = UTF-8 Unicode
+% spellcheck-language "cs"
+
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[IL2]{fontenc}
+\usepackage[czech]{babel}
+\usepackage[left=2cm, right=2cm, top=3cm, bottom=3cm]{geometry}
+\usepackage[fleqn]{mathtools}
+\usepackage{amsfonts,amssymb}
+\usepackage{enumitem}
+\usepackage{icomma}
+\usepackage{tikz}
+\usepackage{etoolbox}
+\usepackage{forest}
+\usepackage{amsthm}
+
+% Hlavička:
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\rhead{Jan Joneš}
+\renewcommand{\headrulewidth}{0pt}
+
+\begin{document}
+
+\section*{Specifikace programu ipaSim}
+
+\subsection*{Úvod}
+
+ipaSim je program umožňující spouštět aplikace napsané pro operační systém iOS na zařízeních s operačním systémem Windows.
+Vstupem je tedy balíček *.ipa, standardní formát pro distribuci aplikací na iOS a macOS.
+Uvnitř balíčku je mimo jiné také strojový kód aplikace, většinou pro architekturu ARM, na které operační systém iOS běží.
+Tento strojový kód bude ipaSim emulovat a volání operačního systému bude překládat na volání OS Windows.
+
+Díky tomu se bude emulovaná aplikace chovat jako nativní aplikace napsaná pro Windows.
+Zároveň nebude nutné emulovat žádnou část systému iOS, pouze kód aplikace.
+
+\subsection*{Podobné projekty}
+
+\textbf{TODO:} Wine, Darlinghq (https://www.darlinghq.org/), Cocotron (http://www.cocotron.org/).
+
+\subsection*{Platforma}
+
+\textbf{TODO:} C++, UWP.
+
+\subsection*{Načítání balíčků}
+
+Při přeložení aplikace napsané pro iOS například pomocí IDE Xcode vznikne balíček obsahující všechny potřebné soubory k běhu aplikace na cílovém zařízení.
+Tento balíček má většinou příponu *.ipa (zkratka z \textit{iPhone application}), je to jednoduše ZIP a obsahuje metadata, multimediální zdroje (ikony, obrázky apod.) a samotný spustitelný soubor.
+Nás bude zajímat hlavně posledně zmíněná část -- spustitelný soubor, který ipaSim musí načíst do paměti pro emulování.
+Ten má formát Mach-O, případně Fat Mach-O (ten prostě obsahuje více Mach-O částí pro různé architektury, např. ARM a ARM64).
+
+Mach-O formát je podobný jiným formátům spustitelných souborů (např. PE a ELF).
+Obsahuje hlavičku popisující jeho strukturu, různé sekce... \textbf{TODO.}
+My na jeho čtení použijeme knihovnu LIEF.
+
+Pro emulaci aplikací budeme jednoduše napodobovat chování operačního systému iOS při načítání aplikací do paměti.
+Přesněji tedy programu dyld, který se o tuto část stará.
+Nejprve tedy jednoduše načteme všechny sekce obsažené v Mach-O souboru do operační paměti.
+Poté provedeme relokace, a dynamické linkování, viz další sekci.
+
+\subsection*{Emulování kódu}
+
+Pro emulování kódu použijeme knihovnu Unicorn, která je založená na emulátoru Qemu (na rozdíl od něj ale nevyžaduje emulování celého operačního systému).
+Jemu prostě řekneme, kde je v paměti načtený kód a odkud jej má začít provádět.
+Pokud aplikace zavolá funkci operačního systému, vyskočí ven z namapované paměti, což zachytíme a volání převedeme na volání OS Windows.
+
+\subsection*{Volání OS}
+
+Pro převádění mezi voláními iOS a Windows použijeme knihovnu WinObjC.
+Ta poskytuje API funkce přesně stejné jako systémové knihovny iOS, a tyto funkce jsou implementované pomocí volání tzv. WinRT API, tedy moderního API OS Windows (dostupného od Windows 10).
+Malý zádrhel je pouze v tom, že tato knihovna je navržená pro fungování se zdrojovými kódy iOS aplikací, kdežto mi chceme emulovat již přeložené spustitelné soubory.
+Problém spočívá v použití runtime jazyka Objective-C, který není binárně kompatibilní s tím, který používá Apple v systému iOS.
+To není problém pro WinObjC, kde se zdrojové kódy prostě přeloží pro ten správný runtime, ale je to problém pro naši aplikaci, kde jsou kódy už přeložené pro konkrétní a nekompatibilní runtime.
+
+\subsection*{Objective-C runtime}
+
+K čemu je vůbec takový runtime dobrý?
+Aplikace pro iOS jsou napsané v jazyce Objective-C, který je velmi dynamický a pro běh programů v něm napsaných se spoléhá na svojí runtime knihovnu, jejíž funkce přeložené programy volají.
+Tyto funkce zahrnují například funkce pro posílání zpráv mezi objekty, což je základní forma komunikace mezi objekty v Objective-C (nahrazuje volání funkcí), nebo funkce pro dynamickou introspekci objektů.
+Zároveň se runtime spoléhá na datové struktury vygenerované překladačem, které jsou uloženy v Mach-O souboru.
+Ty obsahují například informace o třídách a metodách použitých v programu.
+A právě tyto datové struktury nejsou mezi jednotlivými runtime knihovnami kompatibilní.
+Proto je nutné použít runtime, který bude tyto struktury interpretovat správně, tak jak by to dělal runtime v iOS.
+
+Pro Windows existují různé implementace Objective-C (\textbf{TODO:} příklady), žádná ale není kompatibilní s runtime knihovnou od Applu.
+Proto bude naše aplikace obsahovat vlastní Objective-C runtime, který bude pravděpodobně pouze port runtime knihovny od Applu.
+Ta je napsaná v C++, a tak můžeme přenositelné části zachovat a přepsat pouze kód závislý na OS.
+Využijeme také, že tato knihovna závisí na POSIXových vláknech, pro které existuje na Windows port winpthreads.
+
+\end{document}
