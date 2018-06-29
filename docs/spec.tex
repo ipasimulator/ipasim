@@ -42,7 +42,10 @@ Zároveň nebude nutné emulovat žádnou část systému iOS, pouze kód aplika
 
 \subsection*{Platforma}
 
-\textbf{TODO:} C++, UWP.
+ipaSim bude UWP aplikace napsaná v jazyce C++ pomocí platformy C++/WinRT, což je sada hlavičkových souborů obalující WinRT API.
+Jazyk C++ je vhodný, protože knihovny, které budeme používat, v podstatě nemají obdoby v jiných programovacích jazycích.
+Zároveň je ipaSim velice nízkoúrovňová aplikace pracující často přímo s pamětí, na což je jazyk C++ ideální.
+Založit projekt na platformě UWP je nutné, protože knihovna WinObjC volá API funkce WinRT.
 
 \subsection*{Načítání balíčků}
 
