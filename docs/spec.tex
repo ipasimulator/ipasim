@@ -64,31 +64,31 @@ Wine~\cite{wine} je linuxový nástroj, který umožňuje spouštět Windows apl
 K tomu využívá převod mezi Win32 API (tedy funkcemi operačního systému Windows) a funkcemi Linuxu, podobně jako to bude dělat naše aplikace.
 
 Darling~\cite{darling} je velice podobný program, který umožňuje spouštění macOS aplikací na Linuxu.
-Tento projekt je ovšem ve velmi rané fázi a umí emulovat pouze jednoduché konzolové aplikace.
+Tento projekt je ovšem ve velmi rané fázi a umí emulovat pouze jednoduché konzolové aplikace \cite{darlingStatus}.
 
 \subsection*{Platforma}
 
-ipaSim bude UWP~\cite{uwp} aplikace napsaná v jazyce \Cpp pomocí platformy \Cpp/WinRT~\cite{cppwinrt}.
+ipaSim bude UWP\footnote{\url{https://docs.microsoft.com/en-us/windows/uwp/}} aplikace napsaná v jazyce \Cpp pomocí nadstavby \Cpp/WinRT\footnote{\url{https://docs.microsoft.com/en-us/windows/uwp/cpp-and-winrt-apis/}}.
 To je sada hlavičkových souborů obalujících WinRT API, tedy funkce Windows dostupné na všech zařízeních s Windows 10 (desktopech, mobilních zařízeních a dalších).
 Jazyk \Cpp je vhodný, protože knihovny, které budeme používat, v podstatě nemají obdoby v jiných programovacích jazycích.
 Zároveň bude ipaSim velice nízkoúrovňová aplikace pracující často přímo s pamětí, na což je také jazyk \Cpp ideální.
-Založit projekt na platformě UWP je nutné, protože knihovna WinObjC volá API funkce WinRT.
+Založit projekt na platformě UWP je nutné, protože stěžejní knihovna WinObjC (viz sekci~\nameref{sec:winobjc}) je na ní založená.
 
 \subsection*{Načítání balíčků}
 
-Při přeložení aplikace napsané pro iOS například pomocí IDE Xcode vznikne balíček obsahující všechny potřebné soubory k běhu aplikace na cílovém zařízení.
-Tento balíček má většinou příponu *.ipa (zkratka z \textit{iPhone application}), je to jednoduše ZIP a obsahuje metadata, multimediální zdroje (ikony, obrázky apod.) a samotný spustitelný soubor.
+Při přeložení aplikace napsané pro iOS (například pomocí IDE Xcode\footnote{\url{https://developer.apple.com/xcode/}}) vznikne balíček obsahující všechny potřebné soubory k běhu aplikace na cílovém zařízení.
+Tento balíček má většinou příponu \texttt{*.ipa} (zkratka z \textit{iPhone application}), je to normální archiv ZIP a obsahuje metadata, multimediální zdroje (ikony, obrázky apod.) a samotný spustitelný soubor \cite{ipa}.
 Nás bude zajímat hlavně posledně zmíněná část -- spustitelný soubor, který ipaSim musí načíst do paměti pro emulování.
-Ten má formát Mach-O, případně Fat Mach-O (ten prostě obsahuje více Mach-O částí pro různé architektury, např. ARM a ARM64).
+Ten má formát Mach-O, případně Fat Mach-O, který obsahuje více Mach-O částí pro různé architektury (např. ARM a ARM64) \cite{macho}.
 
 Mach-O formát je podobný jiným formátům spustitelných souborů (např. PE a ELF).
-Obsahuje hlavičku popisující jeho strukturu, různé sekce... \textbf{TODO.}
-My na jeho čtení použijeme knihovnu LIEF.
+Obsahuje hlavičku popisující jeho strukturu, tabulku symbolů, použité sdílené knihovny a v neposlední řadě i segmenty a sekce obsahující kód a data.
+My na jeho čtení můžeme použít například knihovnu LIEF\footnote{\url{https://github.com/lief-project/LIEF}}.
 
-Pro emulaci aplikací budeme jednoduše napodobovat chování operačního systému iOS při načítání aplikací do paměti.
-Přesněji tedy programu dyld, který se o tuto část stará.
-Nejprve tedy jednoduše načteme všechny sekce obsažené v Mach-O souboru do operační paměti.
-Poté provedeme relokace, a dynamické linkování, viz další sekci.
+Pro emulaci aplikací budeme napodobovat chování systému iOS při načítání aplikací do paměti \cite{execMacho}.
+Nejprve jednoduše načteme všechny sekce obsažené v Mach-O souboru do operační paměti.
+Poté provedeme relokace a dynamické linkování s knihovnami operačního systému.
+Zde se právě provede převod mezi funkcemi iOS a Windows -- emulovaná aplikace totiž samozřejmě závisí na funkcích iOS, my ji ale slinkujeme s funkcemi WinObjC (viz sekci~\nameref{sec:winobjc}).
 
 \subsection*{Emulování kódu}
 
@@ -97,6 +97,7 @@ Jemu prostě řekneme, kde je v paměti načtený kód a odkud jej má začít p
 Pokud aplikace zavolá funkci operačního systému, vyskočí ven z namapované paměti, což zachytíme a volání převedeme na volání OS Windows.
 
 \subsection*{Volání OS}
+\label{sec:winobjc}
 
 Pro převádění mezi voláními iOS a Windows použijeme knihovnu WinObjC.
 Ta poskytuje API funkce přesně stejné jako systémové knihovny iOS, a tyto funkce jsou implementované pomocí volání tzv. WinRT API, tedy moderního API OS Windows (dostupného od Windows 10).
