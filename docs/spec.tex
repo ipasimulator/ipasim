@@ -1,10 +1,8 @@
-% !TEX TS-program = pdflatex
 % !TEX encoding = UTF-8 Unicode
-% spellcheck-language "cs"
 
 \documentclass[12pt]{article}
 \usepackage[utf8]{inputenc}
-\usepackage[IL2]{fontenc}
+\usepackage[T1]{fontenc}
 \usepackage[czech]{babel}
 \usepackage[left=2cm, right=2cm, top=3cm, bottom=3cm]{geometry}
 \usepackage[fleqn]{mathtools}
@@ -15,36 +13,65 @@
 \usepackage{etoolbox}
 \usepackage{forest}
 \usepackage{amsthm}
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+\usepackage{relsize,xspace}
 
-% Hlavička:
+% Hlavička.
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \rhead{Jan Joneš}
+\lhead{}
 \renewcommand{\headrulewidth}{0pt}
 
+% Styl URL.
+\DeclareUrlCommand\url{\urlstyle{tt}}
+
+% C++.
+\newcommand{\Rplus}{\protect\hspace{-.1em}\protect\raisebox{.35ex}{\smaller{\smaller\textbf{+}}}}
+\newcommand{\Cpp}{\mbox{C\Rplus\Rplus}\xspace}
+
+% IEEE citace.
+\makeatletter
+\def\bstctlcite{\@ifnextchar[{\@bstctlcite}{\@bstctlcite[@auxout]}}
+\def\@bstctlcite[#1]#2{\@bsphack
+  \@for\@citeb:=#2\do{%
+    \edef\@citeb{\expandafter\@firstofone\@citeb}%
+    \if@filesw\immediate\write\csname #1\endcsname{\string\citation{\@citeb}}\fi}%
+  \@esphack}
+\makeatother
+
 \begin{document}
+
+\bstctlcite{BSTcontrol}
 
 \section*{Specifikace programu ipaSim}
 
 \subsection*{Úvod}
 
-ipaSim je program umožňující spouštět aplikace napsané pro operační systém iOS na zařízeních s operačním systémem Windows.
-Vstupem je tedy balíček *.ipa, standardní formát pro distribuci aplikací na iOS a macOS.
+ipaSim bude program umožňující spouštět aplikace napsané pro operační systém iOS na zařízeních s operačním systémem Windows.
+
+Vstupem bude balíček *.ipa, což je standardní formát pro distribuci aplikací na iOS a macOS.
 Uvnitř balíčku je mimo jiné také strojový kód aplikace, většinou pro architekturu ARM, na které operační systém iOS běží.
-Tento strojový kód bude ipaSim emulovat a volání operačního systému bude překládat na volání OS Windows.
+Tento strojový kód bude ipaSim emulovat a funkce iOS, které bude emulovaná aplikace volat, se přeloží na odpovídající funkce Windows.
 
 Díky tomu se bude emulovaná aplikace chovat jako nativní aplikace napsaná pro Windows.
 Zároveň nebude nutné emulovat žádnou část systému iOS, pouze kód aplikace.
 
 \subsection*{Podobné projekty}
 
-\textbf{TODO:} Wine, Darlinghq (https://www.darlinghq.org/), Cocotron (http://www.cocotron.org/).
+Wine~\cite{wine} je linuxový nástroj, který umožňuje spouštět Windows aplikace.
+K tomu využívá převod mezi Win32 API (tedy funkcemi operačního systému Windows) a funkcemi Linuxu, podobně jako to bude dělat naše aplikace.
+
+Darling~\cite{darling} je velice podobný program, který umožňuje spouštění macOS aplikací na Linuxu.
+Tento projekt je ovšem ve velmi rané fázi a umí emulovat pouze jednoduché konzolové aplikace.
 
 \subsection*{Platforma}
 
-ipaSim bude UWP aplikace napsaná v jazyce C++ pomocí platformy C++/WinRT, což je sada hlavičkových souborů obalující WinRT API.
-Jazyk C++ je vhodný, protože knihovny, které budeme používat, v podstatě nemají obdoby v jiných programovacích jazycích.
-Zároveň je ipaSim velice nízkoúrovňová aplikace pracující často přímo s pamětí, na což je jazyk C++ ideální.
+ipaSim bude UWP~\cite{uwp} aplikace napsaná v jazyce \Cpp pomocí platformy \Cpp/WinRT~\cite{cppwinrt}.
+To je sada hlavičkových souborů obalujících WinRT API, tedy funkce Windows dostupné na všech zařízeních s Windows 10 (desktopech, mobilních zařízeních a dalších).
+Jazyk \Cpp je vhodný, protože knihovny, které budeme používat, v podstatě nemají obdoby v jiných programovacích jazycích.
+Zároveň bude ipaSim velice nízkoúrovňová aplikace pracující často přímo s pamětí, na což je také jazyk \Cpp ideální.
 Založit projekt na platformě UWP je nutné, protože knihovna WinObjC volá API funkce WinRT.
 
 \subsection*{Načítání balíčků}
@@ -77,9 +104,8 @@ Malý zádrhel je pouze v tom, že tato knihovna je navržená pro fungování s
 Problém spočívá v použití runtime jazyka Objective-C, který není binárně kompatibilní s tím, který používá Apple v systému iOS.
 To není problém pro WinObjC, kde se zdrojové kódy prostě přeloží pro ten správný runtime, ale je to problém pro naši aplikaci, kde jsou kódy už přeložené pro konkrétní a nekompatibilní runtime.
 
-\subsection*{Objective-C runtime}
+\subsection*{Běhové prostředí jazyka Objective-C}
 
-K čemu je vůbec takový runtime dobrý?
 Aplikace pro iOS jsou napsané v jazyce Objective-C, který je velmi dynamický a pro běh programů v něm napsaných se spoléhá na svojí runtime knihovnu, jejíž funkce přeložené programy volají.
 Tyto funkce zahrnují například funkce pro posílání zpráv mezi objekty, což je základní forma komunikace mezi objekty v Objective-C (nahrazuje volání funkcí), nebo funkce pro dynamickou introspekci objektů.
 Zároveň se runtime spoléhá na datové struktury vygenerované překladačem, které jsou uloženy v Mach-O souboru.
@@ -89,7 +115,10 @@ Proto je nutné použít runtime, který bude tyto struktury interpretovat sprá
 
 Pro Windows existují různé implementace Objective-C (\textbf{TODO:} příklady), žádná ale není kompatibilní s runtime knihovnou od Applu.
 Proto bude naše aplikace obsahovat vlastní Objective-C runtime, který bude pravděpodobně pouze port runtime knihovny od Applu.
-Ta je napsaná v C++, a tak můžeme přenositelné části zachovat a přepsat pouze kód závislý na OS.
-Využijeme také, že tato knihovna závisí na POSIXových vláknech, pro které existuje na Windows port winpthreads.
+Ta je napsaná v \Cpp, a tak můžeme přenositelné části zachovat a přepsat pouze kód závislý na OS.
+Využijeme také, že tato knihovna závisí na | POSIXových vláknech, pro které existuje na Windows port winpthreads.
+
+\bibliographystyle{IEEEtran}
+\bibliography{spec}
 
 \end{document}

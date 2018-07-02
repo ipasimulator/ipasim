@@ -255,3 +255,8 @@ Generated Files/
 /docs/*.aux
 /docs/*.log
 /docs/*.synctex.gz
+/docs/*.bbl
+/docs/*.blg
+/docs/*.fdb_latexmk
+/docs/*.fls
+/docs/*.out
