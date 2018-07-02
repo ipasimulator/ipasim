@@ -13,3 +13,4 @@ And usually when there is more than one sentence, only the first is on the first
 - [docs] - Documentation (`/docs/`).
 - [deps] - 3rd-party dependencies (`/deps/`).
 - [pthread] - `pthreads-win32` port (`/src/pthread/` and `/deps/pthreads.2/`).
+- [res] - Resources (`/res/`).
