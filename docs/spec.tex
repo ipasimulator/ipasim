@@ -98,14 +98,14 @@ To není problém pro WinObjC, kde se zdrojové kódy prostě přeloží pro to 
 
 \subsection*{Běhové prostředí jazyka Objective-C}
 
-Aplikace pro iOS jsou napsané v jazyce Objective-C, který je velmi dynamický a pro běh programů v něm napsaných se spoléhá na svoji běhovou knihovnu, jejíž funkce přeložené programy volají \cite{objc, understandingObjc}.
+Aplikace pro iOS jsou napsané v jazyce Objective-C, který je velmi dynamický a pro běh programů v něm napsaných se spoléhá na svoji běhovou knihovnu, jejíž funkce přeložené programy volají \cite{objc, understandingObjc, objcDecompiler}.
 Tyto funkce zahrnují například funkce pro posílání zpráv mezi objekty, což je základní forma komunikace mezi objekty v Objective-C (nahrazuje volání funkcí), nebo funkce pro dynamickou introspekci objektů, počítání referencí a další.
 Zároveň se běhová knihovna spoléhá na datové struktury vygenerované překladačem, které jsou uloženy v Mach-O souboru.
 Ty obsahují například informace o třídách a metodách použitých v programu a používají se například právě pro vyhledávání kódu metody při posílání zpráv mezi objekty.
 A právě tyto datové struktury nejsou mezi jednotlivými běhovými knihovnami kompatibilní.
 Proto je nutné použít běhovou knihovnu, která bude tyto struktury interpretovat správně tak, jak by to dělalo běhové prostředí v iOS.
 
-Pro Windows existují různé implementace běhového prostředí jazyka Objective-C (například \cite{modernObjc, gnustep}), žádná ale není kompatibilní s běhovým prostředím od Applu.
+Pro Windows existují různé implementace běhového prostředí jazyka Objective-C (například \cite{modernObjc, modularObjc, gnustep}), žádná ale není kompatibilní s běhovým prostředím od Applu.
 Proto bude naše aplikace obsahovat vlastní běhové prostředí, které bude pravděpodobně pouze port běhové knihovny od Applu.
 Ta je open-source\footnote{\url{https://opensource.apple.com/source/objc4/}} a napsaná v \Cpp, takže můžeme přenositelné části zachovat a přepsat pouze kód závislý na OS.
 Využijeme také, že tato knihovna používá posixová vlákna, pro které existuje na Windows port pthreads-win32\footnote{\url{http://www.sourceware.org/pthreads-win32/}}.
