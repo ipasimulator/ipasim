@@ -4,6 +4,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[czech]{babel}
+\usepackage[czech]{babelbib}
 \usepackage[left=2cm, right=2cm, top=3cm, bottom=3cm]{geometry}
 \usepackage[fleqn]{mathtools}
 \usepackage{amsfonts,amssymb}
@@ -31,19 +32,7 @@
 \newcommand{\Rplus}{\protect\hspace{-.1em}\protect\raisebox{.35ex}{\smaller{\smaller\textbf{+}}}}
 \newcommand{\Cpp}{\mbox{C\Rplus\Rplus}\xspace}
 
-% IEEE citace.
-\makeatletter
-\def\bstctlcite{\@ifnextchar[{\@bstctlcite}{\@bstctlcite[@auxout]}}
-\def\@bstctlcite[#1]#2{\@bsphack
-  \@for\@citeb:=#2\do{%
-    \edef\@citeb{\expandafter\@firstofone\@citeb}%
-    \if@filesw\immediate\write\csname #1\endcsname{\string\citation{\@citeb}}\fi}%
-  \@esphack}
-\makeatother
-
 \begin{document}
-
-\bstctlcite{BSTcontrol}
 
 \section*{Specifikace programu ipaSim}
 
@@ -121,7 +110,7 @@ Proto bude naše aplikace obsahovat vlastní běhové prostředí, které bude p
 Ta je open-source\footnote{\url{https://opensource.apple.com/source/objc4/}} a napsaná v \Cpp, takže můžeme přenositelné části zachovat a přepsat pouze kód závislý na OS.
 Využijeme také, že tato knihovna používá posixová vlákna, pro které existuje na Windows port pthreads-win32\footnote{\url{http://www.sourceware.org/pthreads-win32/}}.
 
-\bibliographystyle{IEEEtran}
+\bibliographystyle{babunsrt}
 \bibliography{spec}
 
 \end{document}
