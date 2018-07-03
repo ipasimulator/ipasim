@@ -105,7 +105,7 @@ Ty obsahují například informace o třídách a metodách použitých v progra
 A právě tyto datové struktury nejsou mezi jednotlivými běhovými knihovnami kompatibilní.
 Proto je nutné použít běhovou knihovnu, která bude tyto struktury interpretovat správně, tak jak by to dělalo běhové prostředí v iOS.
 
-Pro Windows existují různé implementace běhového prostředí jazyka Objective-C (například~\cite{modernObjc, gnustep}), žádná ale není kompatibilní s běhovým prostředím od Applu.
+Pro Windows existují různé implementace běhového prostředí jazyka Objective-C (například \cite{modernObjc, gnustep}), žádná ale není kompatibilní s běhovým prostředím od Applu.
 Proto bude naše aplikace obsahovat vlastní běhové prostředí, které bude pravděpodobně pouze port běhové knihovny od Applu.
 Ta je open-source\footnote{\url{https://opensource.apple.com/source/objc4/}} a napsaná v \Cpp, takže můžeme přenositelné části zachovat a přepsat pouze kód závislý na OS.
 Využijeme také, že tato knihovna používá posixová vlákna, pro které existuje na Windows port pthreads-win32\footnote{\url{http://www.sourceware.org/pthreads-win32/}}.
