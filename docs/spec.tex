@@ -40,7 +40,7 @@
 
 ipaSim bude program umožňující spouštět aplikace napsané pro operační systém iOS na zařízeních s operačním systémem Windows.
 
-Vstupem bude balíček *.ipa, což je standardní formát pro distribuci aplikací na iOS a macOS.
+Vstupem bude balíček \texttt{*.ipa}, což je standardní formát pro distribuci aplikací na iOS a macOS.
 Uvnitř balíčku je mimo jiné také strojový kód aplikace, většinou pro architekturu ARM, na které operační systém iOS běží.
 Tento strojový kód bude ipaSim emulovat a funkce iOS, které bude emulovaná aplikace volat, se přeloží na odpovídající funkce Windows.
 
@@ -65,7 +65,7 @@ Založit projekt na platformě UWP je nutné, protože stěžejní knihovna WinO
 
 \subsection*{Načítání balíčků}
 
-Při přeložení aplikace napsané pro iOS (například pomocí IDE Xcode\footnote{\url{https://developer.apple.com/xcode/}}) vznikne balíček obsahující všechny potřebné soubory k běhu aplikace na cílovém zařízení.
+Po přeložení aplikace napsané pro iOS (například pomocí IDE Xcode\footnote{\url{https://developer.apple.com/xcode/}}) vznikne balíček obsahující všechny potřebné soubory k běhu aplikace na cílovém zařízení.
 Tento balíček má většinou příponu \texttt{*.ipa} (zkratka z \textit{iPhone application}), je to normální archiv ZIP a obsahuje metadata, multimediální zdroje (ikony, obrázky apod.) a samotný spustitelný soubor \cite{ipa}.
 Nás bude zajímat hlavně posledně zmíněná část -- spustitelný soubor, který ipaSim musí načíst do paměti pro emulování.
 Tento soubor má formát Mach-O, případně Fat Mach-O, který obsahuje více Mach-O částí pro různé architektury (např. ARM a ARM64) \cite{macho}.
@@ -77,7 +77,7 @@ My na jeho čtení můžeme použít například knihovnu LIEF\footnote{\url{htt
 Pro emulaci aplikací budeme napodobovat chování systému iOS při načítání aplikací do paměti \cite{execMacho}.
 Nejprve jednoduše načteme všechny sekce obsažené v Mach-O souboru do operační paměti.
 Poté provedeme relokace a dynamické linkování s knihovnami operačního systému.
-Zde se právě provede převod mezi funkcemi iOS a Windows -- emulovaná aplikace totiž samozřejmě závisí na funkcích iOS, my ji ale slinkujeme s funkcemi knihovny WinObjC (viz sekci~\nameref{sec:winobjc}).
+Zde se právě aplikuje převod mezi funkcemi iOS a Windows -- emulovaná aplikace totiž samozřejmě závisí na funkcích iOS, my ji ale slinkujeme s funkcemi knihovny WinObjC (viz sekci~\nameref{sec:winobjc}).
 
 \subsection*{Emulování kódu}
 
@@ -103,7 +103,7 @@ Tyto funkce zahrnují například funkce pro posílání zpráv mezi objekty, co
 Zároveň se běhová knihovna spoléhá na datové struktury vygenerované překladačem, které jsou uloženy v Mach-O souboru.
 Ty obsahují například informace o třídách a metodách použitých v programu a používají se například právě pro vyhledávání kódu metody při posílání zpráv mezi objekty.
 A právě tyto datové struktury nejsou mezi jednotlivými běhovými knihovnami kompatibilní.
-Proto je nutné použít běhovou knihovnu, která bude tyto struktury interpretovat správně, tak jak by to dělalo běhové prostředí v iOS.
+Proto je nutné použít běhovou knihovnu, která bude tyto struktury interpretovat správně tak, jak by to dělalo běhové prostředí v iOS.
 
 Pro Windows existují různé implementace běhového prostředí jazyka Objective-C (například \cite{modernObjc, gnustep}), žádná ale není kompatibilní s běhovým prostředím od Applu.
 Proto bude naše aplikace obsahovat vlastní běhové prostředí, které bude pravděpodobně pouze port běhové knihovny od Applu.
