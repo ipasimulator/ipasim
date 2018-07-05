@@ -182,13 +182,19 @@ clang -x objective-c++ -arch x86_64 -fmessage-length=0 -fdiagnostics-show-note-i
 
 Now (July 2018), we are going to use this command as a base and we will add other options to it (see `build.cmd` file for the result).
 
+- `-target "i386-pc-windows-msvc"` - let's just try to build for x86 first.
 - `-std=c++14` - because we use MSVC C++ std library which uses C++14 features.
 - `-DOBJC_PORT` - our flag that enables changes made by us to port the code.
 - `-D__OBJC2__=1` - we want to build the "new" runtime (which is used on iPhones).
 - `-DHAVE_STRUCT_TIMESPEC` - so that pthreads-win32 library doesn't redefine `struct timespec`.
+- `-Wno-nullability-completeness` - whatever, deal with those later.
 - `-I ".\include"` - this folder contains our proxy headers.
 - `-I "..\..\deps\apple-headers"` - this folder contains the real headers referenced by our proxy headers.
 - `-I "..\..\deps\pthreads.2"` - for `pthread.h`.
+
+These were removed:
+
+- `-fno-rtti` - MSVC C++ headers use `typeid`, so it needs RTTI.
 
 **TODO: Do this with CMake.**
 **TODO: Use toolchains for different arm and x86 configurations.**
