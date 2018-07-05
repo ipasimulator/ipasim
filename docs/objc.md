@@ -180,7 +180,7 @@ This is command built via copy from macOS command:
 clang -x objective-c++ -arch x86_64 -fmessage-length=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit=0 -std=gnu++11 -stdlib=libc++ -Wno-trigraphs -fno-exceptions -fno-rtti -fno-sanitize=vptr -fpascal-strings -O0 -Wno-missing-field-initializers -Wno-missing-prototypes -Wno-implicit-atomic-properties -Wno-arc-repeated-use-of-weak -Wno-non-virtual-dtor -Wno-overloaded-virtual -Wno-exit-time-destructors -Wno-missing-braces -Wparentheses -Wswitch -Wno-unused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wno-empty-body -Wno-uninitialized -Wno-unknown-pragmas -Wshadow -Wno-four-char-constants -Wno-conversion -Wno-constant-conversion -Wno-int-conversion -Wno-bool-conversion -Wno-enum-conversion -Wno-float-conversion -Wno-non-literal-null-conversion -Wno-objc-literal-conversion -Wshorten-64-to-32 -Wnewline-eof -Wno-selector -Wno-strict-selector-match -Wno-undeclared-selector -Wno-deprecated-implementations -Wno-c++11-extensions -DOS_OBJECT_USE_OBJC=0 -DLIBC_NO_LIBCRASHREPORTERCLIENT -fstrict-aliasing -Wprotocol -Wno-deprecated-declarations -Wno-invalid-offsetof -mmacosx-version-min=10.13 -g -fvisibility=hidden -fvisibility-inlines-hidden -Wno-sign-conversion -Wno-infinite-recursion -Wno-move -Wno-comma -Wno-block-capture-autoreleasing -Wno-strict-prototypes -Wno-range-loop-analysis -Wall -Wextra -Wstrict-aliasing=2 -Wstrict-overflow=4 -Wno-unused-parameter -Wno-deprecated-objc-isa-usage -Wno-cast-of-sel-type -fdollars-in-identifiers -fobjc-legacy-dispatch -D_LIBCPP_VISIBLE= -MMD -MT dependencies -o ".\Debug\hashtable2_418C34B7.obj" -c "..\..\deps\objc4\runtime\hashtable2.mm"
 ```
 
-Now (July 2018), we are going to use this command as a base and we will add other options to it (see `build.cmd` file for the result).
+Now (July 2018), we are going to use this command as a base and we will add other options to it (see `build_one.cmd` file for the result).
 
 - `-target "i386-pc-windows-msvc"` - let's just try to build for x86 first.
 - `-std=c++14` - because we use MSVC C++ std library which uses C++14 features.
@@ -194,7 +194,7 @@ Now (July 2018), we are going to use this command as a base and we will add othe
 
 These were removed:
 
-- `-fno-rtti` - MSVC C++ headers use `typeid`, so it needs RTTI.
+- `-fno-rtti` - MSVC C++ headers use `typeid`, so they need RTTI.
 
 **TODO: Do this with CMake.**
 **TODO: Use toolchains for different arm and x86 configurations.**
