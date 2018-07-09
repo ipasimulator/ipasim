@@ -7,3 +7,5 @@ call build_one.cmd objc-auto.mm
 call build_one.cmd objc-block-trampolines.mm
 call build_one.cmd objc-cache-old.mm
 call build_one.cmd objc-cache.mm
+call build_one.cmd objc-class-old.mm
+call build_one.cmd objc-class.mm
