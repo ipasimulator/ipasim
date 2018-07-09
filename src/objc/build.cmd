@@ -19,3 +19,4 @@ call build_one.cmd objc-load.mm %*
 call build_one.cmd objc-loadmethod.mm %*
 call build_one.cmd objc-lockdebug.mm %*
 call build_one.cmd objc-opt.mm %*
+call build_one.cmd objc-os.mm %*
