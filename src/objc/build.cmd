@@ -1,4 +1,5 @@
 @echo off
+rem Try also "build.cmd -Wno-unused-command-line-argument".
 call build_one.cmd hashtable2.mm %*
 call build_one.cmd maptable.mm %*
 call build_one.cmd NSObject.mm %*
