@@ -207,3 +207,5 @@ These were removed:
 - `[format-error-pthread-self]` - There is a format error with `phtread_self()` - original code supposed it returns a pointer, which it doesn't in pthreads-win32.
 - `[use-unicorn-alloc]` - Maybe use unicorn's allocation engine instead.
 - `[angle-brackets]` - We want to use `"..."` includes instead of `<objc/...>` ones.
+
+**TODO: Maybe implement POSIX functions via Cygwin or something like that...**
