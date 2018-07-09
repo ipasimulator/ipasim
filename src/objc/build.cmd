@@ -25,3 +25,7 @@ call build_one.cmd objc-references.mm %*
 call build_one.cmd objc-runtime-new.mm %*
 call build_one.cmd objc-runtime-old.mm %*
 call build_one.cmd objc-runtime.mm %*
+call build_one.cmd objc-sel-old.mm %*
+call build_one.cmd objc-sel-set.mm %*
+call build_one.cmd objc-sel.mm %*
+call build_one.cmd objc-sync.mm %*
