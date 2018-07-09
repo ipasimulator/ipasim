@@ -185,6 +185,8 @@ Now (July 2018), we are going to use this command as a base and we will add othe
 
 - `-target "i386-pc-windows-msvc"` - let's just try to build for x86 first.
 - `-std=c++14` - because we use MSVC C++ std library which uses C++14 features.
+- `-fblocks` - needed and also can be found in the listing from `-###` above.
+  **TODO: What other things differ between the listing with and without `-###`?**
 - `-DOBJC_PORT` - our flag that enables changes made by us to port the code.
 - `-D__OBJC2__=1` - we want to build the "new" runtime (which is used on iPhones).
 - `-DHAVE_STRUCT_TIMESPEC` - so that pthreads-win32 library doesn't redefine `struct timespec`.
