@@ -13,3 +13,4 @@ call build_one.cmd objc-errors.mm %*
 call build_one.cmd objc-exception.mm %*
 call build_one.cmd objc-file-old.mm %*
 call build_one.cmd objc-file.mm %*
+call build_one.cmd objc-initialize.mm %*
