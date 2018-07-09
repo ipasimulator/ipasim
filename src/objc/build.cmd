@@ -29,3 +29,4 @@ call build_one.cmd objc-sel-old.mm %*
 call build_one.cmd objc-sel-set.mm %*
 call build_one.cmd objc-sel.mm %*
 call build_one.cmd objc-sync.mm %*
+call build_one.cmd objc-weak.mm %*
