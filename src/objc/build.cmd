@@ -9,3 +9,4 @@ call build_one.cmd objc-cache-old.mm
 call build_one.cmd objc-cache.mm
 call build_one.cmd objc-class-old.mm
 call build_one.cmd objc-class.mm
+call build_one.cmd objc-errors.mm
