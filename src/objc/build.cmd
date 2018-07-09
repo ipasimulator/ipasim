@@ -23,3 +23,5 @@ call build_one.cmd objc-opt.mm %*
 call build_one.cmd objc-os.mm %*
 call build_one.cmd objc-references.mm %*
 call build_one.cmd objc-runtime-new.mm %*
+call build_one.cmd objc-runtime-old.mm %*
+call build_one.cmd objc-runtime.mm %*
