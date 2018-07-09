@@ -203,3 +203,4 @@ These were removed:
 ### Command keywords
 
 - `[no-direct-keys]` - `pthread_key_t` (and it's equivalent `tls_key_t`) are integers on macOS, but not in pthreads-win32, so we cannot use integers for them as the original code does.
+- `[format-error-pthread-self]` - There is a format error with `phtread_self()` - original code supposed it returns a pointer, which it doesn't in pthreads-win32.
