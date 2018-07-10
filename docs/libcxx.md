@@ -7,6 +7,7 @@ It sometimes depends heavily on it (e.g. it calls directly `__cxa_throw` in `obj
 So, it would be ideal to use it for our Windows `objc` port as well.
 
 **TODO: Ok, it turns out, we would also need `libc++abi` library, which is not buildable on Windows yet.**
+**TODO: Still, maybe use this library instead of VC++ headers...**
 
 ## Building from sources
 
