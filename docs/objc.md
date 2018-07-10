@@ -196,6 +196,9 @@ clang -x objective-c++ -arch x86_64 -fmessage-length=0 -fdiagnostics-show-note-i
 Now (July 2018), we are going to use this command as a base and we will add other options to it (see `build_one.cmd` file for the result).
 
 - `-target "i386-pc-windows-msvc"` - let's just try to build for x86 first.
+  `-target "i386-apple-macosx10.13.0"` is used for language `assembler-with-cpp` since the original assembler uses directives only valid for Mach-O files and this option will generate Mach-O output for us.
+  We then convert this Mach-O file to PE format using tool [objconv](www.agner.org/optimize/#objconv).
+  **TODO: Add instructions on how to get the tool to section Dependencies, or include it via Git LFS.**
 - `-std=c++14` - because we use MSVC C++ std library which uses C++14 features.
   This is only included if the language is `objective-c++`.
 - `-fblocks` - needed and also can be found in the listing from `-###` above.
