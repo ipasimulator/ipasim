@@ -29,6 +29,8 @@ call build_one.cmd objc-sel-old.mm %*
 call build_one.cmd objc-sel-set.mm %*
 call build_one.cmd objc-sel.mm %*
 call build_one.cmd objc-sync.mm %*
+call build_one.cmd objc-typeencoding.mm %*
 call build_one.cmd objc-weak.mm %*
 call build_one.cmd Object.mm %*
 call build_one.cmd Protocol.mm %*
+call build_one.cmd OldClasses.subproj\List.m %*
