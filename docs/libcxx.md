@@ -6,6 +6,8 @@ Library `objc4` on macOS uses `libc++` as standard library.
 It sometimes depends heavily on it (e.g. it calls directly `__cxa_throw` in `objc-exception.mm`).
 So, it would be ideal to use it for our Windows `objc` port as well.
 
+**TODO: Ok, it turns out, we would also need `libc++abi` library, which is not buildable on Windows yet.**
+
 ## Building from sources
 
 See also <https://libcxx.llvm.org/docs/BuildingLibcxx.html#experimental-support-for-windows>.
