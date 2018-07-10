@@ -8,7 +8,6 @@
 #include <Windows.h>
 
 BOOL SetThreadContext(HANDLE hThread, const CONTEXT *lpContext);
-UINT GetSystemDirectory(LPTSTR lpBuffer, UINT uSize);
 HMODULE LoadLibrary(LPCTSTR lpFileName);
 
 #endif
