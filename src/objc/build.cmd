@@ -37,3 +37,6 @@ call build_one.cmd objective-c OldClasses.subproj\List.m %*
 call build_one.cmd assembler-with-cpp Messengers.subproj\objc-msg-arm.s %*
 call build_one.cmd assembler-with-cpp Messengers.subproj\objc-msg-arm64.s %*
 call build_one.cmd assembler-with-cpp Messengers.subproj\objc-msg-i386.s %*
+call build_one.cmd assembler-with-cpp Messengers.subproj\objc-msg-simulator-i386.s %*
+call build_one.cmd assembler-with-cpp Messengers.subproj\objc-msg-simulator-x86_64.s %*
+call build_one.cmd assembler-with-cpp Messengers.subproj\objc-msg-x86_64.s %*
