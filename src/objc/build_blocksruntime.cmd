@@ -1,7 +1,7 @@
 @echo off
 
 echo.
-echo Building BlocksRuntime...
+echo build.cmd: Building BlocksRuntime...
 echo.
 
 clang -target "i386-pc-windows-msvc" -I"..\..\deps\blocksruntime" -c "..\..\deps\blocksruntime\BlocksRuntime\data.c" -o ".\Debug\data.o"

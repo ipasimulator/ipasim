@@ -15,7 +15,7 @@ goto loop
 :afterloop
 
 echo.
-echo build_one.cmd: Building %file%...
+echo build.cmd: Building %file%...
 echo.
 
 if [%language%]==[objective-c++] (set std=-std=c++14) else (set std=)
