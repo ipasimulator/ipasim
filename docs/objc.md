@@ -223,6 +223,7 @@ These were removed:
 
 Building linking command similarily (see `link.cmd`):
 
+- `-nologo` - be quiet.
 - `-dll` - we want a DLL.
 - `-force:multiple` - ignore duplicate definitions.
   **TODO: Don't do this.**
