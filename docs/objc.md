@@ -241,7 +241,7 @@ Building linking command similarily (see `link.cmd`):
 
 We need some POSIX functions (`pthreads`, but also `libc++abi` and `libunwind`), that's why we will use `mingw-w64`.
 
-See also <https://github.com/martell/mingw-w64-clang>.
+See also <https://github.com/martell/mingw-w64-clang> and <https://github.com/mstorsjo/llvm-mingw>.
 **TODO: Maybe build that on Linux VM and take out the resulting Windows binaries and use them!**
 
 ### Comment keywords
