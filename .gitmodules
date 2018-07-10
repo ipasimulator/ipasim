@@ -16,3 +16,6 @@
 [submodule "deps/apple-headers"]
 	path = deps/apple-headers
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/apple-headers
+[submodule "deps/blocksruntime"]
+	path = deps/blocksruntime
+	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/blocksruntime
