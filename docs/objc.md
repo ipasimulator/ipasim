@@ -201,6 +201,7 @@ These were removed:
 
 - `-fno-rtti` - MSVC C++ headers use `typeid`, so they need RTTI.
 - `-std=gnu++11` - we use our own `-std`.
+- `-arch x86_64` - we use our own architecture inside `-target`.
 
 **TODO: Do this with CMake.**
 **TODO: Use toolchains for different arm and x86 configurations.**
