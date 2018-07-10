@@ -1,5 +1,8 @@
 @echo off
 rem Try also "build.cmd -Wno-unused-command-line-argument".
+
+if exist ".\Debug\files.txt" del ".\Debug\files.txt"
+
 call build_one.cmd objective-c++ hashtable2.mm %*
 call build_one.cmd objective-c++ maptable.mm %*
 call build_one.cmd objective-c++ NSObject.mm %*
@@ -48,3 +51,5 @@ call build_one.cmd assembler-with-cpp a2a3-blocktramps-arm.s %*
 call build_one.cmd assembler-with-cpp a2a3-blocktramps-i386.s %*
 call build_one.cmd assembler-with-cpp a2a3-blocktramps-x86_64.s %*
 call build_one.cmd assembler-with-cpp objc-sel-table.s %*
+
+call link.cmd
