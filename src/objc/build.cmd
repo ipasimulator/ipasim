@@ -52,4 +52,6 @@ call build_one.cmd assembler-with-cpp a2a3-blocktramps-i386.s %*
 call build_one.cmd assembler-with-cpp a2a3-blocktramps-x86_64.s %*
 call build_one.cmd assembler-with-cpp objc-sel-table.s %*
 
+call build_blocksruntime.cmd
+
 call link.cmd
