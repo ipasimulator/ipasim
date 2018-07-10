@@ -229,7 +229,8 @@ Building linking command similarily (see `link.cmd`):
 - `-dll` - we want a DLL.
 - `-force:multiple` - ignore duplicate definitions.
   **TODO: Don't do this.**
-- `-defaultlib:libcmt.lib` - include C Runtime (for `malloc` and related).
+- `-out:".\Debug\libobjc.A.dll"` - let's name the library `libobjc.A.dll` (because its original name is `libobjc.A.dylib`).
+- `"libcmt.lib"` - include C Runtime (for `malloc` and related).
 - `".\Debug\blocksruntime.lib"` - include `BlocksRuntime` (built by `build_blocksruntime.cmd`).
 - `"..\..\Debug\pthread\pthread.lib"` - pthreads-win32 library.
   **TODO: This must currently be built using Visual Studio.
