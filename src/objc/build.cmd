@@ -40,3 +40,10 @@ call build_one.cmd assembler-with-cpp Messengers.subproj\objc-msg-i386.s %*
 call build_one.cmd assembler-with-cpp Messengers.subproj\objc-msg-simulator-i386.s %*
 call build_one.cmd assembler-with-cpp Messengers.subproj\objc-msg-simulator-x86_64.s %*
 call build_one.cmd assembler-with-cpp Messengers.subproj\objc-msg-x86_64.s %*
+call build_one.cmd assembler-with-cpp a1a2-blocktramps-arm.s %*
+call build_one.cmd assembler-with-cpp a1a2-blocktramps-arm64.s %*
+call build_one.cmd assembler-with-cpp a1a2-blocktramps-i386.s %*
+call build_one.cmd assembler-with-cpp a1a2-blocktramps-x86_64.s %*
+call build_one.cmd assembler-with-cpp a2a3-blocktramps-arm.s %*
+call build_one.cmd assembler-with-cpp a2a3-blocktramps-i386.s %*
+call build_one.cmd assembler-with-cpp a2a3-blocktramps-x86_64.s %*
