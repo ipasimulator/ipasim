@@ -203,6 +203,8 @@ Now (July 2018), we are going to use this command as a base and we will add othe
   This is only included if the language is `objective-c++`.
 - `-fblocks` - needed and also can be found in the listing from `-###` above.
   **TODO: What other things differ between the listing with and without `-###`?**
+- `-fobjc-runtime=macosx-10.13.0` - to compile against the Apple's runtime API.
+  Otherwise, GCC runtime would be used (probably because of the `-target` option).
 - `-DOBJC_PORT` - our flag that enables changes made by us to port the code.
 - `-D__OBJC2__=1` - we want to build the "new" runtime (which is used on iPhones).
 - `-DHAVE_STRUCT_TIMESPEC` - so that pthreads-win32 library doesn't redefine `struct timespec`.
