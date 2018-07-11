@@ -52,9 +52,8 @@ call build_one.cmd assembler-with-cpp a2a3-blocktramps-i386.s %*
 call build_one.cmd assembler-with-cpp a2a3-blocktramps-x86_64.s %*
 call build_one.cmd assembler-with-cpp objc-sel-table.s %*
 
-rem TODO: Maybe build with c++ as language (but beware of implications inside build_one.cmd).
 set dir=libclosure
-call build_one.cmd objective-c++ data.c %*
-call build_one.cmd objective-c++ runtime.c %*
+call build_one.cmd c++ data.c %*
+call build_one.cmd c++ runtime.c %*
 
 call link.cmd
