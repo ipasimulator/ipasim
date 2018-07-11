@@ -207,6 +207,7 @@ Now (July 2018), we are going to use this command as a base and we will add othe
   Otherwise, GCC runtime would be used (probably because of the `-target` option).
 - `-DOBJC_PORT` - our flag that enables changes made by us to port the code.
 - `-D__OBJC2__=1` - we want to build the "new" runtime (which is used on iPhones).
+- `-DBUILDING_OBJC=1` - we are building it!
 - `-DHAVE_STRUCT_TIMESPEC` - so that pthreads-win32 library doesn't redefine `struct timespec`.
 - `-DNOMINMAX` - there are no `min` and `max` macros on macOS, so we don't want them either.
 - `-Wno-nullability-completeness` - whatever, deal with those later.
