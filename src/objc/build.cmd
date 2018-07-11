@@ -57,4 +57,7 @@ set dir=libclosure
 call build_one.cmd c++ data.c %*
 call build_one.cmd c++ runtime.c %*
 
+set dir=..\src\objc
+call build_one.cmd objective-c++ dladdr.mm %*
+
 call link.cmd
