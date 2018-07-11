@@ -19,3 +19,6 @@
 [submodule "deps/blocksruntime"]
 	path = deps/blocksruntime
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/blocksruntime
+[submodule "deps/libclosure"]
+	path = deps/libclosure
+	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/libclosure
