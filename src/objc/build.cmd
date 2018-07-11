@@ -54,7 +54,8 @@ call build_one.cmd assembler-with-cpp a2a3-blocktramps-x86_64.s %*
 call build_one.cmd assembler-with-cpp objc-sel-table.s %*
 
 set dir=libclosure
-call build_one.cmd c++ data.c %*
+call build_one.cmd c data.c %*
+rem TODO: This should also be compiled as C.
 call build_one.cmd c++ runtime.c %*
 
 set dir=..\src\objc
