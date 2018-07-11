@@ -251,6 +251,12 @@ See also <https://github.com/martell/mingw-w64-clang> and <https://github.com/ms
 Wow, [exceptions are complex](https://llvm.org/docs/ExceptionHandling.html).
 Let's not support them for the moment.
 
+#### Blocks runtime
+
+We currently use ported Apple's `libclosure`.
+Alternatively, we could also use [LLVM's implementation](http://compiler-rt.llvm.org/) (see also <http://mackyle.github.io/blocksruntime/>) or extract it from [GNUstep's libobjc](https://github.com/gnustep/libobjc2).
+The Apple's one is the one that the original `objc4` was built against, though, so it's the best.
+
 ### Comment keywords
 
 - `[no-direct-keys]` - `pthread_key_t` (and it's equivalent `tls_key_t`) are integers on macOS, but not in pthreads-win32, so we cannot use integers for them as the original code does.
