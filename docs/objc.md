@@ -235,6 +235,8 @@ Building linking command similarily (see `link.cmd`):
   This could happen if `build_one.cmd` is run manually.
 - `-ignore:4049,4217` - ignoring warnings about "locally defined symbols".
   **TODO: What does that even means and does it matter?**
+- `-def:".\libobjc.def"` - explicitly export symbols defined in `*.s` files.
+  **TODO: Maybe do that with `__declspec(dllexport)` or something like that, too?**
 - `-out:".\Debug\libobjc.A.dll"` - let's name the library `libobjc.A.dll` (because its original name is `libobjc.A.dylib`).
 - `"libcmt.lib"` - include C Runtime (for `malloc` and related).
 - `"..\..\Debug\pthread\pthread.lib"` - pthreads-win32 library.

@@ -1,0 +1,32 @@
+EXPORTS
+
+; From objc-msg-i386.s.obj.
+_cache_getMethod
+_cache_getImp
+objc_msgSend
+objc_msgSendSuper
+objc_msgSendv
+objc_msgSend_fpret
+objc_msgSendv_fpret
+objc_msgSend_stret
+objc_msgSendSuper_stret
+objc_msgSendv_stret
+_objc_msgForward_impcache
+_objc_msgForward
+_objc_msgForward_stret
+method_invoke
+method_invoke_stret
+
+; From a1a2-blocktramps-i386.s.obj and a2a3-blocktramps-i386.s.obj.
+_a1a2_tramphead
+_a1a2_firsttramp
+_a1a2_nexttramp
+_a2a3_tramphead
+_a1a2_trampend
+_a2a3_firsttramp
+_a2a3_nexttramp
+_a2a3_trampend
+
+; From objc-sel-table.s.obj.
+_objc_opt_data
+_objc_opt_rw_data
