@@ -213,6 +213,7 @@ Now (July 2018), we are going to use this command as a base and we will add othe
 - `-I ".\include"` - this folder contains our proxy headers.
 - `-I "..\..\deps\apple-headers"` - this folder contains the real headers referenced by our proxy headers.
 - `-I "..\..\deps\pthreads.2"` - for `pthread.h`.
+- `-I "..\..\deps\libclosure"` - for `Block.h` and `Block_private.h`.
 
 These were removed:
 
@@ -233,7 +234,6 @@ Building linking command similarily (see `link.cmd`):
   This could happen if `build_one.cmd` is run manually.
 - `-out:".\Debug\libobjc.A.dll"` - let's name the library `libobjc.A.dll` (because its original name is `libobjc.A.dylib`).
 - `"libcmt.lib"` - include C Runtime (for `malloc` and related).
-- `".\Debug\blocksruntime.lib"` - include `BlocksRuntime` (built by `build_blocksruntime.cmd`).
 - `"..\..\Debug\pthread\pthread.lib"` - pthreads-win32 library.
   **TODO: This must currently be built using Visual Studio.
   Build it with scripts as others.**
@@ -257,5 +257,9 @@ Let's not support them for the moment.
 - `[format-error-pthread-self]` - There is a format error with `phtread_self()` - original code supposed it returns a pointer, which it doesn't in pthreads-win32.
 - `[use-unicorn-alloc]` - Maybe use unicorn's allocation engine instead.
 - `[angle-brackets]` - We want to use `"..."` includes instead of `<objc/...>` ones.
+- `[ptr-conversion]` - There is a conversion from `void *` to pointer of some specific type.
+  Our compiler complains, so we add an explicit conversion.
+  **TODO: Why does this works for Apple?**
+  **TODO: This is in `libclosure` (so this might not be the appropriate place to list it).**
 
 **TODO: Maybe implement POSIX functions via Cygwin or something like that...**
