@@ -229,6 +229,8 @@ Building linking command similarily (see `link.cmd`):
 - `-dll` - we want a DLL.
 - `-force:multiple` - ignore duplicate definitions.
   **TODO: Don't do this.**
+- `-ignore:4042` - ignore that there might be duplicate entries in `.\Debug\files.txt`.
+  This could happen if `build_one.cmd` is run manually.
 - `-out:".\Debug\libobjc.A.dll"` - let's name the library `libobjc.A.dll` (because its original name is `libobjc.A.dylib`).
 - `"libcmt.lib"` - include C Runtime (for `malloc` and related).
 - `".\Debug\blocksruntime.lib"` - include `BlocksRuntime` (built by `build_blocksruntime.cmd`).
