@@ -232,6 +232,8 @@ Building linking command similarily (see `link.cmd`):
   **TODO: Don't do this.**
 - `-ignore:4042` - ignore that there might be duplicate entries in `.\Debug\files.txt`.
   This could happen if `build_one.cmd` is run manually.
+- `-ignore:4049,4217` - ignoring warnings about "locally defined symbols".
+  **TODO: What does that even means and does it matter?**
 - `-out:".\Debug\libobjc.A.dll"` - let's name the library `libobjc.A.dll` (because its original name is `libobjc.A.dylib`).
 - `"libcmt.lib"` - include C Runtime (for `malloc` and related).
 - `"..\..\Debug\pthread\pthread.lib"` - pthreads-win32 library.
