@@ -18,8 +18,6 @@ echo.
 echo build.cmd: Building %file%...
 echo.
 
-if [%dir%]==[] set dir=objc4\runtime
-
 if [%language%]==[objective-c++] (set std=-std=c++14) else (set std=)
 
 if [%language%]==[assembler-with-cpp] (

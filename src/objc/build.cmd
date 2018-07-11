@@ -3,6 +3,7 @@ rem Try also "build.cmd -Wno-unused-command-line-argument".
 
 if exist ".\Debug\files.txt" del ".\Debug\files.txt"
 
+set dir=objc4\runtime
 call build_one.cmd objective-c++ hashtable2.mm %*
 call build_one.cmd objective-c++ maptable.mm %*
 call build_one.cmd objective-c++ NSObject.mm %*
