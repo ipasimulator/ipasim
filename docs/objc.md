@@ -244,6 +244,11 @@ We need some POSIX functions (`pthreads`, but also `libc++abi` and `libunwind`),
 See also <https://github.com/martell/mingw-w64-clang> and <https://github.com/mstorsjo/llvm-mingw>.
 **TODO: Maybe build that on Linux VM and take out the resulting Windows binaries and use them!**
 
+#### Exceptions
+
+Wow, [exceptions are complex](https://llvm.org/docs/ExceptionHandling.html).
+Let's not support them for the moment.
+
 ### Comment keywords
 
 - `[no-direct-keys]` - `pthread_key_t` (and it's equivalent `tls_key_t`) are integers on macOS, but not in pthreads-win32, so we cannot use integers for them as the original code does.
