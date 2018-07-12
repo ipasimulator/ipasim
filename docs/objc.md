@@ -205,6 +205,7 @@ Now (July 2018), we are going to use this command as a base and we will add othe
   **TODO: What other things differ between the listing with and without `-###`?**
 - `-fobjc-runtime=macosx-10.13.0` - to compile against the Apple's runtime API.
   Otherwise, GCC runtime would be used (probably because of the `-target` option).
+- `-gfull` - generate debugging information.
 - `-DOBJC_PORT` - our flag that enables changes made by us to port the code.
 - `-D__OBJC2__=1` - we want to build the "new" runtime (which is used on iPhones).
 - `-DBUILDING_OBJC=1` - we are building it!
