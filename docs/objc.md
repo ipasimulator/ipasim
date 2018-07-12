@@ -280,5 +280,7 @@ The Apple's one is the one that the original `objc4` was built against, though, 
   Our compiler complains, so we add an explicit conversion.
   **TODO: Why does this works for Apple?**
   **TODO: This is in `libclosure` (so this might not be the appropriate place to list it).**
+- `[i386-asm]` - `objc-msg-i386.s` uses the old ABI (`!__OBJC2__`), so we use `objc-msg-simulator-i386.s` which uses the new ABI (`__OBJC2__`).
+  **TODO: Is this correct and does Apple do this, too?**
 
 **TODO: Maybe implement POSIX functions via Cygwin or something like that...**

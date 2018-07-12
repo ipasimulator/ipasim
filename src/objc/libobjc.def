@@ -1,19 +1,37 @@
 EXPORTS
 
-; From objc-msg-i386.s.obj.
-_cache_getMethod
-_cache_getImp
+; From objc-msg-simulator-i386.s.obj.
+_objc_msgNil
+_objc_msgNil_fpret
+_objc_msgNil_stret
+cache_getImp
 objc_msgSend
+objc_msgLookup
 objc_msgSendSuper
-objc_msgSendv
+objc_msgLookupSuper
+objc_msgSendSuper2
+objc_msgLookupSuper2
 objc_msgSend_fpret
-objc_msgSendv_fpret
+objc_msgLookup_fpret
 objc_msgSend_stret
+objc_msgLookup_stret
 objc_msgSendSuper_stret
-objc_msgSendv_stret
+objc_msgLookupSuper_stret
+objc_msgSendSuper2_stret
+objc_msgLookupSuper2_stret
+_objc_msgSend_uncached
+_objc_msgSend_stret_uncached
+_objc_msgLookup_uncached
+_objc_msgLookup_stret_uncached
 _objc_msgForward_impcache
 _objc_msgForward
 _objc_msgForward_stret
+objc_msgSend_debug
+objc_msgSendSuper2_debug
+objc_msgSend_stret_debug
+objc_msgSendSuper2_stret_debug
+objc_msgSend_fpret_debug
+objc_msgSend_noarg
 method_invoke
 method_invoke_stret
 
