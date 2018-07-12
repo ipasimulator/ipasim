@@ -30,3 +30,6 @@ _a2a3_trampend
 ; From objc-sel-table.s.obj.
 _objc_opt_data
 _objc_opt_rw_data
+
+; From objc-cache.mm.obj.
+_objc_empty_cache
