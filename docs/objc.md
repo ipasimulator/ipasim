@@ -262,6 +262,13 @@ See also <https://github.com/martell/mingw-w64-clang> and <https://github.com/ms
 Wow, [exceptions are complex](https://llvm.org/docs/ExceptionHandling.html).
 Let's not support them for the moment.
 
+Reading material:
+
+- <https://itanium-cxx-abi.github.io/cxx-abi/abi-eh.html>
+- <https://monoinfinito.wordpress.com/series/exception-handling-in-c/>
+- <https://www.intel.com/content/dam/www/public/us/en/documents/guides/itanium-software-runtime-architecture-guide.pdf>
+- <https://itanium-cxx-abi.github.io/cxx-abi/abi.html>
+
 #### Blocks runtime
 
 We currently use ported Apple's `libclosure`.
