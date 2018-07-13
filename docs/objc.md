@@ -278,6 +278,9 @@ And `map_images` is actually handled inside `_objc_init`, so that should be the 
 
 Originally `_objc_init` is called by `_os_object_init(void)` in `libdispatch`, that is in turn called by `libdispatch_init(void)` also in `libdispatch` and that is in turn called by `libSystem_initializer` which is a `__attribute__((constructor))` in `libSystem`.
 
+The initialization phase depends heavily on reading the `.dylib`s' headers and sections.
+That will be OK for our emulated `.dylib`s and Mach-O executables, but we will need to write equivalent code to initialize WinObjC `.dll`s and `.dll` of the runtime itself, because they are not in Mach-O format, obviously.
+
 ### Comment keywords
 
 - `[no-direct-keys]` - `pthread_key_t` (and it's equivalent `tls_key_t`) are integers on macOS, but not in pthreads-win32, so we cannot use integers for them as the original code does.
