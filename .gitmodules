@@ -20,3 +20,7 @@
 	path = deps/libclosure
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/libclosure
 	branch = objc_port
+[submodule "deps/WinObjC"]
+	path = deps/WinObjC
+	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/WinObjC
+	branch = port
