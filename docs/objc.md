@@ -282,5 +282,8 @@ The Apple's one is the one that the original `objc4` was built against, though, 
   **TODO: This is in `libclosure` (so this might not be the appropriate place to list it).**
 - `[i386-asm]` - `objc-msg-i386.s` uses the old ABI (`!__OBJC2__`), so we use `objc-msg-simulator-i386.s` which uses the new ABI (`__OBJC2__`).
   **TODO: Is this correct and does Apple do this, too?**
+- `[unaligned]` - These instructions need aligned addresses to work, but we don't currently have them, so we use their unaligned variants.
+  **TODO: It would be better to align the addresses instead.
+  See e.g. Clang's `-falign-functions` (also do this in WinObjC `.dll`s).**
 
 **TODO: Maybe implement POSIX functions via Cygwin or something like that...**
