@@ -37,6 +37,16 @@ So, an alternative and better approach is to create an UWP `.dll` project in Vis
 > >  */
 > > ```
 
+### Why should we build for UWP?
+
+After all, only difference is that it uses `api-ms-*` umbrella `.dll`s instead of `kernel32.dll` (if done properly - i.e., if built against UWP's `platform.winmd` - see [docs on Objective-C runtime](objc.md), section Porting, for more information).
+Well, [umbrella libraries](https://docs.microsoft.com/en-us/windows/desktop/apiindex/windows-umbrella-libraries) are in fact just virtual `.dll`s (they don't exist anywhere on disk), they are mapped to physical `.dll`s (like `kernel32.dll`, `kernelbase.dll`, etc.) by `ApiSetSchema.dll` mapping library.
+See [this StackOverflow answer](https://stackoverflow.com/a/47530043/9080566), where it's described.
+
+**TODO: But does that have any pros or cons?**
+As I see it now, those `api-ms-*.dll`s might only contain the high-level (i.e., structured) WinRT APIs and not the low-level ones (i.e., plain C, good old Win32 APIs).
+Or, maybe they contain both, but the high-level ones cannot be found elsewhere (or at least not easily, because since they're umbrella libraries, all the APIs must technically exist elsewhere).
+
 ## Comments in code
 
 When porting code by copying it (or cloning from a remote repository, etc.), we add comments prefixed with `[port]` to indicate that those are our comments.
