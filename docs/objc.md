@@ -289,6 +289,22 @@ Originally `_objc_init` is called by `_os_object_init(void)` in `libdispatch`, t
 The initialization phase depends heavily on reading the `.dylib`s' headers and sections.
 That will be OK for our emulated `.dylib`s and Mach-O executables, but we will need to write equivalent code to initialize WinObjC `.dll`s and `.dll` of the runtime itself, because they are not in Mach-O format, obviously.
 
+#### Building for UWP
+
+**TODO: We should use C++/WinRT, which can convert UWP's `platform.winmd` to C++ header files that Clang would be able to read.**
+See also how Visual Studio builds e.g. `pthreads.2` to see what is passed to the compiler.
+It can be seen in logs located in `src/pthread/Debug/pthread.log/CL.command.1.log`:
+
+```cmd
+/c /IC:\USERS\JJONE\FILES\PROJECTS\IPASIM\REPOS\IPASIMULATOR\SRC\PTHREAD\..\..\DEPS\PTHREADS.2\ /IC:\USERS\JJONE\FILES\PROJECTS\IPASIM\REPOS\IPASIMULATOR\SRC\PTHREAD\ /I"GENERATED FILES\\" /IDEBUG\ /ZI /nologo /W3 /WX- /diagnostics:classic /sdl /Od /Oy- /D PTW32_BUILD /D HAVE_STRUCT_TIMESPEC /D __CLEANUP_C /D _WINDLL /D _WINDLL /D _UNICODE /D UNICODE /D _DEBUG /D WINAPI_FAMILY=WINAPI_FAMILY_APP /D __WRL_NO_DEFAULT_LIB__ /Gm- /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"DEBUG\\" /Fd"DEBUG\VC141.PDB" /Gd /TC /FU"C:\PROGRAM FILES (X86)\MICROSOFT VISUAL STUDIO\2017\ENTERPRISE\VC\TOOLS\MSVC\14.14.26428\LIB\X86\STORE\REFERENCES\PLATFORM.WINMD" /analyze- /FC C:\USERS\JJONE\FILES\PROJECTS\IPASIM\REPOS\IPASIMULATOR\DEPS\PTHREADS.2\ATTR.C
+```
+
+And here is how linker is invoked (`src/pthread/Debug/pthread.log/link.command.1.log`):
+
+```cmd
+/OUT:"C:\USERS\JJONE\FILES\PROJECTS\IPASIM\REPOS\IPASIMULATOR\DEBUG\PTHREAD\PTHREAD.DLL" /INCREMENTAL /NOLOGO WINDOWSAPP.LIB /MANIFEST:NO /DEBUG:FASTLINK /PDB:"C:\USERS\JJONE\FILES\PROJECTS\IPASIM\REPOS\IPASIMULATOR\DEBUG\PTHREAD\PTHREAD.PDB" /SUBSYSTEM:CONSOLE /TLBID:1 /APPCONTAINER /WINMD:NO /WINMDFILE:"C:\USERS\JJONE\FILES\PROJECTS\IPASIM\REPOS\IPASIMULATOR\DEBUG\PTHREAD\PTHREAD.WINMD" /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\USERS\JJONE\FILES\PROJECTS\IPASIM\REPOS\IPASIMULATOR\DEBUG\PTHREAD\PTHREAD.LIB" /MACHINE:X86 /DLL DEBUG\ATTR.OBJDEBUG\AUTOSTATIC.OBJDEBUG\BARRIER.OBJDEBUG\CANCEL.OBJDEBUG\CLEANUP.OBJDEBUG\CONDVAR.OBJDEBUG\CREATE.OBJDEBUG\DLL.OBJDEBUG\ERRNO.OBJDEBUG\EXIT.OBJDEBUG\FORK.OBJDEBUG\GLOBAL.OBJDEBUG\MISC.OBJDEBUG\MUTEX.OBJDEBUG\NONPORTABLE.OBJDEBUG\PRIVATE.OBJDEBUG\RWLOCK.OBJDEBUG\SCHED.OBJDEBUG\SEMAPHORE.OBJDEBUG\SIGNAL.OBJDEBUG\SPIN.OBJDEBUG\SYNC.OBJDEBUG\TSD.OBJDEBUG\STUBS.OBJ
+```
+
 ### Comment keywords
 
 - `[no-direct-keys]` - `pthread_key_t` (and it's equivalent `tls_key_t`) are integers on macOS, but not in pthreads-win32, so we cannot use integers for them as the original code does.
