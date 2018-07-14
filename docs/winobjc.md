@@ -71,7 +71,7 @@ msbuild "/t:WinObjC Frameworks Package\Package\WinObjC_Frameworks" /p:Configurat
 > How to build projects in solutions with `MSBuild`?
 > See [this StackOverflow answer](https://stackoverflow.com/a/19534376/9080566) and [official docs](https://docs.microsoft.com/en-us/visualstudio/msbuild/how-to-build-specific-targets-in-solutions-by-using-msbuild-exe).
 
-It should all succeed (except for the `NugetRestore` project, that can fail) and generate output packages in `deps/WinObjC/tools/OutputPackages/Debug/` and `deps/WinObjC/build/OutputPackages/Debug/`.
+It should all succeed and generate output packages in `deps/WinObjC/tools/OutputPackages/Debug/` and `deps/WinObjC/build/OutputPackages/Debug/`.
 Now clean the working directory with `git clean -fdx`, switch back to branch `port` and proceed to building the ported version as described below.
 
 > To clean up even more, delete all `WinObjC.*` folders from `%HomePath%\.nuget\packages\`.
@@ -82,5 +82,6 @@ To inject our Objective-C runtime into WinObjC, follow these instructions:
 
 - Copy the runtime (as `libobjc2{.dll,.lib,.pdb}`) into `deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/`.
 - Follow the exact same process as when building from source, except that now you should be on branch `port`, of course.
+  **TODO: It doesn't work!**
 
 **TODO: `pthreads-win32`'s `.dll` should be probably included with our runtime, too.**
