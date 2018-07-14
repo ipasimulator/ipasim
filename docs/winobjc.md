@@ -49,16 +49,20 @@ Follow these instructions to build from source.
 
 ```ps
 .\init.ps1
+.\.tools\nuget.exe restore .\tools\tools.sln
 ```
 
 - Run Developer Command Prompt inside `deps/WinObjC`:
 
-> Try also specifying the `/m` option to let `msbuild` use multiple cores.
+> Note that multi-core building (with MSBuild's option `/m`) doesn't work very well.
+> It sometimes gives the following error:
+> ```
+> fatal error C1041: cannot open program database '<path to repository>\deps\WinObjC\tools\WinObjCRT\dll\Release\vc141.pdb'; if multiple CL.EXE write to the same .PDB file, please use /FS [<path to repository>\deps\WinObjC\tools\WinObjCRT\dll\WinObjCRT.vcxproj]
+> ```
+> **TODO: Fix that error and use multi-core building.**
 
 ```cmd
-msbuild /t:Restore /p:BuildProjectReferences=false .\tools\tools.sln
-msbuild "/t:WinObjC Language Package\Package\WinObjC_Language" /p:Configuration=Debug /p:Platform=x86 .\tools\tools.sln
-msbuild "/t:WinObjC Packaging Package\Package\WinObjC_Packaging" /p:Configuration=Debug /p:Platform=x86 .\tools\tools.sln
+msbuild "/t:WinObjC Language Package\Package\WinObjC_Language;WinObjC Packaging Package\Package\WinObjC_Packaging" /p:Configuration=Debug /p:Platform=x86 .\tools\tools.sln
 msbuild /t:Restore /p:BuildProjectReferences=false .\build\build.sln
 git submodule update --init --recursive
 msbuild "/t:WinObjC Frameworks Package\Package\WinObjC_Frameworks" /p:Configuration=Debug /p:Platform=x86 .\build\build.sln
