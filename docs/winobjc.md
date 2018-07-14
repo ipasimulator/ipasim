@@ -31,11 +31,7 @@ msbuild /t:Restore /p:BuildProjectReferences=false .\build\build.sln
 
 ### Installing `WinObjC.Tools`
 
-They can be found at [Chocolatey](https://chocolatey.org), as is described [in WinObjC's wiki](https://github.com/Microsoft/WinObjC/wiki/Using-vsimporter).
-
-### Building in Visual Studio
-
-If the build fails because Visual Studio cannot read or write some files, it seems that you need to wait until the solution is fully loaded, `#include`s parsed, etc. - i.e., until it says "Ready" in the status bar.
+They can be found at [Chocolatey](https://chocolatey.org), as is described on one [WinObjC's wiki page](https://github.com/Microsoft/WinObjC/wiki/Using-vsimporter).
 
 ### Summing up
 
@@ -56,9 +52,11 @@ Follow these instructions to build from source.
 
 > Note that multi-core building (with MSBuild's option `/m`) doesn't work very well.
 > It sometimes gives the following error:
+>
 > ```
 > fatal error C1041: cannot open program database '<path to repository>\deps\WinObjC\tools\WinObjCRT\dll\Release\vc141.pdb'; if multiple CL.EXE write to the same .PDB file, please use /FS [<path to repository>\deps\WinObjC\tools\WinObjCRT\dll\WinObjCRT.vcxproj]
 > ```
+>
 > **TODO: Fix that error and use multi-core building.**
 
 ```cmd
