@@ -288,82 +288,8 @@ private:
 		// For variadic functions, we need to semantically analyze some of its arguments
 		// to determine what the whole called signature looks like.
 		if (name == "objc_msgSend") {
-			// First argument is a pointer to the target instance (can be null).
-			// Second argument is an op selector. That's usually just a pointer to a string
-			// containing the method's name.
-			// NOTE: This function shouldn't actually be called as variadic (see its docs),
-			// so we don't do that.
-
-			// There are two ways how to do this.
-			// One option is to use HeadersAnalyzer to generate proxy code for every
-			// Objective-C method and just call the correct proxy (selected by the selector "op").
-			// Alternative to the above is dynamically determining
-			// what the method's parameter types are and then dynamically invoking
-			// objc_msgSend via libffi.
-
-			// Here, we implement the second variant.
-
-			// TODO: Move these structures to separate .h file (or include an existing one).
-			// HACK: These structures were copied from IDA.
-			struct __objc2_meth_list {
-				uint32_t entrysize;
-				uint32_t count;
-			};
-			struct __objc2_meth {
-				char *name;
-				char *types;
-				void *imp;
-			};
-			typedef void __objc2_prot_list;
-			typedef void __objc2_ivar_list;
-			typedef void __objc2_prop_list;
-			struct __objc2_class_ro {
-				uint32_t flags;
-				uint32_t ivar_base_start;
-				uint32_t ivar_base_size;
-				//uint32_t reserved;
-				void *ivar_lyt;
-				char *name;
-				__objc2_meth_list *base_meths;
-				__objc2_prot_list *base_prots;
-				__objc2_ivar_list *ivars;
-				void *weak_ivar_lyt;
-				__objc2_prop_list *base_props;
-			};
-			struct __objc2_class {
-				__objc2_class *isa;
-				__objc2_class *superclass;
-				void *cache;
-				void *vtable;
-				__objc2_class_ro *info;
-			};
-			// ===
-			typedef struct objc_object {
-				__objc2_class *isa;
-			} *id;
-
-			auto obj = reinterpret_cast<id>(r0);
-			auto sel = reinterpret_cast<char *>(r1);
-			for (auto isa = obj->isa; reinterpret_cast<uint32_t>(isa) != dl.slide_; isa = isa->superclass) {
-				auto meths = isa->info->base_meths;
-				// TODO: Bug in the dyld - fields that were NULL (0) in the binary are now equal to slide!
-				if (reinterpret_cast<uint32_t>(meths) != dl.slide_) {
-					// Try to find the method.
-					auto meth_arr = reinterpret_cast<__objc2_meth *>(meths + 1);
-					for (uint32_t i = 0; i != meths->count; ++i) {
-						if (!std::strcmp(meth_arr[i].name, sel)) {
-							cout << "Found!" << endl;
-						}
-					}
-				}
-			}
-			cout << "Not found!" << endl;
-
-			// TODO: A big problem found - the .ipa uses the NeXT ObjC runtime, but WinObjC uses the GNUstep one!
-            // How to solve it? Well, we could build WinObjC with some ObjC runtime binary compatible
-            // with the Apple's runtime (NeXT-family runtime). Clang actually can generate the runtime
-            // structures, so we would only need to implement the methods (and we could inspire by Apple's
-            // source code here). See also clang's abstract class CGObjCRuntime.
+            // TODO: Use `objc_msgLookup` to retrieve the target function.
+			// TODO: Bug in our dyld - fields that were NULL (0) in the binary are now equal to slide! (this note was copied from removed code)
 		}
 
 		// execute target function using emulated cpu's context
