@@ -211,6 +211,7 @@ Now (July 2018), we are going to use this command as a base and we will add othe
 - `-DBUILDING_OBJC=1` - we are building it!
 - `-DHAVE_STRUCT_TIMESPEC` - so that pthreads-win32 library doesn't redefine `struct timespec`.
 - `-DNOMINMAX` - there are no `min` and `max` macros on macOS, so we don't want them either.
+- `-DWINAPI_FAMILY=WINAPI_FAMILY_PC_APP` - to build the `.dll` for UWP, see [docs on porting](porting.md) for more information.
 - `-Wno-nullability-completeness` - whatever, deal with those later.
 - `-I ".\include"` - this folder contains our proxy headers.
 - `-I "..\..\deps\apple-headers"` - this folder contains the real headers referenced by our proxy headers.
