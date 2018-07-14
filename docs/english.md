@@ -84,3 +84,28 @@ If they are callbacks (or structures containing callbacks or whatever), they nee
 
 This semantical handling is based on an external map (a database file) of symbol names and structured data about them (mainly their signatures).
 This map is built from the bridge's `.hpp` files at compile-time.
+
+## Calling `objc_msgSend`
+
+This function is very special, because it doesn't have any easily determinable signature.
+Even for normal variadic functions, their signature can be determined usually by their first argument which is a format string or something.
+But that's not true for `objc_msgSend` - users could legitimately call this function manually providing incompatible selector and arguments - and then in the target function not using the specified arguments but instead manually pulling them from stack - and this would work if the emulated app used it correctly.
+
+```mm
+@implementation SomeClass
++(void)someFunc {
+  // Actually somehow implemented directly in assembler,
+  // pulling it's arguments from stack (even though it
+  // formally declares that it has no arguments). Because
+  // why not (could be done for obfuscation purposes)...
+}
++(void)otherFunc {
+  // Call someFunc manually.
+  objc_msgSend(self, @sel("someFunc"), 1, 2, 3);
+}
+@end
+```
+
+But that's actually not a problem - the emulated application can do this only in its own user code.
+And then we don't have to care about arguments, we just jump to the address and it will work.
+Otherwise, it cannot do this when calling system libraries, because they just wouldn't work.
