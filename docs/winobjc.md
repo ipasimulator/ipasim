@@ -53,6 +53,8 @@ Follow these instructions to build from source.
 
 - Run Developer Command Prompt inside `deps/WinObjC`:
 
+> Try also specifying the `/m` option to let `msbuild` use multiple cores.
+
 ```cmd
 msbuild /t:Restore /p:BuildProjectReferences=false .\tools\tools.sln
 msbuild "/t:WinObjC Language Package\Package\WinObjC_Language" /p:Configuration=Debug /p:Platform=x86 .\tools\tools.sln
@@ -62,31 +64,19 @@ git submodule update --init --recursive
 msbuild "/t:WinObjC Frameworks Package\Package\WinObjC_Frameworks" /p:Configuration=Debug /p:Platform=x86 .\build\build.sln
 ```
 
+> How to build projects in solutions with `MSBuild`?
+> See [this StackOverflow answer](https://stackoverflow.com/a/19534376/9080566) and [official docs](https://docs.microsoft.com/en-us/visualstudio/msbuild/how-to-build-specific-targets-in-solutions-by-using-msbuild-exe).
+
 It should all succeed (except for the `NugetRestore` project, that can fail) and generate output packages in `deps/WinObjC/tools/OutputPackages/Debug/` and `deps/WinObjC/build/OutputPackages/Debug/`.
 Now clean the working directory with `git clean -fdx`, switch back to branch `port` and proceed to building the ported version as described below.
 
+> To clean up even more, delete all `WinObjC.*` folders from `%HomePath%\.nuget\packages\`.
+
 ## Porting
 
-**TODO: Not complete.**
 To inject our Objective-C runtime into WinObjC, follow these instructions:
 
 - Copy the runtime (as `libobjc2{.dll,.lib,.pdb}`) into `deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/`.
-- Build projects `WinObjC.Language` and `WinObjC.Packaging` in solution `deps/WinObjC/tools/tools.sln` for configuration `x86`.
-- Run inside `deps/WinObjC/tools/OutputPackages/Debug/`:
-
-```cmd
-..\..\..\.tools\nuget add -source ..\..\..\..\..\build\packages WinObjC.Language<tab>
-..\..\..\.tools\nuget add -source ..\..\..\..\..\build\packages WinObjC.Compiler<tab>
-..\..\..\.tools\nuget add -source ..\..\..\..\..\build\packages WinObjC.Logging<tab>
-..\..\..\.tools\nuget add -source ..\..\..\..\..\build\packages WinObjC.Packaging<tab>
-```
-
-- Finally, restore packages for the main thing:
-
-```cmd
-msbuild /t:Restore /p:BuildProjectReferences=false .\build\build.sln
-```
-
-- Build project `WinObjC.Frameworks` in solution `deps/WinObjC/build/build.sln` for configuration `x86`.
+- Follow the exact same process as when building from source, except that now you should be on branch `port`, of course.
 
 **TODO: `pthreads-win32`'s `.dll` should be probably included with our runtime, too.**
