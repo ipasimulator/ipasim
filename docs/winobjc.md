@@ -33,37 +33,60 @@ msbuild /t:Restore /p:BuildProjectReferences=false .\build\build.sln
 
 They can be found at [Chocolatey](https://chocolatey.org), as is described [in WinObjC's wiki](https://github.com/Microsoft/WinObjC/wiki/Using-vsimporter).
 
-## Porting
+### Building in Visual Studio
 
-To inject our Objective-C runtime into WinObjC, follow these instructions:
+If the build fails because Visual Studio cannot read or write some files, it seems that you need to wait until the solution is fully loaded, `#include`s parsed, etc. - i.e., until it says "Ready" in the status bar.
 
-- Copy the runtime (as `libobjc2{.dll,.lib,.pdb}`) into `deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/`.
-- Build solution `deps/WinObjC/tools/tools.sln`.
-- Run inside `deps\WinObjC\tools\OutputPackages\Debug`:
+### Summing up
 
-```cmd
-..\..\..\.tools\nuget add -source ..\..\..\..\..\packages WinObjC.Language.0.2.180221-dev-20180713113359.nupkg
-..\..\..\.tools\nuget add -source ..\..\..\..\..\packages WinObjC.Compiler.0.2.180221-dev-20180713113359.nupkg
-..\..\..\.tools\nuget add -source ..\..\..\..\..\packages WinObjC.Logging.0.2.180221-dev-20180713113359.nupkg
-..\..\..\.tools\nuget add -source ..\..\..\..\..\packages WinObjC.Packaging.0.2.180221-dev-20180713104420.nupkg
-cd ..\..\..
-.\.tools\nuget.exe sources add -name local -source ..\..\packages -configfile .\nuget.config
+Follow these instructions to build from source.
+
+- Install `WinObjC.Tools` (see above).
+  **TODO: Maybe build `WinObjC.Tools` package and install it before building everything else...**
+  Also make sure Git LFS is installed (`git lfs install`).
+- Switch to the `develop` or `master` branch (not `port`).
+- Run PowerShell inside `deps/WinObjC`:
+
+```ps
+.\init.ps1
 ```
 
-- Then manually move the `local` source to the top in the `deps\WinObjC\nuget.config`.
-- Restore packages again (in dev cmd) inside `deps\WinObjC`: (**TODO: Needed?**)
+- Run Developer Command Prompt inside `deps/WinObjC`:
 
 ```cmd
 msbuild /t:Restore /p:BuildProjectReferences=false .\tools\tools.sln
+msbuild "/t:WinObjC Language Package\Package\WinObjC_Language" /p:Configuration=Debug /p:Platform=x86 .\tools\tools.sln
+msbuild "/t:WinObjC Packaging Package\Package\WinObjC_Packaging" /p:Configuration=Debug /p:Platform=x86 .\tools\tools.sln
+msbuild /t:Restore /p:BuildProjectReferences=false .\build\build.sln
+git submodule update --init --recursive
+msbuild "/t:WinObjC Frameworks Package\Package\WinObjC_Frameworks" /p:Configuration=Debug /p:Platform=x86 .\build\build.sln
 ```
 
-- And rebuild `tools.sln` (and reinstall the packages into the local source?) (**TODO: Needed?**)
+It should all succeed (except for the `NugetRestore` project, that can fail) and generate output packages in `deps/WinObjC/tools/OutputPackages/Debug/` and `deps/WinObjC/build/OutputPackages/Debug/`.
+Now clean the working directory with `git clean -fdx`, switch back to branch `port` and proceed to building the ported version as described below.
+
+## Porting
+
+**TODO: Not complete.**
+To inject our Objective-C runtime into WinObjC, follow these instructions:
+
+- Copy the runtime (as `libobjc2{.dll,.lib,.pdb}`) into `deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/`.
+- Build projects `WinObjC.Language` and `WinObjC.Packaging` in solution `deps/WinObjC/tools/tools.sln` for configuration `x86`.
+- Run inside `deps/WinObjC/tools/OutputPackages/Debug/`:
+
+```cmd
+..\..\..\.tools\nuget add -source ..\..\..\..\..\build\packages WinObjC.Language<tab>
+..\..\..\.tools\nuget add -source ..\..\..\..\..\build\packages WinObjC.Compiler<tab>
+..\..\..\.tools\nuget add -source ..\..\..\..\..\build\packages WinObjC.Logging<tab>
+..\..\..\.tools\nuget add -source ..\..\..\..\..\build\packages WinObjC.Packaging<tab>
+```
+
 - Finally, restore packages for the main thing:
 
 ```cmd
 msbuild /t:Restore /p:BuildProjectReferences=false .\build\build.sln
 ```
 
-- And build it (`deps\WinObjC\build\build.sln` (and maybe install those packages into the local NuGet source, too).
+- Build project `WinObjC.Frameworks` in solution `deps/WinObjC/build/build.sln` for configuration `x86`.
 
-**TODO: `pthreads-win32`'s `.dll` should be probably included, too.**
+**TODO: `pthreads-win32`'s `.dll` should be probably included with our runtime, too.**
