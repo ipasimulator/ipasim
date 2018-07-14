@@ -232,6 +232,7 @@ public:
         process_bindings();
 
         // map libraries into the Unicorn Engine
+        // TODO: Not correct! The highest symbol's size is not considered.
         for (auto& lib : libs_) {
             uint64_t libLow = lib.second.first & (-4096);
             uint64_t libHigh = (lib.second.second + 4096) & (-4096);
