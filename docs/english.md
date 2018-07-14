@@ -50,7 +50,7 @@ A list of them follows.
    cd ..
    mkdir arm && cd arm
    cmake -G "Visual Studio 15 ARM" -DLLVM_TARGETS_TO_BUILD="ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\..\clang" -DLLVM_TABLEGEN="<full path to source directory>\deps\llvm\build\win32\Release\bin\llvm-tblgen.exe" -Thost=x64 ..\..
-   cd ..\..\yaml-cpp
+   cd ..\..\..\yaml-cpp
    mkdir build && cd build
    mkdir win32 && cd win32
    cmake -G "Visual Studio 15" -Thost=x64 ..\..
