@@ -15,3 +15,4 @@ And usually when there is more than one sentence, only the first is on the first
 - [pthread] - `pthreads-win32` port (`/src/pthread/` and `/deps/pthreads.2/`).
 - [res] - Resources (`/res/`).
 - [uwp] - The main UWP application.
+- [cg] - Code generation utilities (currently, that's the application called `HeadersAnalyzer` for historical reasons).
