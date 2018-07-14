@@ -35,6 +35,7 @@ A list of them follows.
 > For dependencies included as git submodules, [Atlassian blog post](https://www.atlassian.com/blog/git/git-submodules-workflows-tips) with some tips for working with git submodules might be useful.
 
 **TODO: Use <https://docs.microsoft.com/en-us/cpp/vcpkg>.**
+**TODO: Maybe build everything in Docker?**
 
 ## How to build (on 64-bit Windows with Visual Studio 2017)
 
