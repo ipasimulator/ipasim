@@ -85,7 +85,7 @@ If they are callbacks (or structures containing callbacks or whatever), they nee
 This semantical handling is based on an external map (a database file) of symbol names and structured data about them (mainly their signatures).
 This map is built from the bridge's `.hpp` files at compile-time.
 
-## Calling `objc_msgSend`
+### Calling `objc_msgSend`
 
 This function is very special, because it doesn't have any easily determinable signature.
 Even for normal variadic functions, their signature can be determined usually by their first argument which is a format string or something.
