@@ -101,7 +101,7 @@ But that's not true for `objc_msgSend` - users could legitimately call this func
 }
 +(void)otherFunc {
   // Call someFunc manually.
-  objc_msgSend(self, @sel("someFunc"), 1, 2, 3);
+  objc_msgSend(self, @selector(someFunc:), 1, 2, 3);
 }
 @end
 ```
