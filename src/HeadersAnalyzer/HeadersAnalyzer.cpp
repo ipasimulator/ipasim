@@ -181,8 +181,9 @@ int main()
         }
     }
 
-    fstream invokes("C:/Users/jjone/Files/Projects/ipaSim/repos/IPASimulator/out/invokes.inc");
-    fstream headers("C:/Users/jjone/Files/Projects/ipaSim/repos/IPASimulator/out/headers.inc");
+    // TODO: This won't create the /out/ directory if it doesn't exist!
+    fstream invokes("C:/Users/jjone/Files/Projects/ipaSim/repos/IPASimulator/out/invokes.inc", fstream::out);
+    fstream headers("C:/Users/jjone/Files/Projects/ipaSim/repos/IPASimulator/out/headers.inc", fstream::out);
     vector<string> headerPaths{
         "C:/Users/jjone/Files/Projects/ipaSim/repos/IPASimulator/deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/Foundation.h",
         "C:/Users/jjone/Files/Projects/ipaSim/repos/IPASimulator/packages/WinObjC.Language.0.2.171110/build/include/objc/objc-arc.h",
