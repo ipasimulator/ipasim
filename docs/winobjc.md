@@ -81,6 +81,9 @@ Now clean the working directory with `git clean -fdx`, switch back to branch `po
 To inject our Objective-C runtime into WinObjC, follow these instructions:
 
 - Copy the runtime (as `libobjc2{.dll,.lib,.pdb}`) into `deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/`.
+- Copy Clang:
+  - `clang.exe` into `deps/WinObjC/tools/WinObjC.Compiler/LLVM/bin/`.
+  - `libclang.dll` into `deps/WinObjC/tools/WinObjC.Compiler/LLVM/bin/` and `deps/WinObjC/tools/bin/`.
 - Follow the exact same process as when building from source, except that now you should be on branch `port`, of course.
   **TODO: It doesn't work!**
 
