@@ -5,9 +5,13 @@ They were forked from <https://git.llvm.org/git/llvm.git/> and <https://git.llvm
 
 ## Microsoft patches
 
-Then, Microsoft patches from `deps/WinObjC/contrib/clang` (0001-0019) and `deps/WinObjC/contrib/llvm` (0001-0005) were applied to Clang and LLVM, respectively, using `git am`.
-They are applied in branches named `microsoft` which are based on `release_60`.
-Then, branches named `port` were created based on them.
+Then, Microsoft patches 0009-0019 from `deps/WinObjC/contrib/clang` were applied to Clang using `git am`.
+They are applied in branch `microsoft` which is based on `google/stable` (that's some time after `release_60`, where patches prior to 0009 have been already applied by Microsoft).
+In LLVM, there were no patches to apply, but branch `microsoft` was created nevertheless, based on `stable`, for consistency.
+**TODO: Maybe base it on [`RELEASE_601` tag](http://llvm.org/viewvc/llvm-project/llvm/tags/RELEASE_601/final/), instead of `stable` branch.**
+
+> There are also old branches named `port`, not currently used.
+> Before using them again (if changing something in LLVM or Clang), delete them first.
 
 ## Building
 
@@ -15,10 +19,11 @@ Follow the instructions below to build patched LLVM and Clang.
 
 - Make sure you have installed CMake.
 - Run these commands from Developer Command Prompt inside `deps/llvm`:
+  **TODO: Build only projects (and `LLVM_TARGETS_TO_BUILD`) that are necessary.**
 
 ```cmd
 mkdir build && cd build
-cmake -G "Visual Studio 15" -DLLVM_TARGETS_TO_BUILD="ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\clang" ..
+cmake -G "Visual Studio 15" -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\clang" ..
 msbuild /m "/t:CMakePredefinedTargets\ALL_BUILD" /p:Configuration=Debug /p:Platform=Win32 .\LLVM.sln
 ```
 
