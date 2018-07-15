@@ -68,6 +68,8 @@ git submodule update --init --recursive
 msbuild "/t:WinObjC Frameworks Package\Package\WinObjC_Frameworks" /p:Configuration=Debug /p:Platform=x86 .\build\build.sln
 ```
 
+> If you don't want to rebuild `tools.sln` every time you make some changes to them, you can directly edit the packages (in `%HomePath%\.nuget\packages`) instead and then build only `build.sln`.
+
 > How to build projects in solutions with `MSBuild`?
 > See [this StackOverflow answer](https://stackoverflow.com/a/19534376/9080566) and [official docs](https://docs.microsoft.com/en-us/visualstudio/msbuild/how-to-build-specific-targets-in-solutions-by-using-msbuild-exe).
 
