@@ -5,9 +5,9 @@ They were forked from <https://git.llvm.org/git/llvm.git/> and <https://git.llvm
 
 ## Microsoft patches
 
-Then, Microsoft patches (0001-0019) from `deps/WinObjC/contrib/clang` were applied to Clang using `git am`.
-They are applied in branch `microsoft` which is based on `release_60`.
-Then, branch `port` was created in `deps/clang` based on branch `microsoft` and in `deps/llvm` based on branch `release_60`.
+Then, Microsoft patches from `deps/WinObjC/contrib/clang` (0001-0019) and `deps/WinObjC/contrib/llvm` (0001-0005) were applied to Clang and LLVM, respectively, using `git am`.
+They are applied in branches named `microsoft` which are based on `release_60`.
+Then, branches named `port` were created based on them.
 
 ## Building
 
