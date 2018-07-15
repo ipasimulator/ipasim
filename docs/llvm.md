@@ -20,6 +20,7 @@ Follow the instructions below to build patched LLVM and Clang.
 - Make sure you have installed CMake.
 - Run these commands from Developer Command Prompt inside `deps/llvm`:
   **TODO: Build only projects (and `LLVM_TARGETS_TO_BUILD`) that are necessary.**
+  **TODO: Maybe also build it in `Release` configuration, so that it is faster...**
 
 ```cmd
 mkdir build && cd build
