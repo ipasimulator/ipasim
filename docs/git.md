@@ -16,3 +16,17 @@ And usually when there is more than one sentence, only the first is on the first
 - [res] - Resources (`/res/`).
 - [uwp] - The main UWP application.
 - [cg] - Code generation utilities (currently, that's the application called `HeadersAnalyzer` for historical reasons).
+
+## Forking repositories
+
+See [Microsoft docs](https://docs.microsoft.com/en-us/vsts/git/import-git-repository?view=vsts#manually-import-a-repo) for useful instructions.
+Note that in the docs they use `git clone --bare`, but it seems better to use `git clone --mirror` (see also [this StackOverflow answer](https://stackoverflow.com/a/3960063/9080566)).
+Basically, you should execute the following commands:
+
+```cmd
+git clone --mirror https://github.com/contoso/old-contoso-repo.git
+cd old-contoso-repo.git
+git push --mirror https://contoso-ltd.visualstudio.com/MyFirstProject/_git/new-contoso-repo
+```
+
+(And then remove the temporary directory `old-contoso-repo.git`.)

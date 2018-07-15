@@ -2,6 +2,8 @@
 
 ## How was it forked?
 
+> See [docs on Git](git.md) for updated information on how Git repositories should be forked.
+
 Note that not all objects were fetched from [the origin](https://github.com/Microsoft/WinObjC), because of the limits of their [LFS](https://git-lfs.github.com/).
 
 ```cmd
