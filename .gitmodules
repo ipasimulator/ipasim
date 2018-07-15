@@ -1,11 +1,3 @@
-[submodule "deps/llvm"]
-	path = deps/llvm
-	url = https://git.llvm.org/git/llvm.git/
-	branch = release_50
-[submodule "deps/clang"]
-	path = deps/clang
-	url = https://git.llvm.org/git/clang.git/
-	branch = release_50
 [submodule "deps/yaml-cpp"]
 	path = deps/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
@@ -23,4 +15,12 @@
 [submodule "deps/WinObjC"]
 	path = deps/WinObjC
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/WinObjC
+	branch = port
+[submodule "deps/llvm"]
+	path = deps/llvm
+	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/llvm
+	branch = port
+[submodule "deps/clang"]
+	path = deps/clang
+	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/clang
 	branch = port
