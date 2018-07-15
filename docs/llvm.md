@@ -16,6 +16,7 @@ In LLVM, there were no patches to apply, but branch `microsoft` was created neve
 ## Building
 
 Follow the instructions below to build patched LLVM and Clang.
+**TODO: See and somehow use also repo `clang-build`.**
 
 - Make sure you have installed CMake.
 - Run these commands from Developer Command Prompt inside `deps/llvm`:
