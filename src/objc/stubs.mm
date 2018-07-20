@@ -6,7 +6,7 @@
 OBJC_EXPORT void objc_delete_weak_refs(id obj) {}
 
 // Copied from libobjc2/encoding2.c.
-// TODO: Do these work correctly for our runtime?
+// TODO: Do these work correctly for our runtime? Maybe port Apple's NSGetSizeAndAlignment instead (if there is its source code).
 // TODO: This doesn't work, why?
 //#define alignof(type) __builtin_offsetof(struct { const char c; type member; }, member)
 typedef const char *(*type_parser)(const char*, void*);
