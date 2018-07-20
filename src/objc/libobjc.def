@@ -76,3 +76,7 @@ _Block_layout
 _Block_extended_layout
 _Block_object_assign
 _Block_object_dispose
+
+; From objc-exception.mm.obj.
+; TODO: Why is this not exported even though it has `OBJC_EXPORT` in source code?
+objc_ehtype_vtable
