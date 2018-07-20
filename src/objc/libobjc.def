@@ -84,3 +84,4 @@ objc_ehtype_vtable
 ; From NSObject.mm.obj.
 OBJC_CLASS_$_NSObject
 OBJC_METACLASS_$_NSObject
+OBJC_IVAR_$_NSObject.isa
