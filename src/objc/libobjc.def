@@ -80,3 +80,7 @@ _Block_object_dispose
 ; From objc-exception.mm.obj.
 ; TODO: Why is this not exported even though it has `OBJC_EXPORT` in source code?
 objc_ehtype_vtable
+
+; From NSObject.mm.obj.
+OBJC_CLASS_$_NSObject
+OBJC_METACLASS_$_NSObject
