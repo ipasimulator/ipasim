@@ -62,5 +62,6 @@ set dir=..\src\objc
 call build_one.cmd objective-c++ dladdr.mm %*
 call build_one.cmd objective-c++ getsecbyname.mm %*
 call build_one.cmd objective-c++ cxxabi.mm %*
+call build_one.cmd objective-c++ stubs.mm %*
 
 call link.cmd
