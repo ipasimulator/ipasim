@@ -286,6 +286,12 @@ OBJC_EXPORT size_t objc_sizeof_type(const char *type)
 	sizeof_type(type, &size);
 	return size / 8;
 }
+OBJC_EXPORT size_t objc_aligned_size(const char *type)
+{
+	size_t size  = objc_sizeof_type(type);
+	size_t align = objc_alignof_type(type);
+	return size + (size % align);
+}
 
 // Signature copied from libobjc2/objc/runtime.h.
 // TODO: Move this to something like `compat.mm`.
