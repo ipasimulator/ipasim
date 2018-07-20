@@ -275,6 +275,11 @@ static const char *sizeof_type(const char *type, size_t *size)
 	abort();
 	return NULL;
 }
+OBJC_EXPORT const char *objc_skip_typespec(const char *type)
+{
+	size_t ignored = 0;
+	return sizeof_type(type, &ignored);
+}
 OBJC_EXPORT size_t objc_sizeof_type(const char *type)
 {
 	size_t size = 0;
