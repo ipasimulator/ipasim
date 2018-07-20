@@ -52,11 +52,27 @@ _objc_opt_rw_data
 ; From objc-cache.mm.obj.
 _objc_empty_cache
 
+; TODO: Export these from source code instead.
+
 ; From data.c.obj.
-; TODO: Export this from source code instead.
 _NSConcreteStackBlock
 _NSConcreteMallocBlock
 _NSConcreteAutoBlock
 _NSConcreteFinalizingBlock
 _NSConcreteGlobalBlock
 _NSConcreteWeakBlockVariable
+
+; From runtime.c.obj.
+_Block_use_RR2
+_Block_copy
+_Block_release
+_Block_tryRetain
+_Block_isDeallocating
+Block_size
+_Block_use_stret
+_Block_has_signature
+_Block_signature
+_Block_layout
+_Block_extended_layout
+_Block_object_assign
+_Block_object_dispose
