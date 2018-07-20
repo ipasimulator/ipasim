@@ -281,3 +281,12 @@ OBJC_EXPORT size_t objc_sizeof_type(const char *type)
 	sizeof_type(type, &size);
 	return size / 8;
 }
+
+// Signature copied from libobjc2/objc/runtime.h.
+// TODO: Move this to something like `compat.mm`.
+OBJC_EXPORT IMP objc_msg_lookup(id self, SEL _cmd) {
+    // TODO: From obj-abi.h on `objc_msgLookup` and related:
+    // "These are not callable C functions. Do not call them directly."
+    // Maybe just modify WinObjC so that it doesn't use this.
+    return reinterpret_cast<IMP (*)(id, SEL)>(objc_msgLookup)(self, _cmd);
+}
