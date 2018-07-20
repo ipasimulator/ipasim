@@ -301,3 +301,14 @@ OBJC_EXPORT IMP objc_msg_lookup(id self, SEL _cmd) {
     // Maybe just modify WinObjC so that it doesn't use this.
     return reinterpret_cast<IMP (*)(id, SEL)>(objc_msgLookup)(self, _cmd);
 }
+
+// Originals are in libobjc2/associate.m.
+// TODO: Implement these correctly!
+OBJC_EXPORT BOOL object_addMethod_np(id object, SEL name, IMP imp, const char *types)
+{
+	return class_addMethod(object, name, imp, types);
+}
+OBJC_EXPORT IMP object_replaceMethod_np(id object, SEL name, IMP imp, const char *types)
+{
+	return class_replaceMethod(object, name, imp, types);
+}
