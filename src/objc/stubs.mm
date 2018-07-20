@@ -293,13 +293,16 @@ OBJC_EXPORT size_t objc_aligned_size(const char *type)
 	return size + (size % align);
 }
 
-// Signature copied from libobjc2/objc/runtime.h.
+// Signatures copied from libobjc2/objc/runtime.h.
 // TODO: Move this to something like `compat.mm`.
+// TODO: From obj-abi.h on `objc_msgLookup` and related:
+// "These are not callable C functions. Do not call them directly."
+// Maybe just modify WinObjC so that it doesn't use this.
 OBJC_EXPORT IMP objc_msg_lookup(id self, SEL _cmd) {
-    // TODO: From obj-abi.h on `objc_msgLookup` and related:
-    // "These are not callable C functions. Do not call them directly."
-    // Maybe just modify WinObjC so that it doesn't use this.
     return reinterpret_cast<IMP (*)(id, SEL)>(objc_msgLookup)(self, _cmd);
+}
+OBJC_EXPORT IMP objc_msg_lookup_super(struct objc_super *super, SEL _cmd) {
+    return reinterpret_cast<IMP (*)(struct objc_super *, SEL)>(objc_msgLookupSuper2)(super, _cmd);
 }
 
 // Originals are in libobjc2/associate.m.
