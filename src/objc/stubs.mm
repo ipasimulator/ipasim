@@ -315,3 +315,8 @@ OBJC_EXPORT IMP object_replaceMethod_np(id object, SEL name, IMP imp, const char
 {
 	return class_replaceMethod(object, name, imp, types);
 }
+
+// Original is in libobjc2/NSBlocks.m.
+OBJC_EXPORT BOOL objc_create_block_classes_as_subclasses_of(Class super) {
+    return FALSE;
+}
