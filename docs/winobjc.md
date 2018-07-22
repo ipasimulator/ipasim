@@ -101,3 +101,5 @@ To inject our Objective-C runtime into WinObjC, follow these instructions:
   Note that this "tag" is not actually used, because it would be virtually in every `.def` file inside `/deps/WinObjC/build/`.
 - `[ehtype]` - So that it is not an error to have multiple occurrences of symbol `_OBJC_EHTYPE_$_NSException`.
   **TODO: Instead make `clang` to not generate those symbols.**
+- `[no-nsobject]` - `NSObject` is implemented in our runtime, so we disabled it in WinObjC's `Foundation` framework.
+  **TODO: Is our `NSObject` complete, though?**
