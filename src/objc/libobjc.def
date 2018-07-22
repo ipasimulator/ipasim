@@ -46,21 +46,21 @@ _a2a3_nexttramp
 _a2a3_trampend
 
 ; From objc-sel-table.s.obj.
-_objc_opt_data
-_objc_opt_rw_data
+_objc_opt_data DATA
+_objc_opt_rw_data DATA
 
 ; From objc-cache.mm.obj.
-_objc_empty_cache
+_objc_empty_cache DATA
 
 ; TODO: Export these from source code instead.
 
 ; From data.c.obj.
-_NSConcreteStackBlock
-_NSConcreteMallocBlock
-_NSConcreteAutoBlock
-_NSConcreteFinalizingBlock
-_NSConcreteGlobalBlock
-_NSConcreteWeakBlockVariable
+_NSConcreteStackBlock DATA
+_NSConcreteMallocBlock DATA
+_NSConcreteAutoBlock DATA
+_NSConcreteFinalizingBlock DATA
+_NSConcreteGlobalBlock DATA
+_NSConcreteWeakBlockVariable DATA
 
 ; From runtime.c.obj.
 _Block_use_RR2
@@ -79,9 +79,9 @@ _Block_object_dispose
 
 ; From objc-exception.mm.obj.
 ; TODO: Why is this not exported even though it has `OBJC_EXPORT` in source code?
-objc_ehtype_vtable
+objc_ehtype_vtable DATA
 
 ; From NSObject.mm.obj.
-OBJC_CLASS_$_NSObject
-OBJC_METACLASS_$_NSObject
-OBJC_IVAR_$_NSObject.isa
+OBJC_CLASS_$_NSObject DATA
+OBJC_METACLASS_$_NSObject DATA
+OBJC_IVAR_$_NSObject.isa DATA
