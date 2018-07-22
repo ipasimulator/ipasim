@@ -31,6 +31,20 @@ msbuild /m "/t:CMakePredefinedTargets\ALL_BUILD" /p:Configuration=Debug /p:Platf
 
 - The output will be in `deps/llvm/build/Debug/`.
 
-## Comment keywords
+## Porting
+
+### Comment keywords
 
 - `[ipasim-objc-runtime]` - We are adding a new runtime called `ipasim` that derives from the `ios` runtime and introduces changes that the `microsoft` runtime introduced.
+- `[dllimport]` - See section "Objective-C symbols across DLLs".
+
+### Objective-C symbols across DLLs
+
+Currently, Clang works pretty well when configured to use Apple's Objective-C runtime and COFF object file format.
+This is actually surprising since this combination doesn't really make sense in the real world.
+However, it obviously starts making sense as soon as our runtime is involved.
+And then, we will see that it doesn't work perfectly, so we need to make some changes to Clang.
+
+One such thing is `__declspec(dllimport)`ing Objective-C classes.
+Clang actually recognizes this attribute and sets it correctly for the corresponding `GlobalVariable` (see `CGObjCNonFragileABIMac::GetClassGlobal` in `CGObjCMac.cpp`).
+But, this information is later not considered when emitting the `GlobalVariable` in `TargetMachine::getSymbol` in `AsmPrinter::getSymbol` in `AsmPrinter::EmitGlobalVariable` in `AsmPrinter::doFinalization`.
