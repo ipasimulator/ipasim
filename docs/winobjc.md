@@ -103,3 +103,7 @@ To inject our Objective-C runtime into WinObjC, follow these instructions:
   **TODO: Instead make `clang` to not generate those symbols.**
 - `[no-nsobject]` - `NSObject` is implemented in our runtime, so we disabled it in WinObjC's `Foundation` framework.
   **TODO: Is our `NSObject` complete, though?**
+- `[uikit-autolayout]` - There is a circular dependency between projects `AutoLayout` and `UIKit`.
+  You may need to manually build these projects twice to solve this dependency.
+  **TODO: How can this work in the original code?**
+  **TODO: Solve this better.**
