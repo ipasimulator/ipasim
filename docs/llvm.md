@@ -16,20 +16,21 @@ In LLVM, there were no patches to apply, but branch `microsoft` was created neve
 ## Building
 
 Follow the instructions below to build patched LLVM and Clang.
-**TODO: See and somehow use also repo `clang-build`.**
+**TODO: See and somehow use also repo `clang-build` (it contains older build instructions than are those below, though).**
 
 - Make sure you have installed CMake.
 - Run these commands from Developer Command Prompt inside `deps/llvm`:
   **TODO: Build only projects (and `LLVM_TARGETS_TO_BUILD`) that are necessary.**
-  **TODO: Maybe also build it in `Release` configuration, so that it is faster...**
 
 ```cmd
 mkdir build && cd build
 cmake -G "Visual Studio 15" -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\clang" ..
-msbuild /m "/t:CMakePredefinedTargets\ALL_BUILD" /p:Configuration=Debug /p:Platform=Win32 .\LLVM.sln
+msbuild /m "/t:Clang executables\clang;Clang libraries\libclang" /p:Configuration=Release /p:Platform=Win32 /v:m .\LLVM.sln
 ```
 
-- The output will be in `deps/llvm/build/Debug/`.
+- The output will be in `deps/llvm/build/Release/`.
+
+> Alternatively, you can select `/p:Configuration=Debug` to build a version of Clang which you will be able to debug in Visual Studio.
 
 ## Porting
 
