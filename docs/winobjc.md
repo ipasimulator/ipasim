@@ -107,3 +107,4 @@ To inject our Objective-C runtime into WinObjC, follow these instructions:
   You may need to manually build these projects twice to solve this dependency.
   **TODO: How can this work in the original code?**
   **TODO: Solve this better.**
+  See also [official MSDN docs about circular dependencies](https://docs.microsoft.com/en-us/cpp/build/reference/using-an-import-library-and-export-file) and also [this blog post](http://www.lurklurk.org/linkers/linkers.html).
