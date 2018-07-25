@@ -8,3 +8,4 @@
 #include "targetver.h"
 
 #include <iostream>
+#include <LIEF/LIEF.hpp>
