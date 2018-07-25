@@ -24,3 +24,7 @@
 	path = deps/clang
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/clang
 	branch = port
+[submodule "deps/LIEF"]
+	path = deps/LIEF
+	url = https://github.com/lief-project/LIEF.git
+	branch = master
