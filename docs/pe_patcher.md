@@ -10,5 +10,5 @@ This utility adds `.mhdr` section containing Mach header into PE images.
 ```cmd
 mkdir build && cd build
 cmake -DLIEF_PYTHON_API=off ..
-msbuild /t:"LIB_LIEF_STATIC" /p:Configuration=Debug /p:Platform=Win32 /v:m .\LIEF.sln
+msbuild /t:"LIB_LIEF_SHARED" /p:Configuration=Debug /p:Platform=Win32 /v:m .\LIEF.sln
 ```
