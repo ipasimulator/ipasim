@@ -8,7 +8,10 @@ using namespace std;
 int main(int argc, char** argv)
 {
     if (argc != 2) {
-        std::cerr << "Usage: " << argv[0] << " <binary>" << std::endl;
+        cerr << "Usage: " << argv[0] << " <binary>" << endl;
+
+        // Pause.
+        getc(stdin);
         return 1;
     }
 
@@ -23,19 +26,25 @@ int main(int argc, char** argv)
 
     // Move the `.mhdr` section to the top.
     // TODO: It doesn't seem to be working.
-    auto start = binary->sections();
+    /*auto start = binary->sections();
     auto it = --binary->sections().end();
     assert(*it == mhdrSection);
     for (; it != start;) {
         auto curr = it--;
         swap(*it, *curr);
-    }
+    }*/
 
     // TODO: Rebuild the binary (maybe also rearrange the sections to group them into segments).
     //LIEF::PE::Builder builder(binary.get());
     //builder.build_imports(true);
     //builder.patch_imports(true);
-    binary->write(string(argv[1]) + "-edit.exe");
+    //binary->write(string(argv[1]) + "-edit.exe");
+
+    LIEF::PE::Builder builder(binary.get());
+    builder.build();
+    builder.write(string(argv[1]) + "-edit.exe");
+
+    LIEF::PE::Binary patched(binary->name(), binary->type());
 
     cout << "Done" << endl;
     return 0;

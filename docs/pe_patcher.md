@@ -2,6 +2,12 @@
 
 This utility adds `.mhdr` section containing Mach header into PE images.
 
+## Design
+
+There are actually two possible approaches to this.
+One is to modify LLVM linker (`lld-link`) to produce the `.mhdr` section.
+The other one is to use LIEF library to add `.mhdr` section into existing `.dll` file.
+
 ## Building
 
 - Checkout submodule `deps/LIEF`.
