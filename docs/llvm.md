@@ -1,7 +1,7 @@
 # LLVM and Clang
 
-This document describes submodules `deps/llvm` and `deps/clang`.
-They were forked from <https://git.llvm.org/git/llvm.git/> and <https://git.llvm.org/git/clang.git/>, respectively, using `git clone --mirror` and `git push --mirror`.
+This document describes submodules `deps/llvm`, `deps/clang` and `deps/lld`.
+They were forked from <https://git.llvm.org/git/llvm.git/>, <https://git.llvm.org/git/clang.git/> and <https://git.llvm.org/git/lld.git/>, respectively, using `git clone --mirror` and `git push --mirror`.
 
 ## Microsoft patches
 
@@ -9,6 +9,7 @@ Then, Microsoft patches 0009-0019 from `deps/WinObjC/contrib/clang` were applied
 They are applied in branch `microsoft` which is based on `google/stable` (that's some time after `release_60`, where patches prior to 0009 have been already applied by Microsoft).
 In LLVM, there were no patches to apply, but branch `microsoft` was created nevertheless, based on `stable`, for consistency.
 **TODO: Maybe base it on [`RELEASE_601` tag](http://llvm.org/viewvc/llvm-project/llvm/tags/RELEASE_601/final/), instead of `stable` branch.**
+Similarly LLD, but there was not even a `stable` branch, so it was based on some random commit which originated around the same time as the `stable` branches in LLVM and Clang.
 
 > There are also old branches named `port`, not currently used.
 > Before using them again (if changing something in LLVM or Clang), delete them first.
@@ -24,8 +25,8 @@ Follow the instructions below to build patched LLVM and Clang.
 
 ```cmd
 mkdir build && cd build
-cmake -G "Visual Studio 15" -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\clang" ..
-msbuild /m "/t:Clang executables\clang;Clang libraries\libclang" /p:Configuration=Release /p:Platform=Win32 /v:m .\LLVM.sln
+cmake -G "Visual Studio 15" -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\clang" -DLLVM_EXTERNAL_LLD_SOURCE_DIR="..\..\lld" ..
+msbuild /m "/t:Clang executables\clang;Clang libraries\libclang;lld executables\lld" /p:Configuration=Release /p:Platform=Win32 /v:m .\LLVM.sln
 ```
 
 - The output will be in `deps/llvm/build/Release/`.
