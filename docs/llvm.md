@@ -39,6 +39,8 @@ msbuild /m "/t:Clang executables\clang;Clang libraries\libclang;lld executables\
 
 - `[ipasim-objc-runtime]` - We are adding a new runtime called `ipasim` that derives from the `ios` runtime and introduces changes that the `microsoft` runtime introduced.
 - `[dllimport]` - See section "Objective-C symbols across DLLs".
+- `[mhdr]` - We are patching linker (`lld-link`) to add a section named `.mhdr` which will contain Mach-O header.
+  This Mach-O header will then be used by our `libobjc` to initialize the image.
 
 ### Objective-C symbols across DLLs
 
