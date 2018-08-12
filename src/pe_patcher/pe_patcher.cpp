@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 
     // Set its RVA.
     // TODO: Changing virtual_address makes the resulting PE binary invalid. Why?
-    //mhdrSection.virtual_address(va - size); // TODO: Check that it's non-negative.
+    mhdrSection.virtual_address(va - size); // TODO: Check that it's non-negative.
     //mhdrSection.virtual_address(0x34000 << 2);
 
     // Set its characteristics.
@@ -49,30 +49,13 @@ int main(int argc, char** argv)
     binary->optional_header().dll_characteristics_list().erase(LIEF::PE::DLL_CHARACTERISTICS::IMAGE_DLL_CHARACTERISTICS_DYNAMIC_BASE);
     binary->optional_header().dll_characteristics_list().erase(LIEF::PE::DLL_CHARACTERISTICS::IMAGE_DLL_CHARACTERISTICS_NX_COMPAT);
 
+    // Patch entry point. TODO: Doesn't work.
+    //binary->optional_header().addressof_entrypoint(binary->optional_header().addressof_entrypoint() + size);
+
     // Save the binary.
-    binary->write(string(argv[1]) + "-edit.exe");
-
-    // Move the `.mhdr` section to the top.
-    // TODO: It doesn't seem to be working.
-    /*auto start = binary->sections();
-    auto it = --binary->sections().end();
-    assert(*it == mhdrSection);
-    for (; it != start;) {
-        auto curr = it--;
-        swap(*it, *curr);
-    }*/
-
-    // TODO: Rebuild the binary (maybe also rearrange the sections to group them into segments).
-    //LIEF::PE::Builder builder(binary.get());
-    //builder.build_imports(true);
-    //builder.patch_imports(true);
-    //
-
-    /*LIEF::PE::Builder builder(binary.get());
+    LIEF::PE::Builder builder(binary.get());
     builder.build();
     builder.write(string(argv[1]) + "-edit.exe");
-
-    LIEF::PE::Binary patched(binary->name(), binary->type());*/
 
     cout << "Done" << endl;
     return 0;
