@@ -90,6 +90,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>BUILDING_DYLD;WIN32;_DEBUG;DYLD_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\llvm\include;$(SolutionDir)deps\llvm\build\include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4146</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -104,6 +106,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>BUILDING_DYLD;_DEBUG;DYLD_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\llvm\include;$(SolutionDir)deps\llvm\build\include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4146</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -120,6 +124,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>BUILDING_DYLD;WIN32;NDEBUG;DYLD_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\llvm\include;$(SolutionDir)deps\llvm\build\include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4146</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -138,6 +144,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>BUILDING_DYLD;NDEBUG;DYLD_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\llvm\include;$(SolutionDir)deps\llvm\build\include</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4146</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
