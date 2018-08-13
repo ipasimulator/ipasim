@@ -19,6 +19,7 @@ And usually when there is more than one sentence, only the first is on the first
 - [llvm] - LLVM and Clang port (`/deps/llvm/` and `/deps/clang/`).
 - [woc] - WinObjC port (`/deps/WinObjC/`).
 - [pep] - `pe_patcher` (`/src/pe_patcher/`).
+- [dyld] - Our `dyld` (`/src/dyld/`).
 
 ## Forking repositories
 
