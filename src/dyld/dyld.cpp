@@ -28,7 +28,17 @@ struct dylib_info {
 
 vector<dylib_info> dylibs;
 
-void _dyld_initialize(const mach_header* mh) {
+void found_dylib(const char *path, const mach_header *mh) {
+    // Check if we haven't already processed this one.
+    for (auto &&dylib : dylibs) {
+        if (dylib.header == mh) {
+            return;
+        }
+    }
+
+    // Save it.
+    dylibs.push_back(dylib_info{ path, mh });
+
     // Find all `LC_LOAD_DYLIB` commands.
     auto cmd = reinterpret_cast<const load_command *>(mh + 1);
     for (size_t i = 0; i != mh->ncmds; ++i) {
@@ -42,8 +52,8 @@ void _dyld_initialize(const mach_header* mh) {
             if (auto lib = library_guard(name)) {
                 if (auto sym = reinterpret_cast<const mach_header *>(lib.get_symbol("_mh_dylib_header"))) {
 
-                    // If successfull, save it.
-                    dylibs.push_back(dylib_info{ name, sym });
+                    // If successfull, save it and find others recursively.
+                    found_dylib(name, sym);
                 }
             }
         }
@@ -51,6 +61,9 @@ void _dyld_initialize(const mach_header* mh) {
         // Move to the next `load_command`.
         cmd = reinterpret_cast<const load_command *>(reinterpret_cast<const uint8_t *>(cmd) + cmd->cmdsize);
     }
+}
+void _dyld_initialize(const mach_header* mh) {
+    found_dylib(nullptr, mh);
 }
 void _dyld_objc_notify_register(_dyld_objc_notify_mapped mapped,
     _dyld_objc_notify_init init,
