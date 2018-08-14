@@ -52,3 +52,21 @@ void _dyld_initialize(const mach_header* mh) {
         cmd = reinterpret_cast<const load_command *>(reinterpret_cast<const uint8_t *>(cmd) + cmd->cmdsize);
     }
 }
+void _dyld_objc_notify_register(_dyld_objc_notify_mapped mapped,
+    _dyld_objc_notify_init init,
+    _dyld_objc_notify_unmapped unmapped) {
+    vector<const char *> paths;
+    paths.reserve(dylibs.size());
+    vector<const mach_header *> headers;
+    headers.reserve(dylibs.size());
+    for (auto &&dylib : dylibs) {
+        paths.push_back(dylib.path);
+        headers.push_back(dylib.header);
+    }
+
+    mapped(dylibs.size(), paths.data(), headers.data());
+
+    for (auto &&dylib : dylibs) {
+        init(dylib.path, dylib.header);
+    }
+}
