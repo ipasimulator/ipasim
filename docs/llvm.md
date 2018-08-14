@@ -52,3 +52,9 @@ And then, we will see that it doesn't work perfectly, so we need to make some ch
 One such thing is `__declspec(dllimport)`ing Objective-C classes.
 Clang actually recognizes this attribute and sets it correctly for the corresponding `GlobalVariable` (see `CGObjCNonFragileABIMac::GetClassGlobal` in `CGObjCMac.cpp`).
 But, this information is later not considered when emitting the `GlobalVariable` in `TargetMachine::getSymbol` in `AsmPrinter::getSymbol` in `AsmPrinter::EmitGlobalVariable` in `AsmPrinter::doFinalization`.
+
+## Debug info
+
+Besides the `-g -gcodeview` options that make Clang to emit debugging information, there is also a mysterious `-mllvm -emit-codeview-ghash-section` flag.
+More information about it can be found in [this LLVM blog post](http://blog.llvm.org/2018/01/improving-link-time-on-windows-with.html).
+Originally, this was found on SO in [these](https://stackoverflow.com/a/48573877/9080566) [two](https://stackoverflow.com/a/48604068/9080566) answers.
