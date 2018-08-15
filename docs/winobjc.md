@@ -86,6 +86,8 @@ To inject our Objective-C runtime into WinObjC, follow these instructions:
 - Copy Clang:
   - `clang.exe` into `deps/WinObjC/tools/WinObjC.Compiler/LLVM/bin/`.
   - `libclang.dll` into `deps/WinObjC/tools/WinObjC.Compiler/LLVM/bin/` and `deps/WinObjC/tools/bin/`.
+- Copy `lld-link.exe` - see `Islandwood.props` for more information.
+  **TODO: Automate this.**
 - Follow the exact same process as when building from source, except that now you should be on branch `port`, of course.
   Also, add argument `/p:ObjC_Port=true` when executing the `msbuild` commands.
 
