@@ -114,6 +114,9 @@ To inject our Objective-C runtime into WinObjC, follow these instructions:
   **TODO: Is our `NSObject` complete, though?**
 - `[uikit-autolayout]` - There is a circular dependency between projects `AutoLayout` and `UIKit`.
   You may need to manually build these projects twice to solve this dependency.
+  But it's not that easy.
+  First, it doesn't play nicely with `lld-link`.
+  Second, you have to manually disable and then re-enable one of the dependencies while building twice.
   **TODO: How can this work in the original code?**
   **TODO: Solve this better.**
   See also [official MSDN docs about circular dependencies](https://docs.microsoft.com/en-us/cpp/build/reference/using-an-import-library-and-export-file) and also [this blog post](http://www.lurklurk.org/linkers/linkers.html).
