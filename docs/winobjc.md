@@ -92,12 +92,23 @@ To inject our Objective-C runtime into WinObjC, follow these instructions:
   - `libclang.dll` into `deps/WinObjC/tools/WinObjC.Compiler/LLVM/bin/` and `deps/WinObjC/tools/bin/`.
 - Copy `lld-link.exe` and our proxy `link.exe` - see `Islandwood.props` for more information.
   **TODO: Automate this.**
+- Build `/src/dyld/dyld_initializer.cpp` and copy the resulting `dyld_initializer.obj` along with `dyld.lib` into `deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/`.
+  **TODO: Automate this, too.**
 - Follow the exact same process as when building from source, except that now you should be on branch `port`, of course.
   Also, add argument `/p:ObjC_Port=true` when executing the `msbuild` commands.
 
 **TODO: `pthreads-win32`'s `.dll` should be probably included with our runtime, too.**
 
 **TODO: Maybe we should port the `master` branch, not `develop`.**
+
+### Building `HelloUI` sample
+
+```cmd
+msbuild "/t:Restore" /p:Configuration=Debug /p:Platform=Win32 /p:ObjC_Port=true /v:m .\samples\HelloUI\HelloUI-WinStore10.sln
+msbuild "/t:HelloUI\HelloUI" /p:Configuration=Debug /p:Platform=Win32 /p:ObjC_Port=true /v:m .\samples\HelloUI\HelloUI-WinStore10.sln
+```
+
+Then, copy a lot of `.dll`s along.
 
 ## Comment keywords
 

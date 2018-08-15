@@ -26,7 +26,14 @@ struct dylib_info {
     const mach_header *header;
 };
 
+struct dylib_handlers {
+    _dyld_objc_notify_mapped mapped;
+    _dyld_objc_notify_init init;
+    _dyld_objc_notify_unmapped unmapped;
+};
+
 vector<dylib_info> dylibs;
+vector<dylib_handlers> handlers;
 
 void found_dylib(const char *path, const mach_header *mh) {
     // Check if we haven't already processed this one.
@@ -62,24 +69,38 @@ void found_dylib(const char *path, const mach_header *mh) {
         cmd = reinterpret_cast<const load_command *>(reinterpret_cast<const uint8_t *>(cmd) + cmd->cmdsize);
     }
 }
+void handle_dylibs(size_t startIndex) {
+
+    vector<const char *> paths;
+    paths.reserve(dylibs.size() - startIndex);
+    vector<const mach_header *> headers;
+    headers.reserve(dylibs.size() - startIndex);
+    for (size_t i = startIndex; i != dylibs.size(); ++i) {
+        paths.push_back(dylibs[i].path);
+        headers.push_back(dylibs[i].header);
+    }
+
+    for (auto &&handler : handlers) {
+        handler.mapped(headers.size(), paths.data(), headers.data());
+
+        for (size_t i = startIndex; i != dylibs.size(); ++i) {
+            handler.init(dylibs[i].path, dylibs[i].header);
+        }
+    }
+}
 void _dyld_initialize(const mach_header* mh) {
+
+    size_t handled = dylibs.size();
+
     found_dylib(nullptr, mh);
+
+    // Handle new dylibs.
+    handle_dylibs(handled);
 }
 void _dyld_objc_notify_register(_dyld_objc_notify_mapped mapped,
     _dyld_objc_notify_init init,
     _dyld_objc_notify_unmapped unmapped) {
-    vector<const char *> paths;
-    paths.reserve(dylibs.size());
-    vector<const mach_header *> headers;
-    headers.reserve(dylibs.size());
-    for (auto &&dylib : dylibs) {
-        paths.push_back(dylib.path);
-        headers.push_back(dylib.header);
-    }
 
-    mapped(dylibs.size(), paths.data(), headers.data());
-
-    for (auto &&dylib : dylibs) {
-        init(dylib.path, dylib.header);
-    }
+    handlers.push_back(dylib_handlers{ mapped, init, unmapped });
+    handle_dylibs(0);
 }
