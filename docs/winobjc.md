@@ -62,10 +62,10 @@ Follow these instructions to build from source.
 > **TODO: Fix that error and use multi-core building.**
 
 ```cmd
-msbuild "/t:WinObjC Language Package\Package\WinObjC_Language;WinObjC Packaging Package\Package\WinObjC_Packaging" /p:Configuration=Debug /p:Platform=x86 .\tools\tools.sln
-msbuild /t:Restore /p:BuildProjectReferences=false .\build\build.sln
+msbuild "/t:WinObjC Language Package\Package\WinObjC_Language;WinObjC Packaging Package\Package\WinObjC_Packaging" /p:Configuration=Debug /p:Platform=x86 /v:m .\tools\tools.sln
+msbuild /t:Restore /p:BuildProjectReferences=false /v:m .\build\build.sln
 git submodule update --init --recursive
-msbuild "/t:WinObjC Frameworks Package\Package\WinObjC_Frameworks" /p:Configuration=Debug /p:Platform=x86 .\build\build.sln
+msbuild "/t:WinObjC Frameworks Package\Package\WinObjC_Frameworks" /p:Configuration=Debug /p:Platform=x86 /v:m .\build\build.sln
 ```
 
 > If you don't want to rebuild `tools.sln` every time you make some changes to them, you can directly edit the packages (in `%HomePath%\.nuget\packages`) instead and then build only `build.sln`.
@@ -87,6 +87,7 @@ To inject our Objective-C runtime into WinObjC, follow these instructions:
   - `clang.exe` into `deps/WinObjC/tools/WinObjC.Compiler/LLVM/bin/`.
   - `libclang.dll` into `deps/WinObjC/tools/WinObjC.Compiler/LLVM/bin/` and `deps/WinObjC/tools/bin/`.
 - Follow the exact same process as when building from source, except that now you should be on branch `port`, of course.
+  Also, add argument `/p:ObjC_Port=true` when executing the `msbuild` commands.
 
 **TODO: `pthreads-win32`'s `.dll` should be probably included with our runtime, too.**
 
@@ -99,6 +100,8 @@ To inject our Objective-C runtime into WinObjC, follow these instructions:
   This reflects the difference between how our runtime and the GNUstep runtime name those symbols.
   Although symbols `__objc_class_name_*` and `OBJC_METACLASS_$_*` probably doesn't mean the same thing, we only replace those symbols in `.def` files so it only causes them to be exported which is exactly what we want.
   Note that this "tag" is not actually used, because it would be virtually in every `.def` file inside `/deps/WinObjC/build/`.
+  **TODO: Write a script that will do this automatically (without the need for manually changing those `.def` files).
+  Then add this script into one of the MSBuild project files, conditioned with `'$(ObjC_Port)' == 'true'` as other changes.**
 - `[ehtype]` - So that it is not an error to have multiple occurrences of symbol `_OBJC_EHTYPE_$_NSException`.
   **TODO: Instead make `clang` to not generate those symbols.**
 - `[no-nsobject]` - `NSObject` is implemented in our runtime, so we disabled it in WinObjC's `Foundation` framework.
