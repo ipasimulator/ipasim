@@ -70,6 +70,10 @@ msbuild "/t:WinObjC Frameworks Package\Package\WinObjC_Frameworks" /p:Configurat
 
 > If you don't want to rebuild `tools.sln` every time you make some changes to them, you can directly edit the packages (in `%HomePath%\.nuget\packages`) instead and then build only `build.sln`.
 
+> If you want to build just a specific project, you will want to know that the targets are named e.g. `WinObjC Frameworks Package\UIKit\dll\UIKit` (for `UIKit` inside `Frameworks` package).
+> You want to pass this name into MSBuild's `/t:` parameter.
+> Other root folders are named `WinObjC Frameworks` *`<name>`* `Package`, where *`<name>`* is either `Core`, `Third Party`, `UWP Core` or `UWP`.
+
 > How to build projects in solutions with `MSBuild`?
 > See [this StackOverflow answer](https://stackoverflow.com/a/19534376/9080566) and [official docs](https://docs.microsoft.com/en-us/visualstudio/msbuild/how-to-build-specific-targets-in-solutions-by-using-msbuild-exe).
 
