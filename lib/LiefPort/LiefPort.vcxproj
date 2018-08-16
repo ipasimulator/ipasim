@@ -125,6 +125,7 @@
       <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
       <DisableSpecificWarnings>4244;4101</DisableSpecificWarnings>
+      <SupportJustMyCode>false</SupportJustMyCode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -159,6 +160,7 @@
       <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
       <DisableSpecificWarnings>4244;4101</DisableSpecificWarnings>
+      <SupportJustMyCode>false</SupportJustMyCode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -193,6 +195,7 @@
       <ForcedIncludeFiles>iso646.h;Winsock2.h</ForcedIncludeFiles>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
       <DisableSpecificWarnings>4244;4101</DisableSpecificWarnings>
+      <SupportJustMyCode>false</SupportJustMyCode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

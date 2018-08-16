@@ -110,3 +110,13 @@ But that's not true for `objc_msgSend` - users could legitimately call this func
 But that's actually not a problem - the emulated application can do this only in its own user code.
 And then we don't have to care about arguments, we just jump to the address and it will work.
 Otherwise, it cannot do this when calling system libraries, because they just wouldn't work.
+
+## Workaround for Visual Studio 15.8
+
+In the latest Visual Studio 2017 15.8.0, the project `IpaSimulator` stopped building.
+It was because of some error in the C++ standard library.
+So we decided to install an older version and use that instead.
+See [this MSDN article](https://blogs.msdn.microsoft.com/vcblog/2017/11/15/side-by-side-minor-version-msvc-toolsets-in-visual-studio-2017/) for a step-by-step guide on how to do just that.
+
+Also, the new Visual Studio feature `JustMyCode` was causing some trouble, so it was disabled.
+See [this SO answer](https://stackoverflow.com/a/51856410/9080566) for more information.

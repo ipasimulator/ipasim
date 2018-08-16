@@ -181,6 +181,7 @@
       <PreprocessorDefinitions>CONFIG_TCG_INTERPRETER;WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__i386__;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>armeb.h</ForcedIncludeFiles>
       <DisableSpecificWarnings>4018;4244;4267</DisableSpecificWarnings>
+      <SupportJustMyCode>false</SupportJustMyCode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -215,6 +216,7 @@
       <PreprocessorDefinitions>CONFIG_TCG_INTERPRETER;WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__arm__;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>armeb.h</ForcedIncludeFiles>
       <DisableSpecificWarnings>4018;4244;4267</DisableSpecificWarnings>
+      <SupportJustMyCode>false</SupportJustMyCode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -249,6 +251,7 @@
       <PreprocessorDefinitions>CONFIG_TCG_INTERPRETER;WIN32_LEAN_AND_MEAN;WIN32;DEBUG;__x86_64__;_LIB;NEED_CPU_H;_CRT_SECURE_NO_WARNINGS;inline=__inline;__func__=__FUNCTION__;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>armeb.h</ForcedIncludeFiles>
       <DisableSpecificWarnings>4018;4244;4267</DisableSpecificWarnings>
+      <SupportJustMyCode>false</SupportJustMyCode>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
