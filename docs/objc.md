@@ -320,5 +320,12 @@ And here is how linker is invoked (`src/pthread/Debug/pthread.log/link.command.1
 - `[unaligned]` - These instructions need aligned addresses to work, but we don't currently have them, so we use their unaligned variants.
   **TODO: It would be better to align the addresses instead.
   See e.g. Clang's `-falign-functions` (also do this in WinObjC `.dll`s).**
+- `[classrefs]` - There is a bug which causes Objective-C classes imported across assembly boundaries to malfunction.
+  It's because there's an added indirect reference which is not expected by the runtime.
+  For example, in the `export-class` sample, the class is listed in `_objc_classrefs` section as `main.exe!__imp_OBJC_CLASS_$_TestClass`.
+  That is a pointer to `testclass.dll!OBJC_CLASS_$_TestClass` containing the real class.
+  It still doesn't crash immediately, because `Class` is expected to contain pointer to some class in its first field (the `isa` pointer).
+  It just acts very strangely.
+  **TODO: Fix this inside Clang.**
 
 **TODO: Maybe implement POSIX functions via Cygwin or something like that...**

@@ -15,12 +15,7 @@
 @implementation TestClass
 + (void)initialize {}
 + (void)load {}
-// TODO: Why doesn't this work with `+` (i.e., as a static method)?
-// Note: See also https://stackoverflow.com/a/4796925/9080566.
-// This probably doesn't work because the class is worked with as a `main.exe!__imp_OBJC_CLASS_$_TestClass` which
-// is a pointer to `testclass.dll!OBJC_CLASS_$_TestClass` but it's not dereferenced, therefore the runtime sees
-// it as field `isa`, which is also a pointer to class, so it works, but not correctly.
-- (void)sampleMethod {
++ (void)sampleMethod {
     puts("Hello, world!");
 }
 @end

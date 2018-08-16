@@ -9,5 +9,5 @@ __attribute__((objc_root_class))
 IMPEXP @interface TestClass
 + (void)initialize;
 + (void)load;
-- (void)sampleMethod;
++ (void)sampleMethod;
 @end
