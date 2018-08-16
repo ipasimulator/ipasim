@@ -82,6 +82,9 @@ Now clean the working directory with `git clean -fdx`, switch back to branch `po
 
 > To clean up even more, delete all `WinObjC.*` folders from `%HomePath%\.nuget\packages\`.
 
+> There is an odd quirk - output `.dll`s in `deps/WinObjC/build/Win32/Debug/Universal Windows` don't seem to be rewritten when rebuilt unless they are manually deleted first (along with other related files, like `.lib` etc.).
+> **TODO: Fix it.**
+
 ## Porting
 
 To inject our Objective-C runtime into WinObjC, follow these instructions:
