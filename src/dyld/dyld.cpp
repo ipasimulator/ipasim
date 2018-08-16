@@ -92,6 +92,7 @@ void _dyld_initialize(const mach_header* mh) {
 
     size_t handled = dylibs.size();
 
+    // TODO: Find out the path.
     found_dylib(nullptr, mh);
 
     // Handle new dylibs.
