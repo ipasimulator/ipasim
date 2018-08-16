@@ -20,6 +20,7 @@ And usually when there is more than one sentence, only the first is on the first
 - [woc] - WinObjC port (`/deps/WinObjC/`).
 - [pep] - `pe_patcher` (`/src/pe_patcher/`).
 - [dyld] - Our `dyld` (`/src/dyld/`).
+- [sam] - Samples (`/samples/`).
 
 ## Forking repositories
 
