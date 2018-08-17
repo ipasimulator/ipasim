@@ -35,6 +35,12 @@ ninja install-clang install-libclang install-lld
 > Alternatively, you can add option `-DCMAKE_BUILD_TYPE=Debug` to the CMake command to build a version of Clang which you will be able to debug in Visual Studio (do this preferably inside folder `/deps/llvm/build/Debug/`).
 > **TODO: We would also like to add option `-DLLVM_OPTIMIZED_TABLEGEN=On`, but it currently doesn't work.**
 
+For a `Debug` build with `Release` TableGen, do this (after building `llvm-tblgen` and `clang-tblgen` inside `/deps/llvm/build/Release/`):
+
+```cmd
+cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\..\clang" -DLLVM_EXTERNAL_LLD_SOURCE_DIR="..\..\..\lld" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX="..\..\..\..\build" -DLLVM_TABLEGEN="%cd%\..\Release\bin\llvm-tblgen.exe" -DCLANG_TABLEGEN="%cd%\..\Release\bin\clang-tblgen.exe" ..\..
+```
+
 ## Porting
 
 ### Comment keywords
