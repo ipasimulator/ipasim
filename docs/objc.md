@@ -326,6 +326,6 @@ And here is how linker is invoked (`src/pthread/Debug/pthread.log/link.command.1
   That is a pointer to `testclass.dll!OBJC_CLASS_$_TestClass` containing the real class.
   It still doesn't crash immediately, because `Class` is expected to contain pointer to some class in its first field (the `isa` pointer).
   It just acts very strangely.
-  **TODO: Fix this inside Clang.**
+  This was fixed inside our patched Clang - see `[fixbind]` in [the corresponding docs](llvm.md).
 
 **TODO: Maybe implement POSIX functions via Cygwin or something like that...**
