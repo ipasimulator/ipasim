@@ -83,7 +83,9 @@ void found_dylib(const char *path, const mach_header *mh) {
                         uint32_t count = sect->size >> 2;
                         uintptr_t ***data = (decltype(data))((uint8_t *)(sect->addr) + slide);
                         for (size_t k = 0; k != count; ++k, ++data) {
-                            **data = (uintptr_t *)***data;
+                            if (*data) {
+                                **data = (uintptr_t *)***data;
+                            }
                         }
                     }
 
