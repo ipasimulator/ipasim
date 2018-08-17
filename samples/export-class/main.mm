@@ -16,6 +16,12 @@ extern "C" void _objc_init(void);
 
 extern "C" llvm::MachO::mach_header _mh_dylib_header;
 
+@interface DerivedTestClass : TestClass
+@end
+
+@implementation DerivedTestClass
+@end
+
 int main() {
     puts("Press any key to coninue...");
     getc(stdin);
