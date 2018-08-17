@@ -25,13 +25,14 @@ Follow the instructions below to build patched LLVM and Clang.
 
 ```cmd
 mkdir build && cd build
-cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\clang" -DLLVM_EXTERNAL_LLD_SOURCE_DIR="..\..\lld" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="..\..\..\build" ..
+mkdir Release && cd Release
+cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\..\clang" -DLLVM_EXTERNAL_LLD_SOURCE_DIR="..\..\..\lld" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="..\..\..\..\build" ..\..
 ninja install-clang install-libclang install-lld
 ```
 
 - The outputs will be in `/build/`.
 
-> Alternatively, you can add option `-DCMAKE_BUILD_TYPE=Debug` to the CMake command to build a version of Clang which you will be able to debug in Visual Studio.
+> Alternatively, you can add option `-DCMAKE_BUILD_TYPE=Debug` to the CMake command to build a version of Clang which you will be able to debug in Visual Studio (do this preferably inside folder `/deps/llvm/build/Debug/`).
 > **TODO: We would also like to add option `-DLLVM_OPTIMIZED_TABLEGEN=On`, but it currently doesn't work.**
 
 ## Porting
