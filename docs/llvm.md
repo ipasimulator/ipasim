@@ -42,6 +42,10 @@ ninja install-clang install-libclang install-lld
 - `[dllimport]` - See section "Objective-C symbols across DLLs".
 - `[mhdr]` - We are patching linker (`lld-link`) to add a section named `.mhdr` which will contain Mach-O header.
   This Mach-O header will then be used by our `libobjc` to initialize the image.
+- `[fixbind]` - See `[dllimport]` - we are fixing some symbols to use `__declspec(dllimport)` semantics, but that introduces another level of indirection in data pointers.
+  Unfortunately, Windows loader cannot bind symbols directly, so we need to fix those bindings at runtime.
+  In Clang, we create a new section called `.fixbind` which contains addresses to all the bindings that need to be fixed.
+  At runtime, we then fix those addresses in our `dyld`.
 
 ### Objective-C symbols across DLLs
 
