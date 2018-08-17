@@ -35,6 +35,7 @@ struct dylib_handlers {
 vector<dylib_info> dylibs;
 vector<dylib_handlers> handlers;
 
+static const uint8_t *bytes(const void *ptr) { return reinterpret_cast<const uint8_t *>(ptr); }
 void found_dylib(const char *path, const mach_header *mh) {
     // Check if we haven't already processed this one.
     for (auto &&dylib : dylibs) {
@@ -46,9 +47,12 @@ void found_dylib(const char *path, const mach_header *mh) {
     // Save it.
     dylibs.push_back(dylib_info{ path, mh });
 
-    // Find all `LC_LOAD_DYLIB` commands.
+    // Parse load commands.
+    intptr_t slide = 0;
     auto cmd = reinterpret_cast<const load_command *>(mh + 1);
     for (size_t i = 0; i != mh->ncmds; ++i) {
+
+        // Find all `LC_LOAD_DYLIB` commands.
         if (cmd->cmd == LC_LOAD_DYLIB) {
             auto dylib = reinterpret_cast<const dylib_command *>(cmd);
 
@@ -65,8 +69,36 @@ void found_dylib(const char *path, const mach_header *mh) {
             }
         }
 
+        // Find segment `__DATA`.
+        else if (cmd->cmd == LC_SEGMENT) {
+            auto seg = reinterpret_cast<const segment_command *>(cmd);
+            if (seg->segname == string("__DATA")) {
+
+                // And inside this segment, find section `__fixbind`.
+                auto sect = reinterpret_cast<const section *>(bytes(cmd) + sizeof(segment_command));
+                for (size_t j = 0; j != seg->nsects; ++j) {
+                    if (sect->sectname == string("__fixbind")) {
+
+                        // In this section, iterate through all the addresses and fix them up.
+                        uint32_t count = sect->size >> 2;
+                        uintptr_t ***data = (decltype(data))((uint8_t *)(sect->addr) + slide);
+                        for (size_t k = 0; k != count; ++k, ++data) {
+                            **data = (uintptr_t *)***data;
+                        }
+                    }
+
+                    // Move to the next `section`.
+                    sect = reinterpret_cast<const section *>(bytes(sect) + sizeof(section));
+                }
+            }
+            // Also look for segment `__TEXT` to compute `slide`.
+            else if (seg->segname == string("__TEXT")) {
+                slide = (uintptr_t)mh - seg->vmaddr;
+            }
+        }
+
         // Move to the next `load_command`.
-        cmd = reinterpret_cast<const load_command *>(reinterpret_cast<const uint8_t *>(cmd) + cmd->cmdsize);
+        cmd = reinterpret_cast<const load_command *>(bytes(cmd) + cmd->cmdsize);
     }
 }
 void handle_dylibs(size_t startIndex) {
