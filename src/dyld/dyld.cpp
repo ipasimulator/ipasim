@@ -87,6 +87,7 @@ void found_dylib(const char *path, const mach_header *mh) {
                                 **data = (uintptr_t *)***data;
                             }
                         }
+                        break;
                     }
 
                     // Move to the next `section`.
