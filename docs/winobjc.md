@@ -130,7 +130,13 @@ Then, copy a lot of `.dll`s along.
   You may need to manually build these projects twice to solve this dependency.
   But it's not that easy.
   First, it doesn't play nicely with `lld-link`.
-  Second, you have to manually disable and then re-enable one of the dependencies while building twice.
+  Second, you have to disable and then re-enable one of the dependencies while building twice.
+  See the commands below (run them after failed build of the Frameworks package and when you run them, re-run the failed build of the Frameworks package).
   **TODO: How can this work in the original code?**
   **TODO: Solve this better.**
   See also [official MSDN docs about circular dependencies](https://docs.microsoft.com/en-us/cpp/build/reference/using-an-import-library-and-export-file) and also [this blog post](http://www.lurklurk.org/linkers/linkers.html).
+
+  ```cmd
+  msbuild "/t:WinObjC Frameworks Package\UIKit\dll\UIKit" /p:Configuration=Debug /p:Platform=x86 /p:ObjC_Port=true /p:Use_LLD=false /p:BuildProjectReferences=false /p:Include_AutoLayout=false /v:m .\build\build.sln
+  msbuild "/t:WinObjC Frameworks Package\AutoLayout\dll\AutoLayout" /p:Configuration=Debug /p:Platform=x86 /p:ObjC_Port=true /p:BuildProjectReferences=false /v:m .\build\build.sln
+  ```
