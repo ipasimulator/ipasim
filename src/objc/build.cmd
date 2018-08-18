@@ -1,5 +1,5 @@
 @echo off
-rem Try also "build.cmd -Wno-unused-command-line-argument".
+rem Try also `build.cmd -Wno-unused-command-line-argument -Wno-duplicate-decl-specifier`.
 
 if exist ".\Debug\files.txt" del ".\Debug\files.txt"
 
