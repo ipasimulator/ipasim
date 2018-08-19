@@ -93,7 +93,7 @@ To inject our Objective-C runtime into WinObjC, follow these instructions:
 - Copy Clang:
   - `clang.exe` into `deps/WinObjC/tools/WinObjC.Compiler/LLVM/bin/`.
   - `libclang.dll` into `deps/WinObjC/tools/WinObjC.Compiler/LLVM/bin/` and `deps/WinObjC/tools/bin/`.
-- Copy `lld-link.exe` and our proxy `link.exe` - see `Islandwood.props` for more information.
+- Copy `lld-link.exe` and our proxy `link-proxy.exe` - see `Islandwood.props` for more information.
   **TODO: Automate this.**
 - Build `/src/dyld/dyld_initializer.cpp` and copy the resulting `dyld_initializer.obj` along with `dyld.lib` into `deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/`.
   **TODO: Automate this, too.**

@@ -1,5 +1,5 @@
 // Compiled with:
-// clang -target pc-windows-i386 -o build/link.exe -luser32 -lshlwapi main.cpp
+// ..\..\build\bin\clang -target pc-windows-i386 -o build/link-proxy.exe -lshlwapi main.cpp
 // TODO: Create a `.vcxproj` instead.
 
 #include <cstring> // for `_stricmp`
@@ -48,22 +48,11 @@ int main(int argc, char *argv[]) {
         ++s;
 
     if (contains) {
-        // Get directory name of the executable.
-        PathRemoveFileSpecA(argv[0]);
-
-        // Remove that directory from PATH.
-        // TODO: This is very fragile and we are lucky it works!
-        // For example, trailing backslash is not considered, and
-        // so aren't special features such as `..` etc.
-        string path(getenv("PATH"));
-        size_t pos = path.find(argv[0]);
-        if (pos != string::npos) {
-            path.erase(pos, strlen(argv[0]));
-            _putenv_s("PATH", path.c_str());
-        }
-
-        // Now we can safely invoke `link` and not get invoked ourselves.
         return system(("link " + string(s)).c_str());
     }
-    return system(("lld-link " + string(s)).c_str());
+
+    // Get directory name of the executable.
+    PathRemoveFileSpecA(argv[0]);
+
+    return system((string(argv[0]) + "\\lld-link.exe " + s).c_str());
 }
