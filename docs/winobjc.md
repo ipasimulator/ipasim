@@ -85,6 +85,16 @@ Now clean the working directory with `git clean -fdx`, switch back to branch `po
 > There is an odd quirk - output `.dll`s in `deps/WinObjC/build/Win32/Debug/Universal Windows` don't seem to be rewritten when rebuilt unless they are manually deleted first (along with other related files, like `.lib` etc.).
 > **TODO: Fix it.**
 
+> To build via `devenv` command line, do something like this:
+>
+> ```cmd
+> set OBJC_PORT=1
+> devenv build\build.sln /build "Debug|x86" /project build\Accelerate\lib\AccelerateLib.vcxproj && del build\UpgradeLog.htm
+> ```
+>
+> This is better in that it doesn't always link everything, but it doesn't work for `.nuproj` projects.
+> **TODO: Make it work.**
+
 ## Porting
 
 To inject our Objective-C runtime into WinObjC, follow these instructions:
