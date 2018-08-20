@@ -114,7 +114,7 @@ To inject our Objective-C runtime into WinObjC, follow these instructions:
 
 **TODO: Maybe we should port the `master` branch, not `develop`.**
 
-### Building `HelloUI` sample
+### Building sample `HelloUI`
 
 ```cmd
 msbuild "/t:Restore" /p:Configuration=Debug /p:Platform=Win32 /p:ObjC_Port=true /v:m .\samples\HelloUI\HelloUI-WinStore10.sln
