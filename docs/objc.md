@@ -270,6 +270,8 @@ Reading material:
 - <https://www.intel.com/content/dam/www/public/us/en/documents/guides/itanium-software-runtime-architecture-guide.pdf>
 - <https://itanium-cxx-abi.github.io/cxx-abi/abi.html>
 
+Also see how [GNUstep's Objective-C solved this](https://github.com/gnustep/libobjc2/blob/master/eh_win32_msvc.cc).
+
 #### Blocks runtime
 
 We currently use ported Apple's `libclosure`.
