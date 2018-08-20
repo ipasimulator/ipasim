@@ -1,5 +1,5 @@
 // Compiled with:
-// ..\..\deps\llvm\build\Release\bin\clang -target i386-pc-windows-msvc -c dyld_initializer.cpp -o ..\..\Debug\dyld_initializer.obj -g -gcodeview
+// ..\..\build\bin\clang -target i386-pc-windows-msvc -c dyld_initializer.cpp -o ..\..\Debug\dyld_initializer.obj -g -gcodeview
 
 extern "C" char _mh_dylib_header;
 extern "C" void _dyld_initialize(void*);
