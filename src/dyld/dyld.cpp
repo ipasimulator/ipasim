@@ -7,20 +7,6 @@ using namespace llvm;
 using namespace MachO;
 using namespace std;
 
-class library_guard {
-public:
-    library_guard(const char *name) : handle_(LoadLibraryA(name)) {}
-    ~library_guard() {
-        if (handle_) {
-            FreeLibrary(handle_);
-        }
-    }
-    operator bool() { return handle_; }
-    FARPROC get_symbol(LPCSTR name) { return GetProcAddress(handle_, name); }
-private:
-    HMODULE handle_;
-};
-
 struct dylib_info {
     const char *path;
     const mach_header *header;
@@ -52,25 +38,8 @@ void found_dylib(const char *path, const mach_header *mh) {
     auto cmd = reinterpret_cast<const load_command *>(mh + 1);
     for (size_t i = 0; i != mh->ncmds; ++i) {
 
-        // Find all `LC_LOAD_DYLIB` commands.
-        if (cmd->cmd == LC_LOAD_DYLIB) {
-            auto dylib = reinterpret_cast<const dylib_command *>(cmd);
-
-            // Get path.
-            const char *name = reinterpret_cast<const char *>(dylib) + dylib->dylib.name;
-
-            // Try to get its Mach-O header.
-            if (auto lib = library_guard(name)) {
-                if (auto sym = reinterpret_cast<const mach_header *>(lib.get_symbol("_mh_dylib_header"))) {
-
-                    // If successfull, save it and find others recursively.
-                    found_dylib(name, sym);
-                }
-            }
-        }
-
         // Find segment `__DATA`.
-        else if (cmd->cmd == LC_SEGMENT) {
+        if (cmd->cmd == LC_SEGMENT) {
             auto seg = reinterpret_cast<const segment_command *>(cmd);
             if (seg->segname == string("__DATA")) {
 
@@ -130,16 +99,20 @@ void _dyld_initialize(const mach_header* mh) {
 
     size_t handled = dylibs.size();
 
+    // Save and initialize the dylib.
     // TODO: Find out the path.
     found_dylib(nullptr, mh);
 
-    // Handle new dylibs.
+    // Call registered handlers on it.
     handle_dylibs(handled);
 }
 void _dyld_objc_notify_register(_dyld_objc_notify_mapped mapped,
     _dyld_objc_notify_init init,
     _dyld_objc_notify_unmapped unmapped) {
 
+    // Save the handler.
     handlers.push_back(dylib_handlers{ mapped, init, unmapped });
+
+    // Call it on all dylibs loaded so far.
     handle_dylibs(0);
 }
