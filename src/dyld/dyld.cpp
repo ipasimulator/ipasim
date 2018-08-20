@@ -106,11 +106,14 @@ void found_dylib(const char *path, const mach_header *mh) {
 }
 void handle_dylibs(size_t startIndex) {
 
+    // Handle dylibs in reverse order, so that dependencies are resolved first, before libraries
+    // that depend on them.
+
     vector<const char *> paths;
     paths.reserve(dylibs.size() - startIndex);
     vector<const mach_header *> headers;
     headers.reserve(dylibs.size() - startIndex);
-    for (size_t i = startIndex; i != dylibs.size(); ++i) {
+    for (ptrdiff_t i = dylibs.size() - 1, end = startIndex - 1; i != end; --i) {
         paths.push_back(dylibs[i].path);
         headers.push_back(dylibs[i].header);
     }
@@ -118,7 +121,7 @@ void handle_dylibs(size_t startIndex) {
     for (auto &&handler : handlers) {
         handler.mapped(headers.size(), paths.data(), headers.data());
 
-        for (size_t i = startIndex; i != dylibs.size(); ++i) {
+        for (ptrdiff_t i = dylibs.size() - 1, end = startIndex - 1; i != end; --i) {
             handler.init(dylibs[i].path, dylibs[i].header);
         }
     }
