@@ -121,7 +121,7 @@ See [this MSDN article](https://blogs.msdn.microsoft.com/vcblog/2017/11/15/side-
 Also, the new Visual Studio feature `JustMyCode` was causing some trouble, so it was disabled.
 See [this SO answer](https://stackoverflow.com/a/51856410/9080566) for more information.
 
-## Current status
+## `_NSConcreteGlobalBlock` problem
 
 Currently, we are trying to get `CoreFoundation` to import `_NSConcreteGlobalBlock` and others.
 It obviously shouldn't work, because there's no `__declspec(dllimport)` when the symbol is used by Clang.
@@ -130,3 +130,4 @@ It even exports both `_NSConcreteGlobalBlock` and `__imp__NSConcreteGlobalBlock`
 In contrast, only `__imp__NSConcreteGlobalBlock` is exported from our `libobjc.A.lib`, which is why `CoreFoundation` reports undefined symbol `_NSConcreteGlobalBlock`.
 **TODO: Debug the original code to see how does it work even though there is an added level of indirection.**
 **TODO: Build `libobjc2` and see how does it get `_NSConcreteGlobalBlock` into exports.**
+We solved this by marking the symbol as non-constant and fixing it up at runtime, but we still don't know how could it work in the original code.
