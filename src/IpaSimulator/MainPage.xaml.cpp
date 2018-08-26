@@ -365,6 +365,7 @@ private:
                 UC(uc_mem_map_ptr(uc_, vaddr_, vsize_, perms, mem))
             }
             else {
+                // TODO: Memory-map the segment instead of copying it.
                 auto& buff = seg.content();
                 memcpy(mem, buff.data(), buff.size()); // TODO: copy to the end of the allocated space if SG_HIGHVM flag is present
                 UC(uc_mem_map_ptr(uc_, vaddr_, vsize_, perms, mem))
