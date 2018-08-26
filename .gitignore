@@ -260,3 +260,6 @@ Generated Files/
 /docs/*.fdb_latexmk
 /docs/*.fls
 /docs/*.out
+
+# Git Time Metric
+/.gtm/
