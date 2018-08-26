@@ -47,3 +47,6 @@ Don't add it to `pre-push`, though, as it would lead to an infinite recursion.
 
 Also, it works only via editor plugins, so they must be installed before it starts tracking time.
 For Visual Studio, there is no official plugin, so we wrote [a simple one](https://jjones.visualstudio.com/gtm-visualstudio-plugin) ourselves.
+
+We run `gtm init` not only inside the root directory of the project, but also inside folders of our forked dependencies.
+This adds a line into their `.gitignore` files and we tag it with `[gtm]`.
