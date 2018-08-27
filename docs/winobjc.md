@@ -116,12 +116,17 @@ To inject our Objective-C runtime into WinObjC, follow these instructions:
 
 ### Building sample `HelloUI`
 
+Copy folders `UIKit.Xaml`, `Social.Xaml` and `Themes` from `/deps/WinObjC/build/Win32/Debug/Universal Windows/` to `/build/lib/Universal Windows/x86/` inside the NuGet cache for package `WinObjC.Frameworks`.
+**TODO: This should happen automatically.**
+
 ```cmd
 msbuild "/t:Restore" /p:Configuration=Debug /p:Platform=Win32 /p:ObjC_Port=true /v:m .\samples\HelloUI\HelloUI-WinStore10.sln
 msbuild "/t:HelloUI\HelloUI" /p:Configuration=Debug /p:Platform=Win32 /p:ObjC_Port=true /v:m .\samples\HelloUI\HelloUI-WinStore10.sln
 ```
 
-Then, copy a lot of `.dll`s along.
+Then, copy a lot of `.dll`s along and run `HelloUI.exe`.
+It will initialize itself, but won't work any further.
+We are working on that.
 
 ### Other changes
 
