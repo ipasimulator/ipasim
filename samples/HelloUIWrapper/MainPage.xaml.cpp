@@ -56,5 +56,7 @@ MainPage::MainPage()
         if (FARPROC func = win(GetProcAddress(lib, "start"))) {
             ((void(*)(void))func)();
         }
+
+        win(FreeLibrary(lib));
     }
 }
