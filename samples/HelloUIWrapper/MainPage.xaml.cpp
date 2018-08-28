@@ -26,7 +26,23 @@ using namespace std;
 template<typename T>
 static T win(T result) {
     if (!result) {
-        OutputDebugStringA((string("Error: ") + to_string(GetLastError())).c_str());
+        // Retrieve the system error message for the last-error code.
+        LPVOID lpMsgBuf;
+        DWORD dw = GetLastError();
+        FormatMessage(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER |
+            FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            dw,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPTSTR)&lpMsgBuf,
+            0, NULL);
+
+        // Display the error message.
+        OutputDebugStringW((LPCTSTR)lpMsgBuf);
+
+        LocalFree(lpMsgBuf);
     }
     return result;
 }
@@ -34,6 +50,17 @@ static T win(T result) {
 MainPage::MainPage()
 {
 	InitializeComponent();
+
+    win(LoadPackagedLibrary(L"Logging.dll", 0));
+
+    if (HMODULE lib = win(LoadPackagedLibrary(L"UIKit.dll", 0))) {
+        if (FARPROC func = win(GetProcAddress(lib, "UIApplicationMain"))) {
+            // int UIApplicationMain(int argc, char* argv[], void* principalClassName, void* delegateClassName)
+            ((int(*)(int, char *, void *, void *))func)(0, nullptr, nullptr, nullptr);
+        }
+
+        win(FreeLibrary(lib));
+    }
 
     // Let's try to load `HelloUI.exe`.
     if (HMODULE lib = win(LoadPackagedLibrary(L"HelloUI.exe", 0))) {

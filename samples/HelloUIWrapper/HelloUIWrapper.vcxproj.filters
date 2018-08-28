@@ -62,6 +62,57 @@
     <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\UIKit.dll">
       <Filter>Libraries</Filter>
     </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\dyld.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\libobjc.A.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\pthread.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\AutoLayout.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\CoreFoundation.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\CoreGraphics.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\CoreText.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\Foundation.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\ImageIO.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\libxml2.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\Logging.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\MobileCoreServices.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\QuartzCore.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\UIKit.Xaml.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\WinObjCRT.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\libdispatch.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\WOCStdLib.dll">
+      <Filter>Libraries</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainPage.xaml" />
