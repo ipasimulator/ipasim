@@ -116,6 +116,15 @@
     <None Include="..\..\Debug\HelloUILibrary.dll">
       <Filter>Libraries</Filter>
     </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\icuin57.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\icuuc57.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\icudt57.dll">
+      <Filter>Libraries</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainPage.xaml" />

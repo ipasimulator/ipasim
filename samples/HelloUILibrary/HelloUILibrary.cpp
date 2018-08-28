@@ -28,7 +28,7 @@ static T win(T result) {
 }
 
 extern "C" __declspec(dllexport) void start() {
-    win(LoadLibraryA("WS2_32.dll"));
+    win(LoadLibraryA("CoreFoundation.dll"));
 
     if (HMODULE lib = win(LoadLibraryA("UIKit.dll"))) {
         if (FARPROC func = win(GetProcAddress(lib, "UIApplicationMain"))) {
