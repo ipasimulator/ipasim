@@ -316,7 +316,38 @@ OBJC_EXPORT IMP object_replaceMethod_np(id object, SEL name, IMP imp, const char
 	return class_replaceMethod(object, name, imp, types);
 }
 
-// Original is in libobjc2/NSBlocks.m.
+// From libobjc2/NSBlocks.mm.
+// TODO: Move to more appropriate place than `stubs.mm`.
+extern "C" struct objc_class _NSConcreteGlobalBlock;
+extern "C" struct objc_class _NSConcreteStackBlock;
+extern "C" struct objc_class _NSConcreteMallocBlock;
+
+static struct objc_class _NSConcreteGlobalBlockMeta;
+static struct objc_class _NSConcreteStackBlockMeta;
+static struct objc_class _NSConcreteMallocBlockMeta;
+
+static struct objc_class _NSBlock;
+static struct objc_class _NSBlockMeta;
+
+static void createNSBlockSubclass(Class superclass, Class newClass, 
+		Class metaClass, const char *name)
+{
+	// We don't actually use the code from `libobjc2/NSBlocks.mm` here,
+	// since it uses GNU's Objective-C ABI.
+
+	objc_initializeClassPair(superclass, name, newClass, metaClass);
+	objc_registerClassPair(newClass);
+}
+
+#define NEW_CLASS(super, sub) \
+	createNSBlockSubclass((Class)super, (Class)&sub, (Class)&sub ## Meta, #sub)
+
 OBJC_EXPORT BOOL objc_create_block_classes_as_subclasses_of(Class super) {
-    return FALSE;
+	if (_NSBlock.superclass != NULL) { return NO; }
+
+	NEW_CLASS(super, _NSBlock);
+	NEW_CLASS(&_NSBlock, _NSConcreteStackBlock);
+	NEW_CLASS(&_NSBlock, _NSConcreteGlobalBlock);
+	NEW_CLASS(&_NSBlock, _NSConcreteMallocBlock);
+	return YES;
 }
