@@ -1,0 +1,5 @@
+[ver:1,total:2160]
+samples/HelloUIWrapper/MainPage.xaml.cpp:1383,1535439600:180,1535450400:1203,m
+samples/HelloUILibrary/HelloUILibrary.cpp:739,1535450400:319,1535454000:420,m
+samples/HelloUILibrary/HelloUILibrary.h:30,1535450400:30,d
+src/IpaSimulator/MainPage.xaml.cpp:8,1535450400:8,r
