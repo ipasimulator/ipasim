@@ -113,6 +113,9 @@
     <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\WOCStdLib.dll">
       <Filter>Libraries</Filter>
     </None>
+    <None Include="..\..\Debug\HelloUILibrary.dll">
+      <Filter>Libraries</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainPage.xaml" />

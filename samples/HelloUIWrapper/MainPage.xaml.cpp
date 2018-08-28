@@ -51,28 +51,10 @@ MainPage::MainPage()
 {
 	InitializeComponent();
 
-    win(LoadPackagedLibrary(L"Logging.dll", 0));
-
-    if (HMODULE lib = win(LoadPackagedLibrary(L"UIKit.dll", 0))) {
-        if (FARPROC func = win(GetProcAddress(lib, "UIApplicationMain"))) {
-            // int UIApplicationMain(int argc, char* argv[], void* principalClassName, void* delegateClassName)
-            ((int(*)(int, char *, void *, void *))func)(0, nullptr, nullptr, nullptr);
+    // Call `HelloUILibrary.dll!start`.
+    if (HMODULE lib = win(LoadPackagedLibrary(L"HelloUILibrary.dll", 0))) {
+        if (FARPROC func = win(GetProcAddress(lib, "start"))) {
+            ((void(*)(void))func)();
         }
-
-        win(FreeLibrary(lib));
-    }
-
-    // Let's try to load `HelloUI.exe`.
-    if (HMODULE lib = win(LoadPackagedLibrary(L"HelloUI.exe", 0))) {
-
-        // Find it's method `main`.
-        if (FARPROC func = win(GetProcAddress(lib, "main"))) {
-
-            // And call it.
-            char *name = "HelloUI.exe";
-            ((int(*)(int, char **))func)(1, &name);
-        }
-
-        win(FreeLibrary(lib));
     }
 }
