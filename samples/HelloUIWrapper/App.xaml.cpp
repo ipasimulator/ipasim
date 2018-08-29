@@ -1,4 +1,4 @@
-﻿//
+//
 // App.xaml.cpp
 // Implementation of the App class.
 //
@@ -32,6 +32,30 @@ App::App()
     Suspending += ref new SuspendingEventHandler(this, &App::OnSuspending);
 }
 
+template<typename T>
+static T win(T result) {
+    if (!result) {
+        // Retrieve the system error message for the last-error code.
+        LPVOID lpMsgBuf;
+        DWORD dw = GetLastError();
+        FormatMessage(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER |
+            FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            dw,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPTSTR)&lpMsgBuf,
+            0, NULL);
+
+        // Display the error message.
+        OutputDebugStringW((LPCTSTR)lpMsgBuf);
+
+        LocalFree(lpMsgBuf);
+    }
+    return result;
+}
+
 /// <summary>
 /// Invoked when the application is launched normally by the end user.  Other entry points
 /// will be used such as when the application is launched to open a specific file.
@@ -39,6 +63,31 @@ App::App()
 /// <param name="e">Details about the launch request and process.</param>
 void App::OnLaunched(Windows::ApplicationModel::Activation::LaunchActivatedEventArgs^ e)
 {
+    // Let's try to load `HelloUI.exe`.
+    if (HMODULE lib = win(LoadPackagedLibrary(L"HelloUI.dll", 0))) {
+
+        // Find it's method `main`.
+        if (FARPROC func = win(GetProcAddress(lib, "main"))) {
+
+            // And call it.
+            const char *name = "HelloUI.exe";
+            ((int(*)(int, const char **))func)(1, &name);
+        }
+
+        // TODO: Freeing throws an error. Do we want to free it, though?
+        //win(FreeLibrary(lib));
+    }
+
+    // Now, let's call `UIApplicationLaunched`.
+    if (HMODULE lib = win(LoadPackagedLibrary(L"UIKit.dll", 0))) {
+        if (FARPROC func = win(GetProcAddress(lib, "UIApplicationLaunched"))) {
+            ((void(*)(Windows::ApplicationModel::Activation::LaunchActivatedEventArgs^))func)(e);
+        }
+        win(FreeLibrary(lib));
+    }
+
+    // TODO: Remove this old initialization.
+#if 0
     auto rootFrame = dynamic_cast<Frame^>(Window::Current->Content);
 
     // Do not repeat app initialization when the Window already has content,
@@ -88,6 +137,7 @@ void App::OnLaunched(Windows::ApplicationModel::Activation::LaunchActivatedEvent
             Window::Current->Activate();
         }
     }
+#endif
 }
 
 /// <summary>
