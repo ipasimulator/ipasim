@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 
 <Package
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
@@ -46,4 +46,26 @@
   <Capabilities>
     <Capability Name="internetClient" />
   </Capabilities>
+
+  <Extensions>
+    <!-- TODO: This should be automatically added (by referencing `UIKit.Xaml.winmd`). It wasn't added like that just because it didn't work.
+    Also, this needs lot of copying of file `UIKit.Xaml.pri` and folder `UIKit.Xaml` with `.xbf` files around. That should also happen automatically. -->
+    <Extension Category="windows.activatableClass.inProcessServer">
+      <InProcessServer>
+        <Path>UIKit.Xaml.dll</Path>
+        <ActivatableClass ActivatableClassId="UIKit.Xaml.Label" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="UIKit.Xaml.ActivityIndicatorView" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="UIKit.Xaml.ScrollView" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="UIKit.Xaml.TextField" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="UIKit.Xaml.Item" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="UIKit.Xaml.Button" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="UIKit.Xaml.Private.CoreAnimation.LayerProperty" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="UIKit.Xaml.Private.CoreAnimation.Layer" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="UIKit.Xaml.Slider" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="UIKit.Xaml.ProgressView" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="UIKit.Xaml.UIKit_Xaml_XamlTypeInfo.XamlMetaDataProvider" ThreadingModel="both" />
+        <ActivatableClass ActivatableClassId="UIKit.Xaml.ContentDialog" ThreadingModel="both" />
+      </InProcessServer>
+    </Extension>
+  </Extensions>
 </Package>

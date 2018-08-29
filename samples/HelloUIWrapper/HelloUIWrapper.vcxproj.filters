@@ -128,6 +128,9 @@
     <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\HelloUI.dll">
       <Filter>Libraries</Filter>
     </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\UIKit.Xaml.pri">
+      <Filter>Libraries</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainPage.xaml" />
