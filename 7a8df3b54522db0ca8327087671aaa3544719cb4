@@ -1,0 +1,6 @@
+[ver:1,total:1560]
+samples/HelloUIWrapper/Package.appxmanifest:480,1535569200:480,m
+samples/HelloUIWrapper/HelloUIWrapper.vcxproj:440,1535565600:220,1535569200:220,m
+samples/HelloUIWrapper/App.xaml.cpp:420,1535540400:180,1535569200:240,r
+Debug/HelloUIWrapper/AppX/AppxManifest.xml:210,1535547600:180,1535565600:20,1535569200:10,r
+samples/HelloUIWrapper/HelloUIWrapper.vcxproj.filters:10,1535569200:10,m
