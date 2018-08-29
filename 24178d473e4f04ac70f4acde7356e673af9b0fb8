@@ -1,0 +1,8 @@
+[ver:1,total:3540]
+samples/HelloUILibrary/HelloUILibrary.cpp:2490,1535482800:930,1535486400:360,1535536800:840,1535540400:360,m
+samples/HelloUIWrapper/HelloUIWrapper.vcxproj:420,1535482800:180,1535536800:150,1535540400:90,m
+samples/HelloUIWrapper/HelloUIWrapper.vcxproj.filters:150,1535536800:90,1535540400:60,m
+src/objc/stubs.mm:150,1535482800:150,r
+samples/HelloUIWrapper/MainPage.xaml.cpp:150,1535482800:60,1535540400:90,r
+lib/UnicornPort/UnicornPort.vcxproj:120,1535482800:120,r
+samples/HelloUIWrapper/App.xaml.cpp:60,1535482800:60,r
