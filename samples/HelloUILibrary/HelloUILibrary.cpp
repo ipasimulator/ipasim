@@ -28,7 +28,7 @@ static T win(T result) {
 }
 
 extern "C" __declspec(dllexport) void start() {
-
+    // TODO: Remove this block.
 #if 0
     // Manually call `UIApplicationInitialize`, which is an equivalent to `UIApplicationMain`
     // called by `main` in `HelloUI.exe`.
@@ -42,7 +42,6 @@ extern "C" __declspec(dllexport) void start() {
     }
 #else
     // Let's try to load `HelloUI.exe`.
-    // TODO: This doesn't work, why? Maybe try to load it as `.dll`...
     if (HMODULE lib = win(LoadLibraryA("HelloUI.dll"))) {
 
         // Find it's method `main`.
@@ -53,7 +52,8 @@ extern "C" __declspec(dllexport) void start() {
             ((int(*)(int, const char **))func)(1, &name);
         }
 
-        win(FreeLibrary(lib));
+        // TODO: Freeing throws an error.
+        //win(FreeLibrary(lib));
     }
 #endif
 }
