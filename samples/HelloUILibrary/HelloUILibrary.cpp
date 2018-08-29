@@ -29,6 +29,7 @@ static T win(T result) {
 
 extern "C" __declspec(dllexport) void start() {
 
+#if 0
     // Manually call `UIApplicationInitialize`, which is an equivalent to `UIApplicationMain`
     // called by `main` in `HelloUI.exe`.
     if (HMODULE lib = win(LoadLibraryA("UIKit.dll"))) {
@@ -39,10 +40,10 @@ extern "C" __declspec(dllexport) void start() {
 
         win(FreeLibrary(lib));
     }
-
+#else
     // Let's try to load `HelloUI.exe`.
     // TODO: This doesn't work, why? Maybe try to load it as `.dll`...
-    if (HMODULE lib = win(LoadLibraryA("HelloUI.exe"))) {
+    if (HMODULE lib = win(LoadLibraryA("HelloUI.dll"))) {
 
         // Find it's method `main`.
         if (FARPROC func = win(GetProcAddress(lib, "main"))) {
@@ -54,4 +55,5 @@ extern "C" __declspec(dllexport) void start() {
 
         win(FreeLibrary(lib));
     }
+#endif
 }

@@ -53,9 +53,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="HelloUIWrapper_TemporaryKey.pfx" />
-    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\HelloUI.exe">
-      <Filter>Libraries</Filter>
-    </None>
     <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\Starboard.dll">
       <Filter>Libraries</Filter>
     </None>
@@ -126,6 +123,9 @@
       <Filter>Libraries</Filter>
     </None>
     <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\CFNetwork.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\HelloUI.dll">
       <Filter>Libraries</Filter>
     </None>
   </ItemGroup>
