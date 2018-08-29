@@ -1,0 +1,5 @@
+[ver:1,total:1020]
+samples/HelloUIWrapper/App.xaml.cpp:741,1535540400:741,m
+samples/HelloUILibrary/HelloUILibrary.cpp:239,1535540400:239,r
+samples/HelloUILibrary/stdafx.h:20,1535540400:20,r
+samples/HelloUIWrapper/MainPage.xaml.cpp:20,1535540400:20,r
