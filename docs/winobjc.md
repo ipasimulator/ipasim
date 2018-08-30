@@ -125,9 +125,8 @@ msbuild "/t:Restore" /p:Configuration=Debug /p:Platform=Win32 /p:ObjC_Port=true 
 msbuild "/t:HelloUI\HelloUI" /p:Configuration=Debug /p:Platform=Win32 /p:ObjC_Port=true /v:m .\samples\HelloUI\HelloUI-WinStore10.sln
 ```
 
-Then, copy a lot of `.dll`s along and run `HelloUI.exe`.
-It will initialize itself, but won't work any further.
-We are working on that.
+Then, copy a lot of `.dll`s along and also some `.xbf`s (see `/samples/HelloUIWrapper/Package.appxmanifest`).
+Then, run sample `HelloUIWrapper` from Visual Studio.
 
 ### Other changes
 
