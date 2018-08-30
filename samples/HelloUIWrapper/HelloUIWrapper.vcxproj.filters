@@ -134,6 +134,18 @@
     <None Include="..\..\src\RTObjCInterop\Debug\RTObjCInterop.dll">
       <Filter>Libraries</Filter>
     </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\CFCharacterSetBitmaps.bitmap">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\CFUniCharPropertyDatabase.data">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\CFUnicodeData-B.mapping">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\samples\HelloUI\Debug\HelloUI\CFUnicodeData-L.mapping">
+      <Filter>Libraries</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainPage.xaml" />
