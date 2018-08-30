@@ -1,0 +1,7 @@
+[ver:1,total:1020]
+samples/HelloUIWrapper/Package.appxmanifest:472,1535569200:292,1535626800:180,r
+samples/HelloUIWrapper/HelloUIWrapper.vcxproj:240,1535572800:240,r
+samples/HelloUIWrapper/MainPage.xaml.cpp:180,1535623200:180,r
+src/IpaSimulator/MainPage.xaml.cpp:60,1535623200:60,r
+docs/winobjc.md:60,1535626800:60,r
+Debug/HelloUIWrapper/AppX/AppxManifest.xml:8,1535569200:8,r
