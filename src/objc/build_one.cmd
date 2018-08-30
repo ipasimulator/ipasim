@@ -1,5 +1,7 @@
 @echo off
 
+rem TODO: This has an almost-exact duplicate in `/src/RTObjCInterop/build_one.cmd`.
+
 set language=%1
 set file=%2
 

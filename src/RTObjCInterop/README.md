@@ -9,4 +9,5 @@ That's why we created this project - to build our own version of `RTObjCInterop.
 ## Build instructions
 
 Just run the `build.cmd` from Developer Command Prompt inside this directory.
-**TODO: Write script `build.cmd`.**
+This script was built simply by examining the project file `RTObjCInterop.vcxproj` in the original code.
+Then, some include directories from `WinObjC/tools` were added (this would have been added probably by some included `.props` or `.targets` file into the `RTObjCInterop.vcxproj`, but we just guessed them, it was faster).
