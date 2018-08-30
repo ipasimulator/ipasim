@@ -1,0 +1,9 @@
+[ver:1,total:1740]
+src/RTObjCInterop/build_one.cmd:930,1535630400:600,1535634000:330,m
+src/RTObjCInterop/README.md:190,1535630400:70,1535634000:120,m
+src/RTObjCInterop/InteropBase.mm:180,1535630400:60,1535634000:120,r
+src/objc/build_one.cmd:120,1535630400:120,m
+src/RTObjCInterop/RTObject.mm:120,1535634000:120,r
+src/RTObjCInterop/build.cmd:75,1535630400:45,1535634000:30,m
+src/objc/build.cmd:65,1535630400:65,r
+docs/git.md:60,1535630400:60,r
