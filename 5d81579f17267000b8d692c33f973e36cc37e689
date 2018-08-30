@@ -1,0 +1,7 @@
+[ver:1,total:660]
+docs/winobjc.md:360,1535655600:360,m
+samples/HelloUIWrapper/App.xaml.cpp:150,1535655600:150,r
+samples/HelloUIWrapper/Package.appxmanifest:80,1535655600:80,r
+samples/HelloUIWrapper/Generated Files/App.g.hpp:30,1535655600:30,r
+samples/HelloUIWrapper/HelloUIWrapper.vcxproj.filters:20,1535655600:20,m
+samples/HelloUIWrapper/HelloUIWrapper.vcxproj:20,1535655600:20,m
