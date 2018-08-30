@@ -1,0 +1,12 @@
+[ver:1,total:840]
+docs/winobjc.md:350,1535630400:350,r
+src/RTObjCInterop/README.md:229,1535630400:229,m
+src/RTObjCInterop/RTObjCInterop.h:100,1535630400:100,d
+docs/git.md:60,1535630400:60,m
+src/RTObjCInterop/RTObjCInterop.cpp:20,1535630400:20,d
+src/RTObjCInterop/RTObject.mm:15,1535630400:15,m
+src/RTObjCInterop/dllmain.cpp:15,1535630400:15,m
+src/RTObjCInterop/export.def:15,1535630400:15,m
+src/RTObjCInterop/RTHelpers.mm:12,1535630400:12,m
+src/RTObjCInterop/InteropBase.mm:12,1535630400:12,m
+src/RTObjCInterop/ObjCHelpers.mm:12,1535630400:12,m
