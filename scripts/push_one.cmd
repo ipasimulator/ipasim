@@ -1,7 +1,7 @@
 @echo off
 
 echo.
-echo Pushing %1...
+echo Pushing "%1"...
 echo.
 
 pushd %1
