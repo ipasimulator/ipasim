@@ -42,9 +42,8 @@ git push --mirror https://contoso-ltd.visualstudio.com/MyFirstProject/_git/new-c
 For time tracking, we use [Git Time Metric](https://github.com/git-time-metric/gtm), version 1.3.5.
 We started using it on August 26th 2018.
 
-To push its data to remote repository, `git pushgtm` has to be run manually.
-Or, it can be automated by adding that command to script `/.git/hooks/post-commit`.
-Don't add it to `pre-push`, though, as it would lead to an infinite recursion.
+To push its data to remote repository, `git pushgtm` has to be run.
+It's incorporated in script `/scripts/push_all.cmd`, so that it doesn't have to be run manually.
 
 Also, it works only via editor plugins, so they must be installed before it starts tracking time.
 For Visual Studio, there is no official plugin, so we wrote [a simple one](https://jjones.visualstudio.com/gtm-visualstudio-plugin) ourselves.
