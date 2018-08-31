@@ -1,0 +1,8 @@
+[ver:1,total:1980]
+src/IpaSimulator/MainPage.xaml.cpp:1500,1535709600:1320,1535713200:180,m
+src/IpaSimulator/invokes.mm:225,1535709600:225,r
+samples/HelloUIWrapper/App.xaml:75,1535709600:75,r
+lib/LiefPort/LIEF/MachO/enums.hpp:60,1535709600:60,r
+out/invokes.inc:50,1535709600:50,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:50,1535709600:50,r
+out/headers.inc:20,1535709600:20,r
