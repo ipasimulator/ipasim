@@ -1,0 +1,6 @@
+[ver:1,total:720]
+scripts/push_all.cmd:320,1535742000:320,m
+scripts/push_one.cmd:140,1535742000:140,m
+.git/hooks/post-commit:120,1535742000:120,r
+docs/git.md:80,1535742000:80,m
+readme.txt:60,1535742000:60,r
