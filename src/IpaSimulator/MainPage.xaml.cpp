@@ -565,8 +565,8 @@ MainPage::MainPage()
     UC(uc_open(UC_ARCH_ARM, UC_MODE_ARM, &uc))
 
     // load test Mach-O binary
-    filesystem::path dir(ApplicationData::Current->TemporaryFolder->Path->Data());
-    filesystem::path file("test.ipa");
+    filesystem::path dir(ApplicationData::Current->LocalCacheFolder->Path->Data());
+    filesystem::path file("test.bin");
     filesystem::path full = dir / file;
     DynamicLoader::create(full.str(), uc).execute();
 
