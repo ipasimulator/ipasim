@@ -435,10 +435,10 @@ private:
             }
             else if (imp == "/usr/lib/libobjc.A.dylib") {
                 try_load_dll("Foundation.dll") ||
-                    load_dll("libobjc2.dll");
+                    load_dll("libobjc.A.dll");
             }
             else if (imp == "/usr/lib/libSystem.B.dylib") {
-                try_load_dll("libobjc2.dll") ||
+                try_load_dll("libobjc.A.dll") ||
                     try_load_dll("libdispatch.dll") ||
                     load_dll("ucrtbased.dll");
             }
@@ -469,32 +469,10 @@ private:
             n = n.substr(1);
         }
 
-        // translate class names
-        string cprefix("OBJC_CLASS_$_");
-        if (n.substr(0, cprefix.length()) == cprefix) {
-            n = "_OBJC_CLASS_" + n.substr(cprefix.length());
-        }
-
-        // TODO: instead of ignoring, set them to NULL or some catch-all handler (for functions)?
-        // ignore metaclasses
-        // TODO: or are they the objc_class_name things?
-        string mcprefix("OBJC_METACLASS_$_");
-        if (n.substr(0, mcprefix.length()) == mcprefix) {
+        // TODO: don't ignore this, implement it!
+        if (n == "dyld_stub_binder") {
             return true;
         }
-
-        // ignore non-existing symbols (it is observed that they are used only in exports, so it shouldn't matter)
-        if (n == "_objc_empty_cache") {
-            return true;
-        }
-
-        // TODO: don't ignore these, implement them!
-        if (n == "objc_msgSendSuper2" ||
-            n == "dyld_stub_binder" ||
-            n == "__CFConstantStringClassReference") { // defined in CFInternal.h
-            return true;
-        }
-        // ---------------------
 
         // get symbol address
         auto addr = GetProcAddress(winlib, n.c_str());

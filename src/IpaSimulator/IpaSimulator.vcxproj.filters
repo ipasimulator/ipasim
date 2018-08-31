@@ -14,6 +14,10 @@
     <Filter Include="Source Files">
       <UniqueIdentifier>{524b5cdb-de1c-4c8a-aa17-7a08f5afb148}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Libraries">
+      <UniqueIdentifier>{98242619-256a-47b7-bef0-64375903a965}</UniqueIdentifier>
+      <Extensions>dll</Extensions>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml" />
@@ -63,7 +67,6 @@
   <ItemGroup>
     <None Include="IpaSimulator_TemporaryKey.pfx" />
     <None Include="packages.config" />
-    <None Include="..\..\packages\**\*.dll" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainPage.xaml" />
