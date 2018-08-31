@@ -1,0 +1,13 @@
+[ver:1,total:4200]
+src/IpaSimulator/MainPage.xaml.cpp:1396,1535713200:775,1535716800:621,m
+src/IpaSimulator/packages.config:844,1535713200:805,1535716800:39,m
+NuGet.Config:588,1535713200:588,d
+src/IpaSimulator/IpaSimulator.vcxproj:399,1535713200:399,m
+.editorconfig:360,1535713200:290,1535716800:70,r
+src/IpaSimulator/IpaSimulator.vcxproj.filters:326,1535713200:258,1535716800:68,m
+lib/UnicornPort/uc.c:122,1535713200:40,1535716800:82,r
+docs/winobjc.md:60,1535713200:60,r
+samples/HelloUIWrapper/App.xaml:59,1535713200:39,1535716800:20,r
+IPASimulator.sln:20,1535713200:20,r
+out/invokes.inc:20,1535713200:20,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:6,1535713200:6,r
