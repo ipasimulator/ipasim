@@ -491,20 +491,40 @@ private:
 
         auto lib = libs_.find(name);
         if (lib == libs_.end()) {
-            libs_[name] = make_pair(iaddr, iaddr);
+            // We come across this library for the first time, let's find out where it lies in memory
+            // and map it into Unicorn.
+
+            if (auto start = GetProcAddress(winlib, "_mh_dylib_header")) {
+                libs_[name] = make_pair((uint64_t)start, (uint64_t)start + get_lib_size(start));
+            }
+            // TODO: If there is no symbol `_mh_dylib_header`, throw an exception, don't ignore it.
         }
         else {
-            if (lib->second.first > iaddr) {
-                lib->second.first = iaddr;
-            }
-            if (lib->second.second > iaddr) {
-                lib->second.second = iaddr;
-            }
+            // Otherwise, we already loaded this library, so we can free it here.
+            // TODO: Do this via RAII.
+            FreeLibrary(winlib);
         }
 
         // rewrite stub address with the found one
         bind_to((intptr_t)addr);
         return true;
+    }
+    static const uint8_t *bytes(const void *ptr) { return reinterpret_cast<const uint8_t *>(ptr); }
+    static size_t get_lib_size(const void *mhdr) {
+        // Compute lib size by summing vmsizes of all LC_SEGMENT commands.
+        size_t size = 0;
+        auto header = reinterpret_cast<const mach_header *>(mhdr);
+        auto cmd = reinterpret_cast<const load_command *>(header + 1);
+        for (size_t i = 0; i != header->ncmds; ++i) {
+            if (cmd->cmd == LC_SEGMENT) {
+                auto seg = reinterpret_cast<const segment_command_32 *>(cmd);
+                size += seg->vmsize;
+            }
+
+            // Move to the next `load_command`.
+            cmd = reinterpret_cast<const load_command *>(bytes(cmd) + cmd->cmdsize);
+        }
+        return size;
     }
     void bind_to(uintptr_t addr) {
         uint64_t target = unsigned(binfo_->address()) + slide_;
