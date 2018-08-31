@@ -1,0 +1,10 @@
+[ver:1,total:2100]
+src/IpaSimulator/MainPage.xaml.cpp:1867,1535731200:936,1535738400:120,1535742000:811,m
+lib/UnicornPort/uc.c:72,1535731200:72,r
+src/dyld/dyld.cpp:47,1535742000:47,r
+.editorconfig:30,1535731200:30,r
+lib/UnicornPort/unicorn/unicorn.h:30,1535731200:30,r
+src/dyld/stdafx.h:15,1535742000:15,r
+src/dyld/dyld.h:15,1535742000:15,r
+lib/LiefPort/LIEF/MachO/Structures.hpp:12,1535742000:12,r
+lib/LiefPort/MachO/Binary.cpp:12,1535731200:12,r
