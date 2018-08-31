@@ -289,7 +289,6 @@ private:
 		// to determine what the whole called signature looks like.
 		if (name == "objc_msgSend") {
             // TODO: Use `objc_msgLookup` to retrieve the target function.
-			// TODO: Bug in our dyld - fields that were NULL (0) in the binary are now equal to slide! (this note was copied from removed code)
 		}
 
 		// execute target function using emulated cpu's context
@@ -382,6 +381,9 @@ private:
         }
     }
     // inspired by ImageLoaderMachOClassic::rebase
+    // TODO: Bug in our dyld? Fields that were NULL (0) in the binary are now equal to slide!
+    // (This note was copied from removed code.) Is it really a bug, though? It seems that the
+    // original dyld would do the same thing.
     void relocate_segment(const LIEF::MachO::SegmentCommand& seg) {
         for (auto& rel : seg.relocations()) {
             if (rel.is_pc_relative() || rel.origin() != RELOCATION_ORIGINS::ORIGIN_DYLDINFO ||
