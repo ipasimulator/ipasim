@@ -210,6 +210,29 @@ public:
 #endif
         UC(uc_hook_add(uc_, &hook, UC_HOOK_MEM_FETCH_PROT, hook_mem_fetch_prot, this, 1, 0))
 
+        // Initialize before execution - simulate `dyld_initializer.cpp`.
+        {
+            // Find our `_mh_execute_header`.
+            auto hdrSym = bin_.get_symbol("__mh_execute_header");
+            auto hdrAddr = hdrSym.value() + slide_;
+
+            // Call `_dyld_initialize(&_mh_execute_header)`.
+            {
+                auto lib = LoadPackagedLibrary(L"dyld.dll", 0);
+                auto func = GetProcAddress(lib, "_dyld_initialize");
+                ((void(*)(void *))func)((void *)hdrAddr);
+                FreeLibrary(lib);
+            }
+
+            // Call `_objc_init()`.
+            {
+                auto lib = LoadPackagedLibrary(L"libobjc.A.dll", 0);
+                auto func = GetProcAddress(lib, "_objc_init");
+                ((void(*)(void))func)();
+                FreeLibrary(lib);
+            }
+        }
+
         // start execution
         UC(uc_emu_start(uc_, bin_.entrypoint() + slide_, 0, 0, 0))
 
