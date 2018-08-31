@@ -288,7 +288,12 @@ private:
 		// For variadic functions, we need to semantically analyze some of its arguments
 		// to determine what the whole called signature looks like.
 		if (name == "objc_msgSend") {
-            // TODO: Use `objc_msgLookup` to retrieve the target function.
+            // Use `objc_msgLookup` to retrieve the target function.
+            auto lib = LoadPackagedLibrary(L"libobjc.A.dll", 0);
+            auto func = GetProcAddress(lib, "objc_msgLookup");
+            auto imp = ((void *(*)(void *, void *))func)((void *)r0, (void *)r1);
+            // TODO: Do something with `imp`.
+            FreeLibrary(lib);
 		}
 
 		// execute target function using emulated cpu's context
