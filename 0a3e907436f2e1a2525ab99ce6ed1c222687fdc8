@@ -1,0 +1,6 @@
+[ver:1,total:1020]
+src/IpaSimulator/MainPage.xaml.cpp:742,1535742000:742,m
+src/dyld/dyld.cpp:162,1535742000:162,r
+src/dyld/dyld_initializer.cpp:66,1535742000:66,r
+lib/LiefPort/MachO/Binary.cpp:30,1535742000:30,r
+.git/hooks/post-commit:20,1535742000:20,r
