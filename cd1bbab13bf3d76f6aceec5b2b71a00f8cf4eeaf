@@ -1,0 +1,6 @@
+[ver:1,total:2880]
+src/IpaSimulator/MainPage.xaml.cpp:2520,1535817600:1680,1535821200:840,m
+lib/LiefPort/MachO/Binary.cpp:150,1535821200:150,r
+lib/LiefPort/MachO/BinaryParser.tcc:150,1535821200:150,r
+lib/LiefPort/LIEF/MachO/SegmentCommand.hpp:30,1535821200:30,r
+lib/LiefPort/MachO/SegmentCommand.cpp:30,1535821200:30,r
