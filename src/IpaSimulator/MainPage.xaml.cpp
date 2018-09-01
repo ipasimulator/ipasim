@@ -254,6 +254,8 @@ public:
 
         process_bindings();
 
+        relocate();
+
         // map libraries into the Unicorn Engine
         // TODO: Not correct! The highest symbol's size is not considered.
         for (auto& lib : libs_) {
@@ -402,18 +404,18 @@ private:
                     memset(mem + buff.size(), 0, vsize_ - buff.size());
                 }
             }
-
-            if (slide_ != 0) {
-                relocate_segment(seg);
-            }
         }
     }
     // inspired by ImageLoaderMachOClassic::rebase
     // TODO: Bug in our dyld? Fields that were NULL (0) in the binary are now equal to slide!
     // (This note was copied from removed code.) Is it really a bug, though? It seems that the
     // original dyld would do the same thing.
-    void relocate_segment(const LIEF::MachO::SegmentCommand& seg) {
-        for (auto& rel : seg.relocations()) {
+    void relocate() {
+        if (!slide_) {
+            return;
+        }
+
+        for (auto& rel : bin_.relocations()) {
             if (rel.is_pc_relative() || rel.origin() != RELOCATION_ORIGINS::ORIGIN_DYLDINFO ||
                 rel.size() != 32) {
                 throw 1;
@@ -424,10 +426,11 @@ private:
             uint64_t relbase = unsigned(lowAddr_) + slide_;
 
             uint64_t reladdr = relbase + rel.address();
-            uint32_t *val = (uint32_t *)reladdr;
             if (reladdr > vaddr_ + vsize_) {
                 throw "relocation target out of range";
             }
+
+            uint32_t *val = (uint32_t *)reladdr;
             *val = unsigned(*val) + slide_;
         }
     }
