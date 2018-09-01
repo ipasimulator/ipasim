@@ -244,7 +244,8 @@ public:
         auto& header = bin_.header();
         if (header.file_type() != FILE_TYPES::MH_EXECUTE ||
             header.cpu_type() != CPU_TYPES::CPU_TYPE_ARM ||
-            header.has(HEADER_FLAGS::MH_SPLIT_SEGS)) { // required by relocate_segment
+            header.has(HEADER_FLAGS::MH_SPLIT_SEGS) || // required by relocate_segment
+            !header.has(HEADER_FLAGS::MH_PIE)) {       // so that we can slide
             throw 1;
         }
 
