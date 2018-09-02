@@ -376,13 +376,13 @@ private:
             // convert protection
             auto vmprot = seg.init_protection();
             uc_prot perms = UC_PROT_NONE;
-            if (vmprot & VM_PROTECTIONS::VM_PROT_READ) {
+            if (vmprot & (uint32_t)VM_PROTECTIONS::VM_PROT_READ) {
                 perms |= UC_PROT_READ;
             }
-            if (vmprot & VM_PROTECTIONS::VM_PROT_WRITE) {
+            if (vmprot & (uint32_t)VM_PROTECTIONS::VM_PROT_WRITE) {
                 perms |= UC_PROT_WRITE;
             }
-            if (vmprot & VM_PROTECTIONS::VM_PROT_EXECUTE) {
+            if (vmprot & (uint32_t)VM_PROTECTIONS::VM_PROT_EXECUTE) {
                 perms |= UC_PROT_EXEC;
             }
 
@@ -415,6 +415,8 @@ private:
         if (!slide_) {
             return;
         }
+
+        // TODO: Try to use the latest LIEF (from an old good Win32 dll - or load LIEF as plain old Win32 dll).
 
         for (auto& rel : bin_.relocations()) {
             if (rel.is_pc_relative() || rel.origin() != RELOCATION_ORIGINS::ORIGIN_DYLDINFO ||
@@ -550,7 +552,7 @@ private:
         auto header = reinterpret_cast<const mach_header *>(mhdr);
         auto cmd = reinterpret_cast<const load_command *>(header + 1);
         for (size_t i = 0; i != header->ncmds; ++i) {
-            if (cmd->cmd == LC_SEGMENT) {
+            if (cmd->cmd == (uint32_t)LOAD_COMMAND_TYPES::LC_SEGMENT) {
                 auto seg = reinterpret_cast<const segment_command_32 *>(cmd);
                 size += seg->vmsize;
             }
