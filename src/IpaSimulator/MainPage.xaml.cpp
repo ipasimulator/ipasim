@@ -211,6 +211,7 @@ public:
         UC(uc_hook_add(uc_, &hook, UC_HOOK_MEM_FETCH_PROT, hook_mem_fetch_prot, this, 1, 0))
 
         // Initialize before execution - simulate `dyld_initializer.cpp`.
+        // TODO: Catch callbacks into the emulated code.
         {
             // Find our `_mh_execute_header`.
             auto hdrSym = bin_.get_symbol("__mh_execute_header");
@@ -323,6 +324,7 @@ private:
 		}
 
 		// execute target function using emulated cpu's context
+        // TODO: Catch callbacks into the emulated code.
 		if (!invokes::invoke(uc, address, name.c_str(), r0, r1, r2, r3, r13)) {
 			throw "unrecognized function name";
 		}
@@ -410,7 +412,9 @@ private:
     // inspired by ImageLoaderMachOClassic::rebase
     // TODO: Bug in our dyld? Fields that were NULL (0) in the binary are now equal to slide!
     // (This note was copied from removed code.) Is it really a bug, though? It seems that the
-    // original dyld would do the same thing.
+    // original dyld would do the same thing. But we didn't really get inspired by the part
+    // of dyld that parses dyldinfo, did we? Although it should probably do the same thing
+    // on this level.
     void relocate() {
         if (!slide_) {
             return;
