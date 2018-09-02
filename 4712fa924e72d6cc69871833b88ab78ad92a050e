@@ -1,0 +1,10 @@
+[ver:1,total:4010]
+src/IpaSimulator/MainPage.xaml.cpp:3525,1535821200:780,1535824800:600,1535828400:180,1535832000:240,1535868000:240,1535904000:360,1535907600:865,1535911200:260,m
+src/IpaSimulator/compat.h:140,1535907600:60,1535911200:80,m
+build/include/LIEF/filesystem/path.h:120,1535907600:120,r
+lib/LiefPort/LIEF/filesystem/filesystem.h:90,1535907600:90,r
+docs/git.md:60,1535907600:60,r
+lib/LiefPort/MachO/SegmentCommand.cpp:20,1535911200:20,r
+lib/LiefPort/LIEF/filesystem/path.h:20,1535907600:20,r
+build/include/LIEF/MachO/enums.hpp:20,1535907600:20,r
+src/IpaSimulator/pch.h:15,1535907600:15,r
