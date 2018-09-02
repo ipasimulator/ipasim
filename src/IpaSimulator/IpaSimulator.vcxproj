@@ -200,6 +200,9 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <None Include="..\..\build\bin\LIEF.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="..\..\Debug\dyld.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>

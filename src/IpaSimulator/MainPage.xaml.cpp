@@ -416,8 +416,6 @@ private:
             return;
         }
 
-        // TODO: Try to use the latest LIEF (from an old good Win32 dll - or load LIEF as plain old Win32 dll).
-
         for (auto& rel : bin_.relocations()) {
             if (rel.is_pc_relative() || rel.origin() != RELOCATION_ORIGINS::ORIGIN_DYLDINFO ||
                 rel.size() != 32) {

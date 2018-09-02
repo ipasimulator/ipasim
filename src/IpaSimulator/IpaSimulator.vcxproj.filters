@@ -298,6 +298,9 @@
     <None Include="..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\RTObjCInterop.dll">
       <Filter>Libraries</Filter>
     </None>
+    <None Include="..\..\build\bin\LIEF.dll">
+      <Filter>Libraries</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Page Include="MainPage.xaml" />
