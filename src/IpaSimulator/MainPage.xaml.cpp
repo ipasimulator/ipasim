@@ -250,12 +250,12 @@ public:
         }
 
         compute_slide();
-
         load_segments();
 
-        process_bindings();
-
+        // Order matters here - we need to relocate before binding external symbols.
+        // TODO: Why?
         relocate();
+        process_bindings();
 
         // map libraries into the Unicorn Engine
         // TODO: Not correct! The highest symbol's size is not considered.
