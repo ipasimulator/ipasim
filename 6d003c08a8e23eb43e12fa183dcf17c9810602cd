@@ -1,0 +1,8 @@
+[ver:1,total:690]
+lib/LiefPort/MachO/BinaryParser.tcc:480,1535821200:60,1535824800:420,r
+scripts/push_all.cmd:75,1535907600:75,r
+docs/git.md:45,1535907600:45,m
+docs/dyld.md:40,1535907600:40,r
+src/pe_patcher/pe_patcher.cpp:20,1535907600:20,d
+docs/pe_patcher.md:15,1535907600:15,d
+docs/pdflatex16780.fls:15,1535907600:15,r
