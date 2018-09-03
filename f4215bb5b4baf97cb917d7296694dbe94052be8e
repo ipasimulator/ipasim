@@ -1,0 +1,15 @@
+[ver:1,total:4260]
+src/IpaSimulator/compat.cpp:1918,1535954400:1368,1535958000:550,m
+docs/lief.md:928,1535954400:600,1535958000:328,m
+src/IpaSimulator/compat.h:400,1535954400:392,1535958000:8,m
+src/IpaSimulator/MainPage.xaml.cpp:315,1535950800:120,1535954400:195,r
+src/uwpcompat/uwpcompat.cpp:245,1535954400:245,d
+.gitmodules:150,1535958000:150,m
+docs/git.md:120,1535958000:120,r
+src/uwpcompat/uwpcompat.h:60,1535954400:60,d
+docs/llvm.md:30,1535958000:30,r
+.git/config:30,1535958000:30,r
+scripts/push_all.cmd:28,1535958000:28,m
+src/uwpcompat/pch.h:20,1535954400:20,d
+src/IpaSimulator/IpaSimulator.vcxproj.filters:8,1535958000:8,m
+src/IpaSimulator/IpaSimulator.vcxproj:8,1535958000:8,m
