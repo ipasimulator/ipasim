@@ -1,0 +1,4 @@
+[ver:1,total:3600]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:3430,1535983200:2810,1535986800:620,m
+src/IpaSimulator/build_invokes.cmd:140,1535983200:100,1535986800:40,r
+build/include/llvm/ADT/IntrusiveRefCntPtr.h:30,1535983200:30,r
