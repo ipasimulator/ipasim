@@ -1,0 +1,9 @@
+[ver:1,total:1740]
+src/HeadersAnalyzer/tblgen_one.cmd:740,1536001200:345,1536004800:395,m
+src/HeadersAnalyzer/build_tapi.cmd:650,1536001200:505,1536004800:145,m
+docs/tapi.md:120,1536001200:60,1536004800:60,m
+src/IpaSimulator/build_invokes.cmd:120,1536001200:120,r
+build/include/tapi/Driver/DiagnosticTAPIKinds.inc:30,1536001200:30,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:30,1536001200:30,r
+src/objc/build_one.cmd:30,1536001200:30,r
+src/HeadersAnalyzer/cc_mapper.cpp:20,1536001200:20,r
