@@ -1,0 +1,6 @@
+[ver:1,total:1740]
+src/HeadersAnalyzer/cc_mapper.hpp:1245,1535965200:1245,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:192,1535965200:192,r
+src/HeadersAnalyzer/cc_mapper.cpp:159,1535965200:159,m
+src/HeadersAnalyzer/cc_mapper_x86.hpp:124,1535965200:124,d
+src/HeadersAnalyzer/cc_mapper_x86.cpp:20,1535965200:20,d
