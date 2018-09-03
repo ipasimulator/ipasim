@@ -10,6 +10,7 @@ call push_one.cmd ..\deps\LIEF
 call push_one.cmd ..\deps\lld
 call push_one.cmd ..\deps\llvm
 call push_one.cmd ..\deps\objc4
+call push_one.cmd ..\deps\tapi
 call push_one.cmd ..\deps\WinObjC
 call push_one.cmd ..
 

@@ -29,3 +29,7 @@
 	path = deps/LIEF
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/LIEF
 	branch = port
+[submodule "deps/tapi"]
+	path = deps/tapi
+	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/tapi
+	branch = port
