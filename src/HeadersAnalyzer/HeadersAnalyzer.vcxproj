@@ -90,7 +90,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>LLVM_ENABLE_ABI_BREAKING_CHECKS=1;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\llvm\build\$(Configuration)\include;$(SolutionDir)build\include;$(SolutionDir)deps\clang\include;$(SolutionDir)deps\llvm\build\$(Configuration)\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\llvm\build\$(Configuration)\include;$(SolutionDir)build\include;$(SolutionDir)deps\clang\include;$(SolutionDir)deps\clang\lib;$(SolutionDir)deps\llvm\build\$(Configuration)\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -107,7 +107,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>LLVM_ENABLE_ABI_BREAKING_CHECKS=1;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\llvm\build\$(Configuration)\include;$(SolutionDir)build\include;$(SolutionDir)deps\clang\include;$(SolutionDir)deps\llvm\build\$(Configuration)\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\llvm\build\$(Configuration)\include;$(SolutionDir)build\include;$(SolutionDir)deps\clang\include;$(SolutionDir)deps\clang\lib;$(SolutionDir)deps\llvm\build\$(Configuration)\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -126,7 +126,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>LLVM_ENABLE_ABI_BREAKING_CHECKS=1;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\llvm\build\$(Configuration)\include;$(SolutionDir)build\include;$(SolutionDir)deps\clang\include;$(SolutionDir)deps\llvm\build\$(Configuration)\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\llvm\build\$(Configuration)\include;$(SolutionDir)build\include;$(SolutionDir)deps\clang\include;$(SolutionDir)deps\clang\lib;$(SolutionDir)deps\llvm\build\$(Configuration)\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -147,7 +147,7 @@
       <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>LLVM_ENABLE_ABI_BREAKING_CHECKS=1;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)deps\llvm\build\$(Configuration)\include;$(SolutionDir)build\include;$(SolutionDir)deps\clang\include;$(SolutionDir)deps\llvm\build\$(Configuration)\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)deps\llvm\build\$(Configuration)\include;$(SolutionDir)build\include;$(SolutionDir)deps\clang\include;$(SolutionDir)deps\clang\lib;$(SolutionDir)deps\llvm\build\$(Configuration)\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

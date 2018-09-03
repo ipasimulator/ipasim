@@ -6,6 +6,7 @@
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Basic/TargetOptions.h>
 #include <clang/Basic/TargetInfo.h>
+#include <clang/Driver/Driver.h>
 #include <clang/Lex/PreprocessorOptions.h>
 #include <clang/Parse/ParseAST.h>
 #include <clang/AST/Type.h>
@@ -13,12 +14,15 @@
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/AST/GlobalDecl.h>
 #include <clang/CodeGen/ModuleBuilder.h>
+#include /* clang/ */ <Driver/ToolChains/MSVC.h>
 #include <llvm/Demangle/Demangle.h>
 #include <vector>
 
 using namespace clang;
 using namespace frontend;
 using namespace std;
+using namespace driver;
+using namespace toolchains;
 
 class HeadersAnalyzer {
 public:
@@ -201,6 +205,16 @@ int main()
         ci.createDiagnostics();
         ci.getDiagnostics().setIgnoreAllWarnings(true);
 
+        auto targetOpts = make_shared<TargetOptions>();
+        targetOpts->Triple = "arm-apple-darwin"; // TODO: just a wild guess
+        ci.setTarget(TargetInfo::CreateTargetInfo(ci.getDiagnostics(), targetOpts)); // TODO: TargetInfo* should be deleted when not needed anymore
+
+        // Add system header search paths. This is a simplified version of what Clang does.
+        Driver driver("./build/bin/clang.exe", ("arm-apple-darwin"), ci.getDiagnostics());
+        llvm::opt::InputArgList args;
+        MSVCToolChain tc(driver, ci.getTarget().getTriple(), args);
+        ci.getHeaderSearchOpts().AddPath(tc.getSubDirectoryPath(MSVCToolChain::SubDirectoryType::Include), IncludeDirGroup::System, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
+
         ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
         ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/tools/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
         ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/tools/include/WOCStdLib/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
@@ -212,10 +226,6 @@ int main()
         ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/tools/deps/prebuilt/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
         ci.getHeaderSearchOpts().AddPath("./deps/clang/lib/Headers/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
         //ci.getHeaderSearchOpts().ResourceDir = "./deps/clang/lib/Headers/";
-
-        auto targetOpts = make_shared<TargetOptions>();
-        targetOpts->Triple = "arm-apple-darwin"; // TODO: just a wild guess
-        ci.setTarget(TargetInfo::CreateTargetInfo(ci.getDiagnostics(), targetOpts)); // TODO: TargetInfo* should be deleted when not needed anymore
 
         ci.createFileManager();
         ci.createSourceManager(ci.getFileManager());
