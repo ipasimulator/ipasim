@@ -1,0 +1,7 @@
+[ver:1,total:2160]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:720,1535986800:540,1535990400:180,r
+docs/tapi.md:654,1535990400:654,r
+docs/llvm.md:546,1535990400:546,r
+out/invokes.inc:180,1535986800:180,r
+scripts/push_all.cmd:45,1535990400:45,m
+.gitmodules:15,1535990400:15,m
