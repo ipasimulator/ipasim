@@ -15,3 +15,5 @@ Run `build_tapi.cmd` to do that.
 
 - `[must-quote]`: Changed `bool` -> `QuotingType`, `false` -> `QuotingType::None`, `true` -> `QuotingType::Double`.
   LLVM API probably evolved.
+- `[no-dynamic]`: `ObjCProperty` does not contain method `isDynamic` and it seems it never did.
+  **TODO: How could it work in the original code, then?**
