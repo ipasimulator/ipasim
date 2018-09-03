@@ -173,10 +173,13 @@ private:
 int main()
 {
     // Let's try to parse some `.tbd` files...
-    // TODO: This won't build :/
     tapi::internal::FileManager fm(FileSystemOptions{});
     tapi::internal::InterfaceFileManager ifm(fm);
     auto file = ifm.readFile("./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libobjc.A.tbd");
+    if (!file) {
+        cerr << llvm::toString(file.takeError()) << endl;
+        return 1;
+    }
 
     // Get a set of functions we only want to analyze.
     // HACK: This is here for this prototype version only.
