@@ -2,14 +2,6 @@
 
 This is not in any way a complete documentation, it's just a draft containing some ideas that I could forgot until the final documentation is written.
 
-## Projects organization
-
-Projects inside the `Library/LLVM/ARM` solution folder are simply all projects from the generated `deps/llvm/build/arm/LLVM.sln`.
-Similarly projects inside the `Library/LLVM/Win32` folder.
-All of these were added simply by selecting the `.sln` file in the `Add Existing Project...` dialog in Visual Studio.
-
-The same is true for projects inside the `Library/yaml-cpp` solution folder.
-
 ## Updating dependencies
 
 There are some third-party dependencies that can be updated whenever new version comes out.
@@ -35,29 +27,6 @@ A list of them follows.
 
 **TODO: Use <https://docs.microsoft.com/en-us/cpp/vcpkg>.**
 **TODO: Maybe build everything in Docker?**
-
-## How to build (on 64-bit Windows with Visual Studio 2017)
-
-1. Checkout the repository and make sure submodules are checked out as well.
-2. Install `cmake` and make sure it's in your `PATH` environment variable.
-3. Run the following commands:
-
-   ```cmd
-   cd deps\llvm
-   mkdir build && cd build
-   mkdir win32 && cd win32
-   cmake -G "Visual Studio 15" -DLLVM_TARGETS_TO_BUILD="ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\..\clang" -Thost=x64 ..\..
-   cd ..
-   mkdir arm && cd arm
-   cmake -G "Visual Studio 15 ARM" -DLLVM_TARGETS_TO_BUILD="ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\..\clang" -DLLVM_TABLEGEN="<full path to source directory>\deps\llvm\build\win32\Release\bin\llvm-tblgen.exe" -Thost=x64 ..\..
-   cd ..\..\..\yaml-cpp
-   mkdir build && cd build
-   mkdir win32 && cd win32
-   cmake -G "Visual Studio 15" -Thost=x64 ..\..
-   ```
-
-   **TODO: probably remove the `-Thost=x64` option and allow only 32-bit Windows for tooling/compilation and ARM + 32-bit Windows for running the app.**
-4. If projects were successfully generated, you can open the `IPASimulator.sln`.
 
 ## How does it work
 
