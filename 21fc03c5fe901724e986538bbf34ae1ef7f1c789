@@ -1,0 +1,4 @@
+[ver:1,total:900]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:690,1535990400:180,1535994000:510,m
+scripts/push_one.cmd:150,1535990400:120,1535994000:30,r
+build/include/llvm/Support/YAMLTraits.h:60,1535994000:60,r
