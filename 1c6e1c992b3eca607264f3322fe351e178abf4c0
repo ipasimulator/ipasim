@@ -1,0 +1,17 @@
+[ver:1,total:6300]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:2362,1535968800:660,1535972400:730,1535976000:972,m
+src/IpaSimulator/MainPage.xaml.cpp:1268,1535968800:60,1535972400:1092,1535976000:116,m
+src/objc/dladdr.mm:690,1535968800:630,1535972400:60,r
+src/IpaSimulator/build_invokes.cmd:448,1535972400:190,1535976000:258,m
+out/invokes.inc:355,1535968800:270,1535972400:40,1535976000:45,r
+src/IpaSimulator/invokes.h:308,1535972400:272,1535976000:36,m
+src/IpaSimulator/invokes.mm:222,1535972400:186,1535976000:36,m
+src/objc/build_one.cmd:162,1535972400:100,1535976000:62,r
+src/objc/cxxabi.mm:150,1535972400:150,r
+src/RTObjCInterop/build_one.cmd:92,1535976000:92,r
+src/IpaSimulator/pch.h:62,1535972400:50,1535976000:12,m
+src/HeadersAnalyzer/README.md:60,1535968800:60,r
+src/objc/extern-objc.hpp:52,1535972400:40,1535976000:12,d
+src/IpaSimulator/MainPage.xaml.h:30,1535972400:30,r
+src/IpaSimulator/compat.cpp:24,1535976000:24,r
+src/RTObjCInterop/build.cmd:15,1535976000:15,r
