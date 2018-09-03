@@ -171,7 +171,7 @@ int main()
     // HACK: This is here for this prototype version only.
     set<string> imports;
     {
-        fstream importsFile("C:/Users/jjone/Files/Projects/ipaSim/repos/IPASimulator/Debug/imports.txt");
+        fstream importsFile("./Debug/imports.txt");
         for (string line; getline(importsFile, line);) {
             // Skip empty lines.
             if (line.empty()) { continue; }
@@ -181,12 +181,12 @@ int main()
     }
 
     // TODO: This won't create the /out/ directory if it doesn't exist!
-    fstream invokes("C:/Users/jjone/Files/Projects/ipaSim/repos/IPASimulator/out/invokes.inc", fstream::out);
-    fstream headers("C:/Users/jjone/Files/Projects/ipaSim/repos/IPASimulator/out/headers.inc", fstream::out);
+    fstream invokes("./out/invokes.inc", fstream::out);
+    fstream headers("./out/headers.inc", fstream::out);
     vector<string> headerPaths{
-        "C:/Users/jjone/Files/Projects/ipaSim/repos/IPASimulator/deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/Foundation.h",
-        "C:/Users/jjone/Files/Projects/ipaSim/repos/IPASimulator/packages/WinObjC.Language.0.2.171110/build/include/objc/objc-arc.h",
-        "C:/Users/jjone/Files/Projects/ipaSim/repos/IPASimulator/deps/apple-headers/iPhoneOS11.1.sdk/usr/include/objc/message.h"
+        "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/Foundation.h",
+        "./deps/WinObjC/tools/include/objc/objc-arc.h",
+        "./deps/apple-headers/iPhoneOS11.1.sdk/usr/include/objc/message.h"
     };
 
     for (auto &headerPath : headerPaths) {
@@ -200,11 +200,11 @@ int main()
         ci.createDiagnostics();
         ci.getDiagnostics().setIgnoreAllWarnings(true);
 
-        //ci.getHeaderSearchOpts().Sysroot = "C:/Users/jjone/Files/Projects/ipaSim/repos/IPASimulator/deps/apple-headers/iPhoneOS11.1.sdk/";
-        ci.getHeaderSearchOpts().AddPath("C:/Users/jjone/Files/Projects/ipaSim/repos/IPASimulator/deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/", IncludeDirGroup::Angled, /*IsFramework*/ true, /*IgnoreSysRoot*/ false);
-        ci.getHeaderSearchOpts().AddPath("C:/Users/jjone/Files/Projects/ipaSim/repos/IPASimulator/deps/apple-headers/iPhoneOS11.1.sdk/usr/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
-        ci.getHeaderSearchOpts().AddPath("C:/Users/jjone/Files/Projects/ipaSim/repos/IPASimulator/deps/clang/lib/Headers/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
-        //ci.getHeaderSearchOpts().ResourceDir = "C:/Users/jjone/Files/Projects/ipaSim/repos/IPASimulator/deps/clang/lib/Headers/";
+        //ci.getHeaderSearchOpts().Sysroot = "./deps/apple-headers/iPhoneOS11.1.sdk/";
+        ci.getHeaderSearchOpts().AddPath("./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/", IncludeDirGroup::Angled, /*IsFramework*/ true, /*IgnoreSysRoot*/ false);
+        ci.getHeaderSearchOpts().AddPath("./deps/apple-headers/iPhoneOS11.1.sdk/usr/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
+        ci.getHeaderSearchOpts().AddPath("./deps/clang/lib/Headers/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
+        //ci.getHeaderSearchOpts().ResourceDir = "./deps/clang/lib/Headers/";
 
         auto targetOpts = make_shared<TargetOptions>();
         targetOpts->Triple = "arm-apple-darwin"; // TODO: just a wild guess
