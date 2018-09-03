@@ -1,0 +1,5 @@
+[ver:1,total:240]
+build/include/llvm/Demangle/Demangle.h:150,1536015600:150,r
+docs/llvm.md:40,1536015600:40,m
+docs/tapi.md:30,1536015600:30,r
+src/HeadersAnalyzer/HeadersAnalyzer.vcxproj:20,1536015600:20,m
