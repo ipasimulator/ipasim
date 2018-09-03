@@ -56,7 +56,8 @@ public:
         else {
             after_first_ = true;
         }
-        output_ << "if (!std::strcmp(name, \"" << name << "\")) {" << endl;
+        // TODO: Don't compare `module` with symbol name!
+        output_ << "if (!std::strcmp(module, \"" << name << "\")) {" << endl;
 
         // We will simply assume arguments are in r0-r3 or on stack for starters.
         // Inspired by /res/IHI0042F_aapcs.pdf (AAPCS), section 5.5 Parameter Passing.
@@ -184,9 +185,9 @@ int main()
     fstream invokes("./out/invokes.inc", fstream::out);
     fstream headers("./out/headers.inc", fstream::out);
     vector<string> headerPaths{
-        "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/Foundation.framework/Headers/Foundation.h",
+        "./deps/WinObjC/include/Foundation/Foundation.h",
         "./deps/WinObjC/tools/include/objc/objc-arc.h",
-        "./deps/apple-headers/iPhoneOS11.1.sdk/usr/include/objc/message.h"
+        "./deps/WinObjC/tools/include/objc/message.h"
     };
 
     for (auto &headerPath : headerPaths) {
@@ -200,9 +201,15 @@ int main()
         ci.createDiagnostics();
         ci.getDiagnostics().setIgnoreAllWarnings(true);
 
-        //ci.getHeaderSearchOpts().Sysroot = "./deps/apple-headers/iPhoneOS11.1.sdk/";
-        ci.getHeaderSearchOpts().AddPath("./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/", IncludeDirGroup::Angled, /*IsFramework*/ true, /*IgnoreSysRoot*/ false);
-        ci.getHeaderSearchOpts().AddPath("./deps/apple-headers/iPhoneOS11.1.sdk/usr/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
+        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
+        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/tools/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
+        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/tools/include/WOCStdLib/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
+        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/include/Platform/Universal Windows/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
+        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/Frameworks/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
+        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/include/xplat/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
+        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/tools/Logging/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
+        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/tools/include/xplat/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
+        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/tools/deps/prebuilt/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
         ci.getHeaderSearchOpts().AddPath("./deps/clang/lib/Headers/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
         //ci.getHeaderSearchOpts().ResourceDir = "./deps/clang/lib/Headers/";
 

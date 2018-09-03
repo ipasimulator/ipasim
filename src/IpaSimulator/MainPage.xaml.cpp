@@ -12,6 +12,7 @@
 #include <unicorn/unicorn.h>
 #include <memory>
 #include <map>
+#include <psapi.h> // for `GetModuleInformation`
 
 using namespace IpaSimulator;
 using namespace Platform;
@@ -301,31 +302,42 @@ private:
         // read emulated registers
 #define READ_REG(num) uint32_t r##num; UC(uc_reg_read(uc, UC_ARM_REG_R##num, &r##num))
 
-		READ_REG(0)
-		READ_REG(1)
-		READ_REG(2)
-		READ_REG(3)
-		READ_REG(13)
-		READ_REG(14)
+        READ_REG(0)
+        READ_REG(1)
+        READ_REG(2)
+        READ_REG(3)
+        READ_REG(13)
+        READ_REG(14)
 #undef READ_REG
 
-		// TODO: Don't branch by name (it's slow), use numbers instead.
-		auto &name = dl.funcs_[address];
+        // Find the function's module.
+        auto it = dl.funcs_.find(address);
+        string module; // TODO: Don't use strings, use numbers instead.
+        if (it == dl.funcs_.end()) {
+            for (auto&& lib : dl.libs_) {
+                if (lib.second.first <= address && address <= lib.second.second) {
+                    module = lib.first;
+                }
+            }
+        }
+        else {
+            module = it->second;
+        }
 
 		// For variadic functions, we need to semantically analyze some of its arguments
 		// to determine what the whole called signature looks like.
-		if (name == "objc_msgSend") {
+		/*if (name == "objc_msgSend") {
             // Use `objc_msgLookup` to retrieve the target function.
             auto lib = LoadPackagedLibrary(L"libobjc.A.dll", 0);
             auto func = GetProcAddress(lib, "objc_msgLookup");
             auto imp = ((void *(*)(void *, void *))func)((void *)r0, (void *)r1);
             // TODO: Do something with `imp`.
             FreeLibrary(lib);
-		}
+		}*/
 
 		// execute target function using emulated cpu's context
         // TODO: Catch callbacks into the emulated code.
-		if (!invokes::invoke(uc, address, name.c_str(), r0, r1, r2, r3, r13)) {
+		if (!invokes::invoke(uc, module.c_str(), address, r0, r1, r2, r3, r13)) {
 			throw "unrecognized function name";
 		}
 
@@ -524,18 +536,24 @@ private:
             // TODO: maybe also check that there are no (iaddr-1) values bound to avoid ambiguity
         }
 
-		// Remember the function's name.
-		funcs_[iaddr] = n;
+		// Remember the function's module for faster lookup.
+		funcs_[iaddr] = name;
 
         auto lib = libs_.find(name);
         if (lib == libs_.end()) {
             // We come across this library for the first time, let's find out where it lies in memory
             // and map it into Unicorn.
 
+            // Map libraries that act as `.dylib`s without the PE header.
             if (auto start = GetProcAddress(winlib, "_mh_dylib_header")) {
                 libs_[name] = make_pair((uint64_t)start, (uint64_t)start + get_lib_size(start));
             }
-            // TODO: If there is no symbol `_mh_dylib_header`, throw an exception, don't ignore it.
+            // Map other libraries as a whole.
+            else {
+                MODULEINFO info;
+                if (!GetModuleInformation(GetCurrentProcess(), winlib, &info, sizeof(info))) { throw 1; }
+                libs_[name] = make_pair((uint64_t)info.lpBaseOfDll, (uint64_t)info.lpBaseOfDll + info.SizeOfImage);
+            }
         }
         else {
             // Otherwise, we already loaded this library, so we can free it here.
@@ -589,7 +607,7 @@ private:
     uint64_t lowAddr_, highAddr_;
     map<string, pair<uint64_t, uint64_t>> libs_; // libraries' low and high addresses
     set<uint64_t> odd_addrs_; // all bound addresses that are odd, but inserted decremented by 1 (so even)
-	map<uint64_t, string> funcs_; // map from function addresses to their names
+	map<uint64_t, string> funcs_; // map from function addresses to their modules
 };
 
 MainPage::MainPage()

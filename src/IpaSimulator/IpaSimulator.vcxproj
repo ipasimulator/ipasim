@@ -109,7 +109,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>LIEF.lib;invokes.obj;$(ProjectDir)..\..\deps\llvm\build\arm\Debug\lib\LLVMARMCodeGen.lib;$(ProjectDir)..\..\ARM\Debug\UnicornPort\UnicornPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib;$(SolutionDir)build\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)build\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
@@ -122,7 +122,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>LIEF.lib;invokes.obj;$(ProjectDir)..\..\ARM\Release\UnicornPort\UnicornPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib;$(SolutionDir)build\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)build\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -135,7 +135,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>LIEF.lib;invokes.obj;$(ProjectDir)..\..\Debug\UnicornPort\UnicornPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib;$(SolutionDir)build\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)build\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -148,7 +148,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>LIEF.lib;invokes.obj;$(ProjectDir)..\..\Release\UnicornPort\UnicornPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib;$(SolutionDir)build\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)build\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -161,7 +161,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>LIEF.lib;invokes.obj;$(ProjectDir)..\..\x64\Debug\UnicornPort\UnicornPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib;$(SolutionDir)build\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)build\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -174,7 +174,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>LIEF.lib;invokes.obj;$(ProjectDir)..\..\x64\Release\UnicornPort\UnicornPort.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ProjectDir)..\..\lib;$(SolutionDir)build\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)build\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
