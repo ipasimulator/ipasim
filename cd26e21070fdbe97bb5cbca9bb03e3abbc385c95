@@ -1,0 +1,8 @@
+[ver:1,total:2040]
+build/include/llvm/Support/YAMLTraits.h:1050,1536004800:1050,r
+docs/tapi.md:540,1536004800:450,1536008400:90,m
+src/HeadersAnalyzer/build_tapi.cmd:210,1536004800:210,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:90,1536004800:90,r
+src/HeadersAnalyzer/HeadersAnalyzer.vcxproj:75,1536008400:75,m
+src/objc/dladdr.mm:60,1536004800:60,r
+src/HeadersAnalyzer/HeadersAnalyzer.vcxproj.filters:15,1536008400:15,m
