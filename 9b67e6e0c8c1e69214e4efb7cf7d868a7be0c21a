@@ -1,0 +1,5 @@
+[ver:1,total:3720]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:3456,1535976000:240,1535979600:2796,1535983200:420,m
+src/IpaSimulator/build_invokes.cmd:240,1535976000:180,1535979600:60,r
+build/include/llvm/Option/ArgList.h:12,1535979600:12,r
+build/include/llvm/ADT/StringRef.h:12,1535979600:12,r
