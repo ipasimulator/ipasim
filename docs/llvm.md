@@ -14,6 +14,10 @@ Similarly LLD, but there was not even a `stable` branch, so it was based on some
 > There are also old branches named `port`, not currently used.
 > Before using them again (if changing something in LLVM or Clang), delete them first.
 
+## Apple patches
+
+We also added library `ObjCMetadata` to LLVM from <https://opensource.apple.com/source/clang/clang-800.0.42.1/>.
+
 ## Building
 
 Follow the instructions below to build patched LLVM and Clang.
