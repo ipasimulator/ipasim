@@ -162,9 +162,11 @@
     <ClCompile Include="..\..\deps\tapi\lib\Core\Architecture.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\ArchitectureSet.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\ArchitectureSupport.cpp" />
+    <ClCompile Include="..\..\deps\tapi\lib\Core\AvailabilityInfo.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\ConfigurationFile.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\ExtendedInterfaceFile.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\FileManager.cpp" />
+    <ClCompile Include="..\..\deps\tapi\lib\Core\InterfaceFile.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\InterfaceFileBase.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\InterfaceFileManager.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\MachODylibReader.cpp" />
@@ -172,11 +174,17 @@
     <ClCompile Include="..\..\deps\tapi\lib\Core\ReexportFileWriter.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\Registry.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\TextAPI_v1.cpp" />
+    <ClCompile Include="..\..\deps\tapi\lib\Core\TextStub_v1.cpp" />
+    <ClCompile Include="..\..\deps\tapi\lib\Core\TextStub_v2.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\Utils.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\XPI.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\XPISet.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\YAMLReaderWriter.cpp" />
+    <ClCompile Include="..\..\deps\tapi\lib\Driver\Diagnostics.cpp" />
+    <ClCompile Include="..\..\deps\tapi\lib\Driver\DriverOptions.cpp" />
+    <ClCompile Include="..\..\deps\tapi\lib\Driver\Options.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Driver\Snapshot.cpp" />
+    <ClCompile Include="..\..\deps\tapi\lib\Driver\SnapshotFileSystem.cpp" />
     <ClCompile Include="cc_mapper.cpp" />
     <ClCompile Include="HeadersAnalyzer.cpp" />
   </ItemGroup>

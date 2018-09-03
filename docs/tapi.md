@@ -17,3 +17,4 @@ Run `build_tapi.cmd` to do that.
   LLVM API probably evolved.
 - `[no-dynamic]`: `ObjCProperty` does not contain method `isDynamic` and it seems it never did.
   **TODO: How could it work in the original code, then?**
+- `[sort]`: Inspired by [Swift's `TBDGen`](https://github.com/apple/swift/blob/2f4e70bf7f4eee43bfb2f24d6215eb1f63c05d01/lib/TBDGen/tapi/TextStub_v3.cpp#L189).
