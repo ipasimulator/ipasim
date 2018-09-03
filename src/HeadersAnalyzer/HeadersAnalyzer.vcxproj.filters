@@ -99,6 +99,9 @@
     <ClCompile Include="..\..\deps\tapi\lib\Driver\SnapshotFileSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Config\Version.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />

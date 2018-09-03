@@ -159,6 +159,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\deps\tapi\lib\Config\Version.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\Architecture.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\ArchitectureSet.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\ArchitectureSupport.cpp" />
