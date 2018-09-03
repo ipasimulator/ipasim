@@ -1,0 +1,6 @@
+[ver:1,total:540]
+docs/tapi.md:180,1536012000:180,r
+build/include/llvm/ADT/STLExtras.h:180,1536012000:180,r
+src/HeadersAnalyzer/HeadersAnalyzer.vcxproj:60,1536012000:60,m
+src/HeadersAnalyzer/HeadersAnalyzer.vcxproj.filters:60,1536012000:60,m
+build/include/llvm/Support/MathExtras.h:60,1536012000:60,r
