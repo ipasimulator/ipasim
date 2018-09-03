@@ -16,7 +16,8 @@
 #include <clang/AST/GlobalDecl.h>
 #include <clang/CodeGen/ModuleBuilder.h>
 #include <llvm/Demangle/Demangle.h>
-#include <tapi/Core/YAML.h>
+#include <tapi/Core/FileManager.h>
+#include <tapi/Core/InterfaceFileManager.h>
 #include <vector>
 
 using namespace clang;
@@ -171,6 +172,12 @@ private:
 
 int main()
 {
+    // Let's try to parse some `.tbd` files...
+    // TODO: This won't build :/
+    tapi::internal::FileManager fm(FileSystemOptions{});
+    tapi::internal::InterfaceFileManager ifm(fm);
+    auto file = ifm.readFile("./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libobjc.A.tbd");
+
     // Get a set of functions we only want to analyze.
     // HACK: This is here for this prototype version only.
     set<string> imports;

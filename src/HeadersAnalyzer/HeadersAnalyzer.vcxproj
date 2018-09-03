@@ -159,6 +159,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\FileManager.cpp" />
+    <ClCompile Include="..\..\deps\tapi\lib\Core\InterfaceFileManager.cpp" />
     <ClCompile Include="cc_mapper.cpp" />
     <ClCompile Include="HeadersAnalyzer.cpp" />
   </ItemGroup>
