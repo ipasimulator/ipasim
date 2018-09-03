@@ -16,6 +16,7 @@
 #include <clang/AST/GlobalDecl.h>
 #include <clang/CodeGen/ModuleBuilder.h>
 #include <llvm/Demangle/Demangle.h>
+#include <tapi/Core/YAML.h>
 #include <vector>
 
 using namespace clang;
