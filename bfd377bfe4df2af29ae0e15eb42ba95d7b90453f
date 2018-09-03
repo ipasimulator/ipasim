@@ -1,0 +1,10 @@
+[ver:1,total:2940]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:2000,1535961600:1620,1535965200:380,m
+docs/llvm.md:500,1535961600:120,1535965200:380,m
+build/include/llvm/Config/abi-breaking.h:200,1535961600:200,r
+docs/english.md:80,1535961600:60,1535965200:20,r
+src/HeadersAnalyzer/README.md:60,1535965200:60,m
+build/include/llvm/Demangle/Demangle.h:40,1535961600:40,r
+build/include/llvm/Demangle/Compiler.h:20,1535961600:20,r
+build/include/llvm/Config/llvm-config.h:20,1535961600:20,r
+build/include/llvm/Support/Compiler.h:20,1535961600:20,r
