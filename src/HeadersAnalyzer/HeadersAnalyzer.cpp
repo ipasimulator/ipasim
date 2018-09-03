@@ -15,15 +15,12 @@
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/AST/GlobalDecl.h>
 #include <clang/CodeGen/ModuleBuilder.h>
-#include /* clang/ */ <Driver/ToolChains/MSVC.h>
 #include <llvm/Demangle/Demangle.h>
 #include <vector>
 
 using namespace clang;
 using namespace frontend;
 using namespace std;
-using namespace driver;
-using namespace toolchains;
 
 class HeadersAnalyzer {
 public:
