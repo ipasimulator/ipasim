@@ -10,7 +10,6 @@ if %errorlevel% equ 0 (goto push) else (goto dont_push)
 
 echo.
 echo Nothing to push in "%1".
-echo.
 
 goto end
 

@@ -14,4 +14,5 @@ call push_one.cmd ..\deps\tapi
 call push_one.cmd ..\deps\WinObjC
 call push_one.cmd ..
 
+echo.
 pause
