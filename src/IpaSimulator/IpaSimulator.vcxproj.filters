@@ -29,6 +29,9 @@
     <ClCompile Include="invokes.mm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="compat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
@@ -299,6 +302,210 @@
       <Filter>Libraries</Filter>
     </None>
     <None Include="..\..\build\bin\LIEF.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
+      <Filter>Libraries</Filter>
+    </None>
+    <None Include="..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\*.dll">
       <Filter>Libraries</Filter>
     </None>
   </ItemGroup>

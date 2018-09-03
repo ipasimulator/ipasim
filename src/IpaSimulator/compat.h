@@ -1,5 +1,5 @@
 // compat.h: Contains some declarations of <Windows.h> functions not available in UWP.
-// None of them is currently implemented, because they're not used, just declared in
+// None of those are currently implemented, because they're not used, just declared in
 // some header files we need to get compiled.
 
 #include <Windows.h>
