@@ -88,7 +88,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>TAPI_PORT;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TAPI_PORT;PATH_MAX=_MAX_PATH;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)deps\tapi\include;$(SolutionDir)deps\llvm\build\$(Configuration)\include;$(SolutionDir)build\include;$(SolutionDir)deps\clang\include;$(SolutionDir)deps\llvm\build\$(Configuration)\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -105,7 +105,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>TAPI_PORT;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TAPI_PORT;PATH_MAX=_MAX_PATH;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)deps\tapi\include;$(SolutionDir)deps\llvm\build\$(Configuration)\include;$(SolutionDir)build\include;$(SolutionDir)deps\clang\include;$(SolutionDir)deps\llvm\build\$(Configuration)\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -124,7 +124,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>TAPI_PORT;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TAPI_PORT;PATH_MAX=_MAX_PATH;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)deps\tapi\include;$(SolutionDir)deps\llvm\build\$(Configuration)\include;$(SolutionDir)build\include;$(SolutionDir)deps\clang\include;$(SolutionDir)deps\llvm\build\$(Configuration)\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -145,7 +145,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>false</SDLCheck>
-      <PreprocessorDefinitions>TAPI_PORT;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TAPI_PORT;PATH_MAX=_MAX_PATH;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)deps\tapi\include;$(SolutionDir)deps\llvm\build\$(Configuration)\include;$(SolutionDir)build\include;$(SolutionDir)deps\clang\include;$(SolutionDir)deps\llvm\build\$(Configuration)\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -159,8 +159,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\ArchitectureSupport.cpp" />
+    <ClCompile Include="..\..\deps\tapi\lib\Core\ConfigurationFile.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\FileManager.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Core\InterfaceFileManager.cpp" />
+    <ClCompile Include="..\..\deps\tapi\lib\Core\MachODylibReader.cpp" />
+    <ClCompile Include="..\..\deps\tapi\lib\Core\Registry.cpp" />
+    <ClCompile Include="..\..\deps\tapi\lib\Core\YAMLReaderWriter.cpp" />
+    <ClCompile Include="..\..\deps\tapi\lib\Driver\Snapshot.cpp" />
     <ClCompile Include="cc_mapper.cpp" />
     <ClCompile Include="HeadersAnalyzer.cpp" />
   </ItemGroup>

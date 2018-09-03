@@ -1,6 +1,7 @@
 # TAPI
 
 Forked from <https://github.com/ributzka/tapi>.
+**TODO: Fork rather from (more) official source <https://opensource.apple.com/source/tapi/>.**
 
 ## Building
 
@@ -9,3 +10,8 @@ That is also what others do, see for example [Swift's `TBDGen`](https://github.c
 
 We generate some header files using `clang-tblgen`, though.
 Run `build_tapi.cmd` to do that.
+
+## Comment tags
+
+- `[must-quote]`: Changed `bool` -> `QuotingType`, `false` -> `QuotingType::None`, `true` -> `QuotingType::Double`.
+  LLVM API probably evolved.
