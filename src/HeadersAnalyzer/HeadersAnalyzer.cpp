@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <clang/Frontend/CompilerInstance.h>
+#include <clang/Frontend/Utils.h>
 #include <clang/Basic/TargetOptions.h>
 #include <clang/Basic/TargetInfo.h>
 #include <clang/Driver/Driver.h>
@@ -198,40 +199,40 @@ int main()
         headers << "#include \"" << headerPath << "\"" << endl;
         cout << headerPath << endl;
 
-        // inspired by https://github.com/loarabia/Clang-tutorial/
+        // Originally inspired by https://github.com/loarabia/Clang-tutorial/.
         // TODO: move this to a separate class
 
         CompilerInstance ci;
         ci.createDiagnostics();
         ci.getDiagnostics().setIgnoreAllWarnings(true);
 
-        auto targetOpts = make_shared<TargetOptions>();
-        targetOpts->Triple = "arm-apple-darwin"; // TODO: just a wild guess
-        ci.setTarget(TargetInfo::CreateTargetInfo(ci.getDiagnostics(), targetOpts)); // TODO: TargetInfo* should be deleted when not needed anymore
+        vector<const char *> args{
+            "-target=i386-pc-windows-msvc",
+            "-std=c++14",
+            "-fblocks",
+            "-fobjc-runtime=macosx-10.13.0",
+            "-DOBJC_PORT",
+            "-DNOMINMAX",
+            "-DWIN32_LEAN_AND_MEAN",
+            "-I", "./deps/WinObjC/include",
+            "-I", "./deps/WinObjC/include/Platform/Universal Windows",
+            "-I", "./deps/WinObjC/Frameworks/include",
+            "-I", "./deps/WinObjC/include/xplat",
+            "-I", "./deps/WinObjC/tools/include/WOCStdLib",
+            "-I", "./deps/WinObjC/tools/include",
+            "-I", "./deps/WinObjC/tools/Logging/include",
+            "-I", "./deps/WinObjC/tools/include/xplat",
+            "-I", "./deps/WinObjC/tools/deps/prebuilt/include",
+            "-x", "objective-c++",
+            headerPath.c_str()
+        };
+        ci.setInvocation(createInvocationFromCommandLine(llvm::makeArrayRef(args)));
 
-        // Add system header search paths. This is a simplified version of what Clang does.
-        Driver driver("./build/bin/clang.exe", ("arm-apple-darwin"), ci.getDiagnostics());
-        llvm::opt::InputArgList args;
-        MSVCToolChain tc(driver, ci.getTarget().getTriple(), args);
-        ci.getHeaderSearchOpts().AddPath(tc.getSubDirectoryPath(MSVCToolChain::SubDirectoryType::Include), IncludeDirGroup::System, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
-
-        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
-        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/tools/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
-        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/tools/include/WOCStdLib/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
-        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/include/Platform/Universal Windows/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
-        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/Frameworks/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
-        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/include/xplat/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
-        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/tools/Logging/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
-        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/tools/include/xplat/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
-        ci.getHeaderSearchOpts().AddPath("./deps/WinObjC/tools/deps/prebuilt/include/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
-        ci.getHeaderSearchOpts().AddPath("./deps/clang/lib/Headers/", IncludeDirGroup::Angled, /*IsFramework*/ false, /*IgnoreSysRoot*/ false);
-        //ci.getHeaderSearchOpts().ResourceDir = "./deps/clang/lib/Headers/";
+        // TODO: TargetInfo* should be deleted when not needed anymore. Should it, though?
+        ci.setTarget(TargetInfo::CreateTargetInfo(ci.getDiagnostics(), ci.getInvocation().TargetOpts));
 
         ci.createFileManager();
         ci.createSourceManager(ci.getFileManager());
-
-        ci.getInvocation().setLangDefaults(ci.getLangOpts(), InputKind::ObjC, ci.getTarget().getTriple(), ci.getPreprocessorOpts());
-        ci.getLangOpts().Blocks = 1;
 
         //ci.getPreprocessorOpts().UsePredefines = false;
         ci.createPreprocessor(TranslationUnitKind::TU_Complete);
