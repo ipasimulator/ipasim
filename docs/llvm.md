@@ -31,7 +31,7 @@ Follow the instructions below to build patched LLVM and Clang.
 mkdir build && cd build
 mkdir Release && cd Release
 cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\..\clang" -DLLVM_EXTERNAL_LLD_SOURCE_DIR="..\..\..\lld" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="..\..\..\..\build" ..\..
-ninja install-clang install-libclang install-lld install-llvm-headers tools/clang/lib/install lib/install install-LLVMSupport
+ninja install-clang install-libclang install-lld install-llvm-headers tools/clang/lib/install lib/install install-LLVMSupport install-LLVMDemangle
 ```
 
 - The outputs will be in `/build/`.
