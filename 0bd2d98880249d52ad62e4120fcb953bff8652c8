@@ -1,0 +1,4 @@
+[ver:1,total:660]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:420,1536015600:420,m
+build/include/llvm/Support/ErrorOr.h:180,1536015600:180,r
+docs/llvm.md:60,1536015600:60,r
