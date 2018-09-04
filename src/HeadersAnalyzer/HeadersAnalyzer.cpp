@@ -148,19 +148,9 @@ public:
         }
 
         // Call the function through a function pointer saved in argument named "address".
-        {
-            QualType pt = ci_.getASTContext().getPointerType(fpt->desugar());
-            VarDecl *vardecl = VarDecl::Create(ci_.getASTContext(), ci_.getASTContext().getTranslationUnitDecl(),
-                SourceLocation(), SourceLocation(), &ci_.getASTContext().Idents.get("fptr"), pt, nullptr,
-                StorageClass::SC_None);
-            llvm::raw_os_ostream oos(output_);
-            vardecl->print(oos, ci_.getASTContext().getPrintingPolicy());
-            oos.flush();
-        }
-        output_ << " = reinterpret_cast<decltype(fptr)>(address);" << endl;
-
+        output_ << "using ft = decltype(" << f.getIdentifier()->getName().str() << ");" << endl;
         if (!fpt->getReturnType()->isVoidType()) { output_ << "RET("; }
-        output_ << "fptr(";
+        output_ << "reinterpret_cast<ft *>(address)(";
         for (i = 0; i != fpt->getNumParams(); ++i) {
             if (i != 0) { output_ << ", "; }
             output_ << "*v" << to_string(i);
