@@ -1,0 +1,4 @@
+[ver:1,total:1140]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:910,1536048000:60,1536051600:850,m
+out/headers.inc:180,1536048000:180,r
+out/invokes.inc:50,1536051600:50,r
