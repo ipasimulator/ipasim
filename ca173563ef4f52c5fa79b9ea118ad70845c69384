@@ -1,0 +1,4 @@
+[ver:1,total:1140]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:600,1536073200:600,m
+out/invokes.inc:470,1536073200:470,r
+src/IpaSimulator/invokes.mm:70,1536073200:70,r
