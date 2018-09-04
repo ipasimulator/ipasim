@@ -151,8 +151,8 @@ public:
         auto pt = ci_.getASTContext().getPointerType(fpt->desugar());
         {
             auto vardecl = VarDecl::Create(ci_.getASTContext(), ci_.getASTContext().getTranslationUnitDecl(),
-                SourceLocation(), SourceLocation(),
-                &ci_.getASTContext().Idents.get("fptr"), pt, nullptr, StorageClass::SC_None);
+                SourceLocation(), SourceLocation(), &ci_.getASTContext().Idents.get("fptr"), pt, nullptr,
+                StorageClass::SC_None);
             llvm::raw_os_ostream oos(output_);
             vardecl->print(oos, ci_.getASTContext().getPrintingPolicy());
             oos.flush();
