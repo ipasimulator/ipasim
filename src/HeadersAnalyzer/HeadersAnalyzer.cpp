@@ -17,6 +17,7 @@
 #include <clang/AST/GlobalDecl.h>
 #include <clang/CodeGen/ModuleBuilder.h>
 #include <llvm/Demangle/Demangle.h>
+#include <llvm/Support/raw_os_ostream.h>
 #include <tapi/Core/FileManager.h>
 #include <tapi/Core/InterfaceFile.h>
 #include <tapi/Core/InterfaceFileManager.h>
@@ -147,9 +148,19 @@ public:
         }
 
         // Call the function through a function pointer saved in argument named "address".
-        auto pt = ci_.getASTContext().getPointerType(QualType(fpt, 0)); // TODO: How to properly create QualType?
+        auto pt = ci_.getASTContext().getPointerType(fpt->desugar());
+        {
+            auto vardecl = VarDecl::Create(ci_.getASTContext(), ci_.getASTContext().getTranslationUnitDecl(),
+                SourceLocation(), SourceLocation(),
+                &ci_.getASTContext().Idents.get("fptr"), pt, nullptr, StorageClass::SC_None);
+            llvm::raw_os_ostream oos(output_);
+            vardecl->print(oos, ci_.getASTContext().getPrintingPolicy());
+            oos.flush();
+        }
+        output_ << " = reinterpret_cast<decltype(fptr)>(address);" << endl;
+
         if (!fpt->getReturnType()->isVoidType()) { output_ << "RET("; }
-        output_ << "reinterpret_cast<" << pt.getAsString() << ">(address)(";
+        output_ << "fptr(";
         for (i = 0; i != fpt->getNumParams(); ++i) {
             if (i != 0) { output_ << ", "; }
             output_ << "*v" << to_string(i);
