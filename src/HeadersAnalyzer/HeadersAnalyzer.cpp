@@ -38,7 +38,7 @@ using export_list = map<string, export_entry>;
 
 class HeadersAnalyzer {
 public:
-    HeadersAnalyzer(CompilerInstance &ci, set<string> &imports, ostream &output) : ci_(ci), imports_(imports),
+    HeadersAnalyzer(CompilerInstance &ci, export_list &exps, ostream &output) : ci_(ci), exps_(exps),
         after_first_(false), output_(output) {}
     void Initialize() {}
     void HandleTopLevelDecl(DeclGroupRef d) {}
@@ -46,9 +46,8 @@ public:
         string name = f.getNameAsString();
 
         // Skip functions that do not interest us.
-        // HACK: This is here for this prototype version only.
-        // TODO: It should be deterministic whether there is a leading underscore or not.
-        if (!imports_.count(name) && !imports_.count("_" + name)) { return; }
+        auto it = exps_.find(name);
+        if (it == exps_.end()) { return; }
 
         // We cannot handle varargs functions for now.
         // TODO: Handle varargs functions.
@@ -56,6 +55,11 @@ public:
             cerr << "vararg function found: " << name << endl;
             return;
         }
+
+        auto fpt = static_cast<const FunctionProtoType *>(f.getFunctionType());
+
+        // Ignore templates.
+        if (fpt->isDependentType()) { return; }
 
         // TODO: check that the function is actually exported from the corresponding
         // .dylib file (it's enough to check .tbd file inside the SDK which is simply
@@ -81,10 +85,9 @@ public:
         uint8_t r = 0; // register offset (AAPCS's NCRN)
         uint64_t s = 0; // stack offset (relative AAPCS's NSAA)
 
-        auto fpt = static_cast<const FunctionProtoType *>(f.getFunctionType());
         uint32_t i = 0;
         for (auto &pt : fpt->param_types()) {
-            uint64_t bytes = toBytes(ci_.getASTContext().getTypeSize(pt));
+            uint64_t bytes = ci_.getASTContext().getTypeSizeInChars(pt).getQuantity();
 
             output_ << "ARG(" << to_string(i) << ", " << pt.getAsString() << ")" << endl;
 
@@ -146,7 +149,7 @@ public:
 private:
     bool after_first_;
     CompilerInstance &ci_;
-    set<string> &imports_;
+    export_list &exps_;
     ostream &output_;
 
     uint64_t toBytes(uint64_t bits) {
@@ -159,6 +162,9 @@ class CustomASTVisitor : public RecursiveASTVisitor<CustomASTVisitor> {
 public:
     CustomASTVisitor(HeadersAnalyzer &ha) : ha_(ha) {}
     bool VisitFunctionDecl(FunctionDecl *f) { // TODO: override
+        // TODO: Should we call parent's implementation?
+        //if (!RecursiveASTVisitor::VisitFunctionDecl(f)) { return false; }
+
         ha_.VisitFunction(*f);
         return true;
     }
@@ -270,30 +276,20 @@ int main()
                 tbdh.handle_tbd_file((entry.path() / entry.path().filename().replace_extension(".tbd")).string());
             }
         }
+        cout << endl;
     }
 
-    // Get a set of functions we only want to analyze.
-    // HACK: This is here for this prototype version only.
-    set<string> imports;
-    {
-        fstream importsFile("./Debug/imports.txt");
-        for (string line; getline(importsFile, line);) {
-            // Skip empty lines.
-            if (line.empty()) { continue; }
-
-            imports.insert(move(line));
-        }
-    }
-
+    // Create output files.
     // TODO: This won't create the /out/ directory if it doesn't exist!
     fstream invokes("./out/invokes.inc", fstream::out);
     fstream headers("./out/headers.inc", fstream::out);
+
+    // Analyze headers.
     vector<string> headerPaths{
         "./deps/WinObjC/include/Foundation/Foundation.h",
         "./deps/WinObjC/tools/include/objc/objc-arc.h",
         "./deps/WinObjC/tools/include/objc/message.h"
     };
-
     for (auto &headerPath : headerPaths) {
         headers << "#include \"" << headerPath << "\"" << endl;
         cout << headerPath << endl;
@@ -335,7 +331,7 @@ int main()
 
         //ci.getPreprocessorOpts().UsePredefines = false;
         ci.createPreprocessor(TranslationUnitKind::TU_Complete);
-        HeadersAnalyzer ha(ci, imports, invokes);
+        HeadersAnalyzer ha(ci, exps, invokes);
         ci.setASTConsumer(make_unique<CustomASTConsumer>(ha));
         ci.createASTContext();
         ha.Initialize();
