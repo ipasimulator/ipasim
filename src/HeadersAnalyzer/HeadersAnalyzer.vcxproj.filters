@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\tapi">
+      <UniqueIdentifier>{3e26e811-da28-4c98-bd88-57ec8a6e2979}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="HeadersAnalyzer.cpp">
@@ -21,86 +24,86 @@
     <ClCompile Include="cc_mapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\FileManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\InterfaceFileManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\Registry.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Driver\Snapshot.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\YAMLReaderWriter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\ConfigurationFile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\ArchitectureSupport.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\MachODylibReader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\deps\tapi\lib\Core\Architecture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\InterfaceFileBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\ExtendedInterfaceFile.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\tapi</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\tapi\lib\Core\ArchitectureSet.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\tapi</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\XPI.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\XPISet.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\Path.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\Utils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\ReexportFileWriter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\TextAPI_v1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\TextStub_v1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\TextStub_v2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Core\InterfaceFile.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\ArchitectureSupport.cpp">
+      <Filter>Source Files\tapi</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\tapi\lib\Core\AvailabilityInfo.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\tapi</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\deps\tapi\lib\Driver\Options.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\ConfigurationFile.cpp">
+      <Filter>Source Files\tapi</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\tapi\lib\Driver\Diagnostics.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\tapi</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\tapi\lib\Driver\DriverOptions.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\ExtendedInterfaceFile.cpp">
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\FileManager.cpp">
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\InterfaceFile.cpp">
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\InterfaceFileBase.cpp">
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\InterfaceFileManager.cpp">
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\MachODylibReader.cpp">
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Driver\Options.cpp">
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\Path.cpp">
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\ReexportFileWriter.cpp">
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\Registry.cpp">
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Driver\Snapshot.cpp">
+      <Filter>Source Files\tapi</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\tapi\lib\Driver\SnapshotFileSystem.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\TextAPI_v1.cpp">
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\TextStub_v1.cpp">
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\TextStub_v2.cpp">
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\Utils.cpp">
+      <Filter>Source Files\tapi</Filter>
     </ClCompile>
     <ClCompile Include="..\..\deps\tapi\lib\Config\Version.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\XPI.cpp">
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\XPISet.cpp">
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\YAMLReaderWriter.cpp">
+      <Filter>Source Files\tapi</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
