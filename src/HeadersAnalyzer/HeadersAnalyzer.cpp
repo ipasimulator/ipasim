@@ -10,6 +10,7 @@
 #include <clang/Driver/Driver.h>
 #include <clang/Lex/PreprocessorOptions.h>
 #include <clang/Parse/ParseAST.h>
+#include <clang/AST/Mangle.h>
 #include <clang/AST/Type.h>
 #include <clang/AST/ASTContext.h>
 #include <clang/AST/RecursiveASTVisitor.h>
@@ -30,25 +31,59 @@ using namespace tapi::internal;
 
 struct export_entry {
     set<string> libs;
-    string mangledName;
     const FunctionProtoType *type;
 };
 
-// Key is demangled symbol name.
+// Key is symbol name.
 using export_list = map<string, export_entry>;
 
 class HeadersAnalyzer {
 public:
     HeadersAnalyzer(CompilerInstance &ci, export_list &exps, ostream &output) : ci_(ci), exps_(exps),
-        after_first_(false), output_(output) {}
-    void Initialize() {}
+        after_first_(false), output_(output), mctx_(nullptr) {}
+    ~HeadersAnalyzer() {
+        if (mctx_) {
+            delete mctx_;
+        }
+    }
+    void Initialize() {
+        // TODO: Is this mangling what Apple uses?
+        mctx_ = ItaniumMangleContext::create(ci_.getASTContext(), ci_.getDiagnostics());
+    }
     void HandleTopLevelDecl(DeclGroupRef d) {}
     void VisitFunction(FunctionDecl &f) {
-        string name = f.getNameAsString();
+        auto fpt = static_cast<const FunctionProtoType *>(f.getFunctionType());
+
+        // Ignore templates.
+        if (fpt->isDependentType()) { return; }
+
+        // Get function's mangled name. Inspired by
+        // https://github.com/llvm-mirror/clang/blob/1bc73590ad1335313e8f262393547b8af67c9167/lib/Index/CodegenNameGenerator.cpp#L150.
+        string name;
+        if (mctx_->shouldMangleDeclName(&f)) {
+            llvm::raw_string_ostream ostream(name);
+            if (const auto *CtorD = dyn_cast<CXXConstructorDecl>(&f))
+                mctx_->mangleCXXCtor(CtorD, Ctor_Complete, ostream);
+            else if (const auto *DtorD = dyn_cast<CXXDestructorDecl>(&f))
+                mctx_->mangleCXXDtor(DtorD, Dtor_Complete, ostream);
+            else
+                mctx_->mangleName(&f, ostream);
+            ostream.flush();
+        }
+        else {
+            // TODO: Even though our mangler says C functions shouldn't be mangled,
+            // they seem to actually be mangled on iOS.
+            if (f.getLanguageLinkage() == CLanguageLinkage) {
+                name = "_";
+            }
+            name += f.getIdentifier()->getName().str();
+        }
 
         // Skip functions that do not interest us.
         auto it = exps_.find(name);
-        if (it == exps_.end()) { return; }
+        if (it == exps_.end()) {
+            return;
+        }
 
         // We cannot handle varargs functions for now.
         // TODO: Handle varargs functions.
@@ -56,11 +91,6 @@ public:
             cerr << "vararg function found: " << name << endl;
             return;
         }
-
-        auto fpt = static_cast<const FunctionProtoType *>(f.getFunctionType());
-
-        // Ignore templates.
-        if (fpt->isDependentType()) { return; }
 
         // TODO: Check that Apple's and WinObjC's signatures of the function are equal.
 
@@ -151,6 +181,7 @@ private:
     CompilerInstance &ci_;
     export_list &exps_;
     ostream &output_;
+    MangleContext *mctx_;
 
     uint64_t toBytes(uint64_t bits) {
         assert(bits % 8 == 0 && "whole bytes expected");
@@ -213,24 +244,20 @@ public:
         // Find exports.
         for (auto sym : ifile->exports()) {
             // Determine symbol name.
-            string mangled, demangled;
+            // TODO: Skip `ObjectiveC*` symbols, since they aren't functions.
+            string name;
             switch (sym->getKind()) {
             case SymbolKind::ObjectiveCClass:
-                mangled = ("_OBJC_CLASS_$_" + sym->getName()).str();
-                demangled = ("OBJC_CLASS_$_" + sym->getName()).str();
+                name = ("_OBJC_CLASS_$_" + sym->getName()).str();
                 break;
             case SymbolKind::ObjectiveCInstanceVariable:
-                mangled = ("_OBJC_IVAR_$_" + sym->getName()).str();
-                demangled = ("OBJC_IVAR_$_" + sym->getName()).str();
+                name = ("_OBJC_IVAR_$_" + sym->getName()).str();
                 break;
             case SymbolKind::ObjectiveCClassEHType:
-                mangled = ("_OBJC_EHTYPE_$_" + sym->getName()).str();
-                demangled = ("OBJC_EHTYPE_$_" + sym->getName()).str();
+                name = ("_OBJC_EHTYPE_$_" + sym->getName()).str();
                 break;
             case SymbolKind::GlobalSymbol:
-                // TODO: Wrong, the demangled name can be C++ name...
-                mangled = sym->getPrettyName(/* demangle: */ false);
-                demangled = sym->getPrettyName(/* demangle: */ true);
+                name = sym->getName();
                 break;
             default:
                 cerr << "Unrecognized symbol type (" << sym->getAnnotatedName() << ")." << endl;
@@ -238,12 +265,12 @@ public:
             }
 
             // Save export.
-            auto it = exps_.find(demangled);
+            auto it = exps_.find(name);
             if (it != exps_.end()) {
                 it->second.libs.insert(ifile->getInstallName());
             }
             else {
-                exps_[demangled] = export_entry{ /* libs: */ { ifile->getInstallName() }, mangled };
+                exps_[name] = export_entry{ /* libs: */ { ifile->getInstallName() } };
             }
         }
     }
