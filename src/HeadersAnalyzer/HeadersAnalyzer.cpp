@@ -19,11 +19,14 @@
 #include <tapi/Core/FileManager.h>
 #include <tapi/Core/InterfaceFile.h>
 #include <tapi/Core/InterfaceFileManager.h>
+#include <filesystem>
 #include <vector>
 
 using namespace clang;
 using namespace frontend;
 using namespace std;
+using namespace experimental::filesystem;
+using namespace tapi::internal;
 
 class HeadersAnalyzer {
 public:
@@ -171,31 +174,46 @@ private:
     HeadersAnalyzer &ha_;
 };
 
+class tbd_handler {
+public:
+    tbd_handler() : fm(FileSystemOptions()), ifm(fm) {}
+    void handle_tbd_file(const string &path) {
+        auto fileOrError = ifm.readFile(path);
+        if (!fileOrError) {
+            cerr << llvm::toString(fileOrError.takeError()) << " (" << path << ")" << endl;
+            return;
+        }
+        auto file = *fileOrError;
+        if (!file->getArchitectures().contains(Architecture::armv7)) {
+            cerr << "TBD file does not contain architecture ARMv7 (" << path << ")" << endl;
+            return;
+        }
+        auto ifile = dynamic_cast<InterfaceFile *>(file);
+        if (!ifile) {
+            cerr << "Interface file expected (" << path << ")" << endl;
+            return;
+        }
+        cout << "Found TBD file: " << path << endl;
+    }
+private:
+    tapi::internal::FileManager fm;
+    InterfaceFileManager ifm;
+};
+
 int main()
 {
-    // Let's try to parse some `.tbd` files...
-    tapi::internal::FileManager fm(FileSystemOptions{});
-    tapi::internal::InterfaceFileManager ifm(fm);
-    auto fileOrError = ifm.readFile("./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libobjc.A.tbd");
-    if (!fileOrError) {
-        cerr << llvm::toString(fileOrError.takeError()) << endl;
-        return 1;
+    // Discover `.tbd` files.
+    tbd_handler tbdh;
+    vector<string> tbdDirs{
+        "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
+        "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/TextInput/"
+    };
+    string frameworksDir = "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/";
+    for (auto&& dir : tbdDirs) {
+        for (auto&& file : directory_iterator(dir)) {
+            tbdh.handle_tbd_file(file.path().string());
+        }
     }
-    auto file = *fileOrError;
-    if (!file->getArchitectures().contains(tapi::internal::Architecture::armv7)) {
-        cerr << "TBD file does not contain architecture ARMv7" << endl;
-        return 1;
-    }
-    auto ifile = dynamic_cast<tapi::internal::InterfaceFile *>(file);
-    if (!ifile) {
-        cerr << "Interface file expected" << endl;
-        return 1;
-    }
-    for (auto&& exp : ifile->exports()) {
-        exp->print(llvm::outs());
-        llvm::outs() << " " << exp->getPrettyName(/* demangle: */ true) << "\n";
-    }
-    llvm::outs().flush();
 
     // Get a set of functions we only want to analyze.
     // HACK: This is here for this prototype version only.
