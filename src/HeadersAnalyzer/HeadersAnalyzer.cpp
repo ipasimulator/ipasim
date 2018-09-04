@@ -29,7 +29,7 @@ using namespace experimental::filesystem;
 using namespace tapi::internal;
 
 struct export_entry {
-    string lib;
+    set<string> libs;
     string mangledName;
 };
 
@@ -229,11 +229,11 @@ public:
             // Save export.
             auto it = exps_.find(demangled);
             if (it != exps_.end()) {
-                cerr << "Duplicate symbol (" << sym->getAnnotatedName() << ")."
-                    << " The existing one is from library \"" << it->second.lib << "\"." << endl;
-                continue;
+                it->second.libs.insert(ifile->getInstallName());
             }
-            exps_[demangled] = export_entry{ /* lib: */ ifile->getInstallName(), mangled };
+            else {
+                exps_[demangled] = export_entry{ /* libs: */ { ifile->getInstallName() }, mangled };
+            }
         }
     }
 private:
