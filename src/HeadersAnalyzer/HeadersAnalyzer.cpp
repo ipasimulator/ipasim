@@ -17,6 +17,7 @@
 #include <clang/CodeGen/ModuleBuilder.h>
 #include <llvm/Demangle/Demangle.h>
 #include <tapi/Core/FileManager.h>
+#include <tapi/Core/InterfaceFile.h>
 #include <tapi/Core/InterfaceFileManager.h>
 #include <vector>
 
@@ -185,6 +186,16 @@ int main()
         cerr << "TBD file does not contain architecture ARMv7" << endl;
         return 1;
     }
+    auto ifile = dynamic_cast<tapi::internal::InterfaceFile *>(file);
+    if (!ifile) {
+        cerr << "Interface file expected" << endl;
+        return 1;
+    }
+    for (auto&& exp : ifile->exports()) {
+        exp->print(llvm::outs());
+        llvm::outs() << " " << exp->getPrettyName(/* demangle: */ true) << "\n";
+    }
+    llvm::outs().flush();
 
     // Get a set of functions we only want to analyze.
     // HACK: This is here for this prototype version only.

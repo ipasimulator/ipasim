@@ -105,6 +105,9 @@
     <ClCompile Include="..\..\deps\tapi\lib\Core\YAMLReaderWriter.cpp">
       <Filter>Source Files\tapi</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\deps\tapi\lib\Core\Symbol.cpp">
+      <Filter>Source Files\tapi</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
