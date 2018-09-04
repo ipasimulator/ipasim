@@ -217,6 +217,10 @@ public:
                 mangled = ("_OBJC_IVAR_$" + sym->getName()).str();
                 demangled = ("OBJC_IVAR_$" + sym->getName()).str();
                 break;
+            case SymbolKind::ObjectiveCClassEHType:
+                mangled = ("_OBJC_EHTYPE_$_" + sym->getName()).str();
+                demangled = ("OBJC_EHTYPE_$_" + sym->getName()).str();
+                break;
             case SymbolKind::GlobalSymbol:
                 mangled = sym->getPrettyName(/* demangle: */ false);
                 demangled = sym->getPrettyName(/* demangle: */ true);
