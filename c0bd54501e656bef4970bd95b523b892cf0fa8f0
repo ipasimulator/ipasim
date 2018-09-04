@@ -1,0 +1,4 @@
+[ver:1,total:1560]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1465,1536044400:1465,m
+src/objc/libobjc.def:60,1536044400:60,r
+build/include/llvm/ADT/Twine.h:35,1536044400:35,r
