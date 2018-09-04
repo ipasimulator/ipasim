@@ -28,6 +28,14 @@ using namespace std;
 using namespace experimental::filesystem;
 using namespace tapi::internal;
 
+struct export_entry {
+    string lib;
+    string mangledName;
+};
+
+// Key is demangled symbol name.
+using export_list = map<string, export_entry>;
+
 class HeadersAnalyzer {
 public:
     HeadersAnalyzer(CompilerInstance &ci, set<string> &imports, ostream &output) : ci_(ci), imports_(imports),
@@ -176,9 +184,10 @@ private:
 
 class tbd_handler {
 public:
-    tbd_handler() : fm(FileSystemOptions()), ifm(fm) {}
+    tbd_handler(export_list &exps) : exps_(exps), fm_(FileSystemOptions()), ifm_(fm_) {}
     void handle_tbd_file(const string &path) {
-        auto fileOrError = ifm.readFile(path);
+        // Check file.
+        auto fileOrError = ifm_.readFile(path);
         if (!fileOrError) {
             cerr << "Error: " << llvm::toString(fileOrError.takeError()) << " (" << path << ")." << endl;
             return;
@@ -194,31 +203,68 @@ public:
             return;
         }
         cout << "Found TBD file (" << path << ")." << endl;
+
+        // Find exports.
+        for (auto sym : ifile->exports()) {
+            // Determine symbol name.
+            string mangled, demangled;
+            switch (sym->getKind()) {
+            case SymbolKind::ObjectiveCClass:
+                mangled = ("_OBJC_CLASS_$" + sym->getName()).str();
+                demangled = ("OBJC_CLASS_$" + sym->getName()).str();
+                break;
+            case SymbolKind::ObjectiveCInstanceVariable:
+                mangled = ("_OBJC_IVAR_$" + sym->getName()).str();
+                demangled = ("OBJC_IVAR_$" + sym->getName()).str();
+                break;
+            case SymbolKind::GlobalSymbol:
+                mangled = sym->getPrettyName(/* demangle: */ false);
+                demangled = sym->getPrettyName(/* demangle: */ true);
+                break;
+            default:
+                cerr << "Unrecognized symbol type (" << sym->getAnnotatedName() << ")." << endl;
+                continue;
+            }
+
+            // Save export.
+            auto it = exps_.find(demangled);
+            if (it != exps_.end()) {
+                cerr << "Duplicate symbol (" << sym->getAnnotatedName() << ")."
+                    << " The existing one is from library \"" << it->second.lib << "\"." << endl;
+                continue;
+            }
+            exps_[demangled] = export_entry{ /* lib: */ ifile->getInstallName(), mangled };
+        }
     }
 private:
-    tapi::internal::FileManager fm;
-    InterfaceFileManager ifm;
+    export_list &exps_;
+    tapi::internal::FileManager fm_;
+    InterfaceFileManager ifm_;
 };
 
 int main()
 {
+    export_list exps;
+
     // Discover `.tbd` files.
-    tbd_handler tbdh;
-    vector<string> tbdDirs{
-        "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
-        "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/TextInput/"
-    };
-    for (auto&& dir : tbdDirs) {
-        for (auto&& file : directory_iterator(dir)) {
-            tbdh.handle_tbd_file(file.path().string());
+    {
+        tbd_handler tbdh(exps);
+        vector<string> tbdDirs{
+            "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
+            "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/TextInput/"
+        };
+        for (auto&& dir : tbdDirs) {
+            for (auto&& file : directory_iterator(dir)) {
+                tbdh.handle_tbd_file(file.path().string());
+            }
         }
-    }
-    // Discover `.tbd` files inside frameworks.
-    string frameworksDir = "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/";
-    for (auto&& entry : directory_iterator(frameworksDir)) {
-        if (entry.status().type() == file_type::directory &&
-            !entry.path().extension().compare(".framework")) {
-            tbdh.handle_tbd_file((entry.path() / entry.path().filename().replace_extension(".tbd")).string());
+        // Discover `.tbd` files inside frameworks.
+        string frameworksDir = "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/";
+        for (auto&& entry : directory_iterator(frameworksDir)) {
+            if (entry.status().type() == file_type::directory &&
+                !entry.path().extension().compare(".framework")) {
+                tbdh.handle_tbd_file((entry.path() / entry.path().filename().replace_extension(".tbd")).string());
+            }
         }
     }
 
