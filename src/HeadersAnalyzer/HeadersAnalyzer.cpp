@@ -175,9 +175,14 @@ int main()
     // Let's try to parse some `.tbd` files...
     tapi::internal::FileManager fm(FileSystemOptions{});
     tapi::internal::InterfaceFileManager ifm(fm);
-    auto file = ifm.readFile("./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libobjc.A.tbd");
-    if (!file) {
-        cerr << llvm::toString(file.takeError()) << endl;
+    auto fileOrError = ifm.readFile("./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libobjc.A.tbd");
+    if (!fileOrError) {
+        cerr << llvm::toString(fileOrError.takeError()) << endl;
+        return 1;
+    }
+    auto file = *fileOrError;
+    if (!file->getArchitectures().contains(tapi::internal::Architecture::armv7)) {
+        cerr << "TBD file does not contain architecture ARMv7" << endl;
         return 1;
     }
 
