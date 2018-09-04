@@ -162,9 +162,15 @@ public:
             r = 0;
             uint64_t bytes = toBytes(ci_.getASTContext().getTypeSize(fpt->getReturnType()));
             assert(bytes > 0 && "non-trivial return type expected");
-            assert(bytes <= 64 && "we can only handle max. 64-byte-long data for now");
 
             for (;;) {
+                if (r == 4) {
+                    output_ << "// TODO: Return value is too big!";
+                }
+                if (r >= 4) {
+                    output_ << "// ";
+                }
+
                 output_ << "r" << to_string(r) << " = retp[" << to_string(r) << "];" << endl;
                 ++r;
 
