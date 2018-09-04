@@ -180,20 +180,20 @@ public:
     void handle_tbd_file(const string &path) {
         auto fileOrError = ifm.readFile(path);
         if (!fileOrError) {
-            cerr << llvm::toString(fileOrError.takeError()) << " (" << path << ")" << endl;
+            cerr << "Error: " << llvm::toString(fileOrError.takeError()) << " (" << path << ")." << endl;
             return;
         }
         auto file = *fileOrError;
         if (!file->getArchitectures().contains(Architecture::armv7)) {
-            cerr << "TBD file does not contain architecture ARMv7 (" << path << ")" << endl;
+            cerr << "TBD file does not contain architecture ARMv7 (" << path << ")." << endl;
             return;
         }
         auto ifile = dynamic_cast<InterfaceFile *>(file);
         if (!ifile) {
-            cerr << "Interface file expected (" << path << ")" << endl;
+            cerr << "Interface file expected (" << path << ")." << endl;
             return;
         }
-        cout << "Found TBD file: " << path << endl;
+        cout << "Found TBD file (" << path << ")." << endl;
     }
 private:
     tapi::internal::FileManager fm;
@@ -208,10 +208,17 @@ int main()
         "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
         "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/TextInput/"
     };
-    string frameworksDir = "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/";
     for (auto&& dir : tbdDirs) {
         for (auto&& file : directory_iterator(dir)) {
             tbdh.handle_tbd_file(file.path().string());
+        }
+    }
+    // Discover `.tbd` files inside frameworks.
+    string frameworksDir = "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/";
+    for (auto&& entry : directory_iterator(frameworksDir)) {
+        if (entry.status().type() == file_type::directory &&
+            !entry.path().extension().compare(".framework")) {
+            tbdh.handle_tbd_file((entry.path() / entry.path().filename().replace_extension(".tbd")).string());
         }
     }
 
