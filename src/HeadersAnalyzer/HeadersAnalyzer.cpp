@@ -31,6 +31,7 @@ using namespace tapi::internal;
 struct export_entry {
     set<string> libs;
     string mangledName;
+    const FunctionProtoType *type;
 };
 
 // Key is demangled symbol name.
@@ -61,14 +62,13 @@ public:
         // Ignore templates.
         if (fpt->isDependentType()) { return; }
 
-        // TODO: check that the function is actually exported from the corresponding
-        // .dylib file (it's enough to check .tbd file inside the SDK which is simply
-        // a YAML)
-        //YAML::LoadFile("test.yaml");
-        // TODO: maybe use LLVM YAML I/O library instead (http://llvm.org/docs/YamlIO.html)
+        // TODO: Check that Apple's and WinObjC's signatures of the function are equal.
 
-        // TODO: also check that the function has the same signature in WinObjC headers
-        // inside the (NuGet) packages folder
+        // Save function type.
+        // TODO: Wrong, it will get deleted before the container.
+        it->second.type = fpt;
+
+        // TODO: Don't do any of the following code, implement and use `cc_mapper` instead.
 
         if (after_first_) {
             output_ << "else ";
@@ -216,18 +216,19 @@ public:
             string mangled, demangled;
             switch (sym->getKind()) {
             case SymbolKind::ObjectiveCClass:
-                mangled = ("_OBJC_CLASS_$" + sym->getName()).str();
-                demangled = ("OBJC_CLASS_$" + sym->getName()).str();
+                mangled = ("_OBJC_CLASS_$_" + sym->getName()).str();
+                demangled = ("OBJC_CLASS_$_" + sym->getName()).str();
                 break;
             case SymbolKind::ObjectiveCInstanceVariable:
-                mangled = ("_OBJC_IVAR_$" + sym->getName()).str();
-                demangled = ("OBJC_IVAR_$" + sym->getName()).str();
+                mangled = ("_OBJC_IVAR_$_" + sym->getName()).str();
+                demangled = ("OBJC_IVAR_$_" + sym->getName()).str();
                 break;
             case SymbolKind::ObjectiveCClassEHType:
                 mangled = ("_OBJC_EHTYPE_$_" + sym->getName()).str();
                 demangled = ("OBJC_EHTYPE_$_" + sym->getName()).str();
                 break;
             case SymbolKind::GlobalSymbol:
+                // TODO: Wrong, the demangled name can be C++ name...
                 mangled = sym->getPrettyName(/* demangle: */ false);
                 demangled = sym->getPrettyName(/* demangle: */ true);
                 break;
