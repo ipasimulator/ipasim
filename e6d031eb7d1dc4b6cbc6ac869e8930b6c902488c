@@ -1,0 +1,4 @@
+[ver:1,total:3780]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:2850,1536058800:1920,1536062400:930,m
+out/invokes.inc:870,1536058800:660,1536062400:210,r
+build/include/llvm/ADT/PointerUnion.h:60,1536058800:60,r
