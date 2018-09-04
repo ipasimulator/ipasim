@@ -110,7 +110,7 @@ public:
         output_ << "if (!std::strcmp(module, \"" << name << "\")) {" << endl;
 
         // We will simply assume arguments are in r0-r3 or on stack for starters.
-        // Inspired by /res/IHI0042F_aapcs.pdf (AAPCS), section 5.5 Parameter Passing.
+        // Inspired by /res/arm/IHI0042F_aapcs.pdf (AAPCS), section 5.5 Parameter Passing.
 
         uint8_t r = 0; // register offset (AAPCS's NCRN)
         uint64_t s = 0; // stack offset (relative AAPCS's NSAA)
@@ -118,24 +118,23 @@ public:
         uint32_t i = 0;
         for (auto &pt : fpt->param_types()) {
             uint64_t bytes = ci_.getASTContext().getTypeSizeInChars(pt).getQuantity();
+            assert(bytes > 0 && "non-trivial type expected");
 
             output_ << "ARG(" << to_string(i) << ", " << pt.getAsString() << ")" << endl;
 
             // Copy data from registers and/or stack into the argument.
-            if (r == 4) {
-                // We used all the registers, this argument is on the stack.
-                // Note that r13 is the stack pointer.
-                // TODO: Handle unicorn errors.
-                // TODO: Encapsulate this into a macro.
-                // TODO: Maybe read the memory at the SP directly.
-                output_ << "uc_mem_read(uc, r13, c" << to_string(i) << " + " << to_string(s) << ", " << to_string(bytes) << ");" << endl;
-                s += bytes;
-            }
-            else {
-                assert(bytes > 0 && "non-trivial type expected");
-                assert(bytes <= 64 && "we can only handle max. 64-byte-long data for now");
-
-                for (;;) {
+            while (bytes) {
+                if (r == 4) {
+                    // We used all the registers, this argument is on the stack.
+                    // Note that r13 is the stack pointer.
+                    // TODO: Handle unicorn errors.
+                    // TODO: Encapsulate this into a macro.
+                    // TODO: Maybe read the memory at the SP directly.
+                    output_ << "uc_mem_read(uc, r13, c" << to_string(i) << " + " << to_string(s) << ", " << to_string(bytes) << ");" << endl;
+                    s += bytes;
+                    break; // We copied all the data.
+                }
+                else {
                     output_ << "p" << to_string(i) << "[" << to_string(r) << "] = r" << to_string(r) << ";" << endl;
                     ++r;
 
