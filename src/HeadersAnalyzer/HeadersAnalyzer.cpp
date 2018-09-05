@@ -157,6 +157,10 @@ public:
                 // TODO: Don't compare `module` with symbol name!
                 output_ << "if (!std::strcmp(module, \"" << name << "\")) {" << endl;
 
+                // Our printing policy for types. See [pretty-print].
+                PrintingPolicy pp(ci_.getASTContext().getPrintingPolicy());
+                pp.PolishForInlineDeclaration = true;
+
                 // We will simply assume arguments are in r0-r3 or on stack for starters.
                 // Inspired by /res/arm/IHI0042F_aapcs.pdf (AAPCS), section 5.5 Parameter Passing.
 
@@ -168,7 +172,7 @@ public:
                     uint64_t bytes = ci_.getASTContext().getTypeSizeInChars(pt).getQuantity();
                     assert(bytes > 0 && "non-trivial type expected");
 
-                    output_ << "ARG(" << to_string(i) << ", " << pt.getAsString() << ")" << endl;
+                    output_ << "ARG(" << to_string(i) << ", " << pt.getAsString(pp) << ")" << endl;
 
                     // Copy data from registers and/or stack into the argument.
                     while (bytes) {
@@ -199,9 +203,7 @@ public:
                     // Print declaration of the function.
                     DeclStmt decl(DeclGroupRef(const_cast<FunctionDecl *>(&f)), SourceLocation{}, SourceLocation{});
                     llvm::raw_os_ostream s(output_);
-                    PrintingPolicy p = ci_.getASTContext().getPrintingPolicy();
-                    p.PolishForInlineDeclaration = true;
-                    decl.printPretty(s, nullptr, p);
+                    decl.printPretty(s, nullptr, pp);
                     s.flush();
                 }
                 if (!fpt->getReturnType()->isVoidType()) { output_ << "RET("; }
