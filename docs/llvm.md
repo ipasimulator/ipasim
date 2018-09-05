@@ -49,14 +49,15 @@ cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR=
 
 ### Comment keywords
 
-- `[ipasim-objc-runtime]` - We are adding a new runtime called `ipasim` that derives from the `ios` runtime and introduces changes that the `microsoft` runtime introduced.
-- `[dllimport]` - See section "Objective-C symbols across DLLs".
-- `[mhdr]` - We are patching linker (`lld-link`) to add a section named `.mhdr` which will contain Mach-O header.
+- `[ipasim-objc-runtime]`: We are adding a new runtime called `ipasim` that derives from the `ios` runtime and introduces changes that the `microsoft` runtime introduced.
+- `[dllimport]`: See section "Objective-C symbols across DLLs".
+- `[mhdr]`: We are patching linker (`lld-link`) to add a section named `.mhdr` which will contain Mach-O header.
   This Mach-O header will then be used by our `libobjc` to initialize the image.
-- `[fixbind]` - See `[dllimport]` - we are fixing some symbols to use `__declspec(dllimport)` semantics, but that introduces another level of indirection in data pointers.
+- `[fixbind]`: See `[dllimport]` - we are fixing some symbols to use `__declspec(dllimport)` semantics, but that introduces another level of indirection in data pointers.
   Unfortunately, Windows loader cannot bind symbols directly, so we need to fix those bindings at runtime.
   In Clang, we create a new section called `.fixbind` which contains addresses to all the bindings that need to be fixed.
   At runtime, we then fix those addresses in our `dyld`.
+- `[pretty-print]`: We improved pretty printing of functions to match our needs in `HeadersAnalyzer`.
 
 ### Objective-C symbols across DLLs
 
