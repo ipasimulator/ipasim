@@ -196,11 +196,12 @@ public:
 
                 // Call the function through a function pointer saved in argument named "address".
                 {
+                    // Print declaration of the function.
+                    DeclStmt decl(DeclGroupRef(const_cast<FunctionDecl *>(&f)), SourceLocation{}, SourceLocation{});
                     llvm::raw_os_ostream s(output_);
-                    f.print(s, ci_.getASTContext().getPrintingPolicy());
+                    decl.printPretty(s, nullptr, ci_.getASTContext().getPrintingPolicy());
                     s.flush();
                 }
-                output_ << ";" << endl;
                 if (!fpt->getReturnType()->isVoidType()) { output_ << "RET("; }
                 output_ << "reinterpret_cast<decltype(&" << identifier << ")>(address)(";
                 for (i = 0; i != fpt->getNumParams(); ++i) {
@@ -218,7 +219,7 @@ public:
 
                     for (;;) {
                         if (r == 4) {
-                            output_ << "// TODO: Return value is too big!";
+                            output_ << "// TODO: Return value is too big!" << endl;
                         }
                         if (r >= 4) {
                             output_ << "// ";
