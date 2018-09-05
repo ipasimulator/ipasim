@@ -5,6 +5,11 @@
 #include <utility> // for `std::move`
 #include "unicorn/unicorn.h"
 
+// HACK: This is needed because attributes are emitted after function declarations
+// by Clang pretty-printer, even though Clang parser doesn't like `__declspec`
+// attributes there.
+#define __declspec(x) __attribute((x))
+
 // TODO: Rename this class to something meaningful. Maybe something with "dispatch"...
 class invokes {
 public:
