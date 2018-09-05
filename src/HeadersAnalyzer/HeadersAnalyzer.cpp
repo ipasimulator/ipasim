@@ -200,7 +200,7 @@ public:
                     DeclStmt decl(DeclGroupRef(const_cast<FunctionDecl *>(&f)), SourceLocation{}, SourceLocation{});
                     llvm::raw_os_ostream s(output_);
                     PrintingPolicy p = ci_.getASTContext().getPrintingPolicy();
-                    p.PolishForDeclaration = true;
+                    p.PolishForInlineDeclaration = true;
                     decl.printPretty(s, nullptr, p);
                     s.flush();
                 }
