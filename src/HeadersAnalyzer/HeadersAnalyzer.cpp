@@ -30,9 +30,23 @@ using namespace std;
 using namespace experimental::filesystem;
 using namespace tapi::internal;
 
+enum class export_status {
+    NotFound = 0,
+    Found,
+    Overloaded,
+    Generated
+};
+
 struct export_entry {
+    export_entry() = default;
+    export_entry(string firstLib) : status(export_status::NotFound), type(nullptr) {
+        libs.insert(move(firstLib));
+    }
+
     set<string> libs;
+    export_status status;
     const FunctionProtoType *type;
+    string identifier;
 };
 
 // Key is symbol name.
@@ -89,98 +103,132 @@ public:
         // We cannot handle varargs functions for now.
         // TODO: Handle varargs functions.
         if (f.isVariadic()) {
-            cerr << "vararg function found: " << name << endl;
+            it->second.status = export_status::Overloaded;
+            cerr << "Error: function is variadic (" << name << ")." << endl;
             return;
         }
 
+        if (it->second.status != export_status::NotFound) {
+
+            // Just skip it if it is exactly the same function or we already know it's overloaded.
+            // TODO: Maybe just delete overloaded functions from `exps_`.
+            if (it->second.status == export_status::Overloaded ||
+                // TODO: Does this work?
+                it->second.type->desugar() == fpt->desugar()) {
+                return;
+            }
+
+            // Otherwise, it's an overloaded function and we can't support those.
+            it->second.status = export_status::Overloaded;
+            if (it->second.status == export_status::Generated) {
+                // TODO: Such function was generated, but we must ignore it!
+                cerr << "Fatal error: function is overloaded accross headers (" << name << ")." << endl;
+            }
+            else {
+                cerr << "Error: function is overloaded (" << name << ")." << endl;
+            }
+            return;
+        }
+        it->second.status = export_status::Found;
+
         // TODO: Check that Apple's and WinObjC's signatures of the function are equal.
 
-        // Save function type.
-        // TODO: Wrong, it will get deleted before the container.
+        // Save function type and identifier, needed later for code generation.
+        // TODO: Won't this get deleted too early?
         it->second.type = fpt;
+        it->second.identifier = f.getIdentifier()->getName().str();
+    }
+    void GenerateCode() {
+        for (auto &&exp : exps_) {
+            if (exp.second.status == export_status::Found) {
+                exp.second.status = export_status::Generated;
+                const string &name = exp.first;
+                const FunctionProtoType *fpt = exp.second.type;
 
-        // TODO: Don't do any of the following code, implement and use `cc_mapper` instead.
+                // TODO: Don't do any of the following code, implement and use `cc_mapper` instead.
 
-        if (after_first_) {
-            output_ << "else ";
-        }
-        else {
-            after_first_ = true;
-        }
-        // TODO: Don't compare `module` with symbol name!
-        output_ << "if (!std::strcmp(module, \"" << name << "\")) {" << endl;
-
-        // We will simply assume arguments are in r0-r3 or on stack for starters.
-        // Inspired by /res/arm/IHI0042F_aapcs.pdf (AAPCS), section 5.5 Parameter Passing.
-
-        uint8_t r = 0; // register offset (AAPCS's NCRN)
-        uint64_t s = 0; // stack offset (relative AAPCS's NSAA)
-
-        uint32_t i = 0;
-        for (auto &pt : fpt->param_types()) {
-            uint64_t bytes = ci_.getASTContext().getTypeSizeInChars(pt).getQuantity();
-            assert(bytes > 0 && "non-trivial type expected");
-
-            output_ << "ARG(" << to_string(i) << ", " << pt.getAsString() << ")" << endl;
-
-            // Copy data from registers and/or stack into the argument.
-            while (bytes) {
-                if (r == 4) {
-                    // We used all the registers, this argument is on the stack.
-                    // Note that r13 is the stack pointer.
-                    // TODO: Handle unicorn errors.
-                    // TODO: Encapsulate this into a macro.
-                    // TODO: Maybe read the memory at the SP directly.
-                    output_ << "uc_mem_read(uc, r13, c" << to_string(i) << " + " << to_string(s) << ", " << to_string(bytes) << ");" << endl;
-                    s += bytes;
-                    break; // We copied all the data.
+                if (after_first_) {
+                    output_ << "else ";
                 }
                 else {
-                    output_ << "p" << to_string(i) << "[" << to_string(r) << "] = r" << to_string(r) << ";" << endl;
-                    ++r;
-
-                    if (bytes <= 4) { break; }
-                    bytes -= 4;
+                    after_first_ = true;
                 }
+                // TODO: Don't compare `module` with symbol name!
+                output_ << "if (!std::strcmp(module, \"" << name << "\")) {" << endl;
+
+                // We will simply assume arguments are in r0-r3 or on stack for starters.
+                // Inspired by /res/arm/IHI0042F_aapcs.pdf (AAPCS), section 5.5 Parameter Passing.
+
+                uint8_t r = 0; // register offset (AAPCS's NCRN)
+                uint64_t s = 0; // stack offset (relative AAPCS's NSAA)
+
+                uint32_t i = 0;
+                for (auto &pt : fpt->param_types()) {
+                    uint64_t bytes = ci_.getASTContext().getTypeSizeInChars(pt).getQuantity();
+                    assert(bytes > 0 && "non-trivial type expected");
+
+                    output_ << "ARG(" << to_string(i) << ", " << pt.getAsString() << ")" << endl;
+
+                    // Copy data from registers and/or stack into the argument.
+                    while (bytes) {
+                        if (r == 4) {
+                            // We used all the registers, this argument is on the stack.
+                            // Note that r13 is the stack pointer.
+                            // TODO: Handle unicorn errors.
+                            // TODO: Encapsulate this into a macro.
+                            // TODO: Maybe read the memory at the SP directly.
+                            output_ << "uc_mem_read(uc, r13, c" << to_string(i) << " + " << to_string(s) << ", " << to_string(bytes) << ");" << endl;
+                            s += bytes;
+                            break; // We copied all the data.
+                        }
+                        else {
+                            output_ << "p" << to_string(i) << "[" << to_string(r) << "] = r" << to_string(r) << ";" << endl;
+                            ++r;
+
+                            if (bytes <= 4) { break; }
+                            bytes -= 4;
+                        }
+                    }
+
+                    ++i;
+                }
+
+                // Call the function through a function pointer saved in argument named "address".
+                output_ << "using ft = decltype(" << exp.second.identifier << ");" << endl;
+                if (!fpt->getReturnType()->isVoidType()) { output_ << "RET("; }
+                output_ << "reinterpret_cast<ft *>(address)(";
+                for (i = 0; i != fpt->getNumParams(); ++i) {
+                    if (i != 0) { output_ << ", "; }
+                    output_ << "*v" << to_string(i);
+                }
+                if (!fpt->getReturnType()->isVoidType()) { output_ << ")"; }
+                output_ << ");" << endl;
+
+                // Handle the return value.
+                if (!fpt->getReturnType()->isVoidType()) {
+                    r = 0;
+                    uint64_t bytes = toBytes(ci_.getASTContext().getTypeSize(fpt->getReturnType()));
+                    assert(bytes > 0 && "non-trivial return type expected");
+
+                    for (;;) {
+                        if (r == 4) {
+                            output_ << "// TODO: Return value is too big!";
+                        }
+                        if (r >= 4) {
+                            output_ << "// ";
+                        }
+
+                        output_ << "r" << to_string(r) << " = retp[" << to_string(r) << "];" << endl;
+                        ++r;
+
+                        if (bytes <= 4) { break; }
+                        bytes -= 4;
+                    }
+                }
+
+                output_ << "}" << endl;
             }
-
-            ++i;
         }
-
-        // Call the function through a function pointer saved in argument named "address".
-        output_ << "using ft = decltype(" << f.getIdentifier()->getName().str() << ");" << endl;
-        if (!fpt->getReturnType()->isVoidType()) { output_ << "RET("; }
-        output_ << "reinterpret_cast<ft *>(address)(";
-        for (i = 0; i != fpt->getNumParams(); ++i) {
-            if (i != 0) { output_ << ", "; }
-            output_ << "*v" << to_string(i);
-        }
-        if (!fpt->getReturnType()->isVoidType()) { output_ << ")"; }
-        output_ << ");" << endl;
-
-        // Handle the return value.
-        if (!fpt->getReturnType()->isVoidType()) {
-            r = 0;
-            uint64_t bytes = toBytes(ci_.getASTContext().getTypeSize(fpt->getReturnType()));
-            assert(bytes > 0 && "non-trivial return type expected");
-
-            for (;;) {
-                if (r == 4) {
-                    output_ << "// TODO: Return value is too big!";
-                }
-                if (r >= 4) {
-                    output_ << "// ";
-                }
-
-                output_ << "r" << to_string(r) << " = retp[" << to_string(r) << "];" << endl;
-                ++r;
-
-                if (bytes <= 4) { break; }
-                bytes -= 4;
-            }
-        }
-
-        output_ << "}" << endl;
     }
 private:
     bool after_first_;
@@ -276,7 +324,7 @@ public:
                 it->second.libs.insert(ifile->getInstallName());
             }
             else {
-                exps_[name] = export_entry{ /* libs: */ { ifile->getInstallName() } };
+                exps_[name] = export_entry(ifile->getInstallName());
             }
         }
     }
@@ -377,6 +425,8 @@ int main()
         ci.getDiagnosticClient().BeginSourceFile(ci.getLangOpts(), &ci.getPreprocessor());
         ParseAST(ci.getSema(), /*PrintStats*/ false, /*SkipFunctionBodies*/ true);
         ci.getDiagnosticClient().EndSourceFile();
+
+        ha.GenerateCode();
     }
 
     return 0;
