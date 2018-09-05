@@ -38,15 +38,14 @@ enum class export_status {
 };
 
 struct export_entry {
-    export_entry() : status(export_status::NotFound), type(nullptr) {}
-    export_entry(string firstLib) : status(export_status::NotFound), type(nullptr) {
+    export_entry() : status(export_status::NotFound), decl(nullptr) {}
+    export_entry(string firstLib) : status(export_status::NotFound), decl(nullptr) {
         libs.insert(move(firstLib));
     }
 
     set<string> libs;
     export_status status;
-    const FunctionProtoType *type;
-    string identifier;
+    const FunctionDecl *decl;
 };
 
 // Key is symbol name.
@@ -67,7 +66,7 @@ public:
     }
     void HandleTopLevelDecl(DeclGroupRef d) {}
     void VisitFunction(FunctionDecl &f) {
-        auto fpt = static_cast<const FunctionProtoType *>(f.getFunctionType());
+        const FunctionProtoType *fpt = f.getFunctionType()->getAs<FunctionProtoType>();
 
         // Ignore templates.
         if (fpt->isDependentType()) { return; }
@@ -114,7 +113,7 @@ public:
             // TODO: Maybe just delete overloaded functions from `exps_`.
             if (it->second.status == export_status::Overloaded ||
                 // TODO: Does this work?
-                it->second.type->desugar() == fpt->desugar()) {
+                it->second.decl->getFunctionType()->getAs<FunctionProtoType>()->desugar() == fpt->desugar()) {
                 return;
             }
 
@@ -133,17 +132,19 @@ public:
 
         // TODO: Check that Apple's and WinObjC's signatures of the function are equal.
 
-        // Save function type and identifier, needed later for code generation.
+        // Save function, it will be needed later for code generation.
         // TODO: Won't this get deleted too early?
-        it->second.type = fpt;
-        it->second.identifier = f.getIdentifier()->getName().str();
+        it->second.decl = &f;
     }
     void GenerateCode() {
         for (auto &&exp : exps_) {
             if (exp.second.status == export_status::Found) {
                 exp.second.status = export_status::Generated;
+
+                const FunctionDecl &f = *exp.second.decl;
+                const FunctionProtoType *fpt = f.getFunctionType()->getAs<FunctionProtoType>();
                 const string &name = exp.first;
-                const FunctionProtoType *fpt = exp.second.type;
+                string identifier = f.getIdentifier()->getName().str();
 
                 // TODO: Don't do any of the following code, implement and use `cc_mapper` instead.
 
@@ -194,9 +195,14 @@ public:
                 }
 
                 // Call the function through a function pointer saved in argument named "address".
-                output_ << "using ft = decltype(" << exp.second.identifier << ");" << endl;
+                {
+                    llvm::raw_os_ostream s(output_);
+                    f.print(s, ci_.getASTContext().getPrintingPolicy());
+                    s.flush();
+                }
+                output_ << ";" << endl;
                 if (!fpt->getReturnType()->isVoidType()) { output_ << "RET("; }
-                output_ << "reinterpret_cast<ft *>(address)(";
+                output_ << "reinterpret_cast<decltype(&" << identifier << ")>(address)(";
                 for (i = 0; i != fpt->getNumParams(); ++i) {
                     if (i != 0) { output_ << ", "; }
                     output_ << "*v" << to_string(i);
