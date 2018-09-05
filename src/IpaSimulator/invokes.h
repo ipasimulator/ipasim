@@ -1,7 +1,8 @@
 #ifndef _H_INVOKES
 #define _H_INVOKES
 
-#include <stdint.h>
+#include <cstdint> // for int types
+#include <utility> // for `std::move`
 #include "unicorn/unicorn.h"
 
 // TODO: Rename this class to something meaningful.

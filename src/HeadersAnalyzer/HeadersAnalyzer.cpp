@@ -210,7 +210,7 @@ public:
                 output_ << "reinterpret_cast<decltype(&" << identifier << ")>(address)(";
                 for (i = 0; i != fpt->getNumParams(); ++i) {
                     if (i != 0) { output_ << ", "; }
-                    output_ << "*v" << to_string(i);
+                    output_ << "std::move(*v" << to_string(i) << ")";
                 }
                 if (!fpt->getReturnType()->isVoidType()) { output_ << ")"; }
                 output_ << ");" << endl;
