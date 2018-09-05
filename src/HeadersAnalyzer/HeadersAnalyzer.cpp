@@ -219,7 +219,7 @@ public:
                 // Handle the return value.
                 if (!fpt->getReturnType()->isVoidType()) {
                     r = 0;
-                    uint64_t bytes = toBytes(ci_.getASTContext().getTypeSize(fpt->getReturnType()));
+                    uint64_t bytes = ci_.getASTContext().getTypeSizeInChars(fpt->getReturnType()).getQuantity();
                     assert(bytes > 0 && "non-trivial return type expected");
 
                     for (;;) {
@@ -248,11 +248,6 @@ private:
     export_list &exps_;
     ostream &output_;
     MangleContext *mctx_;
-
-    uint64_t toBytes(uint64_t bits) {
-        assert(bits % 8 == 0 && "whole bytes expected");
-        return bits / 8;
-    }
 };
 
 class CustomASTVisitor : public RecursiveASTVisitor<CustomASTVisitor> {
