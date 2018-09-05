@@ -136,6 +136,7 @@ public:
         // TODO: Won't this get deleted too early?
         it->second.decl = &f;
     }
+    // TODO: Merge dispatching code for functions with the same signature.
     void GenerateCode() {
         for (auto &&exp : exps_) {
             if (exp.second.status == export_status::Found) {
