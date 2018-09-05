@@ -199,7 +199,9 @@ public:
                     // Print declaration of the function.
                     DeclStmt decl(DeclGroupRef(const_cast<FunctionDecl *>(&f)), SourceLocation{}, SourceLocation{});
                     llvm::raw_os_ostream s(output_);
-                    decl.printPretty(s, nullptr, ci_.getASTContext().getPrintingPolicy());
+                    PrintingPolicy p = ci_.getASTContext().getPrintingPolicy();
+                    p.PolishForDeclaration = true;
+                    decl.printPretty(s, nullptr, p);
                     s.flush();
                 }
                 if (!fpt->getReturnType()->isVoidType()) { output_ << "RET("; }
