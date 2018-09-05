@@ -38,7 +38,7 @@ enum class export_status {
 };
 
 struct export_entry {
-    export_entry() = default;
+    export_entry() : status(export_status::NotFound), type(nullptr) {}
     export_entry(string firstLib) : status(export_status::NotFound), type(nullptr) {
         libs.insert(move(firstLib));
     }
