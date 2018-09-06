@@ -42,3 +42,8 @@ See [our documentation about it](../../docs/tapi.md) for details.
 ### Analyzing iOS headers
 
 This is work in progress.
+
+> Note that better approach to this would be analyzing debugging symbols of iOS `.dylib`s.
+> That way, we would get all the necessary type information and we could be 100% sure that it is correct (i.e., matching the `.dylib`s).
+> When analyzing headers, we might get wrong information if we don't configure Clang exactly the same way Apple did when building the `.dylib`s.
+> Unfortunately, it seems that there are no debugging symbols available for Apple's `.dylib`s.

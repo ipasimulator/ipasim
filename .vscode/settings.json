@@ -1,3 +1,10 @@
 {
-    "cSpell.language": "en,cs"
+    "cSpell.language": "en,cs",
+    "cSpell.words": [
+        "LLDB",
+        "LLVM",
+        "TAPI",
+        "dylib",
+        "roadmap"
+    ]
 }
