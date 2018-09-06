@@ -374,6 +374,8 @@ int main()
     fstream headers("./out/headers.inc", fstream::out);
 
     // Analyze headers.
+    // TODO: Maybe use `/deps/WinObjC/.apianalyzer/` configuration files.
+    // TODO: Parse headers just for deprecated attributes and `@Status` comments.
     vector<string> headerPaths{
         "./deps/WinObjC/include/Foundation/Foundation.h",
         "./deps/WinObjC/tools/include/objc/objc-arc.h",
