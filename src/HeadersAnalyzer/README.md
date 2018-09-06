@@ -33,3 +33,12 @@ Here's how our compile-time code generation utility works:
 5. Via LLDB, it generates wrappers mentioned above.
    It throws function signatures at LLDB and asks it where are the arguments in registers and stack.
    It then puts or extracts arguments from there (when generating wrappers from compiled to emulated code, or from emulated to compiled code, respectively).
+
+### Analyzing TBD files
+
+This is implemented with the help of Apple's TAPI library that can read TBD files.
+See [our documentation about it](../../docs/tapi.md) for details.
+
+### Analyzing iOS headers
+
+This is work in progress.
