@@ -66,7 +66,6 @@ public:
         // TODO: Is this mangling what Apple uses?
         mctx_ = ItaniumMangleContext::create(ci_.getASTContext(), ci_.getDiagnostics());
     }
-    void HandleTopLevelDecl(DeclGroupRef d) {}
     void VisitFunction(FunctionDecl &f) {
         const FunctionProtoType *fpt = f.getFunctionType()->getAs<FunctionProtoType>();
 
@@ -252,9 +251,10 @@ private:
     MangleContext *mctx_;
 };
 
-class CustomASTVisitor : public RecursiveASTVisitor<CustomASTVisitor> {
+template<typename T>
+class CustomASTVisitor : public RecursiveASTVisitor<CustomASTVisitor<T>> {
 public:
-    CustomASTVisitor(HeadersAnalyzer &ha) : ha_(ha) {}
+    CustomASTVisitor(T &ha) : ha_(ha) {}
     bool VisitFunctionDecl(FunctionDecl *f) { // TODO: override
         // TODO: Should we call parent's implementation?
         //if (!RecursiveASTVisitor::VisitFunctionDecl(f)) { return false; }
@@ -263,23 +263,22 @@ public:
         return true;
     }
 private:
-    HeadersAnalyzer & ha_;
+    T & ha_;
 };
 
+template<typename T>
 class CustomASTConsumer : public ASTConsumer {
 public:
-    CustomASTConsumer(HeadersAnalyzer &ha) : v_(ha), ha_(ha) {}
+    CustomASTConsumer(T &ha) : v_(ha), ha_(ha) {}
     bool HandleTopLevelDecl(DeclGroupRef d) override {
-        ha_.HandleTopLevelDecl(d);
-        // TODO: move the following code into the HandleTopLevelDecl function
         for (auto b : d) {
             v_.TraverseDecl(b);
         }
         return true;
     }
 private:
-    CustomASTVisitor v_;
-    HeadersAnalyzer &ha_;
+    CustomASTVisitor<T> v_;
+    T &ha_;
 };
 
 class tbd_handler {
@@ -343,6 +342,12 @@ private:
     InterfaceFileManager ifm_;
 };
 
+class iOSHeadersAnalyzer {
+public:
+    void VisitFunction(FunctionDecl &f) {
+    }
+};
+
 int main()
 {
     // Parse iOS headers.
@@ -350,19 +355,34 @@ int main()
     {
         // Parse the response file.
         llvm::BumpPtrAllocator A;
-        llvm::StringSaver Saver(A);
-        llvm::SmallVector<const char *, 256> Argv;
+        llvm::StringSaver Saver{ A };
+        // First argument should be executable name.
+        llvm::SmallVector<const char *, 256> Argv{ "clang.exe" };
         if (!llvm::cl::readConfigFile("./src/HeadersAnalyzer/analyze_ios_headers.cfg", Saver, Argv)) {
             cerr << "Error: couldn't parse the response file." << endl;
             return 1;
         }
 
-        llvm::IntrusiveRefCntPtr<DiagnosticsEngine> diags{};
-
         // Create `CompilerInstance` of Clang.
-        CompilerInstance ci;
-        ci.setDiagnostics(diags.get());
-        ci.setInvocation(createInvocationFromCommandLine(Argv, diags));
+        CompilerInstance CI;
+        CI.createDiagnostics();
+        CI.setInvocation(createInvocationFromCommandLine(Argv, &CI.getDiagnostics()));
+
+        // Register our AST analyzer.
+        iOSHeadersAnalyzer HA;
+        CI.setASTConsumer(make_unique<CustomASTConsumer<iOSHeadersAnalyzer>>(HA));
+
+        // Create necessary components.
+        unique_ptr<TargetInfo> T{ TargetInfo::CreateTargetInfo(CI.getDiagnostics(), CI.getInvocation().TargetOpts) };
+        CI.setTarget(T.get());
+        CI.createSourceManager(*CI.createFileManager());
+        CI.createPreprocessor(TranslationUnitKind::TU_Complete);
+        CI.createASTContext();
+        CI.createSema(TranslationUnitKind::TU_Complete, nullptr);
+
+        // TODO: Load source file.
+
+        ParseAST(CI.getSema(), /* PrintStats = */ false, /* SkipFunctionBodies = */ true);
 
         // TODO: Again, just for testing.
         return 0;
@@ -448,7 +468,7 @@ int main()
         //ci.getPreprocessorOpts().UsePredefines = false;
         ci.createPreprocessor(TranslationUnitKind::TU_Complete);
         HeadersAnalyzer ha(ci, exps, invokes);
-        ci.setASTConsumer(make_unique<CustomASTConsumer>(ha));
+        ci.setASTConsumer(make_unique<CustomASTConsumer<HeadersAnalyzer>>(ha));
         ci.createASTContext();
         ha.Initialize();
         ci.createSema(TranslationUnitKind::TU_Complete, nullptr);
