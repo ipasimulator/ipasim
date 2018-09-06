@@ -1,0 +1,10 @@
+[ver:1,total:4800]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:2645,1536249600:1705,1536253200:940,m
+src/HeadersAnalyzer/analyze_ios_headers.txt:1395,1536249600:1170,1536253200:225,d
+src/HeadersAnalyzer/analyze_ios_headers.cmd:350,1536249600:180,1536253200:170,m
+src/HeadersAnalyzer/analyze_ios_headers.cfg:190,1536253200:190,m
+src/HeadersAnalyzer/README.md:80,1536249600:80,r
+build/include/llvm/Support/CommandLine.h:80,1536253200:80,r
+src/HeadersAnalyzer/Debug/args.txt:30,1536249600:15,1536253200:15,r
+src/HeadersAnalyzer/build_tapi.cmd:15,1536249600:15,r
+build/include/llvm/ADT/ArrayRef.h:15,1536249600:15,r
