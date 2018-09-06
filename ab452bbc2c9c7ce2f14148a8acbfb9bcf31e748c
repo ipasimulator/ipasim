@@ -1,0 +1,7 @@
+[ver:1,total:2400]
+src/HeadersAnalyzer/analyze_ios_headers.cmd:1410,1536235200:1340,1536246000:70,m
+src/HeadersAnalyzer/README.md:500,1536235200:430,1536246000:70,m
+src/HeadersAnalyzer/analyze_ios_headers.txt:380,1536235200:240,1536246000:140,m
+src/HeadersAnalyzer/Debug/args.txt:80,1536246000:80,r
+src/HeadersAnalyzer/build_tapi.cmd:20,1536235200:20,r
+src/HeadersAnalyzer/tblgen_one.cmd:10,1536235200:10,r
