@@ -50,3 +50,12 @@ This is work in progress.
 > That way, we would get all the necessary type information and we could be 100% sure that it is correct (i.e., matching the `.dylib`s).
 > When analyzing headers, we might get wrong information if we don't configure Clang exactly the same way Apple did when building the `.dylib`s.
 > Unfortunately, it seems that there are no debugging symbols available for Apple's `.dylib`s.
+
+#### Clang command line
+
+To analyze headers, we run Clang on iOS headers as if we were building some iOS `.dylib`.
+In fact, we already know how to do this - we ported `libobj.A.dylib`.
+Of course, we built it for Windows platform, but the sources we based our build commands on were targeted for macOS/iOS.
+So, here we can base our Clang command line on those sources (it probably doesn't differ that much, it's mainly about the `-target` option).
+
+See `analyze_ios_headers.txt` for the command line arguments and run them with `analyze_ios_headers.cmd`.

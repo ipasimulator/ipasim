@@ -1,0 +1,8 @@
+# Contains options to Clang. It has a simple syntax: Lines starting
+# with `#` are ignored.
+
+# We want only the phase that gets us the AST.
+-fsyntax-only
+
+# A sample input for now.
+"../../deps/apple-headers/iPhoneOS11.1.sdk/usr/include/objc/objc.h"
