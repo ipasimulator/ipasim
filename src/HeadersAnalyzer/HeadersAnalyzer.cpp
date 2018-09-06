@@ -17,12 +17,14 @@
 #include <clang/AST/GlobalDecl.h>
 #include <clang/CodeGen/ModuleBuilder.h>
 #include <llvm/Demangle/Demangle.h>
+#include <llvm/Support/CommandLine.h>
 #include <llvm/Support/raw_os_ostream.h>
 #include <tapi/Core/FileManager.h>
 #include <tapi/Core/InterfaceFile.h>
 #include <tapi/Core/InterfaceFileManager.h>
 #include <filesystem>
 #include <vector>
+#include <sstream>
 
 using namespace clang;
 using namespace frontend;
@@ -343,6 +345,29 @@ private:
 
 int main()
 {
+    // Parse iOS headers.
+    // TODO: This is so up here just for testing. In production, it should be lower.
+    {
+        // Parse the response file.
+        llvm::BumpPtrAllocator A;
+        llvm::StringSaver Saver(A);
+        llvm::SmallVector<const char *, 256> Argv;
+        if (!llvm::cl::readConfigFile("./src/HeadersAnalyzer/analyze_ios_headers.cfg", Saver, Argv)) {
+            cerr << "Error: couldn't parse the response file." << endl;
+            return 1;
+        }
+
+        llvm::IntrusiveRefCntPtr<DiagnosticsEngine> diags{};
+
+        // Create `CompilerInstance` of Clang.
+        CompilerInstance ci;
+        ci.setDiagnostics(diags.get());
+        ci.setInvocation(createInvocationFromCommandLine(Argv, diags));
+
+        // TODO: Again, just for testing.
+        return 0;
+    }
+
     export_list exps;
 
     // Discover `.tbd` files.
