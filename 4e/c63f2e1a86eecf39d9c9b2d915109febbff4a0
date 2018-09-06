@@ -1,0 +1,6 @@
+[ver:1,total:2760]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:2162,1536253200:1522,1536256800:640,m
+build/include/llvm/ADT/IntrusiveRefCntPtr.h:386,1536253200:56,1536256800:330,r
+src/HeadersAnalyzer/analyze_ios_headers.cfg:150,1536256800:150,r
+src/HeadersAnalyzer/analyze_ios_headers.cmd:50,1536253200:30,1536256800:20,r
+build/include/llvm/ADT/ArrayRef.h:12,1536253200:12,r
