@@ -33,6 +33,9 @@ Here's how our compile-time code generation utility works:
 5. Via LLDB, it generates wrappers mentioned above.
    It throws function signatures at LLDB and asks it where are the arguments in registers and stack.
    It then puts or extracts arguments from there (when generating wrappers from compiled to emulated code, or from emulated to compiled code, respectively).
+6. We also parse `WinObjC` headers (i.e., those used to produce our `.dll`s) to find which functions are implemented and which are not.
+   This can be easily determined because unimplemented functions are marked as deprecated with `__attribute((deprecated))`.
+   They also have documentation comments with more details and we parse those, too.
 
 ### Analyzing TBD files
 
