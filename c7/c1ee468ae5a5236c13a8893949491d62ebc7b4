@@ -1,0 +1,6 @@
+[ver:1,total:780]
+src/HeadersAnalyzer/analyze_ios_headers.txt:650,1536246000:650,m
+docs/objc.md:50,1536246000:50,r
+src/HeadersAnalyzer/analyze_ios_headers.cmd:45,1536246000:45,r
+src/HeadersAnalyzer/README.md:20,1536246000:20,r
+src/objc/include/sys/cdefs.h:15,1536246000:15,r
