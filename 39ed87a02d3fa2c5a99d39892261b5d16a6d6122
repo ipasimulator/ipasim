@@ -1,0 +1,4 @@
+[ver:1,total:1800]
+src/HeadersAnalyzer/README.md:1540,1536224400:120,1536228000:1420,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:200,1536224400:180,1536228000:20,r
+out/invokes.inc:60,1536224400:60,r
