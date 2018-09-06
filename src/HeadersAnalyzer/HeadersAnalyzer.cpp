@@ -380,9 +380,19 @@ int main()
         CI.createASTContext();
         CI.createSema(TranslationUnitKind::TU_Complete, nullptr);
 
-        // TODO: Load source file.
+        // Load source files.
+        fstream inputs{ "./src/HeadersAnalyzer/analyze_ios_headers.in", fstream::in };
+        string line;
+        while (getline(inputs, line)) {
+            if (line.empty()) continue;
 
-        ParseAST(CI.getSema(), /* PrintStats = */ false, /* SkipFunctionBodies = */ true);
+            // Analyze the input.
+            CI.getSourceManager().setMainFileID(CI.getSourceManager().createFileID(CI.getFileManager().getFile(line),
+                SourceLocation(), SrcMgr::C_User));
+            CI.getDiagnosticClient().BeginSourceFile(CI.getLangOpts(), &CI.getPreprocessor());
+            ParseAST(CI.getSema(), /* PrintStats = */ false, /* SkipFunctionBodies = */ true);
+            CI.getDiagnosticClient().EndSourceFile();
+        }
 
         // TODO: Again, just for testing.
         return 0;
