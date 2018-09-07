@@ -501,14 +501,12 @@ int main() {
     CI.setInvocation(
         createInvocationFromCommandLine(Argv, &CI.getDiagnostics()));
 
-    // Don't emit anything.
+    // Don't emit any files.
     // TODO: Too platform-specific.
     CI.getFrontendOpts().OutputFile = "NUL";
 
-    // Prepare headers.
-    iOSHeadersAction iOSAct(iOSExps);
-    if (!CI.ExecuteAction(iOSAct))
-      return 1;
+    // Include all declarations in the result.
+    CI.getLangOpts().EmitAllDecls = true;
 
     // Get a `llvm::Module`.
     llvm::LLVMContext Ctx;
