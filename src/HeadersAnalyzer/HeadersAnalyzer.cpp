@@ -394,16 +394,16 @@ private:
 
 int main()
 {
-    export_list iOSExps{ { "_sel_registerName", { "libobjc.A.dylib" } } };
+    export_list iOSExps = { { "_sel_registerName", { "libobjc.A.dylib" } } };
 
     // Parse iOS headers.
     // TODO: This is so up here just for testing. In production, it should be lower.
     {
         // Parse the response file.
         llvm::BumpPtrAllocator A;
-        llvm::StringSaver Saver{ A };
-        // First argument should be executable name.
-        llvm::SmallVector<const char *, 256> Argv{ "clang.exe" };
+        llvm::StringSaver Saver(A);
+        // First argument should be an executable name.
+        llvm::SmallVector<const char *, 256> Argv = { "clang.exe" };
         if (!llvm::cl::readConfigFile("./src/HeadersAnalyzer/analyze_ios_headers.cfg", Saver, Argv)) {
             cerr << "Error: couldn't parse the response file." << endl;
             return 1;
@@ -415,25 +415,25 @@ int main()
         CI.setInvocation(createInvocationFromCommandLine(Argv, &CI.getDiagnostics()));
 
         // Create necessary components.
-        unique_ptr<TargetInfo> T{ TargetInfo::CreateTargetInfo(CI.getDiagnostics(), CI.getInvocation().TargetOpts) };
+        unique_ptr<TargetInfo> T(TargetInfo::CreateTargetInfo(CI.getDiagnostics(), CI.getInvocation().TargetOpts));
         CI.setTarget(T.get());
         CI.createSourceManager(*CI.createFileManager());
         CI.createPreprocessor(TranslationUnitKind::TU_Complete);
         CI.createASTContext();
 
         // Register our AST analyzer.
-        iOSHeadersAnalyzer HA{ CI, iOSExps };
+        iOSHeadersAnalyzer HA(CI, iOSExps);
         CI.setASTConsumer(make_unique<CustomASTConsumer<iOSHeadersAnalyzer>>(HA));
         CI.createSema(TranslationUnitKind::TU_Complete, nullptr);
 
         // Load source files.
-        fstream inputs{ "./src/HeadersAnalyzer/analyze_ios_headers.in", fstream::in };
-        string line;
-        while (getline(inputs, line)) {
-            if (line.empty()) continue;
+        fstream Inputs("./src/HeadersAnalyzer/analyze_ios_headers.in", fstream::in);
+        string Line;
+        while (getline(Inputs, Line)) {
+            if (Line.empty()) continue;
 
             // Analyze the input.
-            CI.getSourceManager().setMainFileID(CI.getSourceManager().createFileID(CI.getFileManager().getFile(line),
+            CI.getSourceManager().setMainFileID(CI.getSourceManager().createFileID(CI.getFileManager().getFile(Line),
                 SourceLocation(), SrcMgr::C_User));
             CI.getDiagnosticClient().BeginSourceFile(CI.getLangOpts(), &CI.getPreprocessor());
             ParseAST(CI.getSema(), /* PrintStats = */ false, /* SkipFunctionBodies = */ true);
