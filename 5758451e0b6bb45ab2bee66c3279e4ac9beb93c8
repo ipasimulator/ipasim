@@ -1,0 +1,3 @@
+[ver:1,total:300]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:285,1536318000:285,m
+build/include/llvm/ADT/SmallVector.h:15,1536318000:15,r
