@@ -1,0 +1,3 @@
+[ver:1,total:2640]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:2620,1536346800:1440,1536350400:1180,m
+build/include/llvm/ADT/STLExtras.h:20,1536350400:20,r
