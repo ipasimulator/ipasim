@@ -1,0 +1,6 @@
+[ver:1,total:4800]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:4020,1536321600:1260,1536325200:1860,1536328800:900,m
+src/HeadersAnalyzer/analyze_ios_headers.cfg:560,1536328800:560,m
+build/include/llvm/ADT/StringRef.h:180,1536328800:180,r
+objc.ll:20,1536328800:20,d
+src/HeadersAnalyzer/analyze_ios_headers.cmd:20,1536328800:20,r
