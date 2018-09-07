@@ -433,10 +433,44 @@ private:
   MangleContext *Mangle;
 };
 
+// TODO: Is this correct? See also <llvm/IR/Mangler.h>.
+class iOSMangler {
+public:
+  iOSMangler(const CompilerInstance &CI)
+      : Mangle(CI.getASTContext().createMangleContext()) {}
+  ~iOSMangler() { delete Mangle; }
+  string MangleFunctionName(const FunctionDecl &Func) {
+    // Get function's mangled name. Inspired by
+    // https://github.com/llvm-mirror/clang/blob/1bc73590ad1335313e8f262393547b8af67c9167/lib/Index/CodegenNameGenerator.cpp#L150.
+    string FName;
+    if (Mangle->shouldMangleDeclName(&Func)) {
+      llvm::raw_string_ostream OS(FName);
+      if (const auto *CtorD = dyn_cast<CXXConstructorDecl>(&Func))
+        Mangle->mangleCXXCtor(CtorD, Ctor_Complete, OS);
+      else if (const auto *DtorD = dyn_cast<CXXDestructorDecl>(&Func))
+        Mangle->mangleCXXDtor(DtorD, Dtor_Complete, OS);
+      else
+        Mangle->mangleName(&Func, OS);
+      OS.flush();
+    } else {
+      // TODO: Even though our mangler says C functions shouldn't be mangled,
+      // they seem to actually be mangled on iOS.
+      if (Func.getLanguageLinkage() == CLanguageLinkage)
+        FName = "_";
+      FName += Func.getIdentifier()->getName().str();
+    }
+    return std::move(FName);
+  }
+
+private:
+  MangleContext *Mangle;
+};
+
 // See `iOSHeadersAction`.
 class iOSHeadersConsumer : public ASTConsumer {
 public:
-  iOSHeadersConsumer(export_list &Exps) : Exps(Exps) {}
+  iOSHeadersConsumer(const CompilerInstance &CI, export_list &Exps)
+      : CI(CI), Exps(Exps) {}
   bool HandleTopLevelDecl(DeclGroupRef DeclGroup) override {
     for (const auto *Decl : DeclGroup) {
       if (auto *Func = llvm::dyn_cast<FunctionDecl>(Decl)) {
@@ -448,13 +482,15 @@ public:
 
 private:
   void HandleFunctionDecl(const FunctionDecl *Func) {
-    cout << Func->getNameInfo().getName().getAsString() << '\n';
+    iOSMangler Mangler(CI);
+    cout << "F: " << Mangler.MangleFunctionName(*Func) << '\n';
 
     const auto *FTy = Func->getType()->getAs<FunctionType>();
     assert(FTy);
   }
 
 private:
+  const CompilerInstance &CI;
   export_list &Exps;
 };
 
@@ -466,9 +502,8 @@ public:
   iOSHeadersAction(export_list &Exps) : Exps(Exps) {}
 
   std::unique_ptr<clang::ASTConsumer>
-  CreateASTConsumer(clang::CompilerInstance &CI,
-                    llvm::StringRef InFile) override {
-    return llvm::make_unique<iOSHeadersConsumer>(Exps);
+  CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) override {
+    return llvm::make_unique<iOSHeadersConsumer>(CI, Exps);
   }
 
 private:
@@ -505,6 +540,11 @@ int main() {
     // TODO: Too platform-specific.
     CI.getFrontendOpts().OutputFile = "NUL";
 
+    // Prepare headers.
+    iOSHeadersAction iOSAct(iOSExps);
+    if (!CI.ExecuteAction(iOSAct))
+      return 1;
+
     // Include all declarations in the result.
     CI.getLangOpts().EmitAllDecls = true;
 
@@ -523,6 +563,7 @@ int main() {
     for (const auto &Func : *Module) {
       llvm::outs() << Func.getName() << '\n';
     }
+    llvm::outs().flush();
 
     // TODO: Again, just for testing.
     return 0;
