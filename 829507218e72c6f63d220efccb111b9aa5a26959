@@ -1,0 +1,4 @@
+[ver:1,total:660]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:426,1536339600:426,m
+src/HeadersAnalyzer/analyze_ios_headers.cfg:174,1536339600:174,m
+build/include/llvm/ADT/StringRef.h:60,1536339600:60,r
