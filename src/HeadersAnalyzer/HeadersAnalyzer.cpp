@@ -344,12 +344,58 @@ private:
 
 class iOSHeadersAnalyzer {
 public:
-    void VisitFunction(FunctionDecl &f) {
+    iOSHeadersAnalyzer(const CompilerInstance &CI, export_list &Exps) : CI(CI), Exps(Exps) {
+        // TODO: Is this mangling what Apple uses?
+        Mangle = CI.getASTContext().createMangleContext();
     }
+    ~iOSHeadersAnalyzer() {
+        delete Mangle;
+    }
+    // TODO: Rename to `visitFunction` (with lowercase "v").
+    void VisitFunction(FunctionDecl &Func) {
+        const FunctionProtoType *FPT = Func.getFunctionType()->getAs<FunctionProtoType>();
+
+        // Ignore templates.
+        if (FPT->isDependentType()) return;
+
+        // Get function's mangled name. Inspired by
+        // https://github.com/llvm-mirror/clang/blob/1bc73590ad1335313e8f262393547b8af67c9167/lib/Index/CodegenNameGenerator.cpp#L150.
+        string FName;
+        if (Mangle->shouldMangleDeclName(&Func)) {
+            llvm::raw_string_ostream OS(FName);
+            if (const auto *CtorD = dyn_cast<CXXConstructorDecl>(&Func))
+                Mangle->mangleCXXCtor(CtorD, Ctor_Complete, OS);
+            else if (const auto *DtorD = dyn_cast<CXXDestructorDecl>(&Func))
+                Mangle->mangleCXXDtor(DtorD, Dtor_Complete, OS);
+            else
+                Mangle->mangleName(&Func, OS);
+            OS.flush();
+        }
+        else {
+            // TODO: Even though our mangler says C functions shouldn't be mangled,
+            // they seem to actually be mangled on iOS.
+            if (Func.getLanguageLinkage() == CLanguageLinkage)
+                FName = "_";
+            FName += Func.getIdentifier()->getName().str();
+        }
+
+        // Skip functions that don't interest us.
+        auto Exp = Exps.find(FName);
+        if (Exp == Exps.end()) return;
+
+        // TODO: Do something with the function.
+        cout << FName << '\n';
+    }
+private:
+    export_list Exps;
+    const CompilerInstance &CI;
+    MangleContext *Mangle;
 };
 
 int main()
 {
+    export_list iOSExps{ { "_sel_registerName", { "libobjc.A.dylib" } } };
+
     // Parse iOS headers.
     // TODO: This is so up here just for testing. In production, it should be lower.
     {
@@ -368,16 +414,16 @@ int main()
         CI.createDiagnostics();
         CI.setInvocation(createInvocationFromCommandLine(Argv, &CI.getDiagnostics()));
 
-        // Register our AST analyzer.
-        iOSHeadersAnalyzer HA;
-        CI.setASTConsumer(make_unique<CustomASTConsumer<iOSHeadersAnalyzer>>(HA));
-
         // Create necessary components.
         unique_ptr<TargetInfo> T{ TargetInfo::CreateTargetInfo(CI.getDiagnostics(), CI.getInvocation().TargetOpts) };
         CI.setTarget(T.get());
         CI.createSourceManager(*CI.createFileManager());
         CI.createPreprocessor(TranslationUnitKind::TU_Complete);
         CI.createASTContext();
+
+        // Register our AST analyzer.
+        iOSHeadersAnalyzer HA{ CI, iOSExps };
+        CI.setASTConsumer(make_unique<CustomASTConsumer<iOSHeadersAnalyzer>>(HA));
         CI.createSema(TranslationUnitKind::TU_Complete, nullptr);
 
         // Load source files.
