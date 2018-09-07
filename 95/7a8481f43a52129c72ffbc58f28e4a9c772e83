@@ -1,0 +1,10 @@
+[ver:1,total:5520]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:3973,1536303600:540,1536307200:1329,1536310800:844,1536314400:1260,m
+compile_commands.json:504,1536307200:474,1536310800:30,d
+src/HeadersAnalyzer/analyze_ios_headers.cfg:370,1536303600:340,1536314400:30,r
+.vscode/settings.json:235,1536303600:60,1536307200:131,1536310800:44,r
+src/HeadersAnalyzer/compile_commands.json:156,1536307200:156,d
+src/HeadersAnalyzer/analyze_ios_headers.in:150,1536303600:120,1536314400:30,r
+src/HeadersAnalyzer/compile_flags.txt:102,1536310800:102,d
+src/HeadersAnalyzer/Debug/HeadersAnalyzer.log:20,1536303600:20,r
+src/HeadersAnalyzer/cc_mapper.hpp:10,1536307200:10,r
