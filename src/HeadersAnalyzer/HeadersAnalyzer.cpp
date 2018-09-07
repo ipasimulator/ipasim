@@ -433,6 +433,17 @@ private:
   MangleContext *Mangle;
 };
 
+enum class ExportStatus { NotFound = 0, Found, Overloaded };
+
+struct ExportEntry {
+  ExportEntry() : Status(ExportStatus::NotFound) {}
+
+  ExportStatus Status;
+  set<string> Libs;
+};
+
+using ExportList = map<string, ExportEntry>;
+
 // TODO: Is this correct? See also <llvm/IR/Mangler.h>.
 class iOSMangler {
 public:
@@ -469,7 +480,7 @@ private:
 // See `iOSHeadersAction`.
 class iOSHeadersConsumer : public ASTConsumer {
 public:
-  iOSHeadersConsumer(const CompilerInstance &CI, export_list &Exps)
+  iOSHeadersConsumer(const CompilerInstance &CI, ExportList &Exps)
       : CI(CI), Exps(Exps) {}
   bool HandleTopLevelDecl(DeclGroupRef DeclGroup) override {
     for (const auto *Decl : DeclGroup) {
@@ -482,16 +493,19 @@ public:
 
 private:
   void HandleFunctionDecl(const FunctionDecl *Func) {
-    iOSMangler Mangler(CI);
-    cout << "F: " << Mangler.MangleFunctionName(*Func) << '\n';
+    // Handle only functions that interest us.
+    string MangledName = iOSMangler(CI).MangleFunctionName(*Func);
+    auto Exp = Exps.find(MangledName);
+    if (Exp == Exps.end())
+      return;
 
-    const auto *FTy = Func->getType()->getAs<FunctionType>();
-    assert(FTy);
+    // TODO: Attach bodies to those functions, so that they get compiled.
+    cout << "F: " << MangledName << '\n';
   }
 
 private:
   const CompilerInstance &CI;
-  export_list &Exps;
+  ExportList &Exps;
 };
 
 // This action will "use" functions from headers, so that they are compiled into
@@ -499,7 +513,7 @@ private:
 // inspect their calling conventions later.
 class iOSHeadersAction : public ASTFrontendAction {
 public:
-  iOSHeadersAction(export_list &Exps) : Exps(Exps) {}
+  iOSHeadersAction(ExportList &Exps) : Exps(Exps) {}
 
   std::unique_ptr<clang::ASTConsumer>
   CreateASTConsumer(CompilerInstance &CI, llvm::StringRef InFile) override {
@@ -507,11 +521,11 @@ public:
   }
 
 private:
-  export_list &Exps;
+  ExportList &Exps;
 };
 
 int main() {
-  export_list iOSExps = {{"_sel_registerName", {"libobjc.A.dylib"}}};
+  ExportList iOSExps = {{"_sel_registerName", {}}};
 
   // Parse iOS headers.
   // TODO: This is so up here just for testing. In production, it should be
@@ -567,31 +581,6 @@ int main() {
 
     // TODO: Again, just for testing.
     return 0;
-
-    // Create necessary components.
-    unique_ptr<TargetInfo> T(TargetInfo::CreateTargetInfo(
-        CI.getDiagnostics(), CI.getInvocation().TargetOpts));
-    CI.setTarget(T.get());
-    CI.createSourceManager(*CI.createFileManager());
-    CI.createPreprocessor(TranslationUnitKind::TU_Complete);
-    CI.createASTContext();
-
-    // Register our AST analyzer.
-    iOSHeadersAnalyzer HA(CI, iOSExps);
-    CI.setASTConsumer(make_unique<CustomASTConsumer<iOSHeadersAnalyzer>>(HA));
-    CI.createSema(TranslationUnitKind::TU_Complete, nullptr);
-
-    // Analyze the inputs.
-    for (const auto &Input : CI.getFrontendOpts().Inputs) {
-      CI.getSourceManager().setMainFileID(CI.getSourceManager().createFileID(
-          CI.getFileManager().getFile(Input.getFile()), SourceLocation(),
-          SrcMgr::C_User));
-      CI.getDiagnosticClient().BeginSourceFile(CI.getLangOpts(),
-                                               &CI.getPreprocessor());
-      ParseAST(CI.getSema(), /* PrintStats */ false,
-               /* SkipFunctionBodies */ true);
-      CI.getDiagnosticClient().EndSourceFile();
-    }
   }
 
   export_list exps;
