@@ -466,20 +466,15 @@ int main() {
     CI.setASTConsumer(make_unique<CustomASTConsumer<iOSHeadersAnalyzer>>(HA));
     CI.createSema(TranslationUnitKind::TU_Complete, nullptr);
 
-    // Load source files.
-    fstream Inputs("./src/HeadersAnalyzer/analyze_ios_headers.in", fstream::in);
-    string Line;
-    while (getline(Inputs, Line)) {
-      if (Line.empty())
-        continue;
-
-      // Analyze the input.
+    // Analyze the inputs.
+    for (const auto &Input : CI.getFrontendOpts().Inputs) {
       CI.getSourceManager().setMainFileID(CI.getSourceManager().createFileID(
-          CI.getFileManager().getFile(Line), SourceLocation(), SrcMgr::C_User));
+          CI.getFileManager().getFile(Input.getFile()), SourceLocation(),
+          SrcMgr::C_User));
       CI.getDiagnosticClient().BeginSourceFile(CI.getLangOpts(),
                                                &CI.getPreprocessor());
-      ParseAST(CI.getSema(), /* PrintStats = */ false,
-               /* SkipFunctionBodies = */ true);
+      ParseAST(CI.getSema(), /* PrintStats */ false,
+               /* SkipFunctionBodies */ true);
       CI.getDiagnosticClient().EndSourceFile();
     }
 
