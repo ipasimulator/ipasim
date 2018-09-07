@@ -1,0 +1,5 @@
+[ver:1,total:780]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:675,1536318000:240,1536321600:435,m
+src/HeadersAnalyzer/analyze_ios_headers.cmd:60,1536321600:60,m
+src/HeadersAnalyzer/analyze_ios_headers.cfg:30,1536321600:30,m
+src/HeadersAnalyzer/analyze_ios_headers.in:15,1536321600:15,d
