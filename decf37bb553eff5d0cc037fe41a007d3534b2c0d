@@ -1,0 +1,4 @@
+[ver:1,total:3060]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:2868,1536339600:1500,1536343200:1248,1536346800:120,m
+src/HeadersAnalyzer/analyze_ios_headers.cfg:180,1536343200:180,r
+build/include/llvm/ADT/STLExtras.h:12,1536343200:12,r
