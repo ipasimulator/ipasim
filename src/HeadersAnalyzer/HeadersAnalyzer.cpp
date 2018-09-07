@@ -458,13 +458,16 @@ int main() {
     CI.setInvocation(
         createInvocationFromCommandLine(Argv, &CI.getDiagnostics()));
 
-    // TODO: Don't emit anything!
+    // Don't emit anything.
+    // TODO: Too platform-specific.
+    CI.getFrontendOpts().OutputFile = "NUL";
+
+    // Get a `llvm::Module`.
     llvm::LLVMContext Ctx;
     EmitLLVMAction EmitLLVM(&Ctx);
     if (!CI.ExecuteAction(EmitLLVM)) {
       return 1;
     }
-
     auto Module = EmitLLVM.takeModule();
 
     // TODO: Again, just for testing.
