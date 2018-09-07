@@ -12,6 +12,7 @@
 #include <clang/AST/Type.h>
 #include <clang/Basic/TargetInfo.h>
 #include <clang/Basic/TargetOptions.h>
+#include <clang/CodeGen/CodeGenAction.h>
 #include <clang/CodeGen/ModuleBuilder.h>
 #include <clang/Driver/Driver.h>
 #include <clang/Frontend/CompilerInstance.h>
@@ -20,6 +21,8 @@
 #include <clang/Parse/ParseAST.h>
 
 #include <llvm/Demangle/Demangle.h>
+#include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Module.h>
 #include <llvm/Support/CommandLine.h>
 #include <llvm/Support/raw_os_ostream.h>
 
@@ -449,9 +452,23 @@ int main() {
 
     // Create `CompilerInstance` of Clang.
     CompilerInstance CI;
+    // TODO: No diagnostics options set at the beginning (like ignore unknown
+    // arguments, etc.). How should that be done?
     CI.createDiagnostics();
     CI.setInvocation(
         createInvocationFromCommandLine(Argv, &CI.getDiagnostics()));
+
+    // TODO: Don't emit anything!
+    llvm::LLVMContext Ctx;
+    EmitLLVMAction EmitLLVM(&Ctx);
+    if (!CI.ExecuteAction(EmitLLVM)) {
+      return 1;
+    }
+
+    auto Module = EmitLLVM.takeModule();
+
+    // TODO: Again, just for testing.
+    return 0;
 
     // Create necessary components.
     unique_ptr<TargetInfo> T(TargetInfo::CreateTargetInfo(
@@ -477,9 +494,6 @@ int main() {
                /* SkipFunctionBodies */ true);
       CI.getDiagnosticClient().EndSourceFile();
     }
-
-    // TODO: Again, just for testing.
-    return 0;
   }
 
   export_list exps;
