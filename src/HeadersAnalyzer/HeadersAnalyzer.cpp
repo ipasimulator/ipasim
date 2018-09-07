@@ -21,6 +21,7 @@
 #include <clang/Parse/ParseAST.h>
 
 #include <llvm/Demangle/Demangle.h>
+#include <llvm/IR/DebugInfo.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/Support/CommandLine.h>
@@ -432,6 +433,48 @@ private:
   MangleContext *Mangle;
 };
 
+// See `iOSHeadersAction`.
+class iOSHeadersConsumer : public ASTConsumer {
+public:
+  iOSHeadersConsumer(export_list &Exps) : Exps(Exps) {}
+  bool HandleTopLevelDecl(DeclGroupRef DeclGroup) override {
+    for (const auto *Decl : DeclGroup) {
+      if (auto *Func = llvm::dyn_cast<FunctionDecl>(Decl)) {
+        HandleFunctionDecl(Func);
+      }
+    }
+    return true;
+  }
+
+private:
+  void HandleFunctionDecl(const FunctionDecl *Func) {
+    cout << Func->getNameInfo().getName().getAsString() << '\n';
+
+    const auto *FTy = Func->getType()->getAs<FunctionType>();
+    assert(FTy);
+  }
+
+private:
+  export_list &Exps;
+};
+
+// This action will "use" functions from headers, so that they are compiled into
+// LLVM. Otherwise, they would be thrown out as unused, but we need them to
+// inspect their calling conventions later.
+class iOSHeadersAction : public ASTFrontendAction {
+public:
+  iOSHeadersAction(export_list &Exps) : Exps(Exps) {}
+
+  std::unique_ptr<clang::ASTConsumer>
+  CreateASTConsumer(clang::CompilerInstance &CI,
+                    llvm::StringRef InFile) override {
+    return llvm::make_unique<iOSHeadersConsumer>(Exps);
+  }
+
+private:
+  export_list &Exps;
+};
+
 int main() {
   export_list iOSExps = {{"_sel_registerName", {"libobjc.A.dylib"}}};
 
@@ -462,13 +505,26 @@ int main() {
     // TODO: Too platform-specific.
     CI.getFrontendOpts().OutputFile = "NUL";
 
+    // Prepare headers.
+    iOSHeadersAction iOSAct(iOSExps);
+    if (!CI.ExecuteAction(iOSAct))
+      return 1;
+
     // Get a `llvm::Module`.
     llvm::LLVMContext Ctx;
     EmitLLVMAction EmitLLVM(&Ctx);
-    if (!CI.ExecuteAction(EmitLLVM)) {
+    if (!CI.ExecuteAction(EmitLLVM))
       return 1;
-    }
     auto Module = EmitLLVM.takeModule();
+
+    // Create debug info.
+    llvm::DebugInfoFinder DIF;
+    DIF.processModule(*Module);
+
+    // TODO: There are no functions right now.
+    for (const auto &Func : *Module) {
+      llvm::outs() << Func.getName() << '\n';
+    }
 
     // TODO: Again, just for testing.
     return 0;
