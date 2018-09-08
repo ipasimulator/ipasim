@@ -1,0 +1,4 @@
+[ver:1,total:1740]
+docs/llvm.md:1290,1536418800:60,1536422400:960,1536426000:270,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:360,1536422400:180,1536426000:180,r
+scripts/push_all.cmd:90,1536426000:90,m
