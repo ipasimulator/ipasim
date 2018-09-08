@@ -22,6 +22,9 @@
 
 #include <llvm/Demangle/Demangle.h>
 #include <llvm/IR/DebugInfo.h>
+#include <llvm/IR/Instructions.h>
+#include <llvm/IR/IntrinsicInst.h>
+#include <llvm/IR/Intrinsics.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Mangler.h>
 #include <llvm/IR/Module.h>
@@ -585,10 +588,23 @@ int main() {
       llvm::SmallString<16> Name;
       llvm::Mangler().getNameWithPrefix(Name, &Func,
                                         /* CannotUsePrivateLabel */ false);
-      cout << Name.c_str() << endl;
 
-      // Get debug info for this function.
-      const llvm::DISubprogram *Subprog = Func.getSubprogram();
+      // Filter uninteresting functions.
+      auto Exp = iOSExps.find(Name.str().str());
+      if (Exp == iOSExps.end())
+        continue;
+
+      // Extract arguments from function's IR.
+      const llvm::BasicBlock &Entry = Func.getEntryBlock();
+      for (const llvm::Instruction &Inst : *Entry.getIterator()) {
+
+        // Find all `@llvm.dbg.declare` calls.
+        const auto *Call = dyn_cast<llvm::DbgDeclareInst>(&Inst);
+        if (!Call)
+          continue;
+
+        cout << Call->getVariable()->getName().str() << '\n';
+      }
     }
 
     // TODO: Again, just for testing.
