@@ -1,0 +1,4 @@
+[ver:1,total:1920]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1878,1536393600:1473,1536397200:405,m
+build/include/llvm/IR/Mangler.h:30,1536393600:15,1536397200:15,r
+build/include/llvm/IR/DebugInfoMetadata.h:12,1536393600:12,r
