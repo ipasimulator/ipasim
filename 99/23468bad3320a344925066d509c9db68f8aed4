@@ -1,0 +1,5 @@
+[ver:1,total:1560]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1192,1536415200:690,1536418800:502,m
+docs/llvm.md:272,1536415200:240,1536418800:32,m
+build/include/llvm/Support/TargetSelect.h:66,1536418800:66,r
+src/HeadersAnalyzer/analyze_ios_headers.cfg:30,1536415200:30,r
