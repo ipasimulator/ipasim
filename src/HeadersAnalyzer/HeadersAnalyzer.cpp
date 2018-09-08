@@ -565,51 +565,12 @@ int main() {
     // TODO: Maybe filter them (include only those in `Exps`).
     CI.getLangOpts().EmitAllDecls = true;
 
-    // Get a `llvm::Module`.
+    // Compile to an object file.
+    CI.getFrontendOpts().OutputFile = "./src/HeadersAnalyzer/Debug/iOSHeaders.o";
     llvm::LLVMContext Ctx;
-    EmitCodeGenOnlyAction Act(&Ctx);
+    EmitObjAction Act(&Ctx);
     if (!CI.ExecuteAction(Act))
       return 1;
-    auto Module = Act.takeModule();
-
-    // Process functions.
-    cout << '\n';
-    for (const llvm::Function &Func : *Module) {
-      // Mangle the name to compare it with iOS exports.
-      llvm::SmallString<16> Name;
-      llvm::Mangler().getNameWithPrefix(Name, &Func,
-                                        /* CannotUsePrivateLabel */ false);
-
-      // Filter uninteresting functions.
-      auto Exp = iOSExps.find(Name.str().str());
-      if (Exp == iOSExps.end())
-        continue;
-
-      // Extract arguments from function's IR.
-      vector<const llvm::DbgDeclareInst *> Dbgs;
-      Dbgs.resize(Func.arg_size());
-      const llvm::BasicBlock &Entry = Func.getEntryBlock();
-      for (const llvm::Instruction &Inst : *Entry.getIterator()) {
-
-        // Find only `@llvm.dbg.declare` calls.
-        const auto *Call = dyn_cast<llvm::DbgDeclareInst>(&Inst);
-        if (!Call)
-          continue;
-
-        // Find corresponding argument.
-        if (unsigned int Arg = Call->getVariable()->getArg()) {
-          Dbgs[Arg - 1] = Call;
-        }
-      }
-
-      // TODO: Process arguments.
-      for (const llvm::DbgDeclareInst *Dbg : Dbgs) {
-        assert(!Dbg->getExpression()->getNumElements() &&
-               "We can't handle `DIExpressons` yet.");
-
-        Dbg->dump();
-      }
-    }
 
     // TODO: Again, just for testing.
     return 0;
