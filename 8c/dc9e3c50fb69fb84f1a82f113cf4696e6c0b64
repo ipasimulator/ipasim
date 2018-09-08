@@ -1,0 +1,5 @@
+[ver:1,total:1740]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1492,1536404400:712,1536408000:600,1536415200:180,m
+build/include/llvm/IR/IntrinsicInst.h:158,1536404400:158,r
+build/include/llvm/IR/DebugInfo.h:60,1536404400:60,r
+build/include/llvm/IR/InstVisitor.h:30,1536404400:30,r
