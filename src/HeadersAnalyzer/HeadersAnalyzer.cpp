@@ -595,15 +595,25 @@ int main() {
         continue;
 
       // Extract arguments from function's IR.
+      vector<const llvm::DbgDeclareInst *> Dbgs;
+      Dbgs.resize(Func.arg_size());
       const llvm::BasicBlock &Entry = Func.getEntryBlock();
       for (const llvm::Instruction &Inst : *Entry.getIterator()) {
 
-        // Find all `@llvm.dbg.declare` calls.
+        // Find only `@llvm.dbg.declare` calls.
         const auto *Call = dyn_cast<llvm::DbgDeclareInst>(&Inst);
         if (!Call)
           continue;
 
-        cout << Call->getVariable()->getName().str() << '\n';
+        // Find corresponding argument.
+        if (unsigned int Arg = Call->getVariable()->getArg()) {
+          Dbgs[Arg - 1] = Call;
+        }
+      }
+
+      // TODO: Process arguments.
+      for (const llvm::DbgDeclareInst *Dbg : Dbgs) {
+        Dbg->dump();
       }
     }
 
