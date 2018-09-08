@@ -1,0 +1,10 @@
+[ver:1,total:3840]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:2981,1536397200:340,1536400800:2281,1536404400:360,m
+src/HeadersAnalyzer/analyze_ios_headers.cfg:375,1536397200:360,1536400800:15,r
+src/HeadersAnalyzer/README.md:180,1536397200:180,r
+build/include/llvm/IR/DebugInfo.h:150,1536400800:150,r
+build/include/llvm/IR/DebugInfoMetadata.h:59,1536397200:20,1536400800:39,r
+build/include/llvm/IR/GlobalValue.h:30,1536400800:30,r
+build/include/llvm/IR/IntrinsicInst.h:30,1536400800:30,r
+build/include/llvm/IR/BasicBlock.h:20,1536400800:20,r
+build/include/llvm/IR/Function.h:15,1536400800:15,r
