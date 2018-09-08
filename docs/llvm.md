@@ -58,6 +58,7 @@ cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR=
   In Clang, we create a new section called `.fixbind` which contains addresses to all the bindings that need to be fixed.
   At runtime, we then fix those addresses in our `dyld`.
 - `[pretty-print]`: We improved pretty printing of functions to match our needs in `HeadersAnalyzer`.
+- `[emit-all-decls]`: See [`HeadersAnalyzer` docs](../src/HeadersAnalyzer/README.md).
 
 ### Objective-C symbols across DLLs
 
