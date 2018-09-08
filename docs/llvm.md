@@ -59,6 +59,10 @@ cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_
   At runtime, we then fix those addresses in our `dyld`.
 - `[pretty-print]`: We improved pretty printing of functions to match our needs in `HeadersAnalyzer`.
 - `[emit-all-decls]`: See [`HeadersAnalyzer` docs](../src/HeadersAnalyzer/README.md).
+- `[irt]`: We renamed folder `InstrumentationRuntime` to `IRt` because the former was too long for Windows.
+  **TODO: Obviously, don't do this.
+  Rather move our sources near the root (e.g., `C:\src\`).
+  But then also mention that in build instructions.**
 
 ### Objective-C symbols across DLLs
 
