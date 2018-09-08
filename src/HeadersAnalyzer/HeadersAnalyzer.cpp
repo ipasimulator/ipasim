@@ -573,7 +573,14 @@ int main() {
     llvm::DebugInfoFinder DIF;
     DIF.processModule(*Module);
 
-    // TODO: There are no functions right now.
+    cout << '\n';
+    cout << "Types: " << DIF.type_count() << '\n'
+         << "Global variables: " << DIF.global_variable_count() << '\n'
+         << "Compile units: " << DIF.compile_unit_count() << '\n'
+         << "Scopes: " << DIF.scope_count() << '\n'
+         << "Subprograms: " << DIF.subprogram_count() << '\n';
+    cout << '\n';
+
     for (const auto &Func : *Module) {
       llvm::outs() << Func.getName() << '\n';
     }
