@@ -23,6 +23,7 @@
 #include <llvm/Demangle/Demangle.h>
 #include <llvm/IR/DebugInfo.h>
 #include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/Mangler.h>
 #include <llvm/IR/Module.h>
 #include <llvm/Support/CommandLine.h>
 #include <llvm/Support/raw_os_ostream.h>
@@ -499,7 +500,7 @@ private:
     if (Exp == Exps.end())
       return;
 
-    // TODO: Attach bodies to those functions, so that they get compiled.
+    // TODO: Remove if we won't use it.
     cout << "F: " << MangledName << '\n';
   }
 
@@ -554,12 +555,8 @@ int main() {
     // TODO: Too platform-specific.
     CI.getFrontendOpts().OutputFile = "NUL";
 
-    // Prepare headers.
-    iOSHeadersAction iOSAct(iOSExps);
-    if (!CI.ExecuteAction(iOSAct))
-      return 1;
-
     // Include all declarations in the result.
+    // TODO: Maybe filter them (include only those in `Exps`).
     CI.getLangOpts().EmitAllDecls = true;
 
     // Get a `llvm::Module`.
@@ -581,13 +578,17 @@ int main() {
          << "Subprograms: " << DIF.subprogram_count() << '\n';
     cout << '\n';
 
-    for (const auto &Func : *Module) {
-      llvm::outs() << Func.getName() << '\n';
-    }
-
+    // Process functions.
     cout << '\n';
-    for (const auto *Subprog : DIF.subprograms()) {
-      Subprog->dump(Module.get());
+    for (const llvm::Function &Func : *Module) {
+      // Mangle the name to compare it with iOS exports.
+      llvm::SmallString<16> Name;
+      llvm::Mangler().getNameWithPrefix(Name, &Func,
+                                        /* CannotUsePrivateLabel */ false);
+      cout << Name.c_str() << endl;
+
+      // Get debug info for this function.
+      const llvm::DISubprogram *Subprog = Func.getSubprogram();
     }
 
     // TODO: Again, just for testing.
