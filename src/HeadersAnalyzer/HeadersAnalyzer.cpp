@@ -554,17 +554,13 @@ int main() {
     CI.setInvocation(
         createInvocationFromCommandLine(Argv, &CI.getDiagnostics()));
 
-    // Don't emit any files.
-    // TODO: Too platform-specific.
-    CI.getFrontendOpts().OutputFile = "NUL";
-
     // Include all declarations in the result.
     // TODO: Maybe filter them (include only those in `Exps`).
     CI.getLangOpts().EmitAllDecls = true;
 
     // Get a `llvm::Module`.
     llvm::LLVMContext Ctx;
-    EmitLLVMAction EmitLLVM(&Ctx);
+    EmitLLVMOnlyAction EmitLLVM(&Ctx);
     if (!CI.ExecuteAction(EmitLLVM))
       return 1;
     auto Module = EmitLLVM.takeModule();
