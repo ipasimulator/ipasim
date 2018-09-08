@@ -584,7 +584,11 @@ int main() {
     for (const auto &Func : *Module) {
       llvm::outs() << Func.getName() << '\n';
     }
-    llvm::outs().flush();
+
+    cout << '\n';
+    for (const auto *Subprog : DIF.subprograms()) {
+      Subprog->dump(Module.get());
+    }
 
     // TODO: Again, just for testing.
     return 0;
