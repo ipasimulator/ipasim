@@ -1,7 +1,7 @@
 # LLVM and Clang
 
-This document describes submodules `deps/llvm`, `deps/clang` and `deps/lld`.
-They were forked from <https://git.llvm.org/git/llvm.git/>, <https://git.llvm.org/git/clang.git/> and <https://git.llvm.org/git/lld.git/>, respectively, using `git clone --mirror` and `git push --mirror`.
+This document describes submodules `deps/llvm`, `deps/clang`, `deps/lld` and `deps/lldb`.
+They were forked from <https://git.llvm.org/git/llvm.git/>, <https://git.llvm.org/git/clang.git/>, <https://git.llvm.org/git/lld.git/> and <https://git.llvm.org/git/lldb.git/>, respectively, using `git clone --mirror` and `git push --mirror`.
 
 ## Microsoft patches
 
@@ -9,7 +9,7 @@ Then, Microsoft patches 0009-0019 from `deps/WinObjC/contrib/clang` were applied
 They are applied in branch `microsoft` which is based on `google/stable` (that's some time after `release_60`, where patches prior to 0009 have been already applied by Microsoft).
 In LLVM, there were no patches to apply, but branch `microsoft` was created nevertheless, based on `stable`, for consistency.
 **TODO: Maybe base it on [`RELEASE_601` tag](http://llvm.org/viewvc/llvm-project/llvm/tags/RELEASE_601/final/), instead of `stable` branch.**
-Similarly LLD, but there was not even a `stable` branch, so it was based on some random commit which originated around the same time as the `stable` branches in LLVM and Clang.
+Similarly LLD and LLDB, but there was not even a `stable` branch, so it was based on some random commit which originated around the same time as the `stable` branches in LLVM and Clang.
 
 > There are also old branches named `port`, not currently used.
 > Before using them again (if changing something in LLVM or Clang), delete them first.
@@ -25,13 +25,13 @@ Follow the instructions below to build patched LLVM and Clang.
 
 - Make sure you have installed CMake.
 - Run these commands from Developer Command Prompt inside `deps/llvm`:
-  **TODO: Build only projects (and `LLVM_TARGETS_TO_BUILD`) that are necessary.**
+  **TODO: Build only targets (and `LLVM_TARGETS_TO_BUILD`) that are necessary.**
 
 ```cmd
 mkdir build && cd build
 mkdir Release && cd Release
-cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\..\clang" -DLLVM_EXTERNAL_LLD_SOURCE_DIR="..\..\..\lld" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="..\..\..\..\build" -DCMAKE_INSTALL_MESSAGE=LAZY ..\..
-ninja install-clang install-libclang install-lld install-llvm-headers install-clang-headers tools/clang/lib/install lib/install install-LLVMSupport install-LLVMDemangle
+cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\..\clang" -DLLVM_EXTERNAL_LLD_SOURCE_DIR="..\..\..\lld" -DLLVM_EXTERNAL_LLDB_SOURCE_DIR="..\..\..\lldb" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="..\..\..\..\build" -DCMAKE_INSTALL_MESSAGE=LAZY ..\..
+ninja install-clang install-libclang install-lld install-llvm-headers install-clang-headers install-lldb-headers tools/clang/lib/install lib/install install-LLVMSupport install-LLVMDemangle tools/lldb/source/Symbol/install
 ```
 
 - The outputs will be in `/build/`.
@@ -42,7 +42,7 @@ ninja install-clang install-libclang install-lld install-llvm-headers install-cl
 For a `Debug` build with `Release` TableGen, do this (after building `llvm-tblgen` and `clang-tblgen` inside `/deps/llvm/build/Release/`):
 
 ```cmd
-cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\..\clang" -DLLVM_EXTERNAL_LLD_SOURCE_DIR="..\..\..\lld" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX="..\..\..\..\build" -DCMAKE_INSTALL_MESSAGE=LAZY -DLLVM_TABLEGEN="%cd%\..\Release\bin\llvm-tblgen.exe" -DCLANG_TABLEGEN="%cd%\..\Release\bin\clang-tblgen.exe" ..\..
+cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\..\clang" -DLLVM_EXTERNAL_LLD_SOURCE_DIR="..\..\..\lld" -DLLVM_EXTERNAL_LLDB_SOURCE_DIR="..\..\..\lldb" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX="..\..\..\..\build" -DCMAKE_INSTALL_MESSAGE=LAZY -DLLVM_TABLEGEN="%cd%\..\Release\bin\llvm-tblgen.exe" -DCLANG_TABLEGEN="%cd%\..\Release\bin\clang-tblgen.exe" ..\..
 ```
 
 ## Porting

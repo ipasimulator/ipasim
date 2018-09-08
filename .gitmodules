@@ -33,3 +33,7 @@
 	path = deps/tapi
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/tapi
 	branch = port
+[submodule "deps/lldb"]
+	path = deps/lldb
+	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/lldb
+	branch = port

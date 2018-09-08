@@ -8,6 +8,7 @@ call push_one.cmd ..\deps\clang
 call push_one.cmd ..\deps\libclosure
 call push_one.cmd ..\deps\LIEF
 call push_one.cmd ..\deps\lld
+call push_one.cmd ..\deps\lldb
 call push_one.cmd ..\deps\llvm
 call push_one.cmd ..\deps\objc4
 call push_one.cmd ..\deps\tapi
