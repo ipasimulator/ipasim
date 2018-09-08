@@ -1,6 +1,9 @@
 // HeadersAnalyzer.cpp : Defines the entry point for the console application.
 //
 
+#include <lldb/API/SBDebugger.h>
+#include <lldb/API/SBTarget.h>
+
 #include <tapi/Core/FileManager.h>
 #include <tapi/Core/InterfaceFile.h>
 #include <tapi/Core/InterfaceFileManager.h>
@@ -531,6 +534,7 @@ private:
 
 int main() {
   ExportList iOSExps = {{"_sel_registerName", {}}};
+  const char *OutputFile = "./src/HeadersAnalyzer/Debug/iOSHeaders.o";
 
   // Parse iOS headers.
   // TODO: This is so up here just for testing. In production, it should be
@@ -566,11 +570,20 @@ int main() {
     CI.getLangOpts().EmitAllDecls = true;
 
     // Compile to an object file.
-    CI.getFrontendOpts().OutputFile = "./src/HeadersAnalyzer/Debug/iOSHeaders.o";
+    CI.getFrontendOpts().OutputFile = OutputFile;
     llvm::LLVMContext Ctx;
     EmitObjAction Act(&Ctx);
     if (!CI.ExecuteAction(Act))
       return 1;
+  }
+
+  {
+    using namespace lldb;
+
+    // Load the object file into LLDB.
+    SBDebugger::Initialize();
+    auto Debugger = SBDebugger::Create(/* source_init_files */ false);
+    SBTarget Target = Debugger.CreateTarget(OutputFile);
 
     // TODO: Again, just for testing.
     return 0;
