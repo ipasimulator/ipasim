@@ -1,0 +1,4 @@
+[ver:1,total:834]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:740,1536390000:740,r
+docs/llvm.md:74,1536393600:74,m
+src/HeadersAnalyzer/analyze_ios_headers.cfg:20,1536390000:20,r
