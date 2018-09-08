@@ -58,4 +58,24 @@ In fact, we already know how to do this - we ported `libobj.A.dylib`.
 Of course, we built it for Windows platform, but the sources we based our build commands on were targeted for macOS/iOS.
 So, here we can base our Clang command line on those sources (it probably doesn't differ that much, it's mainly about the `-target` option).
 
-See `analyze_ios_headers.txt` for the command line arguments and run them with `analyze_ios_headers.cmd`.
+See `analyze_ios_headers.txt` for the command line arguments.
+
+#### Possible implementations
+
+We need LLVM and debugging information about all the functions, so that we can later figure out how and where arguments lie in memory and registers.
+To do that, we execute `EmitLLVMAction` along with option `-g` (to emit debug info).
+That won't preserve undefined functions, though (i.e., functions that only have declarations, no body).
+We obviously have mostly those functions as we analyze headers and we want them emitted too (with empty bodies possibly as we only care about signatures).
+
+This could be done by rewriting the AST tree before emitting LLVM to include empty bodies for every function (possibly with some throw statement, so that even functions that should return something are valid).
+Or we could lower the functions manually to LLVM representation and then get debug info for them.
+Or we could just somehow "use" the function's type since that all we care about anyway.
+For example, emitting some global variable and initializing it with address to that function.
+But that would also require an AST-rewriting step or emitting textual code.
+
+#### Our approach
+
+We chose the simplest (and we believe also the cleanest) solution - we used Clang's `LangOpts.EmitAllDecls` and made it emit really all declarations.
+Until our changes, this option only emitted functions that *had bodies* but were discarded because no other function referenced them.
+After our changes, this option emits also functions without bodies.
+See tag `[emit-all-decls]` in Clang's code to see those changes.
