@@ -569,18 +569,6 @@ int main() {
       return 1;
     auto Module = EmitLLVM.takeModule();
 
-    // Create debug info.
-    llvm::DebugInfoFinder DIF;
-    DIF.processModule(*Module);
-
-    cout << '\n';
-    cout << "Types: " << DIF.type_count() << '\n'
-         << "Global variables: " << DIF.global_variable_count() << '\n'
-         << "Compile units: " << DIF.compile_unit_count() << '\n'
-         << "Scopes: " << DIF.scope_count() << '\n'
-         << "Subprograms: " << DIF.subprogram_count() << '\n';
-    cout << '\n';
-
     // Process functions.
     cout << '\n';
     for (const llvm::Function &Func : *Module) {
@@ -613,6 +601,9 @@ int main() {
 
       // TODO: Process arguments.
       for (const llvm::DbgDeclareInst *Dbg : Dbgs) {
+        assert(!Dbg->getExpression()->getNumElements() &&
+               "We can't handle `DIExpressons` yet.");
+
         Dbg->dump();
       }
     }
