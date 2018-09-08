@@ -1,0 +1,5 @@
+[ver:1,total:780]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:630,1536386400:330,1536390000:300,m
+src/HeadersAnalyzer/analyze_ios_headers.cfg:60,1536390000:60,r
+build/include/llvm/IR/DebugInfoMetadata.h:60,1536386400:60,r
+build/include/llvm/IR/Metadata.h:30,1536386400:30,r
