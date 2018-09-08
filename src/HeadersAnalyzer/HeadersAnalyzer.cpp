@@ -29,6 +29,7 @@
 #include <llvm/IR/Mangler.h>
 #include <llvm/IR/Module.h>
 #include <llvm/Support/CommandLine.h>
+#include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/raw_os_ostream.h>
 
 #include <filesystem>
@@ -546,6 +547,12 @@ int main() {
       return 1;
     }
 
+    // Initialize LLVM for code generation.
+    llvm::InitializeAllTargetInfos();
+    llvm::InitializeAllTargets();
+    llvm::InitializeAllTargetMCs();
+    llvm::InitializeAllAsmPrinters();
+
     // Create `CompilerInstance` of Clang.
     CompilerInstance CI;
     // TODO: No diagnostics options set at the beginning (like ignore unknown
@@ -560,10 +567,10 @@ int main() {
 
     // Get a `llvm::Module`.
     llvm::LLVMContext Ctx;
-    EmitLLVMOnlyAction EmitLLVM(&Ctx);
-    if (!CI.ExecuteAction(EmitLLVM))
+    EmitCodeGenOnlyAction Act(&Ctx);
+    if (!CI.ExecuteAction(Act))
       return 1;
-    auto Module = EmitLLVM.takeModule();
+    auto Module = Act.takeModule();
 
     // Process functions.
     cout << '\n';
