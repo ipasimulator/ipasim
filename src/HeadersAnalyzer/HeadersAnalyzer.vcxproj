@@ -95,6 +95,7 @@
       <PreprocessorDefinitions>TAPI_PORT;PATH_MAX=_MAX_PATH;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)deps\tapi\include;$(SolutionDir)deps\llvm\build\$(Configuration)\include;$(SolutionDir)build\include;$(SolutionDir)deps\clang\include;$(SolutionDir)deps\llvm\build\$(Configuration)\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/experimental:external /external:anglebrackets /external:templates- /external:W0 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,6 +113,7 @@
       <PreprocessorDefinitions>TAPI_PORT;PATH_MAX=_MAX_PATH;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)deps\tapi\include;$(SolutionDir)deps\llvm\build\$(Configuration)\include;$(SolutionDir)build\include;$(SolutionDir)deps\clang\include;$(SolutionDir)deps\llvm\build\$(Configuration)\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/experimental:external /external:anglebrackets /external:templates- /external:W0 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -131,6 +133,7 @@
       <PreprocessorDefinitions>TAPI_PORT;PATH_MAX=_MAX_PATH;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)deps\tapi\include;$(SolutionDir)deps\llvm\build\$(Configuration)\include;$(SolutionDir)build\include;$(SolutionDir)deps\clang\include;$(SolutionDir)deps\llvm\build\$(Configuration)\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/experimental:external /external:anglebrackets /external:templates- /external:W0 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -152,6 +155,7 @@
       <PreprocessorDefinitions>TAPI_PORT;PATH_MAX=_MAX_PATH;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)deps\tapi\include;$(SolutionDir)deps\llvm\build\$(Configuration)\include;$(SolutionDir)build\include;$(SolutionDir)deps\clang\include;$(SolutionDir)deps\llvm\build\$(Configuration)\tools\clang\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/experimental:external /external:anglebrackets /external:templates- /external:W0 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
