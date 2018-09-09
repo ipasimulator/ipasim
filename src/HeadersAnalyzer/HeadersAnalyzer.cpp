@@ -534,7 +534,6 @@ private:
 
 int main() {
   ExportList iOSExps = {{"_sel_registerName", {}}};
-  const char *OutputFile = "./src/HeadersAnalyzer/Debug/iOSHeaders.o";
 
   // Parse iOS headers.
   // TODO: This is so up here just for testing. In production, it should be
@@ -569,12 +568,13 @@ int main() {
     // TODO: Maybe filter them (include only those in `Exps`).
     CI.getLangOpts().EmitAllDecls = true;
 
-    // Compile to an object file.
-    CI.getFrontendOpts().OutputFile = OutputFile;
+    // Compile to LLVM IR.
     llvm::LLVMContext Ctx;
-    EmitObjAction Act(&Ctx);
+    EmitLLVMOnlyAction Act(&Ctx);
     if (!CI.ExecuteAction(Act))
       return 1;
+
+    // TODO: Do something with the compiled code.
   }
 
   {
@@ -583,12 +583,11 @@ int main() {
     SBDebugger::Initialize();
 
     // Load the object file into LLDB.
-    auto Debugger = SBDebugger::Create(
-        /* source_init_files */ false,
-        [](const char *Str, void *) { cout << Str; }, nullptr);
+    auto Debugger = SBDebugger::Create(/* source_init_files */ false);
     if (!Debugger.IsValid())
       return 1;
-    SBTarget Target = Debugger.CreateTarget(OutputFile);
+    SBTarget Target = Debugger.CreateTarget(
+        "./deps/WinObjC/build/Win32/Debug/Universal Windows/libobjc.A.dll");
     if (!Target.IsValid())
       return 1;
 
