@@ -1,0 +1,5 @@
+[ver:1,total:1380]
+docs/llvm.md:640,1536480000:640,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:620,1536480000:620,r
+.git/logs/HEAD:90,1536480000:90,r
+build/include/lldb/lldb-defines.h:30,1536480000:30,r
