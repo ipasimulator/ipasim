@@ -1,0 +1,4 @@
+[ver:1,total:3780]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:3140,1536440400:180,1536476400:1940,1536480000:1020,m
+build/include/lldb/API/SBDebugger.h:520,1536440400:420,1536476400:100,r
+docs/llvm.md:120,1536476400:120,r
