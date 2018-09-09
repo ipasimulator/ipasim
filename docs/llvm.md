@@ -30,8 +30,8 @@ Follow the instructions below to build patched LLVM and Clang.
 ```cmd
 mkdir build && cd build
 mkdir Release && cd Release
-cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\..\clang" -DLLVM_EXTERNAL_LLD_SOURCE_DIR="..\..\..\lld" -DLLVM_EXTERNAL_LLDB_SOURCE_DIR="..\..\..\lldb" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="..\..\..\..\build" -DCMAKE_INSTALL_MESSAGE=LAZY ..\..
-ninja install-clang install-libclang install-lld install-llvm-headers install-clang-headers install-lldb-headers tools/clang/lib/install lib/install install-LLVMSupport install-LLVMDemangle install-liblldb
+cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\..\clang" -DLLVM_EXTERNAL_LLD_SOURCE_DIR="..\..\..\lld" -DLLVM_EXTERNAL_LLDB_SOURCE_DIR="..\..\..\lldb" -DLLVM_ENABLE_DIA_SDK=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="..\..\..\..\build" -DCMAKE_INSTALL_MESSAGE=LAZY ..\..
+ninja install-clang install-libclang install-lld install-llvm-headers install-clang-headers install-lldb-headers tools/clang/lib/install lib/install install-LLVMSupport install-LLVMDemangle install-liblldb tools/lldb/source/install
 ```
 
 - The outputs will be in `/build/`.
@@ -42,7 +42,7 @@ ninja install-clang install-libclang install-lld install-llvm-headers install-cl
 For a `Debug` build with `Release` TableGen, do this (after building `llvm-tblgen` and `clang-tblgen` inside `/deps/llvm/build/Release/`):
 
 ```cmd
-cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\..\clang" -DLLVM_EXTERNAL_LLD_SOURCE_DIR="..\..\..\lld" -DLLVM_EXTERNAL_LLDB_SOURCE_DIR="..\..\..\lldb" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX="..\..\..\..\build" -DCMAKE_INSTALL_MESSAGE=LAZY -DLLVM_TABLEGEN="%cd%\..\Release\bin\llvm-tblgen.exe" -DCLANG_TABLEGEN="%cd%\..\Release\bin\clang-tblgen.exe" ..\..
+cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_DIR="..\..\..\clang" -DLLVM_EXTERNAL_LLD_SOURCE_DIR="..\..\..\lld" -DLLVM_EXTERNAL_LLDB_SOURCE_DIR="..\..\..\lldb" -DLLVM_ENABLE_DIA_SDK=OFF -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX="..\..\..\..\build" -DCMAKE_INSTALL_MESSAGE=LAZY -DLLVM_TABLEGEN="%cd%\..\Release\bin\llvm-tblgen.exe" -DCLANG_TABLEGEN="%cd%\..\Release\bin\clang-tblgen.exe" ..\..
 ```
 
 ## Porting
