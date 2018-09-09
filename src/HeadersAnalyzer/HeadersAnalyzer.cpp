@@ -1,6 +1,9 @@
 // HeadersAnalyzer.cpp : Defines the entry point for the console application.
 //
 
+#include <lldb/API/SBDebugger.h>
+#include <lldb/API/SBTarget.h>
+
 #include <tapi/Core/FileManager.h>
 #include <tapi/Core/InterfaceFile.h>
 #include <tapi/Core/InterfaceFileManager.h>
@@ -574,8 +577,43 @@ int main() {
       return 1;
   }
 
-  // TODO: Again, just for testing.
-  return 0;
+  {
+    // Initialize LLDB.
+    using namespace lldb;
+    SBDebugger::Initialize();
+
+    // Load the object file into LLDB.
+    auto Debugger = SBDebugger::Create(
+        /* source_init_files */ false,
+        [](const char *Str, void *) { cout << Str; }, nullptr);
+    if (!Debugger.IsValid())
+      return 1;
+    SBTarget Target = Debugger.CreateTarget(OutputFile);
+    if (!Target.IsValid())
+      return 1;
+
+    // Process functions.
+    for (const auto &Exp : iOSExps) {
+      // TODO: We are removing the leading underscore here. We don't want to do
+      // that and even if we would, not like this.
+      SBSymbolContextList Funcs = Target.FindFunctions(Exp.first.c_str() + 1);
+      if (!Funcs.IsValid())
+        return 1;
+      assert(Funcs.GetSize() == 1 && "Exactly one function expected.");
+      SBSymbolContext Func = Funcs.GetContextAtIndex(0);
+      if (!Func.IsValid())
+        return 1;
+
+      cout << Func.GetSymbol().GetName() << endl;
+    }
+
+    // Destroy LLDB.
+    SBDebugger::Destroy(Debugger);
+    SBDebugger::Terminate();
+
+    // TODO: Again, just for testing.
+    return 0;
+  }
 
   export_list exps;
 
