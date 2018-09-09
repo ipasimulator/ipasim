@@ -44,8 +44,6 @@ See [our documentation about it](../../docs/tapi.md) for details.
 
 ### Analyzing iOS headers
 
-This is work in progress.
-
 > Note that better approach to this would be analyzing debugging symbols of iOS `.dylib`s.
 > That way, we would get all the necessary type information and we could be 100% sure that it is correct (i.e., matching the `.dylib`s).
 > When analyzing headers, we might get wrong information if we don't configure Clang exactly the same way Apple did when building the `.dylib`s.
@@ -79,3 +77,25 @@ We chose the simplest (and we believe also the cleanest) solution - we used Clan
 Until our changes, this option only emitted functions that *had bodies* but were discarded because no other function referenced them.
 After our changes, this option emits also functions without bodies.
 See tag `[emit-all-decls]` in Clang's code to see those changes.
+
+### Generating wrappers
+
+There are two possible approaches to this.
+One would be to leverage debugging information to get mapping from function arguments to registers and stack offsets.
+This is what debugger should know - if we are debugging and set a breakpoint inside a function, it has to show us values of the function's arguments.
+Although, it may as well use the other approach, too.
+
+This other approach is to use Clang to generate wrappers in ARM and in i386 for every function.
+The ARM wrapper has the same signature as the iOS function, and it simply extracts the function's arguments into some well-known structure (stored on stack).
+We generate this wrapper simply by generating C++ code which is then compiled by Clang.
+Currently, this code is generated in textual form, but it could also be generated as AST or LLVM IR and then compiled.
+That way, we delegate the low-level details of argument passing, calling conventions, etc. to Clang which should know them best.
+Even better then, say, debugger, that's also why we chose this approach over the one mentioned above.
+The i386 wrapper then takes a pointer to this structure and calls the real function with arguments from that structure.
+Again, this wrapper is generated from C++ code using Clang.
+Then, at runtime, the ARM wrappers are mapped to the virtual machine and their code is emulated.
+When they call our i386 wrappers, the machine code jumps to an unmapped memory.
+We catch that and simply extract a pointer to the structure (it's always in some well known location, e.g., if it's first argument, then the location is register `r0`).
+Then, we call the proper i386 wrapper with this pointer as a parameter.
+Return values are passed in the same structure.
+Wrappers for callbacks are generated similarly.
