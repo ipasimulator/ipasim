@@ -535,7 +535,6 @@ private:
 int main() {
   ExportList iOSExps = {{"_sel_registerName", {}}};
   const char *OutputFile = "./src/HeadersAnalyzer/Debug/iOSHeaders.o";
-  string Triple;
 
   // Parse iOS headers.
   // TODO: This is so up here just for testing. In production, it should be
@@ -576,8 +575,6 @@ int main() {
     EmitObjAction Act(&Ctx);
     if (!CI.ExecuteAction(Act))
       return 1;
-
-    Triple = CI.getTarget().getTriple().str();
   }
 
   {
@@ -589,7 +586,7 @@ int main() {
     auto Debugger = SBDebugger::Create(
         /* source_init_files */ false,
         [](const char *Str, void *) { cout << Str; }, nullptr);
-    SBTarget Target = Debugger.CreateTargetWithFileAndArch(OutputFile, Triple.c_str());
+    SBTarget Target = Debugger.CreateTarget(OutputFile);
 
     // Destroy LLDB.
     SBDebugger::Destroy(Debugger);
