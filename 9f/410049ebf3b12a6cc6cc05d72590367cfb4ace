@@ -1,0 +1,10 @@
+[ver:1,total:2700]
+src/HeadersAnalyzer/README.md:1280,1536490800:140,1536508800:1140,m
+build/include/llvm/IR/Argument.h:680,1536490800:680,r
+docs/llvm.md:530,1536490800:530,r
+build/include/lldb/API/SBValue.h:75,1536490800:75,r
+build/include/lldb/API/SBFunction.h:45,1536490800:45,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:30,1536490800:30,r
+build/include/llvm/IR/Function.h:30,1536490800:30,r
+build/include/lldb/API/SBValueList.h:15,1536490800:15,r
+build/include/lldb/API/SBBlock.h:15,1536490800:15,r
