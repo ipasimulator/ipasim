@@ -1,0 +1,5 @@
+[ver:1,total:2160]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1804,1536566400:844,1536570000:960,m
+docs/llvm.md:272,1536566400:32,1536570000:240,m
+build/include/lldb/API/SBTarget.h:72,1536566400:72,r
+build/include/lldb/API/SBDefines.h:12,1536566400:12,r
