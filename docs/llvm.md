@@ -64,6 +64,8 @@ cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_
   Rather move our sources near the root (e.g., `C:\src\`).
   But then also mention that in build instructions.**
 - `[macho]`: We want to read Mach-O object files on Windows, too.
+  Alternative to this would be to emit PE/COFF instead, or just DWARF (`-gsplit-dwarf`).
+  Then, we wouldn't have to read Mach-O object files.
 
 ### Objective-C symbols across DLLs
 
