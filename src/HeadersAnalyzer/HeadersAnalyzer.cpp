@@ -617,11 +617,11 @@ int main() {
       return 1;
 
     // Process DLLs.
-    vector<string> DLLs{
-        "./deps/WinObjC/build/Win32/Debug/Universal Windows/libobjc.A.dll"};
+    path DLLPath = "./deps/WinObjC/build/Win32/Debug/Universal Windows/";
+    vector<string> DLLs{"libobjc.A.dll"};
     for (const string &DLL : DLLs) {
       // Load the DLL into LLDB.
-      SBTarget Target = Debugger.CreateTarget(DLL.c_str());
+      SBTarget Target = Debugger.CreateTarget((DLLPath / DLL).string().c_str());
       if (!Target.IsValid())
         return 1;
 
