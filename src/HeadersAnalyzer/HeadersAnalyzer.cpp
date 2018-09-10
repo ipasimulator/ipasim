@@ -621,13 +621,17 @@ int main() {
     vector<string> DLLs{"libobjc.A.dll"};
     for (const string &DLL : DLLs) {
       // Load the DLL and its PDB into LLDB.
-      SBTarget Target = Debugger.CreateTarget((DLLDir / DLL).string().c_str());
+      SBTarget Target = Debugger.GetDummyTarget();
+      if (!Target.IsValid())
+        return 1;
+      assert(Target.GetNumModules() == 0 &&
+             "No modules expected in the dummy target.");
+      SBModule Module = Target.AddModule(
+          (DLLDir / DLL).string().c_str(), nullptr, nullptr,
+          (DLLDir / DLL).replace_extension(".pdb").string().c_str());
       if (!Target.IsValid())
         return 1;
       assert(Target.GetNumModules() == 1 && "Exactly one module expected.");
-      SBModule Module = Target.GetModuleAtIndex(0);
-      Module.GetSymbolFileSpec().SetFilename(
-          path(DLL).replace_extension(".pdb").string().c_str());
 
       // Process functions.
       size_t Symbols = Module.GetNumSymbols();
