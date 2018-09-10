@@ -1,0 +1,6 @@
+[ver:1,total:180]
+docs/llvm.md:60,1536566400:60,m
+src/HeadersAnalyzer/README.md:30,1536566400:30,r
+src/HeadersAnalyzer/analyze_ios_headers.cfg:30,1536566400:30,r
+src/HeadersAnalyzer/iOSHeaders.mm:30,1536566400:30,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:30,1536566400:30,r
