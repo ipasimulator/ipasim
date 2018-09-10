@@ -1,0 +1,6 @@
+[ver:1,total:1920]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1730,1536559200:150,1536562800:440,1536566400:1140,m
+build/include/lldb/API/SBModule.h:100,1536559200:60,1536562800:40,r
+build/include/lldb/API/SBTarget.h:50,1536559200:30,1536562800:20,r
+build/include/lldb/API/SBSymbol.h:20,1536562800:20,r
+build/include/lldb/API/SBCompileUnit.h:20,1536562800:20,r
