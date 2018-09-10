@@ -617,42 +617,44 @@ int main() {
       return 1;
 
     // Process DLLs.
-    path DLLDir = "./deps/WinObjC/build/Win32/Debug/Universal Windows/";
-    vector<string> DLLs{"libobjc.A.dll"};
-    for (const string &DLL : DLLs) {
-      // Load the DLL and its PDB into LLDB.
-      SBTarget Target = Debugger.GetDummyTarget();
-      if (!Target.IsValid())
-        return 1;
-      assert(Target.GetNumModules() == 0 &&
-             "No modules expected in the dummy target.");
-      SBModule Module = Target.AddModule(
-          (DLLDir / DLL).string().c_str(), nullptr, nullptr,
-          (DLLDir / DLL).replace_extension(".pdb").string().c_str());
-      if (!Target.IsValid())
-        return 1;
-      assert(Target.GetNumModules() == 1 && "Exactly one module expected.");
+    vector<pair<path, vector<string>>> DLLs{
+        {"./src/objc/Debug/", {"libobjc.A.dll"}}};
+    for (const auto &DLLGroup : DLLs) {
+      for (const string &DLL : DLLGroup.second) {
+        // Load the DLL and its PDB into LLDB.
+        SBTarget Target = Debugger.GetDummyTarget();
+        if (!Target.IsValid())
+          return 1;
+        assert(Target.GetNumModules() == 0 &&
+               "No modules expected in the dummy target.");
+        SBModule Module = Target.AddModule(
+            (DLLGroup.first / DLL).string().c_str(), nullptr, nullptr,
+            (DLLGroup.first / DLL).replace_extension(".pdb").string().c_str());
+        if (!Target.IsValid())
+          return 1;
+        assert(Target.GetNumModules() == 1 && "Exactly one module expected.");
 
-      // Process functions.
-      size_t Symbols = Module.GetNumSymbols();
-      for (size_t i = 0; i != Symbols; ++i) {
-        SBSymbol Symbol = Module.GetSymbolAtIndex(i);
+        // Process functions.
+        size_t Symbols = Module.GetNumSymbols();
+        for (size_t i = 0; i != Symbols; ++i) {
+          SBSymbol Symbol = Module.GetSymbolAtIndex(i);
 
-        // TODO: In PE/COFF export data directory, there are stored only names
-        // without the leading underscore. Some of them were exported without
-        // leading underscore at all, though. `dumpbin` distinguishes both
-        // cases correctly, how does it do that?
-        const char *Name = Symbol.GetName();
-        string MangledName = '_' + string(Name);
+          // TODO: In PE/COFF export data directory, there are stored only names
+          // without the leading underscore. Some of them were exported without
+          // leading underscore at all, though. `dumpbin` distinguishes both
+          // cases correctly, how does it do that?
+          const char *Name = Symbol.GetName();
+          string MangledName = '_' + string(Name);
 
-        // Find and bind the symbol with iOS exports.
-        auto Exp = iOSExps.find(Name);
-        if (Exp == iOSExps.end()) {
-          Exp = iOSExps.find(MangledName);
-          if (Exp == iOSExps.end())
-            continue;
+          // Find and bind the symbol with iOS exports.
+          auto Exp = iOSExps.find(Name);
+          if (Exp == iOSExps.end()) {
+            Exp = iOSExps.find(MangledName);
+            if (Exp == iOSExps.end())
+              continue;
+          }
+          Exp->second.DLL = move(DLL);
         }
-        Exp->second.DLL = move(DLL);
       }
     }
 
