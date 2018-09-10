@@ -445,6 +445,7 @@ enum class ExportStatus { NotFound = 0, Found, Overloaded };
 
 struct ExportEntry {
   ExportEntry() : Status(ExportStatus::NotFound) {}
+  ExportEntry(string Lib) : Status(ExportStatus::NotFound), Libs{Lib} {}
 
   ExportStatus Status;
   set<string> Libs;
@@ -533,7 +534,7 @@ private:
 };
 
 int main() {
-  ExportList iOSExps = {{"_sel_registerName", {}}};
+  ExportList iOSExps = {{"_sel_registerName", {"/usr/lib/libobjc.A.dylib"}}};
 
   // Parse iOS headers.
   // TODO: This is so up here just for testing. In production, it should be
@@ -573,8 +574,36 @@ int main() {
     EmitLLVMOnlyAction Act(&Ctx);
     if (!CI.ExecuteAction(Act))
       return 1;
+    auto Module = Act.takeModule();
 
-    // TODO: Do something with the compiled code.
+    // Find exported functions.
+    for (const llvm::Function &Func : *Module) {
+      // Mangle the name to compare it with iOS exports.
+      llvm::SmallString<16> Name;
+      llvm::Mangler().getNameWithPrefix(Name, &Func,
+                                        /* CannotUsePrivateLabel */ false);
+
+      // Filter uninteresting functions.
+      string NameStr = Name.str().str();
+      auto Exp = iOSExps.find(NameStr);
+      if (Exp == iOSExps.end())
+        continue;
+
+      // Update status accordingly.
+      switch (Exp->second.Status) {
+      case ExportStatus::Found:
+        Exp->second.Status = ExportStatus::Overloaded;
+        cerr << "Error: function overloaded (" << NameStr << ").\n";
+        continue;
+      case ExportStatus::Overloaded:
+        continue;
+      case ExportStatus::NotFound:
+        Exp->second.Status = ExportStatus::Found;
+        break;
+      }
+
+      // TODO: Save the function's signature.
+    }
   }
 
   {
