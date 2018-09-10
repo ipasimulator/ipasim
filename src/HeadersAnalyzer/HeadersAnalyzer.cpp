@@ -449,6 +449,7 @@ struct ExportEntry {
 
   ExportStatus Status;
   set<string> Libs;
+  string DLL;
 };
 
 using ExportList = map<string, ExportEntry>;
@@ -606,33 +607,50 @@ int main() {
     }
   }
 
+  // Load DLLs and PDBs.
   {
     // Initialize LLDB.
     using namespace lldb;
     SBDebugger::Initialize();
-
-    // Load the object file into LLDB.
     auto Debugger = SBDebugger::Create(/* source_init_files */ false);
     if (!Debugger.IsValid())
       return 1;
-    SBTarget Target = Debugger.CreateTarget(
-        "./deps/WinObjC/build/Win32/Debug/Universal Windows/libobjc.A.dll");
-    if (!Target.IsValid())
-      return 1;
 
-    // Process functions.
-    for (const auto &Exp : iOSExps) {
-      // TODO: We are removing the leading underscore here. We don't want to do
-      // that and even if we would, not like this.
-      SBSymbolContextList Funcs = Target.FindFunctions(Exp.first.c_str() + 1);
-      if (!Funcs.IsValid())
-        return 1;
-      assert(Funcs.GetSize() == 1 && "Exactly one function expected.");
-      SBSymbolContext Func = Funcs.GetContextAtIndex(0);
-      if (!Func.IsValid())
+    // Process DLLs.
+    vector<string> DLLs{
+        "./deps/WinObjC/build/Win32/Debug/Universal Windows/libobjc.A.dll"};
+    for (const string &DLL : DLLs) {
+      // Load the DLL into LLDB.
+      SBTarget Target = Debugger.CreateTarget(DLL.c_str());
+      if (!Target.IsValid())
         return 1;
 
-      cout << Func.GetSymbol().GetName() << endl;
+      // Process functions.
+      for (const auto &Exp : iOSExps) {
+        assert(Target.GetNumModules() == 1 && "Exactly one module expected.");
+        SBModule Module = Target.GetModuleAtIndex(0);
+
+        size_t Symbols = Module.GetNumSymbols();
+        for (size_t i = 0; i != Symbols; ++i) {
+          SBSymbol Symbol = Module.GetSymbolAtIndex(i);
+
+          // TODO: In PE/COFF export data directory, there are stored only names
+          // without the leading underscore. Some of them were exported without
+          // leading underscore at all, though. `dumpbin` distinguishes both
+          // cases correctly, how does it do that?
+          const char *Name = Symbol.GetName();
+          string MangledName = '_' + string(Name);
+
+          // Find and bind the symbol with iOS exports.
+          auto Exp = iOSExps.find(Name);
+          if (Exp == iOSExps.end()) {
+            Exp = iOSExps.find(MangledName);
+            if (Exp == iOSExps.end())
+              continue;
+          }
+          Exp->second.DLL = move(DLL);
+        }
+      }
     }
 
     // Destroy LLDB.
