@@ -1,0 +1,8 @@
+[ver:1,total:1920]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1665,1536674400:800,1536678000:865,m
+build/include/llvm/Transforms/Utils/FunctionComparator.h:100,1536674400:100,r
+build/include/llvm/ADT/Twine.h:50,1536678000:50,r
+build/include/llvm/IR/Function.h:40,1536678000:40,r
+build/include/llvm/ADT/PointerIntPair.h:30,1536678000:30,r
+build/include/llvm/IR/Type.h:20,1536678000:20,r
+build/include/llvm/IR/LLVMContext.h:15,1536678000:15,r
