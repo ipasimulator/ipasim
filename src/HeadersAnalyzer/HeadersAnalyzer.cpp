@@ -589,28 +589,9 @@ public:
 
 class TypeComparer {
 public:
-  TypeComparer() : ClangCtx(), Parser(ClangCtx) {
-    using namespace lldb;
-    using namespace lldb_private;
-
-    // Set PDB symbol file.
-    // TODO: Doesn't work and is too specific.
-    Debugger = Debugger::CreateInstance();
-    ModuleSpec ModuleSpec(FileSpec("./src/objc/Debug/libobjc.A.dll",
-                                   /* resolve_path */ true));
-    ModuleSpec.GetSymbolFileSpec().SetFile("./src/objc/Debug/libobjc.A.pdb",
-                                           /* resolve_path */ true);
-    Module =
-        Debugger->GetSelectedOrDummyTarget()->GetSharedModule(move(ModuleSpec));
-
-    // ObjectFile *Obj =
-    //    ObjectFilePECOFF::CreateInstance(Module, Buffer, 0, nullptr, 0, 0);
-
-    //Module.reset(new lldb_private::Module(lldb_private::ModuleSpec()));
-    Buffer.reset(new DataBufferHeap);
-    ObjectFile.reset(new ObjectFileDummy(Module, Buffer));
-    SymbolFile *SymbolFile = SymbolFilePDB::CreateInstance(ObjectFile.get());
-    SymbolFile->CalculateAbilities(); // Initialization, actually.
+  // TODO: Maybe we could get `ClangCtx` from LLDB instead of creating it.
+  TypeComparer(lldb_private::SymbolFile *SymbolFile)
+      : ClangCtx(), Parser(ClangCtx) {
     ClangCtx.SetSymbolFile(SymbolFile);
   }
 
@@ -650,10 +631,12 @@ public:
 private:
   lldb_private::ClangASTContext ClangCtx;
   PDBASTParser Parser;
-  lldb::DebuggerSP Debugger;
-  lldb::ModuleSP Module;
-  lldb::DataBufferSP Buffer;
-  unique_ptr<ObjectFileDummy> ObjectFile;
+};
+
+class SBDebuggerGuard {
+public:
+  SBDebuggerGuard() { lldb::SBDebugger::Initialize(); }
+  ~SBDebuggerGuard() { lldb::SBDebugger::Terminate(); }
 };
 
 int main() {
@@ -731,29 +714,39 @@ int main() {
     }
 
     // Load DLLs and PDBs.
-    // TODO: Without this, DIA SDK is not found. Why?
-    lldb::SBDebugger::Initialize();
 
-    TypeComparer TC;
+    // Initialize LLDB.
+    using namespace lldb;
+    using namespace lldb_private;
+    using namespace llvm::pdb;
+    SBDebuggerGuard DebuggerGuard;
+    DebuggerSP Debugger = Debugger::CreateInstance();
+
     vector<pair<path, vector<string>>> DLLs{
         {"./src/objc/Debug/", {"libobjc.A.dll"}}};
     for (const auto &DLLGroup : DLLs) {
       for (const string &DLL : DLLGroup.second) {
-        // Load PDB of the DLL.
-        using namespace llvm::pdb;
-        unique_ptr<IPDBSession> Session;
-        // TODO: Use `Native` reader when it's ready.
-        llvm::Error Error = loadDataForPDB(
-            PDB_ReaderType::DIA,
-            (DLLGroup.first / DLL).replace_extension(".pdb").string().c_str(),
-            Session);
-        if (Error) {
-          cerr << llvm::toString(move(Error)) << '\n';
-          return 1;
-        }
+        path DLLPath(DLLGroup.first / DLL);
+        path PDBPath(DLLPath);
+        PDBPath.replace_extension(".pdb");
+
+        // Load PDB into LLDB. This is a hack, actually, because no simple way
+        // of loading the PDB worked for us.
+        ModuleSpec ModuleSpec(FileSpec(DLLPath.string().c_str(),
+                                       /* resolve_path */ true));
+        ModuleSpec.GetSymbolFileSpec().SetFile(PDBPath.string().c_str(),
+                                               /* resolve_path */ true);
+        ModuleSP Module =
+            Debugger->GetSelectedOrDummyTarget()->GetSharedModule(ModuleSpec);
+        DataBufferSP Buffer(new DataBufferHeap);
+        ObjectFileDummy Obj(Module, Buffer);
+        SymbolFile *SymbolFile = SymbolFilePDB::CreateInstance(&Obj);
+        SymbolFile->CalculateAbilities(); // Initialization, actually.
+        SymbolFilePDB *PDB = static_cast<SymbolFilePDB *>(SymbolFile);
+        TypeComparer TC(SymbolFile);
 
         // Process functions.
-        auto SymbolExe = Session->getGlobalScope();
+        auto SymbolExe = PDB->GetPDBSession().getGlobalScope();
         auto EnumSymbols = SymbolExe->findAllChildren(PDB_SymType::Function);
         uint32_t SymbolCount = EnumSymbols->getChildCount();
         for (uint32_t I = 0; I != SymbolCount; ++I) {
@@ -775,9 +768,6 @@ int main() {
         }
       }
     }
-
-    // TODO: Use RAII.
-    lldb::SBDebugger::Terminate();
 
     // TODO: Again, just for testing.
     return 0;
