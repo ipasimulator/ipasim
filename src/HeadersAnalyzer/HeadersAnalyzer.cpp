@@ -1,6 +1,7 @@
 // HeadersAnalyzer.cpp : Defines the entry point for the console application.
 //
 
+#include <Plugins/ObjectFile/PECOFF/ObjectFilePECOFF.h>
 #include <Plugins/SymbolFile/PDB/PDBASTParser.h>
 #include <Plugins/SymbolFile/PDB/SymbolFilePDB.h>
 #include <lldb/API/SBDebugger.h>
@@ -10,6 +11,7 @@
 #include <lldb/Symbol/ClangUtil.h>
 #include <lldb/Symbol/SymbolVendor.h>
 #include <lldb/Symbol/Type.h>
+#include <lldb/Utility/DataBufferHeap.h>
 
 #include <tapi/Core/FileManager.h>
 #include <tapi/Core/InterfaceFile.h>
@@ -549,6 +551,42 @@ private:
   ExportList &Exps;
 };
 
+class ObjectFileUnimplemented : public lldb_private::ObjectFile {
+public:
+  ObjectFileUnimplemented(const lldb::ModuleSP &Module,
+                          const lldb::DataBufferSP &Buffer)
+      : ObjectFile(Module, nullptr, 0, 0, Buffer, 0) {}
+
+#define unimplemented throw 1
+  void Dump(lldb_private::Stream *S) override { unimplemented; }
+  uint32_t GetAddressByteSize() const override { unimplemented; }
+  uint32_t GetDependentModules(lldb_private::FileSpecList &file_list) override {
+    unimplemented;
+  }
+  bool IsExecutable() const override { unimplemented; }
+  bool GetArchitecture(lldb_private::ArchSpec &arch) override { unimplemented; }
+  void
+  CreateSections(lldb_private::SectionList &unified_section_list) override {
+    unimplemented;
+  }
+  lldb_private::Symtab *GetSymtab() override { unimplemented; }
+  bool IsStripped() override { unimplemented; }
+  bool GetUUID(lldb_private::UUID *uuid) override { unimplemented; }
+  lldb::ByteOrder GetByteOrder() const override { unimplemented; }
+  bool ParseHeader() override { unimplemented; }
+  Type CalculateType() override { unimplemented; }
+  Strata CalculateStrata() override { unimplemented; }
+  lldb_private::ConstString GetPluginName() override { unimplemented; }
+  uint32_t GetPluginVersion() override { unimplemented; }
+#undef unimplemented
+};
+class ObjectFileDummy : public ObjectFileUnimplemented {
+public:
+  ObjectFileDummy(const lldb::ModuleSP &Module,
+                  const lldb::DataBufferSP &Buffer)
+      : ObjectFileUnimplemented(Module, Buffer) {}
+};
+
 class TypeComparer {
 public:
   TypeComparer() : ClangCtx(), Parser(ClangCtx) {
@@ -564,7 +602,15 @@ public:
                                            /* resolve_path */ true);
     Module =
         Debugger->GetSelectedOrDummyTarget()->GetSharedModule(move(ModuleSpec));
-    SymbolFile *SymbolFile = Module->GetSymbolVendor()->GetSymbolFile();
+
+    // ObjectFile *Obj =
+    //    ObjectFilePECOFF::CreateInstance(Module, Buffer, 0, nullptr, 0, 0);
+
+    //Module.reset(new lldb_private::Module(lldb_private::ModuleSpec()));
+    Buffer.reset(new DataBufferHeap);
+    ObjectFile.reset(new ObjectFileDummy(Module, Buffer));
+    SymbolFile *SymbolFile = SymbolFilePDB::CreateInstance(ObjectFile.get());
+    SymbolFile->CalculateAbilities(); // Initialization, actually.
     ClangCtx.SetSymbolFile(SymbolFile);
   }
 
@@ -606,6 +652,8 @@ private:
   PDBASTParser Parser;
   lldb::DebuggerSP Debugger;
   lldb::ModuleSP Module;
+  lldb::DataBufferSP Buffer;
+  unique_ptr<ObjectFileDummy> ObjectFile;
 };
 
 int main() {
