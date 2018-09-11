@@ -17,6 +17,7 @@
 #include <tapi/Core/InterfaceFile.h>
 #include <tapi/Core/InterfaceFileManager.h>
 
+#include <CodeGen/CodeGenModule.h>
 #include <clang/AST/ASTContext.h>
 #include <clang/AST/GlobalDecl.h>
 #include <clang/AST/Mangle.h>
@@ -24,6 +25,7 @@
 #include <clang/AST/Type.h>
 #include <clang/Basic/TargetInfo.h>
 #include <clang/Basic/TargetOptions.h>
+#include <clang/CodeGen/CodeGenABITypes.h>
 #include <clang/CodeGen/CodeGenAction.h>
 #include <clang/CodeGen/ModuleBuilder.h>
 #include <clang/Driver/Driver.h>
@@ -589,46 +591,37 @@ public:
 
 class TypeComparer {
 public:
-  // TODO: Maybe we could get `ClangCtx` from LLDB instead of creating it.
-  TypeComparer(lldb_private::SymbolFile *SymbolFile)
-      : ClangCtx(), Parser(ClangCtx) {
+  // Note that if we got `PDBAstParser` from `Module` rather then created it,
+  // `CreateLLDBTypeFromPDBType` wouldn't work - see branch `cg_got_clang_ctx`.
+  TypeComparer(CodeGen::CodeGenModule &CGM,
+               lldb_private::SymbolFile *SymbolFile)
+      : CGM(CGM), ClangCtx(), Parser(ClangCtx) {
     ClangCtx.SetSymbolFile(SymbolFile);
   }
 
-  bool areEquivalent(const llvm::Type &Type1,
-                     const llvm::pdb::PDBSymbol &Type2) {
+  llvm::Type *getLLVMType(const llvm::pdb::PDBSymbol &Symbol) {
     using namespace lldb;
-    using namespace llvm::pdb;
     using namespace lldb_private;
 
-    TypeSP LLDBType2 = Parser.CreateLLDBTypeFromPDBType(Type2);
-    QualType CanonType2 =
-        ClangUtil::GetCanonicalQualType(LLDBType2->GetFullCompilerType());
-
-    return false;
+    TypeSP LLDBType = Parser.CreateLLDBTypeFromPDBType(Symbol);
+    QualType CanonType =
+        ClangUtil::GetCanonicalQualType(LLDBType->GetFullCompilerType());
+    return convertTypeForMemory(CGM, CanonType);
   }
-  bool areEquivalent(const llvm::FunctionType &Func1,
-                     const llvm::pdb::PDBSymbolFunc &Func2) {
-    auto Sig2 = Func2.getSignature();
+  bool areEqual(const llvm::Type *Type, const llvm::pdb::PDBSymbol &Symbol) {
+    return Type == getLLVMType(Symbol);
+  }
+  bool areEquivalent(const llvm::FunctionType &Func,
+                     const llvm::pdb::PDBSymbolFunc &SymbolFunc) {
+    auto *Func2 = static_cast<llvm::FunctionType *>(getLLVMType(SymbolFunc));
 
-    // Variadic arguments.
-    if (Func1.isVarArg() != Sig2->isCVarArgs())
-      return false;
-
-    auto Args2 = Func2.getArguments();
-
-    // Number of arguments.
-    if (Func1.params().size() != Args2->getChildCount())
-      return false;
-
-    // Type of return values.
-    if (!areEquivalent(*Func1.getReturnType(), *Sig2->getReturnType()))
-      return false;
-
-    return true;
+    // TODO: Implement. Try to use LLDB, LLVM or Clang. See also
+    // `MergeFunctionPass`.
+    return false;
   }
 
 private:
+  CodeGen::CodeGenModule &CGM;
   lldb_private::ClangASTContext ClangCtx;
   PDBASTParser Parser;
 };
@@ -713,7 +706,11 @@ int main() {
       Exp->second.Type = Func.getFunctionType();
     }
 
-    // Load DLLs and PDBs.
+    // Create `CodeGenModule`.
+    CI.createASTContext();
+    CodeGen::CodeGenModule CGM(CI.getASTContext(), CI.getHeaderSearchOpts(),
+                               CI.getPreprocessorOpts(), CI.getCodeGenOpts(),
+                               *Module, CI.getDiagnostics());
 
     // Initialize LLDB.
     using namespace lldb;
@@ -722,6 +719,7 @@ int main() {
     SBDebuggerGuard DebuggerGuard;
     DebuggerSP Debugger = Debugger::CreateInstance();
 
+    // Load DLLs and PDBs.
     vector<pair<path, vector<string>>> DLLs{
         {"./src/objc/Debug/", {"libobjc.A.dll"}}};
     for (const auto &DLLGroup : DLLs) {
@@ -743,7 +741,7 @@ int main() {
         SymbolFile *SymbolFile = SymbolFilePDB::CreateInstance(&Obj);
         SymbolFile->CalculateAbilities(); // Initialization, actually.
         SymbolFilePDB *PDB = static_cast<SymbolFilePDB *>(SymbolFile);
-        TypeComparer TC(SymbolFile);
+        TypeComparer TC(CGM, SymbolFile);
 
         // Process functions.
         auto SymbolExe = PDB->GetPDBSession().getGlobalScope();
