@@ -1,0 +1,15 @@
+[ver:1,total:5700]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:4300,1536656400:1905,1536660000:2395,m
+build/include/lldb/utility/regularexpression.h:280,1536660000:280,r
+build/include/llvm/IR/ValueHandle.h:225,1536656400:225,r
+build/include/lldb/Symbol/ClangUtil.h:180,1536660000:180,r
+src/HeadersAnalyzer/README.md:165,1536656400:30,1536660000:135,r
+build/include/lldb/Symbol/CompilerType.h:120,1536660000:120,r
+build/include/llvm/DebugInfo/PDB/PDBTypes.h:120,1536660000:120,r
+build/include/llvm/DebugInfo/PDB/UDTLayout.h:120,1536660000:120,r
+build/include/llvm/Support/TargetSelect.h:60,1536656400:60,r
+build/include/lldb/symbol/clangastcontext.h:50,1536660000:50,r
+build/include/lldb/Symbol/TypeSystem.h:20,1536660000:20,r
+build/include/lldb/Symbol/ClangASTImporter.h:20,1536660000:20,r
+build/include/lldb/lldb-forward.h:20,1536660000:20,r
+build/include/lldb/Symbol/Type.h:20,1536660000:20,r
