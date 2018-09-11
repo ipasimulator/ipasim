@@ -1,0 +1,9 @@
+[ver:1,total:3420]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:3246,1536663600:1731,1536667200:1515,m
+build/include/lldb/lldb-forward.h:45,1536667200:45,r
+build/include/lldb/Core/PluginInterface.h:35,1536663600:15,1536667200:20,r
+build/include/lldb/Utility/DataBufferHeap.h:24,1536663600:24,r
+build/include/lldb/Core/ModuleSpec.h:20,1536667200:20,r
+build/include/lldb/Symbol/ObjectFile.h:20,1536667200:20,r
+build/include/lldb/Utility/DataBuffer.h:15,1536663600:15,r
+build/include/lldb/Utility/DataBufferLLVM.h:15,1536663600:15,r
