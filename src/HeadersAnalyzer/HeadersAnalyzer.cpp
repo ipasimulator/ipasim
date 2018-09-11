@@ -453,6 +453,7 @@ struct ExportEntry {
   ExportStatus Status;
   set<string> Libs;
   string DLL;
+  uint32_t RVA;
 };
 
 using ExportList = map<string, ExportEntry>;
@@ -648,6 +649,9 @@ int main() {
           if (Exp == iOSExps.end())
             continue;
           Exp->second.DLL = move(DLL);
+          Exp->second.RVA = Func->getRelativeVirtualAddress();
+
+          // TODO: Verify that the function has the same signature.
         }
 
         // TODO: Remove LLDB code if not needed anymore.
