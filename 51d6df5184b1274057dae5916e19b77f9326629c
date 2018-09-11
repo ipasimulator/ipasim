@@ -1,0 +1,4 @@
+[ver:1,total:3420]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:3240,1536681600:1680,1536685200:1560,m
+build/include/HeadersAnalyzer/Libs.inc:150,1536685200:150,d
+src/HeadersAnalyzer/Debug/0.mm:30,1536685200:30,r
