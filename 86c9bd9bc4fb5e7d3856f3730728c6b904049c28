@@ -1,0 +1,5 @@
+[ver:1,total:1200]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:930,1536652800:930,m
+build/include/lldb/API/SystemInitializerFull.h:180,1536652800:180,r
+docs/llvm.md:60,1536652800:60,r
+build/include/llvm/DebugInfo/PDB/PDB.h:30,1536652800:30,r
