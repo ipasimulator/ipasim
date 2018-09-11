@@ -1,9 +1,6 @@
 // HeadersAnalyzer.cpp : Defines the entry point for the console application.
 //
 
-#include <lldb/API/SBDebugger.h>
-#include <lldb/API/SBTarget.h>
-
 #include <tapi/Core/FileManager.h>
 #include <tapi/Core/InterfaceFile.h>
 #include <tapi/Core/InterfaceFileManager.h>
@@ -613,14 +610,6 @@ int main() {
 
   // Load DLLs and PDBs.
   {
-    // Initialize LLDB.
-    using namespace lldb;
-    SBDebugger::Initialize();
-    auto Debugger = SBDebugger::Create(/* source_init_files */ false);
-    if (!Debugger.IsValid())
-      return 1;
-
-    // Process DLLs.
     vector<pair<path, vector<string>>> DLLs{
         {"./src/objc/Debug/", {"libobjc.A.dll"}}};
     for (const auto &DLLGroup : DLLs) {
@@ -651,46 +640,11 @@ int main() {
           Exp->second.DLL = move(DLL);
           Exp->second.RVA = Func->getRelativeVirtualAddress();
 
-          // TODO: Verify that the function has the same signature.
-        }
-
-        // TODO: Remove LLDB code if not needed anymore.
-        break;
-
-        SBTarget Target =
-            Debugger.CreateTarget((DLLGroup.first / DLL).string().c_str());
-        if (!Target.IsValid())
-          return 1;
-        assert(Target.GetNumModules() == 1 && "Expected exactly one module.");
-        SBModule Module = Target.GetModuleAtIndex(0);
-
-        // Process functions.
-        size_t Symbols = Module.GetNumSymbols();
-        for (size_t i = 0; i != Symbols; ++i) {
-          SBSymbol Symbol = Module.GetSymbolAtIndex(i);
-
-          // TODO: In PE/COFF export data directory, there are stored only names
-          // without the leading underscore. Some of them were exported without
-          // leading underscore at all, though. `dumpbin` distinguishes both
-          // cases correctly, how does it do that?
-          const char *Name = Symbol.GetName();
-          string MangledName = '_' + string(Name);
-
-          // Find and bind the symbol with iOS exports.
-          auto Exp = iOSExps.find(Name);
-          if (Exp == iOSExps.end()) {
-            Exp = iOSExps.find(MangledName);
-            if (Exp == iOSExps.end())
-              continue;
-          }
-          Exp->second.DLL = move(DLL);
+          // TODO: Verify that the function has the same signature as the iOS
+          // one.
         }
       }
     }
-
-    // Destroy LLDB.
-    SBDebugger::Destroy(Debugger);
-    SBDebugger::Terminate();
 
     // TODO: Again, just for testing.
     return 0;
