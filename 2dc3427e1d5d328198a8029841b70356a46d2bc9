@@ -1,0 +1,13 @@
+[ver:1,total:5160]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:4203,1536598800:300,1536602400:960,1536606000:180,1536609600:180,1536613200:180,1536616800:180,1536649200:888,1536652800:1335,m
+build/include/llvm/DebugInfo/PDB/DIA/DIASession.h:247,1536649200:112,1536652800:135,r
+build/include/llvm/DebugInfo/PDB/Native/PDBFile.h:192,1536649200:192,r
+build/include/llvm/DebugInfo/PDB/PDBTypes.h:115,1536649200:85,1536652800:30,r
+build/include/llvm/DebugInfo/PDB/IPDBSession.h:115,1536649200:115,r
+build/include/llvm/DebugInfo/PDB/DIA/DIASupport.h:90,1536649200:90,r
+build/include/llvm/DebugInfo/PDB/Native/NativeSession.h:72,1536649200:72,r
+build/include/llvm/Support/Error.h:42,1536649200:42,r
+build/include/llvm/DebugInfo/PDB/IPDBTable.h:30,1536649200:30,r
+build/include/llvm/DebugInfo/PDB/Native/PDBFileBuilder.h:30,1536649200:30,r
+build/include/llvm/DebugInfo/PDB/IPDBEnumChildren.h:12,1536649200:12,r
+build/include/llvm/DebugInfo/PDB/IPDBSourceFile.h:12,1536649200:12,r
