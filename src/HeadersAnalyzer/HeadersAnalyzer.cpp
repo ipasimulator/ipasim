@@ -783,6 +783,20 @@ int main() {
       }
     }
 
+    // Create output files.
+    path IncludeDir("./build/include/HeadersAnalyzer/");
+    {
+      error_code E;
+      if (!create_directories(IncludeDir, E)) {
+        cerr << "Error while creating output directory: " << E.message()
+             << '\n';
+        return 1;
+      }
+    }
+    fstream iOSInc((IncludeDir / "iOS.inc").c_str(), fstream::out);
+
+    // TODO: Generate iOS code.
+
     // TODO: Again, just for testing.
     return 0;
   }
