@@ -23,6 +23,9 @@
 #include <clang/Lex/PreprocessorOptions.h>
 #include <clang/Parse/ParseAST.h>
 
+#include <llvm/DebugInfo/PDB/DIA/DIASession.h>
+#include <llvm/DebugInfo/PDB/PDBSymbolExe.h>
+#include <llvm/DebugInfo/PDB/PDBSymbolFunc.h>
 #include <llvm/Demangle/Demangle.h>
 #include <llvm/IR/DebugInfo.h>
 #include <llvm/IR/Instructions.h>
@@ -621,18 +624,41 @@ int main() {
         {"./src/objc/Debug/", {"libobjc.A.dll"}}};
     for (const auto &DLLGroup : DLLs) {
       for (const string &DLL : DLLGroup.second) {
-        // Load the DLL and its PDB into LLDB.
-        SBTarget Target = Debugger.GetDummyTarget();
+        // Load PDB of the DLL.
+        using namespace llvm::pdb;
+        unique_ptr<IPDBSession> Session;
+        llvm::Error Error = DIASession::createFromPdb(
+            (DLLGroup.first / DLL).replace_extension(".pdb").string().c_str(),
+            Session);
+        if (Error) {
+          cerr << llvm::toString(move(Error)) << '\n';
+          return 1;
+        }
+
+        // Process functions.
+        auto SymbolExe = Session->getGlobalScope();
+        auto EnumSymbols = SymbolExe->findAllChildren(PDB_SymType::Function);
+        uint32_t SymbolCount = EnumSymbols->getChildCount();
+        for (uint32_t I = 0; I != SymbolCount; ++I) {
+          auto Symbol = EnumSymbols->getChildAtIndex(I);
+          auto Func = static_cast<PDBSymbolFunc *>(Symbol.get());
+
+          // Find the corresponding iOS export.
+          auto Exp = iOSExps.find(Func->getUndecoratedName());
+          if (Exp == iOSExps.end())
+            continue;
+          Exp->second.DLL = move(DLL);
+        }
+
+        // TODO: Remove LLDB code if not needed anymore.
+        break;
+
+        SBTarget Target =
+            Debugger.CreateTarget((DLLGroup.first / DLL).string().c_str());
         if (!Target.IsValid())
           return 1;
-        assert(Target.GetNumModules() == 0 &&
-               "No modules expected in the dummy target.");
-        SBModule Module = Target.AddModule(
-            (DLLGroup.first / DLL).string().c_str(), nullptr, nullptr,
-            (DLLGroup.first / DLL).replace_extension(".pdb").string().c_str());
-        if (!Target.IsValid())
-          return 1;
-        assert(Target.GetNumModules() == 1 && "Exactly one module expected.");
+        assert(Target.GetNumModules() == 1 && "Expected exactly one module.");
+        SBModule Module = Target.GetModuleAtIndex(0);
 
         // Process functions.
         size_t Symbols = Module.GetNumSymbols();
