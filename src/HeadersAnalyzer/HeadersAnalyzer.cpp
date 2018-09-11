@@ -787,8 +787,8 @@ int main() {
     path IncludeDir("./build/include/HeadersAnalyzer/");
     {
       error_code E;
-      if (!create_directories(IncludeDir, E)) {
-        cerr << "Error while creating output directory: " << E.message()
+      if (!create_directories(IncludeDir, E) && E) {
+        cerr << "Fatal error while creating output directory: " << E.message()
              << '\n';
         return 1;
       }
