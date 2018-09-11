@@ -50,6 +50,7 @@
 #include <llvm/Support/CommandLine.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/raw_os_ostream.h>
+#include <llvm/Transforms/Utils/FunctionComparator.h>
 
 #include <filesystem>
 #include <fstream>
@@ -593,9 +594,9 @@ class TypeComparer {
 public:
   // Note that if we got `PDBAstParser` from `Module` rather then created it,
   // `CreateLLDBTypeFromPDBType` wouldn't work - see branch `cg_got_clang_ctx`.
-  TypeComparer(CodeGen::CodeGenModule &CGM,
+  TypeComparer(CodeGen::CodeGenModule &CGM, llvm::Module *Module,
                lldb_private::SymbolFile *SymbolFile)
-      : CGM(CGM), ClangCtx(), Parser(ClangCtx) {
+      : CGM(CGM), Module(Module), ClangCtx(), Parser(ClangCtx) {
     ClangCtx.SetSymbolFile(SymbolFile);
   }
 
@@ -611,19 +612,33 @@ public:
   bool areEqual(const llvm::Type *Type, const llvm::pdb::PDBSymbol &Symbol) {
     return Type == getLLVMType(Symbol);
   }
-  bool areEquivalent(const llvm::FunctionType &Func,
+  bool areEquivalent(llvm::FunctionType *Func,
                      const llvm::pdb::PDBSymbolFunc &SymbolFunc) {
     auto *Func2 = static_cast<llvm::FunctionType *>(getLLVMType(SymbolFunc));
-
-    // TODO: Implement. Try to use LLDB, LLVM or Clang. See also
-    // `MergeFunctionPass`.
-    return false;
+    return FunctionComparer::compareTypes(Module, Func, Func2) == 0;
   }
 
 private:
   CodeGen::CodeGenModule &CGM;
+  llvm::Module *Module;
   lldb_private::ClangASTContext ClangCtx;
   PDBASTParser Parser;
+
+  // Just to get access to protected function `cmpTypes`.
+  class FunctionComparer : llvm::FunctionComparator {
+  public:
+    static int compareTypes(llvm::Module *Module, llvm::FunctionType *FTy1,
+                            llvm::FunctionType *FTy2) {
+      return FunctionComparer(Module, FTy1).cmpTypes(FTy1, FTy2);
+    }
+
+  private:
+    FunctionComparer(llvm::Module *Module, llvm::FunctionType *FTy)
+        : FunctionComparator(
+              llvm::Function::Create(FTy, llvm::GlobalValue::ExternalLinkage,
+                                     "", Module),
+              nullptr, nullptr) {}
+  };
 };
 
 class SBDebuggerGuard {
@@ -734,14 +749,15 @@ int main() {
                                        /* resolve_path */ true));
         ModuleSpec.GetSymbolFileSpec().SetFile(PDBPath.string().c_str(),
                                                /* resolve_path */ true);
-        ModuleSP Module =
+        ModuleSP LLDBModule =
             Debugger->GetSelectedOrDummyTarget()->GetSharedModule(ModuleSpec);
         DataBufferSP Buffer(new DataBufferHeap);
-        ObjectFileDummy Obj(Module, Buffer);
+        ObjectFileDummy Obj(LLDBModule, Buffer);
         SymbolFile *SymbolFile = SymbolFilePDB::CreateInstance(&Obj);
         SymbolFile->CalculateAbilities(); // Initialization, actually.
         SymbolFilePDB *PDB = static_cast<SymbolFilePDB *>(SymbolFile);
-        TypeComparer TC(CGM, SymbolFile);
+        // TODO: Get rid of `.get()`.
+        TypeComparer TC(CGM, Module.get(), SymbolFile);
 
         // Process functions.
         auto SymbolExe = PDB->GetPDBSession().getGlobalScope();
@@ -759,7 +775,7 @@ int main() {
           Exp->second.RVA = Func->getRelativeVirtualAddress();
 
           // Verify that the function has the same signature as the iOS one.
-          if (!TC.areEquivalent(*Exp->second.Type, *Func)) {
+          if (!TC.areEquivalent(Exp->second.Type, *Func)) {
             cerr << "Error: functions' signatures are not equivalent ("
                  << Exp->first << ").\n";
           }
