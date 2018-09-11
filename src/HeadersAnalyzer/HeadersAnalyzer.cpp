@@ -2,9 +2,13 @@
 //
 
 #include <Plugins/SymbolFile/PDB/PDBASTParser.h>
+#include <Plugins/SymbolFile/PDB/SymbolFilePDB.h>
 #include <lldb/API/SBDebugger.h>
+#include <lldb/Core/Debugger.h>
+#include <lldb/Core/Module.h>
 #include <lldb/Symbol/ClangASTContext.h>
 #include <lldb/Symbol/ClangUtil.h>
+#include <lldb/Symbol/SymbolVendor.h>
 #include <lldb/Symbol/Type.h>
 
 #include <tapi/Core/FileManager.h>
@@ -548,8 +552,20 @@ private:
 class TypeComparer {
 public:
   TypeComparer() : ClangCtx(), Parser(ClangCtx) {
-    // TODO: Set PDB symbol file.
-    ClangCtx.SetSymbolFile();
+    using namespace lldb;
+    using namespace lldb_private;
+
+    // Set PDB symbol file.
+    // TODO: Doesn't work and is too specific.
+    Debugger = Debugger::CreateInstance();
+    ModuleSpec ModuleSpec(FileSpec("./src/objc/Debug/libobjc.A.dll",
+                                   /* resolve_path */ true));
+    ModuleSpec.GetSymbolFileSpec().SetFile("./src/objc/Debug/libobjc.A.pdb",
+                                           /* resolve_path */ true);
+    Module =
+        Debugger->GetSelectedOrDummyTarget()->GetSharedModule(move(ModuleSpec));
+    SymbolFile *SymbolFile = Module->GetSymbolVendor()->GetSymbolFile();
+    ClangCtx.SetSymbolFile(SymbolFile);
   }
 
   bool areEquivalent(const llvm::Type &Type1,
@@ -588,6 +604,8 @@ public:
 private:
   lldb_private::ClangASTContext ClangCtx;
   PDBASTParser Parser;
+  lldb::DebuggerSP Debugger;
+  lldb::ModuleSP Module;
 };
 
 int main() {
