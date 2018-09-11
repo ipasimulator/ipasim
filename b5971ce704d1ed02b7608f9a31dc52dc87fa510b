@@ -1,0 +1,3 @@
+[ver:1,total:1260]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1230,1536670800:1110,1536674400:120,m
+build/include/lldb/Core/Module.h:30,1536670800:30,r
