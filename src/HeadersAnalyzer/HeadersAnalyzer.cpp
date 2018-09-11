@@ -1,6 +1,8 @@
 // HeadersAnalyzer.cpp : Defines the entry point for the console application.
 //
 
+#include <lldb/API/SBDebugger.h>
+
 #include <tapi/Core/FileManager.h>
 #include <tapi/Core/InterfaceFile.h>
 #include <tapi/Core/InterfaceFileManager.h>
@@ -20,7 +22,8 @@
 #include <clang/Lex/PreprocessorOptions.h>
 #include <clang/Parse/ParseAST.h>
 
-#include <llvm/DebugInfo/PDB/DIA/DIASession.h>
+#include <llvm/DebugInfo/PDB/IPDBSession.h>
+#include <llvm/DebugInfo/PDB/PDB.h>
 #include <llvm/DebugInfo/PDB/PDBSymbolExe.h>
 #include <llvm/DebugInfo/PDB/PDBSymbolFunc.h>
 #include <llvm/Demangle/Demangle.h>
@@ -610,6 +613,9 @@ int main() {
 
   // Load DLLs and PDBs.
   {
+    // TODO: Without this, DIA SDK is not found. Why?
+    lldb::SBDebugger::Initialize();
+
     vector<pair<path, vector<string>>> DLLs{
         {"./src/objc/Debug/", {"libobjc.A.dll"}}};
     for (const auto &DLLGroup : DLLs) {
@@ -617,7 +623,8 @@ int main() {
         // Load PDB of the DLL.
         using namespace llvm::pdb;
         unique_ptr<IPDBSession> Session;
-        llvm::Error Error = DIASession::createFromPdb(
+        llvm::Error Error = loadDataForPDB(
+            PDB_ReaderType::DIA,
             (DLLGroup.first / DLL).replace_extension(".pdb").string().c_str(),
             Session);
         if (Error) {
@@ -645,6 +652,9 @@ int main() {
         }
       }
     }
+
+    // TODO: Use RAII.
+    lldb::SBDebugger::Terminate();
 
     // TODO: Again, just for testing.
     return 0;
