@@ -99,3 +99,6 @@ We catch that and simply extract a pointer to the structure (it's always in some
 Then, we call the proper i386 wrapper with this pointer as a parameter.
 Return values are passed in the same structure.
 Wrappers for callbacks are generated similarly.
+
+The wrappers themselves are generated in LLVM IR.
+That was chosen over C++ because it's easier to generate and the result is more robust.
