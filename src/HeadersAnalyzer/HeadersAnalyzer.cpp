@@ -1,7 +1,11 @@
 // HeadersAnalyzer.cpp : Defines the entry point for the console application.
 //
 
+#include <Plugins/SymbolFile/PDB/PDBASTParser.h>
 #include <lldb/API/SBDebugger.h>
+#include <lldb/Symbol/ClangASTContext.h>
+#include <lldb/Symbol/ClangUtil.h>
+#include <lldb/Symbol/Type.h>
 
 #include <tapi/Core/FileManager.h>
 #include <tapi/Core/InterfaceFile.h>
@@ -34,6 +38,7 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Mangler.h>
 #include <llvm/IR/Module.h>
+#include <llvm/IR/ValueHandle.h>
 #include <llvm/Support/CommandLine.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/raw_os_ostream.h>
@@ -447,13 +452,15 @@ private:
 enum class ExportStatus { NotFound = 0, Found, Overloaded };
 
 struct ExportEntry {
-  ExportEntry() : Status(ExportStatus::NotFound) {}
-  ExportEntry(string Lib) : Status(ExportStatus::NotFound), Libs{Lib} {}
+  ExportEntry() : Status(ExportStatus::NotFound), RVA(0), Type(nullptr) {}
+  ExportEntry(string Lib)
+      : Status(ExportStatus::NotFound), Libs{Lib}, RVA(0), Type(nullptr) {}
 
   ExportStatus Status;
   set<string> Libs;
   string DLL;
   uint32_t RVA;
+  llvm::FunctionType *Type;
 };
 
 using ExportList = map<string, ExportEntry>;
@@ -538,8 +545,54 @@ private:
   ExportList &Exps;
 };
 
+class TypeComparer {
+public:
+  TypeComparer() : ClangCtx(), Parser(ClangCtx) {
+    // TODO: Set PDB symbol file.
+    ClangCtx.SetSymbolFile();
+  }
+
+  bool areEquivalent(const llvm::Type &Type1,
+                     const llvm::pdb::PDBSymbol &Type2) {
+    using namespace lldb;
+    using namespace llvm::pdb;
+    using namespace lldb_private;
+
+    TypeSP LLDBType2 = Parser.CreateLLDBTypeFromPDBType(Type2);
+    QualType CanonType2 =
+        ClangUtil::GetCanonicalQualType(LLDBType2->GetFullCompilerType());
+
+    return false;
+  }
+  bool areEquivalent(const llvm::FunctionType &Func1,
+                     const llvm::pdb::PDBSymbolFunc &Func2) {
+    auto Sig2 = Func2.getSignature();
+
+    // Variadic arguments.
+    if (Func1.isVarArg() != Sig2->isCVarArgs())
+      return false;
+
+    auto Args2 = Func2.getArguments();
+
+    // Number of arguments.
+    if (Func1.params().size() != Args2->getChildCount())
+      return false;
+
+    // Type of return values.
+    if (!areEquivalent(*Func1.getReturnType(), *Sig2->getReturnType()))
+      return false;
+
+    return true;
+  }
+
+private:
+  lldb_private::ClangASTContext ClangCtx;
+  PDBASTParser Parser;
+};
+
 int main() {
-  ExportList iOSExps = {{"_sel_registerName", {"/usr/lib/libobjc.A.dylib"}}};
+  ExportList iOSExps = {
+      {"_sel_registerName", ExportEntry("/usr/lib/libobjc.A.dylib")}};
 
   // Parse iOS headers.
   // TODO: This is so up here just for testing. In production, it should be
@@ -607,15 +660,15 @@ int main() {
         break;
       }
 
-      // TODO: Save the function's signature.
+      // Save the function's signature.
+      Exp->second.Type = Func.getFunctionType();
     }
-  }
 
-  // Load DLLs and PDBs.
-  {
+    // Load DLLs and PDBs.
     // TODO: Without this, DIA SDK is not found. Why?
     lldb::SBDebugger::Initialize();
 
+    TypeComparer TC;
     vector<pair<path, vector<string>>> DLLs{
         {"./src/objc/Debug/", {"libobjc.A.dll"}}};
     for (const auto &DLLGroup : DLLs) {
@@ -623,6 +676,7 @@ int main() {
         // Load PDB of the DLL.
         using namespace llvm::pdb;
         unique_ptr<IPDBSession> Session;
+        // TODO: Use `Native` reader when it's ready.
         llvm::Error Error = loadDataForPDB(
             PDB_ReaderType::DIA,
             (DLLGroup.first / DLL).replace_extension(".pdb").string().c_str(),
@@ -647,8 +701,11 @@ int main() {
           Exp->second.DLL = move(DLL);
           Exp->second.RVA = Func->getRelativeVirtualAddress();
 
-          // TODO: Verify that the function has the same signature as the iOS
-          // one.
+          // Verify that the function has the same signature as the iOS one.
+          if (!TC.areEquivalent(*Exp->second.Type, *Func)) {
+            cerr << "Error: functions' signatures are not equivalent ("
+                 << Exp->first << ").\n";
+          }
         }
       }
     }
