@@ -1,0 +1,4 @@
+[ver:1,total:2460]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:2280,1536674400:2280,m
+build/include/llvm/IR/DerivedTypes.h:160,1536674400:160,r
+build/include/llvm/IR/LLVMContext.h:20,1536674400:20,r
