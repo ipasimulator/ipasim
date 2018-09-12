@@ -1,0 +1,4 @@
+[ver:1,total:120]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:85,1536753600:85,m
+build/include/llvm/IR/DataLayout.h:20,1536753600:20,r
+build/include/llvm/IR/IRBuilder.h:15,1536753600:15,r
