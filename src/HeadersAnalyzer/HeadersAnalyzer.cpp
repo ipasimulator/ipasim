@@ -47,6 +47,7 @@
 #include <llvm/IR/Mangler.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/ValueHandle.h>
+#include <llvm/IR/Verifier.h>
 #include <llvm/Support/CommandLine.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/raw_os_ostream.h>
@@ -902,6 +903,28 @@ int main() {
         // Call the DLL wrapper function.
         llvm::Value *VP = Builder.CreateBitCast(SP, VPTy, "vp");
         Builder.CreateCall(Wrapper, {VP});
+
+        // Return.
+        if (!RetTy->isVoidTy()) {
+
+          // Get pointer to the return value inside the union.
+          llvm::Value *RP =
+              Builder.CreateBitCast(S, RetTy->getPointerTo(), "rp");
+
+          // Load and return it.
+          llvm::Value *R = Builder.CreateLoad(RP, "r");
+          Builder.CreateRet(R);
+        } else
+          Builder.CreateRetVoid();
+
+        // Verify correctness of the generated IR.
+        string Error;
+        llvm::raw_string_ostream OS(Error);
+        if (verifyFunction(*Func, &OS)) {
+          OS.flush();
+          cerr << "Error while building function (" << Exp->Name
+               << "): " << Error << '\n';
+        }
       }
 
       // TODO: Compile the module.
