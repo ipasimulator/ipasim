@@ -62,6 +62,9 @@
 #include <sstream>
 #include <vector>
 
+// Configuration.
+#define IPASIM_WARN_UNINTERESTING_FUNCTIONS
+
 using namespace clang;
 using namespace frontend;
 using namespace std;
@@ -716,8 +719,13 @@ int main() {
       // Filter uninteresting functions.
       string NameStr = Name.str().str();
       auto Exp = iOSExps.find(NameStr);
-      if (Exp == iOSExps.end())
+      if (Exp == iOSExps.end()) {
+#if defined(IPASIM_WARN_UNINTERESTING_FUNCTIONS)
+        cerr << "Warning: found uninteresting function (" << NameStr
+             << "). Isn't that interesting?\n";
+#endif
         continue;
+      }
 
       // Update status accordingly.
       switch (Exp->Status) {
