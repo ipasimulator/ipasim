@@ -44,13 +44,16 @@
 #include <llvm/IR/IntrinsicInst.h>
 #include <llvm/IR/Intrinsics.h>
 #include <llvm/IR/LLVMContext.h>
+#include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/Mangler.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/ValueHandle.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/CommandLine.h>
+#include <llvm/Support/TargetRegistry.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/raw_os_ostream.h>
+#include <llvm/Target/TargetMachine.h>
 #include <llvm/Transforms/Utils/FunctionComparator.h>
 
 #include <filesystem>
@@ -830,9 +833,11 @@ int main() {
     // Generate iOS libraries.
     size_t LibIdx = 0;
     for (const Dylib &Lib : iOSLibs) {
+      string LibNo = to_string(LibIdx++);
+
       // Prepare for IR generation.
       llvm::IRBuilder<> Builder(Ctx);
-      llvm::Module LibModule(to_string(LibIdx), Ctx);
+      llvm::Module LibModule(LibNo, Ctx);
       LibModule.setSourceFileName(Lib.Name);
       LibModule.setTargetTriple(Module->getTargetTriple());
       LibModule.setDataLayout(Module->getDataLayout());
@@ -931,10 +936,40 @@ int main() {
         }
       }
 
-      // TODO: Compile the module.
-      LibModule.dump();
+      // Compile the module. Inspired by LLVM tutorial:
+      // https://llvm.org/docs/tutorial/LangImpl08.html.
 
-      ++LibIdx;
+      // Create `TargetMachine`.
+      string Error;
+      const llvm::Target *Target =
+          llvm::TargetRegistry::lookupTarget(Module->getTargetTriple(), Error);
+      if (!Target) {
+        cerr << "Error while creating target (" << Lib.Name << "): " << Error
+             << '\n';
+        continue;
+      }
+      llvm::TargetMachine *TM = Target->createTargetMachine(
+          Module->getTargetTriple(), "generic", "", llvm::TargetOptions(),
+          /* Options */ llvm::None);
+
+      // Create output file.
+      error_code EC;
+      llvm::raw_fd_ostream Output((OutputDir / (LibNo + ".o")).string(), EC,
+                                  llvm::sys::fs::F_None);
+      if (EC) {
+        cerr << "Error while creating output file (" << Lib.Name
+             << "): " << EC.message() << '\n';
+        continue;
+      }
+
+      // Emit object code.
+      llvm::legacy::PassManager PM;
+      if (TM->addPassesToEmitFile(PM, Output,
+                                  llvm::TargetMachine::CGFT_ObjectFile)) {
+        cerr << "Error: cannot emit object file.\n";
+        continue;
+      }
+      PM.run(LibModule);
     }
 
     // TODO: Again, just for testing.
