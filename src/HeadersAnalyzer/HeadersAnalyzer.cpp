@@ -659,7 +659,8 @@ public:
 
 int main() {
   vector<Dylib> iOSLibs = {{"/usr/lib/libobjc.A.dylib"}};
-  ExportList iOSExps = {ExportEntry("_sel_registerName", 0)};
+  ExportList iOSExps = {ExportEntry("_sel_registerName", 0),
+                        ExportEntry("_object_setIvar", 0)};
 
   // Parse iOS headers.
   // TODO: This is so up here just for testing. In production, it should be
