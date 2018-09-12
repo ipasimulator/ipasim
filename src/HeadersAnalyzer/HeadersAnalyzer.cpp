@@ -950,7 +950,7 @@ int main() {
       }
       llvm::TargetMachine *TM = Target->createTargetMachine(
           Module->getTargetTriple(), "generic", "", llvm::TargetOptions(),
-          /* Options */ llvm::None);
+          /* RelocModel */ llvm::None);
 
       // Create output file.
       error_code EC;
