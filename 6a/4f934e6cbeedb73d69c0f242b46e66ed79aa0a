@@ -1,0 +1,3 @@
+[ver:1,total:1380]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1350,1536753600:1350,m
+build/include/llvm/Support/TargetRegistry.h:30,1536753600:30,r
