@@ -102,3 +102,19 @@ Wrappers for callbacks are generated similarly.
 
 The wrappers themselves are generated in LLVM IR.
 That was chosen over C++ because it's easier to generate and the result is more robust.
+
+### Calling functions at runtime
+
+We need to be able to call any function from our DLLs based just on an address to which the emulated app jumps.
+For example, the emulated app could manually do what `objc_msgLookup` does, i.e., getting function pointer from Objective-C metadata and then jumping to it.
+(You could argue that most of apps won't do this, so why bother?
+Well, the app could also simply call `objc_msgLookup` and cache the result, which might be an optimization that a compiler would make.)
+
+One approach to this would be modifying the linker.
+It would generate the iOS ARM wrappers inside the DLL in some custom section.
+The Objective-C metadata would then be pointing to those wrappers and the dynamic loader would load this section into the emulator.
+That way, we would delegate most of the work to the compile time, the dynamic loader wouldn't have to do anything special.
+
+It would be too complex to implement, though, so we chose another approach.
+We simply create a map from DLL function addresses to iOS wrapper function addresses.
+And the dynamic loader then uses this map when the emulated app jumps out of mapped executable memory.
