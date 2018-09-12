@@ -87,12 +87,12 @@ Although, it may as well use the other approach, too.
 
 This other approach is to use Clang to generate wrappers in ARM and in i386 for every function.
 The ARM wrapper has the same signature as the iOS function, and it simply extracts the function's arguments into some well-known structure (stored on stack).
-We generate this wrapper simply by generating C++ code which is then compiled by Clang.
-Currently, this code is generated in textual form, but it could also be generated as AST or LLVM IR and then compiled.
+We generate this wrapper simply by generating LLVM IR code which is then compiled to an object file.
+This object file is then linked into a thin `.dylib` that contains only this object file and also imports the corresponding i386 wrappers.
 That way, we delegate the low-level details of argument passing, calling conventions, etc. to Clang which should know them best.
-Even better then, say, debugger, that's also why we chose this approach over the one mentioned above.
+Even better than, say, debugger, that's also why we chose this approach over the one mentioned above.
 The i386 wrapper then takes a pointer to this structure and calls the real function with arguments from that structure.
-Again, this wrapper is generated from C++ code using Clang.
+Again, this wrapper is generated from LLVM IR code and compiled into an object file that is then linked directly into the DLL.
 Then, at runtime, the ARM wrappers are mapped to the virtual machine and their code is emulated.
 When they call our i386 wrappers, the machine code jumps to an unmapped memory.
 We catch that and simply extract a pointer to the structure (it's always in some well known location, e.g., if it's first argument, then the location is register `r0`).
@@ -100,8 +100,43 @@ Then, we call the proper i386 wrapper with this pointer as a parameter.
 Return values are passed in the same structure.
 Wrappers for callbacks are generated similarly.
 
-The wrappers themselves are generated in LLVM IR.
-That was chosen over C++ because it's easier to generate and the result is more robust.
+The wrappers themselves are generated in LLVM IR which was chosen over C++ because it's easier to generate and the result is more robust.
+
+For example, let's say we want to generate wrappers for function `int main(int, char**)`.
+In C++ they would look roughly like this:
+
+```cpp
+// The iOS (ARM) wrapper.
+int main(int argc, char **argv) {
+  union {
+    struct {
+      int *arg0;
+      char ***arg1;
+    } args;
+    int retval;
+  } s;
+  s.args.arg0 = &argc;
+  s.args.arg1 = &argv;
+  $__ipaSim_wrapper_main(&s);
+  return s.retval;
+}
+
+// The DLL (i386) wrapper.
+int $__ipaSim_wrapper_main(void *args) {
+  union {
+    struct {
+      int *arg0;
+      char ***arg1;
+    } args;
+    int retval;
+  } *argsp = (decltype(argsp))args;
+  // Here we call the real native function.
+  argsp->retval = main(*argsp->args.arg0, *argsp->args.arg1);
+}
+```
+
+Of course, we don't generate them like this, in C++.
+Instead, we generate an equivalent LLVM IR code.
 
 ### Calling functions at runtime
 
