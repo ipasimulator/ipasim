@@ -137,3 +137,24 @@ So, don't delete this paragraph.**
 
 We chose, again, a simpler approach, though.
 Because all the Objective-C metadata need to be bound by our dynamic loader (even those between two native DLLs, see `[fixbind]`), we use the map from DLL to iOS addresses to fix up those metadata, so that they point to the wrapper functions, too.
+
+### Variadic functions
+
+We cannot simply generate wrappers around variadic functions that would take its arguments, because we have no simple and general way of knowing the arguments.
+We divide variadic functions to two categories, *messengers* and *loggers*.
+
+**Messengers** are functions like `objc_msgSend`, `objc_msgSend_stret`, etc.
+They have two guaranteed arguments: `id self` and `SEL op`.
+Other arguments can be determined only after the function corresponding to the selector (`op`) passed to them is found.
+It can be found easily by calling the corresponding lookup functions, like `objc_msgLookup`, `objc_msgLookup_stret`, etc.
+Those functions take *only* those two arguments mentioned above and return a function address corresponding to the selector.
+They also don't modify the stack, so that it can be jumped directly to the function and we do exactly that if the resulting function resides in the emulated address space.
+Otherwise, we have to jump to the wrapper function (also in the emulated address space) that will extract the (already known) arguments for us and call the native DLL function.
+
+Generally, we generate iOS wrappers for messengers that call the corresponding lookup functions (or more precisely, their iOS wrappers).
+Then, they simply jump to the result.
+If the result was inside the emulated code, it will simply continue execution, otherwise, it will be handled by our emulation engine as any other function call.
+
+**Loggers** are functions like `printf`, `NSLog`, etc.
+Their arguments can be completely determined from the format string, usually their first argument.
+**TODO: Implement wrappers for those.**

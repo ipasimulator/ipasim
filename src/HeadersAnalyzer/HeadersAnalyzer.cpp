@@ -833,6 +833,8 @@ int main() {
         llvm::Function *Func = llvm::Function::Create(
             Exp->Type, llvm::Function::ExternalLinkage, Exp->Name, &Module);
 
+        // TODO: Handle variadic functions.
+
         // Map parameter types to their pointers.
         vector<llvm::Type *> ParamPointers;
         ParamPointers.reserve(Exp->Type->getNumParams());
@@ -844,7 +846,6 @@ int main() {
         // and return value. It's actually a union of a structure and of the
         // return value where the structure in the union contains addresses of
         // the arguments.
-        // TODO: Won't the names be problem when we have more functions?
         llvm::StructType *Struct =
             llvm::StructType::create(ParamPointers, "struct.args");
 
