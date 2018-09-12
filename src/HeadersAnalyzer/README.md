@@ -42,6 +42,15 @@ Here's how our compile-time code generation utility works:
 This is implemented with the help of Apple's TAPI library that can read TBD files.
 See [our documentation about it](../../docs/tapi.md) for details.
 
+Note that our goal is to later generate `.dylib`s that look exactly like it's described in TBD files from the iOS SDK.
+To be able to do that, several things interest us in the TBD files.
+First is list of exported symbols, of course.
+We simply export those symbols from our wrapper `.dylib` (see below).
+Second is list of re-exported symbols.
+Again, we simply re-export symbols the same way real `.dylib` would do it (and our dynamic loader handles it the same way `dyld` would).
+Third is list of Objective-C classes.
+Not only we export symbols for them (`OBJC_CLASS_$_` and `OBJC_METACLASS_$_`), but we also note them to later generate wrappers for all of their methods.
+
 ### Analyzing iOS headers
 
 > Note that better approach to this would be analyzing debugging symbols of iOS `.dylib`s.
