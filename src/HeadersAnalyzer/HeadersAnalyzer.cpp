@@ -858,7 +858,7 @@ int main() {
         // return value where the structure in the union contains addresses of
         // the arguments.
         llvm::StructType *Struct =
-            llvm::StructType::create(ParamPointers, "struct.args");
+            llvm::StructType::create(ParamPointers, "struct");
 
         // In LLVM IR, union is simply a struct containing the largest element.
         llvm::Type *RetTy = Exp->Type->getReturnType();
@@ -869,7 +869,7 @@ int main() {
         else
           ContainedTy = RetTy;
         llvm::StructType *Union =
-            llvm::StructType::create("union.args", ContainedTy);
+            llvm::StructType::create("union", ContainedTy);
 
         // Our body consists of exactly one `BasicBlock`.
         llvm::BasicBlock *BB = llvm::BasicBlock::Create(Ctx, "entry", Func);
@@ -884,14 +884,16 @@ int main() {
 
         // Process arguments.
         for (llvm::Argument &Arg : Func->args()) {
+          string ArgNo = to_string(Arg.getArgNo());
 
           // Load the argument.
-          llvm::Value *AP = Builder.CreateAlloca(Arg.getType(), nullptr, "ap");
+          llvm::Value *AP =
+              Builder.CreateAlloca(Arg.getType(), nullptr, "ap" + ArgNo);
           Builder.CreateStore(&Arg, AP);
 
           // Get pointer to the corresponding structure's element.
           llvm::Value *EP =
-              Builder.CreateStructGEP(Struct, SP, Arg.getArgNo(), "ep");
+              Builder.CreateStructGEP(Struct, SP, Arg.getArgNo(), "ep" + ArgNo);
 
           // Store argument address in it.
           Builder.CreateStore(AP, EP);
