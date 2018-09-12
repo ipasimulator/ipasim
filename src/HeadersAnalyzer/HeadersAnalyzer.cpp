@@ -843,12 +843,20 @@ int main() {
         // and return value. It's actually a union of a structure and of the
         // return value where the structure in the union contains addresses of
         // the arguments.
-        // TODO: Handle `void` functions correctly.
         // TODO: Won't the names be problem when we have more functions?
         llvm::StructType *Struct =
             llvm::StructType::create(ParamPointers, "struct.args");
-        llvm::StructType *Union = llvm::StructType::create(
-            "union.args", Struct, Exp->Type->getReturnType()->getPointerTo());
+
+        // In LLVM IR, union is simply a struct containing the largest element.
+        llvm::Type *RetTy = Exp->Type->getReturnType();
+        llvm::Type *ContainedTy;
+        if (RetTy->isVoidTy() ||
+            Struct->getScalarSizeInBits() >= RetTy->getScalarSizeInBits())
+          ContainedTy = Struct;
+        else
+          ContainedTy = RetTy;
+        llvm::StructType *Union =
+            llvm::StructType::create("union.args", ContainedTy);
 
         // Our body consists of exactly one `BasicBlock`.
         llvm::BasicBlock *BB = llvm::BasicBlock::Create(Ctx, "entry", Func);
