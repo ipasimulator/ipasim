@@ -119,6 +119,8 @@ It would be too complex to implement, though, so we chose another approach.
 We simply create a map from DLL function addresses to iOS wrapper function addresses.
 And the dynamic loader then uses this map when the emulated app jumps out of mapped executable memory.
 
+#### Function addresses inconsistency
+
 The disadvantage in the second approach is that there is an inconsistency between addresses bound by dynamic loader and addresses located in Objective-C metadata.
 If the emulated code only calls those addresses, it's not a problem as the former are just wrappers around the latter.
 But if the code somehow depended on the values of those addresses, e.g., it compared them, it would be a problem.

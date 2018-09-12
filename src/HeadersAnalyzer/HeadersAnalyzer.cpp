@@ -754,7 +754,14 @@ int main() {
         PDBPath.replace_extension(".pdb");
 
         // Load PDB into LLDB. This is a hack, actually, because no simple way
-        // of loading the PDB worked for us.
+        // of loading the PDB worked for us. We do this simply because we use
+        // some LLDB functions in our `TypeComparer` and they require some
+        // initialized LLDB structures (like `SymbolFile`). Otherwise, we
+        // wouldn't need LLDB at all, since we work directly with `IPDBSession`
+        // which is a LLVM object that can work without LLDB. Although, for some
+        // reason, the DIA SDK is not registered properly when we don't use
+        // `Debugger::Initialize`, so this would also have to be solved before
+        // removing LLDB from our dependencies completely.
         ModuleSpec ModuleSpec(FileSpec(DLLPath.string().c_str(),
                                        /* resolve_path */ true));
         ModuleSpec.GetSymbolFileSpec().SetFile(PDBPath.string().c_str(),
@@ -821,8 +828,18 @@ int main() {
 
       // Generate function wrappers.
       for (const auto *Exp : Lib.Exports) {
+        // Declaration.
         llvm::Function *Func = llvm::Function::Create(
             Exp->Type, llvm::Function::ExternalLinkage, Exp->Name, &Module);
+
+        // TODO: Create a structure that we will use to store the function's
+        // arguments and return value.
+
+        // Our body consists of exactly one `BasicBlock`.
+        llvm::BasicBlock *BB = llvm::BasicBlock::Create(Ctx, "entry", Func);
+        Builder.SetInsertPoint(BB);
+
+        // TODO: Create an array of pointers to function arguments.
       }
 
       // TODO: Compile the module.
