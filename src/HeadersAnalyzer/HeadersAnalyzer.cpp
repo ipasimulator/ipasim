@@ -820,6 +820,12 @@ int main() {
       }
     }
 
+    // DLL function wrappers have all type `(void *) -> void`.
+    llvm::Type *VPTy = llvm::Type::getInt8PtrTy(Ctx);
+    llvm::FunctionType *WrapperTy =
+        llvm::FunctionType::get(llvm::Type::getVoidTy(Ctx), {VPTy},
+                                /* isVarArg */ false);
+
     // Generate iOS libraries.
     size_t I = 0;
     for (const Dylib &Lib : iOSLibs) {
@@ -832,6 +838,11 @@ int main() {
         // Declaration.
         llvm::Function *Func = llvm::Function::Create(
             Exp->Type, llvm::Function::ExternalLinkage, Exp->Name, &Module);
+
+        // DLL wrapper declaration.
+        llvm::Function *Wrapper =
+            llvm::Function::Create(WrapperTy, llvm::Function::ExternalLinkage,
+                                   "$__ipaSim_wrapper_" + Exp->Name, &Module);
 
         // TODO: Handle variadic functions.
 
@@ -865,24 +876,30 @@ int main() {
         Builder.SetInsertPoint(BB);
 
         // Allocate the union.
-        llvm::Value *S = Builder.CreateAlloca(Union);
+        llvm::Value *S = Builder.CreateAlloca(Union, nullptr, "s");
 
         // Get pointer to the structure inside it.
-        llvm::Value *SP = Builder.CreateBitCast(S, Struct->getPointerTo());
+        llvm::Value *SP =
+            Builder.CreateBitCast(S, Struct->getPointerTo(), "sp");
 
         // Process arguments.
         for (llvm::Argument &Arg : Func->args()) {
 
           // Load the argument.
-          llvm::Value *AP = Builder.CreateAlloca(Arg.getType());
+          llvm::Value *AP = Builder.CreateAlloca(Arg.getType(), nullptr, "ap");
           Builder.CreateStore(&Arg, AP);
 
           // Get pointer to the corresponding structure's element.
-          llvm::Value *EP = Builder.CreateStructGEP(Struct, SP, Arg.getArgNo());
+          llvm::Value *EP =
+              Builder.CreateStructGEP(Struct, SP, Arg.getArgNo(), "ep");
 
           // Store argument address in it.
           Builder.CreateStore(AP, EP);
         }
+
+        // Call the DLL wrapper function.
+        llvm::Value *VP = Builder.CreateBitCast(SP, VPTy, "vp");
+        Builder.CreateCall(Wrapper, {VP});
       }
 
       // TODO: Compile the module.
