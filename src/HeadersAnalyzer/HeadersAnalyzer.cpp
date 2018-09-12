@@ -828,11 +828,11 @@ int main() {
                                 /* isVarArg */ false);
 
     // Generate iOS libraries.
-    size_t I = 0;
+    size_t LibIdx = 0;
     for (const Dylib &Lib : iOSLibs) {
       // Prepare for IR generation.
       llvm::IRBuilder<> Builder(Ctx);
-      llvm::Module Module(to_string(I) + ": " + Lib.Name, Ctx);
+      llvm::Module Module(to_string(LibIdx) + ": " + Lib.Name, Ctx);
 
       // Generate function wrappers.
       for (const ExportEntry *Exp : Lib.Exports) {
@@ -930,7 +930,7 @@ int main() {
       // TODO: Compile the module.
       Module.dump();
 
-      ++I;
+      ++LibIdx;
     }
 
     // TODO: Again, just for testing.
