@@ -1,0 +1,5 @@
+[ver:1,total:2160]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1940,1536735600:1160,1536739200:780,m
+src/IpaSimulator/MainPage.xaml.cpp:180,1536732000:180,r
+src/HeadersAnalyzer/README.md:20,1536735600:20,r
+build/include/llvm/IR/IRBuilder.h:20,1536735600:20,r
