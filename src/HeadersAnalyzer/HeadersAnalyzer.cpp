@@ -799,7 +799,7 @@ int main() {
 
           // Find the corresponding iOS export.
           auto Exp = iOSExps.find(Func->getUndecoratedName());
-          if (Exp == iOSExps.end())
+          if (Exp == iOSExps.end() || Exp->Status != ExportStatus::Found)
             continue;
           Exp->DLL = move(DLL);
           Exp->RVA = Func->getRelativeVirtualAddress();
@@ -853,6 +853,9 @@ int main() {
       // Generate function wrappers.
       // TODO: Shouldn't we use aligned instructions?
       for (const ExportEntry *Exp : Lib.Exports) {
+        if (Exp->Status != ExportStatus::Found)
+          continue;
+
         // Declaration.
         llvm::Function *Func = llvm::Function::Create(
             Exp->Type, llvm::Function::ExternalLinkage, Exp->Name, &LibModule);
