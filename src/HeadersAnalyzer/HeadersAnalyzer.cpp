@@ -871,13 +871,17 @@ int main() {
         llvm::Value *SP = Builder.CreateBitCast(S, Struct->getPointerTo());
 
         // Process arguments.
-        size_t I = 0;
-        for (llvm::Type *Ty : Exp->Type->params()) {
+        for (llvm::Argument &Arg : Func->args()) {
+
+          // Load the argument.
+          llvm::Value *AP = Builder.CreateAlloca(Arg.getType());
+          Builder.CreateStore(&Arg, AP);
 
           // Get pointer to the corresponding structure's element.
-          llvm::Value *EP = Builder.CreateStructGEP(Struct, SP, I++);
+          llvm::Value *EP = Builder.CreateStructGEP(Struct, SP, Arg.getArgNo());
 
-          // TODO: Store argument address in it.
+          // Store argument address in it.
+          Builder.CreateStore(AP, EP);
         }
       }
 
