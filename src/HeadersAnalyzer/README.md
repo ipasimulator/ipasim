@@ -92,7 +92,7 @@ This object file is then linked into a thin `.dylib` that contains only this obj
 That way, we delegate the low-level details of argument passing, calling conventions, etc. to Clang which should know them best.
 Even better than, say, debugger, that's also why we chose this approach over the one mentioned above.
 The i386 wrapper then takes a pointer to this structure and calls the real function with arguments from that structure.
-Again, this wrapper is generated from LLVM IR code and compiled into an object file that is then linked directly into the DLL.
+Again, this wrapper is generated from LLVM IR code and compiled into an object file that is then linked into a thin DLL which imports the functions from the original DLL.
 Then, at runtime, the ARM wrappers are mapped to the virtual machine and their code is emulated.
 When they call our i386 wrappers, the machine code jumps to an unmapped memory.
 We catch that and simply extract a pointer to the structure (it's always in some well known location, e.g., if it's first argument, then the location is register `r0`).
@@ -137,6 +137,13 @@ int $__ipaSim_wrapper_main(void *args) {
 
 Of course, we don't generate them like this, in C++.
 Instead, we generate an equivalent LLVM IR code.
+
+> Note that we build the i386 DLLs ourselves, so there shouldn't be a problem generating those wrappers as C++ code and compiling it directly into the DLL.
+> This would have the advantage of not having twice as much DLLs like we have with the approach described above.
+>
+> Or, we could analyze header files of those DLLs' and generate the wrappers from that information into LLVM IR and then object files.
+> And then use those object files when linking the DLLs.
+> This should be implemented after we completely migrate to Clang for building those DLLs - because then, we could use generated [`compile_commands.json` files](https://clang.llvm.org/docs/JSONCompilationDatabase.html) to configure our header analyzer correctly.
 
 ### Calling functions at runtime
 
