@@ -832,14 +832,33 @@ int main() {
         llvm::Function *Func = llvm::Function::Create(
             Exp->Type, llvm::Function::ExternalLinkage, Exp->Name, &Module);
 
-        // TODO: Create a structure that we will use to store the function's
-        // arguments and return value.
+        // Map parameter types to their pointers.
+        vector<llvm::Type *> ParamPointers;
+        ParamPointers.reserve(Exp->Type->getNumParams());
+        for (auto *Ty : Exp->Type->params()) {
+          ParamPointers.push_back(Ty->getPointerTo());
+        }
+
+        // Create a structure that we will use to store the function's arguments
+        // and return value. It's actually a union of a structure and of the
+        // return value where the structure in the union contains addresses of
+        // the arguments.
+        // TODO: Handle `void` functions correctly.
+        // TODO: Won't the names be problem when we have more functions?
+        llvm::StructType *Struct =
+            llvm::StructType::create(ParamPointers, "struct.args");
+        llvm::StructType *Union = llvm::StructType::create(
+            "union.args", Struct, Exp->Type->getReturnType()->getPointerTo());
 
         // Our body consists of exactly one `BasicBlock`.
         llvm::BasicBlock *BB = llvm::BasicBlock::Create(Ctx, "entry", Func);
         Builder.SetInsertPoint(BB);
 
-        // TODO: Create an array of pointers to function arguments.
+        // Allocate the union.
+        auto *S = Builder.CreateAlloca(Union);
+
+        // Get pointer to the structure inside it.
+        Builder.CreateBitCast(S, Struct->getPointerTo());
       }
 
       // TODO: Compile the module.
