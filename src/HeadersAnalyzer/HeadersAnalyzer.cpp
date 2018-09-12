@@ -832,18 +832,21 @@ int main() {
     for (const Dylib &Lib : iOSLibs) {
       // Prepare for IR generation.
       llvm::IRBuilder<> Builder(Ctx);
-      llvm::Module Module(to_string(LibIdx) + ": " + Lib.Name, Ctx);
+      llvm::Module LibModule(to_string(LibIdx), Ctx);
+      LibModule.setSourceFileName(Lib.Name);
+      LibModule.setTargetTriple(Module->getTargetTriple());
+      LibModule.setDataLayout(Module->getDataLayout());
 
       // Generate function wrappers.
       for (const ExportEntry *Exp : Lib.Exports) {
         // Declaration.
         llvm::Function *Func = llvm::Function::Create(
-            Exp->Type, llvm::Function::ExternalLinkage, Exp->Name, &Module);
+            Exp->Type, llvm::Function::ExternalLinkage, Exp->Name, &LibModule);
 
         // DLL wrapper declaration.
-        llvm::Function *Wrapper =
-            llvm::Function::Create(WrapperTy, llvm::Function::ExternalLinkage,
-                                   "$__ipaSim_wrapper_" + Exp->Name, &Module);
+        llvm::Function *Wrapper = llvm::Function::Create(
+            WrapperTy, llvm::Function::ExternalLinkage,
+            "$__ipaSim_wrapper_" + Exp->Name, &LibModule);
 
         // TODO: Handle variadic functions.
 
@@ -928,7 +931,7 @@ int main() {
       }
 
       // TODO: Compile the module.
-      Module.dump();
+      LibModule.dump();
 
       ++LibIdx;
     }
