@@ -1,0 +1,3 @@
+[ver:1,total:840]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:780,1536753600:780,m
+build/include/llvm/IR/Module.h:60,1536753600:60,r
