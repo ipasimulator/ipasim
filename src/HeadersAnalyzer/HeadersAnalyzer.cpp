@@ -838,6 +838,7 @@ int main() {
       LibModule.setDataLayout(Module->getDataLayout());
 
       // Generate function wrappers.
+      // TODO: Shouldn't we use aligned instructions?
       for (const ExportEntry *Exp : Lib.Exports) {
         // Declaration.
         llvm::Function *Func = llvm::Function::Create(
