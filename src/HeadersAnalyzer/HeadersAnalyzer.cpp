@@ -822,13 +822,13 @@ int main() {
 
     // Generate iOS libraries.
     size_t I = 0;
-    for (const auto &Lib : iOSLibs) {
+    for (const Dylib &Lib : iOSLibs) {
       // Prepare for IR generation.
       llvm::IRBuilder<> Builder(Ctx);
       llvm::Module Module(to_string(I) + ": " + Lib.Name, Ctx);
 
       // Generate function wrappers.
-      for (const auto *Exp : Lib.Exports) {
+      for (const ExportEntry *Exp : Lib.Exports) {
         // Declaration.
         llvm::Function *Func = llvm::Function::Create(
             Exp->Type, llvm::Function::ExternalLinkage, Exp->Name, &Module);
@@ -838,7 +838,7 @@ int main() {
         // Map parameter types to their pointers.
         vector<llvm::Type *> ParamPointers;
         ParamPointers.reserve(Exp->Type->getNumParams());
-        for (auto *Ty : Exp->Type->params()) {
+        for (llvm::Type *Ty : Exp->Type->params()) {
           ParamPointers.push_back(Ty->getPointerTo());
         }
 
@@ -865,10 +865,20 @@ int main() {
         Builder.SetInsertPoint(BB);
 
         // Allocate the union.
-        auto *S = Builder.CreateAlloca(Union);
+        llvm::Value *S = Builder.CreateAlloca(Union);
 
         // Get pointer to the structure inside it.
-        Builder.CreateBitCast(S, Struct->getPointerTo());
+        llvm::Value *SP = Builder.CreateBitCast(S, Struct->getPointerTo());
+
+        // Process arguments.
+        size_t I = 0;
+        for (llvm::Type *Ty : Exp->Type->params()) {
+
+          // Get pointer to the corresponding structure's element.
+          llvm::Value *EP = Builder.CreateStructGEP(Struct, SP, I++);
+
+          // TODO: Store argument address in it.
+        }
       }
 
       // TODO: Compile the module.
