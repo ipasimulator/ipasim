@@ -470,14 +470,9 @@ enum class ExportStatus { NotFound = 0, Found, Overloaded };
 struct ExportEntry {
   ExportEntry(string Name)
       : Name(Name), Status(ExportStatus::NotFound), RVA(0), Type(nullptr) {}
-  ExportEntry(string Name, size_t Lib)
-      : Name(Name), Status(ExportStatus::NotFound), Libs{Lib}, RVA(0),
-        Type(nullptr) {}
 
   string Name;
   mutable ExportStatus Status;
-  mutable set<size_t> Libs;
-  mutable string DLL;
   mutable uint32_t RVA;
   mutable llvm::FunctionType *Type;
 
@@ -687,11 +682,29 @@ public:
   ~SBDebuggerGuard() { lldb::SBDebugger::Terminate(); }
 };
 
+struct DLLEntry {
+  DLLEntry(string Name) : Name(Name) {}
+
+  string Name;
+  vector<const ExportEntry *> Exports;
+};
+
+struct DLLGroup {
+  path Dir;
+  vector<DLLEntry> DLLs;
+};
+
 int main() {
-  vector<Dylib> iOSLibs = {{"/usr/lib/libobjc.A.dylib"}};
-  ExportList iOSExps = {ExportEntry("_sel_registerName", 0),
-                        ExportEntry("_object_setIvar", 0)};
+  ExportList iOSExps;
+  auto addExp = [&](string Name) {
+    return &*iOSExps.insert(ExportEntry(Name)).first;
+  };
+  vector<Dylib> iOSLibs = {
+      {"/usr/lib/libobjc.A.dylib",
+       {addExp("_sel_registerName"), addExp("_object_setIvar")}}};
   ClassExportList iOSClasses = {{"_NSObject", 0}};
+  vector<DLLGroup> DLLGroups = {
+      {"./src/objc/Debug/", {DLLEntry("libobjc.A.dll")}}};
 
   // Parse iOS headers.
   // TODO: This is so up here just for testing. In production, it should be
@@ -747,9 +760,10 @@ int main() {
         // If not found among exported functions, try if it isn't an Objective-C
         // function.
         auto Class = findClassMethod(iOSClasses, NameStr);
-        if (Class != iOSClasses.end())
-          Exp = iOSExps.insert(ExportEntry(NameStr, Class->second)).first;
-        else {
+        if (Class != iOSClasses.end()) {
+          Exp = iOSExps.insert(ExportEntry(NameStr)).first;
+          iOSLibs[Class->second].Exports.push_back(&*Exp);
+        } else {
 #if defined(IPASIM_WARN_UNINTERESTING_FUNCTIONS)
           cerr << "Warning: found uninteresting function (" << NameStr
                << "). Isn't that interesting?\n";
@@ -789,11 +803,9 @@ int main() {
     DebuggerSP Debugger = Debugger::CreateInstance();
 
     // Load DLLs and PDBs.
-    vector<pair<path, vector<string>>> DLLs = {
-        {"./src/objc/Debug/", {"libobjc.A.dll"}}};
-    for (const auto &DLLGroup : DLLs) {
-      for (const string &DLL : DLLGroup.second) {
-        path DLLPath(DLLGroup.first / DLL);
+    for (DLLGroup &DLLGroup : DLLGroups) {
+      for (DLLEntry &DLL : DLLGroup.DLLs) {
+        path DLLPath(DLLGroup.Dir / DLL.Name);
         path PDBPath(DLLPath);
         PDBPath.replace_extension(".pdb");
 
@@ -832,8 +844,8 @@ int main() {
           auto Exp = iOSExps.find(Func->getUndecoratedName());
           if (Exp == iOSExps.end() || Exp->Status != ExportStatus::Found)
             continue;
-          Exp->DLL = move(DLL);
           Exp->RVA = Func->getRelativeVirtualAddress();
+          DLL.Exports.push_back(&*Exp);
 
           // Verify that the function has the same signature as the iOS one.
           if (!TC.areEquivalent(Exp->Type, *Func)) {
@@ -841,14 +853,6 @@ int main() {
                  << Exp->Name << ").\n";
           }
         }
-      }
-    }
-
-    // Map `iOSExps` to `iOSLibs`.
-    // TODO: Don't do this separatedly, do it while examining TBD files instead.
-    for (auto &Exp : iOSExps) {
-      for (uint32_t Lib : Exp.Libs) {
-        iOSLibs[Lib].Exports.push_back(&Exp);
       }
     }
 
@@ -1015,6 +1019,15 @@ int main() {
         continue;
       }
       PM.run(LibModule);
+    }
+
+    // Generate DLL wrappers.
+    for (const DLLGroup &DLLGroup : DLLGroups) {
+      for (const DLLEntry &DLL : DLLGroup.DLLs) {
+        path DLLPath(DLLGroup.Dir / DLL.Name);
+
+        // TODO: Just do it.
+      }
     }
 
     // TODO: Again, just for testing.
