@@ -63,8 +63,8 @@
 #include <vector>
 
 // Configuration.
-#undef IPASIM_WARN_UNINTERESTING_FUNCTIONS
-#define OUTPUT_LLVM_IR
+constexpr bool WarnUninterestingFunctions = false;
+constexpr bool OutputLLVMIR = false;
 
 using namespace clang;
 using namespace frontend;
@@ -765,10 +765,10 @@ int main() {
           Exp = iOSExps.insert(ExportEntry(NameStr)).first;
           iOSLibs[Class->second].Exports.push_back(&*Exp);
         } else {
-#if defined(IPASIM_WARN_UNINTERESTING_FUNCTIONS)
-          cerr << "Warning: found uninteresting function (" << NameStr
-               << "). Isn't that interesting?\n";
-#endif
+          if constexpr (WarnUninterestingFunctions) {
+            cerr << "Warning: found uninteresting function (" << NameStr
+                 << "). Isn't that interesting?\n";
+          }
           continue;
         }
       }
@@ -990,8 +990,7 @@ int main() {
       // https://llvm.org/docs/tutorial/LangImpl08.html.
 
       // Print out LLVM IR.
-#if defined(OUTPUT_LLVM_IR)
-      {
+      if constexpr (OutputLLVMIR) {
         error_code EC;
         llvm::raw_fd_ostream IROutput((OutputDir / (LibNo + ".ll")).string(),
                                       EC, llvm::sys::fs::F_None);
@@ -1001,7 +1000,6 @@ int main() {
         else
           LibModule.print(IROutput, nullptr);
       }
-#endif
 
       // Create `TargetMachine`.
       string Error;
@@ -1070,8 +1068,7 @@ int main() {
         // TODO: Generate function wrappers.
 
         // Print out LLVM IR.
-#if defined(OUTPUT_LLVM_IR)
-        {
+        if constexpr (OutputLLVMIR) {
           error_code EC;
           llvm::raw_fd_ostream IROutput(
               (OutputDir / DLL.Name).replace_extension(".ll").string(), EC,
@@ -1082,7 +1079,6 @@ int main() {
           else
             LibModule.print(IROutput, nullptr);
         }
-#endif
       }
     }
 
