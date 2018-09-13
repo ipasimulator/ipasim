@@ -1,0 +1,4 @@
+[ver:1,total:1080]
+src/HeadersAnalyzer/README.md:510,1536847200:90,1536850800:360,1536858000:60,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:510,1536847200:90,1536850800:180,1536858000:240,r
+src/HeadersAnalyzer/iOSHeaders.mm:60,1536847200:60,r
