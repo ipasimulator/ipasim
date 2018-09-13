@@ -1022,11 +1022,35 @@ int main() {
     }
 
     // Generate DLL wrappers.
+    // TODO: Share code with iOS libraries generation.
     for (const DLLGroup &DLLGroup : DLLGroups) {
       for (const DLLEntry &DLL : DLLGroup.DLLs) {
         path DLLPath(DLLGroup.Dir / DLL.Name);
 
-        // TODO: Just do it.
+        // Prepare for IR generation.
+        llvm::IRBuilder<> Builder(Ctx);
+        llvm::Module LibModule(DLL.Name, Ctx);
+        LibModule.setSourceFileName(DLLPath.string());
+
+        // Target Windows.
+        string Triple = "i386-pc-windows-msvc";
+        string Error;
+        const llvm::Target *Target =
+            llvm::TargetRegistry::lookupTarget(Triple, Error);
+        if (!Target) {
+          cerr << "Error while creating target (" << DLL.Name << "): " << Error
+               << '\n';
+          continue;
+        }
+
+        // Create `TargetMachine`.
+        llvm::TargetMachine *TM = Target->createTargetMachine(
+            Triple, "generic", "", llvm::TargetOptions(),
+            /* RelocModel */ llvm::None);
+
+        // Configure LLVM `Module`.
+        LibModule.setTargetTriple(Triple);
+        LibModule.setDataLayout(TM->createDataLayout());
       }
     }
 
