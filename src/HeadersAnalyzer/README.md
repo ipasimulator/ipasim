@@ -111,6 +111,7 @@ That way, we delegate the low-level details of argument passing, calling convent
 Even better than, say, debugger, that's also why we chose this approach over the one mentioned above.
 The i386 wrapper then takes a pointer to this structure and calls the real function with arguments from that structure.
 Again, this wrapper is generated from LLVM IR code and compiled into an object file that is then linked into a thin DLL which imports the functions from the original DLL.
+This wrapper DLL has the same name as the original one, but is inside folder `/Wrappers/` when deployed on the target machine, so that they can be distinguished.
 Then, at runtime, the ARM wrappers are mapped to the virtual machine and their code is emulated.
 When they call our i386 wrappers, the machine code jumps to an unmapped memory.
 We catch that and simply extract a pointer to the structure (it's always in some well known location, e.g., if it's first argument, then the location is register `r0`).
@@ -119,6 +120,12 @@ Return values are passed in the same structure.
 Wrappers for callbacks are generated similarly.
 
 The wrappers themselves are generated in LLVM IR which was chosen over C++ because it's easier to generate and the result is more robust.
+
+Note that the correspondence between ARM and i386 wrapper libraries doesn't have to be 1:1.
+For example, we can have function `foo` exported from library `libfoo.dylib` on iOS (we would get this information from `libfoo.tbd`) and function `bar` exported from the same library.
+But on Windows, these can be implemented in different DLLs (maybe for historical reasons), e.g., `Foo.dll` and `Bar.dll`, respectively.
+Then, `libfoo.dylib` would import from both of those DLLs.
+Or, more precisely, `libfoo.dylib` would import from wrapper DLLs `/Wrappers/Foo.dll` and `/Wrappers/Bar.dll` which would then import from the original DLLs `Foo.dll` and `Bar.dll`, respectively.
 
 For example, let's say we want to generate wrappers for function `int main(int, char**)`.
 In C++ they would look roughly like this:
