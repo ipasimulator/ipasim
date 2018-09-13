@@ -64,6 +64,7 @@
 
 // Configuration.
 #undef IPASIM_WARN_UNINTERESTING_FUNCTIONS
+#define OUTPUT_LLVM_IR
 
 using namespace clang;
 using namespace frontend;
@@ -988,6 +989,20 @@ int main() {
       // Compile the module. Inspired by LLVM tutorial:
       // https://llvm.org/docs/tutorial/LangImpl08.html.
 
+      // Print out LLVM IR.
+#if defined(OUTPUT_LLVM_IR)
+      {
+        error_code EC;
+        llvm::raw_fd_ostream IROutput((OutputDir / (LibNo + ".ll")).string(),
+                                      EC, llvm::sys::fs::F_None);
+        if (EC)
+          cerr << "Error while creating LLVM output file (" << Lib.Name
+               << "): " << EC.message() << '\n';
+        else
+          LibModule.print(IROutput, nullptr);
+      }
+#endif
+
       // Create `TargetMachine`.
       string Error;
       const llvm::Target *Target =
@@ -1051,6 +1066,23 @@ int main() {
         // Configure LLVM `Module`.
         LibModule.setTargetTriple(Triple);
         LibModule.setDataLayout(TM->createDataLayout());
+
+        // TODO: Generate function wrappers.
+
+        // Print out LLVM IR.
+#if defined(OUTPUT_LLVM_IR)
+        {
+          error_code EC;
+          llvm::raw_fd_ostream IROutput(
+              (OutputDir / DLL.Name).replace_extension(".ll").string(), EC,
+              llvm::sys::fs::F_None);
+          if (EC)
+            cerr << "Error while creating LLVM output file (" << DLL.Name
+                 << "): " << EC.message() << '\n';
+          else
+            LibModule.print(IROutput, nullptr);
+        }
+#endif
       }
     }
 
