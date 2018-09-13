@@ -87,6 +87,15 @@ Until our changes, this option only emitted functions that *had bodies* but were
 After our changes, this option emits also functions without bodies.
 See tag `[emit-all-decls]` in Clang's code to see those changes.
 
+**TODO: Note that currently, we actually emit *definitions* even if they were only *declarations* in the source code.
+Those fake definitions have probably invalid bodies but we don't care since we are only interested in signatures.
+We do that just for simplicity - there were less modification of Clang's code this way.
+But it would really be better if we didn't emit any bodies, i.e., declarations were emitted as declarations.
+Now, it would probably be a problem if there was a definition and a declaration of the same function in the analyzed files.
+Because we would make the declaration into a definition and then there would be two definitions of the same thing.
+Also, we should probably name the option differently and don't extend the existing `EmitAllDecls` since it actually does a different thing.
+Our option (let's call it `DeclareEverything`) includes all declarations in the resulting LLVM IR, whereas the existing option `EmitAllDecls` really just makes *definitions* (duh) that would otherwise be discarded visible in the resulting LLVM IR.**
+
 ### Generating wrappers
 
 There are two possible approaches to this.
