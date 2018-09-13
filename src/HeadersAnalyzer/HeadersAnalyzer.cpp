@@ -887,14 +887,17 @@ int main() {
         if (Exp->Status != ExportStatus::Found)
           continue;
 
-        // Declaration.
-        llvm::Function *Func = llvm::Function::Create(
-            Exp->Type, llvm::Function::ExternalLinkage, Exp->Name, &LibModule);
+        // Declaration. Note that we add prefix `\01`, so that the name doesn't
+        // get mangled since it already is. LLVM will remove this prefix before
+        // emitting object code for the function.
+        llvm::Function *Func =
+            llvm::Function::Create(Exp->Type, llvm::Function::ExternalLinkage,
+                                   '\01' + Exp->Name, &LibModule);
 
         // DLL wrapper declaration.
         llvm::Function *Wrapper = llvm::Function::Create(
             WrapperTy, llvm::Function::ExternalLinkage,
-            "$__ipaSim_wrapper_" + Exp->Name, &LibModule);
+            "\01$__ipaSim_wrapper_" + Exp->Name, &LibModule);
 
         // TODO: Handle variadic functions.
 
