@@ -63,7 +63,7 @@
 #include <vector>
 
 // Configuration.
-#define IPASIM_WARN_UNINTERESTING_FUNCTIONS
+#undef IPASIM_WARN_UNINTERESTING_FUNCTIONS
 
 using namespace clang;
 using namespace frontend;
@@ -658,6 +658,29 @@ private:
   };
 };
 
+using ClassExportList = map<string, size_t>;
+
+// This is an inverse of `CGObjCCommonMac::GetNameForMethod`.
+// TODO: Find out whether there aren't any Objective-C method name parsers
+// somewhere in the LLVM ecosystem already.
+static auto findClassMethod(const ClassExportList &CEL, const string &Name) {
+  if (Name[0] != '+' && Name[0] != '-')
+    return CEL.end();
+  if (Name[1] != '[')
+    return CEL.end();
+
+  // Find the first space.
+  size_t SpaceIdx = Name.find(' ', 2);
+  if (SpaceIdx == string::npos)
+    return CEL.end();
+
+  // From `[` to the first space is a class name.
+  string ClassName = Name.substr(2, SpaceIdx - 2);
+
+  // On Mach systems, names are mangled with leading underscore.
+  return CEL.find('_' + ClassName);
+}
+
 class SBDebuggerGuard {
 public:
   SBDebuggerGuard() { lldb::SBDebugger::Initialize(); }
@@ -668,6 +691,7 @@ int main() {
   vector<Dylib> iOSLibs = {{"/usr/lib/libobjc.A.dylib"}};
   ExportList iOSExps = {ExportEntry("_sel_registerName", 0),
                         ExportEntry("_object_setIvar", 0)};
+  ClassExportList iOSClasses = {{"_NSObject", 0}};
 
   // Parse iOS headers.
   // TODO: This is so up here just for testing. In production, it should be
@@ -717,14 +741,21 @@ int main() {
                                         /* CannotUsePrivateLabel */ false);
 
       // Filter uninteresting functions.
-      string NameStr = Name.str().str();
+      string NameStr(Name.str().str());
       auto Exp = iOSExps.find(NameStr);
       if (Exp == iOSExps.end()) {
+        // If not found among exported functions, try if it isn't an Objective-C
+        // function.
+        auto Class = findClassMethod(iOSClasses, NameStr);
+        if (Class != iOSClasses.end())
+          Exp = iOSExps.insert(ExportEntry(NameStr, Class->second)).first;
+        else {
 #if defined(IPASIM_WARN_UNINTERESTING_FUNCTIONS)
-        cerr << "Warning: found uninteresting function (" << NameStr
-             << "). Isn't that interesting?\n";
+          cerr << "Warning: found uninteresting function (" << NameStr
+               << "). Isn't that interesting?\n";
 #endif
-        continue;
+          continue;
+        }
       }
 
       // Update status accordingly.
