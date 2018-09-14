@@ -1126,8 +1126,28 @@ int main() {
         LibModule.setTargetTriple(Triple);
         LibModule.setDataLayout(TM->createDataLayout());
 
-        // Since we are transferring data in memory across architectures, they
-        // must have the same endianness for that to work.
+        // Since we are already generating so much wrappers, let's generate some
+        // more. We create a Dylib file that exports the same functions as our
+        // wrapper DLL, so that it can be then used by linker to link our iOS
+        // stub Dylibs.
+        llvm::IRBuilder<> DylibBuilder(Ctx);
+        llvm::Module DylibModule(DLL.Name, Ctx);
+        DylibModule.setSourceFileName(DLLPath.string());
+        const llvm::Target *DylibTarget = llvm::TargetRegistry::lookupTarget(
+            Module->getTargetTriple(), Error);
+        if (!DylibTarget) {
+          cerr << "Error while creating Dylib target (" << DLL.Name
+               << "): " << Error << '\n';
+          continue;
+        }
+        llvm::TargetMachine *DylibTM = DylibTarget->createTargetMachine(
+            Module->getTargetTriple(), "generic", "", llvm::TargetOptions(),
+            /* RelocModel */ llvm::None);
+        DylibModule.setTargetTriple(Module->getTargetTriple());
+        DylibModule.setDataLayout(Module->getDataLayout());
+
+        // Since we are transferring data in memory across architectures,
+        // they must have the same endianness for that to work.
         if (LibModule.getDataLayout().isLittleEndian() !=
             Module->getDataLayout().isLittleEndian()) {
           cerr << "Error: target platforms don't have the same endianness.\n";
@@ -1166,6 +1186,15 @@ int main() {
           Wrapper->setDLLStorageClass(llvm::Function::DLLExportStorageClass);
           if (Func)
             Func->setDLLStorageClass(llvm::Function::DLLImportStorageClass);
+
+          // Generate Dylib stub.
+          llvm::Function *Stub = llvm::Function::Create(
+              WrapperTy, llvm::Function::ExternalLinkage,
+              "\01$__ipaSim_wrapper_" + to_string(Exp->RVA), &DylibModule);
+          llvm::BasicBlock *StubBB =
+              llvm::BasicBlock::Create(Ctx, "entry", Stub);
+          DylibBuilder.SetInsertPoint(StubBB);
+          DylibBuilder.CreateRetVoid();
 
           // TODO: Handle variadic functions.
 
@@ -1332,6 +1361,50 @@ int main() {
             FailingCommands;
         if (TheDriver.ExecuteCompilation(*C, FailingCommands)) {
           cerr << "Error while executing Clang to link a wrapper DLL ("
+               << DLL.Name << ").\n";
+          continue;
+        }
+
+        // Create the stub Dylib.
+        string OOutputPath(
+            (OutputDir / (DLL.Name)).replace_extension(".o").string());
+        llvm::raw_fd_ostream OOutput(OOutputPath, EC, llvm::sys::fs::F_None);
+        if (EC) {
+          cerr << "Error while creating `.o` output file (" << DLL.Name
+               << "): " << EC.message() << '\n';
+          continue;
+        }
+        llvm::legacy::PassManager DylibPM;
+        if (DylibTM->addPassesToEmitFile(
+                DylibPM, OOutput, llvm::TargetMachine::CGFT_ObjectFile)) {
+          cerr << "Error: cannot emit object file.\n";
+          continue;
+        }
+        DylibPM.run(DylibModule);
+        OOutput.close();
+        string OutputDylib(
+            (OutputDir / DLL.Name).replace_extension(".dylib").string());
+        llvm::SmallVector<const char *, 256> StubArgv = {
+            "clang.exe", "-target",
+            // TODO: Don't hardcode target triple.
+            "armv7s-apple-ios10", "-fuse-ld=lld", "-shared", "-o",
+            OutputDylib.c_str(), OOutputPath.c_str()};
+        CompilerInstance StubCI;
+        StubCI.createDiagnostics();
+        driver::Driver StubDriver(StubArgv[0],
+                                  llvm::sys::getDefaultTargetTriple(),
+                                  StubCI.getDiagnostics());
+        unique_ptr<driver::Compilation> StubC(
+            StubDriver.BuildCompilation(StubArgv));
+        if (!StubC || StubC->containsError()) {
+          cerr << "Error while building `Compilation` to link a stub Dylib ("
+               << DLL.Name << ").\n";
+          continue;
+        }
+        llvm::SmallVector<std::pair<int, const driver::Command *>, 4>
+            StubFailingCommands;
+        if (StubDriver.ExecuteCompilation(*StubC, StubFailingCommands)) {
+          cerr << "Error while executing Clang to link a stub Dylib ("
                << DLL.Name << ").\n";
           continue;
         }
