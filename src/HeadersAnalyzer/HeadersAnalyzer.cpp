@@ -66,7 +66,7 @@
 // Configuration.
 enum class LibType { None = 0, Dylib = 0x1, DLL = 0x2, Both = 0x3 };
 constexpr LibType WarnUninterestingFunctions = LibType::None;
-constexpr bool ErrorUnimplementedFunctions = true;
+constexpr LibType ErrorUnimplementedFunctions = LibType::Both;
 constexpr bool OutputLLVMIR = true;
 
 using namespace clang;
@@ -799,6 +799,16 @@ int main() {
       Exp->Type = Func.getFunctionType();
     }
 
+    if constexpr (ErrorUnimplementedFunctions & LibType::Dylib) {
+      for (auto &Exp : iOSExps) {
+        if (Exp.Status == ExportStatus::NotFound) {
+          cerr << "Error: function found in TBD files wasn't found in any "
+                  "Dylib ("
+               << Exp.Name << ").\n";
+        }
+      }
+    }
+
     // Create `CodeGenModule`.
     CI.createASTContext();
     CodeGen::CodeGenModule CGM(CI.getASTContext(), CI.getHeaderSearchOpts(),
@@ -908,7 +918,7 @@ int main() {
 
         // Ignore functions that haven't been found in any DLL.
         if (Exp->Status != ExportStatus::FoundInDLL) {
-          if constexpr (ErrorUnimplementedFunctions) {
+          if constexpr (ErrorUnimplementedFunctions & LibType::DLL) {
             if (Exp->Status == ExportStatus::Found) {
               cerr << "Error: function found in Dylib wasn't found in any DLL ("
                    << Exp->Name << ").\n";
