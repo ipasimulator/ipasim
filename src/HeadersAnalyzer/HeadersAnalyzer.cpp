@@ -1106,6 +1106,17 @@ int main() {
         LibModule.setTargetTriple(Triple);
         LibModule.setDataLayout(TM->createDataLayout());
 
+        // Since we are transferring data in memory across architectures, they
+        // must have the same endianness for that to work.
+        if (LibModule.getDataLayout().isLittleEndian() !=
+            Module->getDataLayout().isLittleEndian()) {
+          cerr << "Error: target platforms don't have the same endianness.\n";
+        } else {
+          assert(LibModule.getDataLayout().isBigEndian() ==
+                     Module->getDataLayout().isBigEndian() &&
+                 "Inconsistency in endianness.");
+        }
+
         // Generate function wrappers.
         for (const ExportEntry *Exp : DLL.Exports) {
           assert(Exp->Status == ExportStatus::FoundInDLL &&
