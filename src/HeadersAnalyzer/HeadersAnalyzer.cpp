@@ -64,7 +64,8 @@
 #include <vector>
 
 // Configuration.
-constexpr bool WarnUninterestingFunctions = false;
+enum class LibType { None = 0, Dylib = 0x1, DLL = 0x2, Both = 0x3 };
+constexpr LibType WarnUninterestingFunctions = LibType::DLL;
 constexpr bool OutputLLVMIR = true;
 
 using namespace clang;
@@ -72,6 +73,10 @@ using namespace frontend;
 using namespace std;
 using namespace experimental::filesystem;
 using namespace tapi::internal;
+
+static constexpr bool operator&(LibType Value, LibType Flag) {
+  return ((uint32_t)Value & (uint32_t)Flag) == (uint32_t)Flag;
+}
 
 enum class export_status { NotFound = 0, Found, Overloaded, Generated };
 
@@ -766,9 +771,9 @@ int main() {
           Exp = iOSExps.insert(ExportEntry(NameStr)).first;
           iOSLibs[Class->second].Exports.push_back(&*Exp);
         } else {
-          if constexpr (WarnUninterestingFunctions) {
-            cerr << "Warning: found uninteresting function (" << NameStr
-                 << "). Isn't that interesting?\n";
+          if constexpr (WarnUninterestingFunctions & LibType::Dylib) {
+            cerr << "Warning: found uninteresting function in Dylib ("
+                 << NameStr << "). Isn't that interesting?\n";
           }
           continue;
         }
@@ -846,8 +851,14 @@ int main() {
 
           // Find the corresponding iOS export.
           auto Exp = iOSExps.find(Func->getUndecoratedName());
-          if (Exp == iOSExps.end() || Exp->Status != ExportStatus::Found)
+          if (Exp == iOSExps.end() || Exp->Status != ExportStatus::Found) {
+            if constexpr (WarnUninterestingFunctions & LibType::DLL) {
+              cerr << "Warning: found uninteresting function in DLL ("
+                   << Func->getUndecoratedName()
+                   << "). Isn't that interesting?\n";
+            }
             continue;
+          }
           Exp->Status = ExportStatus::FoundInDLL;
           Exp->RVA = Func->getRelativeVirtualAddress();
           DLL.Exports.push_back(&*Exp);
