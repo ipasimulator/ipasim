@@ -1221,6 +1221,26 @@ int main() {
           else
             LibModule.print(IROutput, nullptr);
         }
+
+        // Create output file.
+        error_code EC;
+        llvm::raw_fd_ostream Output(
+            (OutputDir / (DLL.Name)).replace_extension(".obj").string(), EC,
+            llvm::sys::fs::F_None);
+        if (EC) {
+          cerr << "Error while creating output file (" << DLL.Name
+               << "): " << EC.message() << '\n';
+          continue;
+        }
+
+        // Emit object code.
+        llvm::legacy::PassManager PM;
+        if (TM->addPassesToEmitFile(PM, Output,
+                                    llvm::TargetMachine::CGFT_ObjectFile)) {
+          cerr << "Error: cannot emit object file.\n";
+          continue;
+        }
+        PM.run(LibModule);
       }
     }
 
