@@ -1383,7 +1383,7 @@ int main() {
         DylibPM.run(DylibModule);
         OOutput.close();
         string OutputDylib(
-            (OutputDir / DLL.Name).replace_extension(".dylib").string());
+            (OutputDir / DLL.Name).replace_extension(".dll.dylib").string());
         llvm::SmallVector<const char *, 256> StubArgv = {
             "clang.exe", "-target",
             // TODO: Don't hardcode target triple.
