@@ -476,16 +476,21 @@ private:
 
 enum class ExportStatus { NotFound = 0, Found, Overloaded, FoundInDLL };
 
+struct DLLGroup;
+struct DLLEntry;
+
 struct ExportEntry {
   ExportEntry(string Name)
       : Name(Name), Status(ExportStatus::NotFound), RVA(0), Type(nullptr),
-        IsObjCMethod(false) {}
+        IsObjCMethod(false), DLLGroup(nullptr), DLL(nullptr) {}
 
   string Name;
   mutable ExportStatus Status;
   mutable uint32_t RVA;
   mutable llvm::FunctionType *Type;
   mutable bool IsObjCMethod;
+  mutable const DLLGroup *DLLGroup;
+  mutable const DLLEntry *DLL;
 
   bool operator<(const ExportEntry &Other) const { return Name < Other.Name; }
 };
@@ -884,6 +889,8 @@ int main() {
           Exp->Status = ExportStatus::FoundInDLL;
           Exp->RVA = Func->getRelativeVirtualAddress();
           DLL.Exports.push_back(&*Exp);
+          Exp->DLLGroup = &DLLGroup;
+          Exp->DLL = &DLL;
 
           // Save function that will serve as a reference for computing
           // addresses of Objective-C methods.
@@ -915,6 +922,15 @@ int main() {
       error_code E;
       if (!create_directories(WrappersDir, E) && E) {
         cerr << "Fatal error while creating wrappers directory: " << E.message()
+             << '\n';
+        return 1;
+      }
+    }
+    path DylibsDir("./out/Dylibs/");
+    {
+      error_code E;
+      if (!create_directories(DylibsDir, E) && E) {
+        cerr << "Fatal error while creating Dylibs directory: " << E.message()
              << '\n';
         return 1;
       }
@@ -1420,6 +1436,75 @@ int main() {
       }
     }
 
+    // Generate iOS Dylibs.
+    size_t DylibIdx = 0;
+    for (const Dylib &Lib : iOSLibs) {
+      string LibNo(to_string(DylibIdx++));
+
+      string OutputDylib((DylibsDir / Lib.Name).string());
+      string InputObject((OutputDir / (LibNo + ".o")).string());
+      string LibraryPath(OutputDir.string());
+      llvm::SmallVector<const char *, 256> DylibArgv = {
+          "clang.exe", "-target",
+          // TODO: Don't hardcode target triple.
+          "armv7s-apple-ios10", "-fuse-ld=lld", "-shared", "-o",
+          OutputDylib.c_str(), InputObject.c_str(),
+          // Don't emit error that symbol `dyld_stub_binder` is undefined.
+          "-undefined", "warning",
+          // But to do that, we cannot use two-level namespace.
+          "-flat_namespace",
+          // See [no-lsystem].
+          "-no_lsystem", "-install_name", Lib.Name.c_str(), "-L",
+          LibraryPath.c_str()};
+
+      // Add DLLs to link.
+      set<const DLLEntry *> DLLs;
+      vector<string> StringOwner;
+      for (const ExportEntry *Exp : Lib.Exports) {
+        if (Exp->DLL && DLLs.insert(Exp->DLL).second) {
+          string DylibName(
+              path(Exp->DLL->Name).replace_extension(".dll").string());
+          const char *DylibCStr = DylibName.c_str();
+          // Remove prefix `lib`.
+          if (!DylibName.compare(0, 3, "lib"))
+            DylibCStr = DylibCStr + 3;
+          DylibArgv.push_back("-l");
+          DylibArgv.push_back(DylibCStr);
+          StringOwner.push_back(move(DylibName));
+        }
+      }
+
+      // Create output directory.
+      {
+        error_code E;
+        if (!create_directories(path(OutputDylib).parent_path(), E) && E) {
+          cerr << "Fatal error while creating Dylib's output directory: "
+               << E.message() << '\n';
+          return 1;
+        }
+      }
+
+      CompilerInstance DylibCI;
+      DylibCI.createDiagnostics();
+      driver::Driver DylibDriver(DylibArgv[0],
+                                 llvm::sys::getDefaultTargetTriple(),
+                                 DylibCI.getDiagnostics());
+      unique_ptr<driver::Compilation> DylibC(
+          DylibDriver.BuildCompilation(DylibArgv));
+      if (!DylibC || DylibC->containsError()) {
+        cerr << "Error while building `Compilation` to link a Dylib ("
+             << Lib.Name << ").\n";
+        continue;
+      }
+      llvm::SmallVector<std::pair<int, const driver::Command *>, 4>
+          DylibFailingCommands;
+      if (DylibDriver.ExecuteCompilation(*DylibC, DylibFailingCommands)) {
+        cerr << "Error while executing Clang to link a Dylib (" << Lib.Name
+             << ").\n";
+        continue;
+      }
+    }
+
     // TODO: Again, just for testing.
     return 0;
   }
@@ -1458,7 +1543,8 @@ int main() {
 
   // Analyze headers.
   // TODO: Maybe use `/deps/WinObjC/.apianalyzer/` configuration files.
-  // TODO: Parse headers just for deprecated attributes and `@Status` comments.
+  // TODO: Parse headers just for deprecated attributes and `@Status`
+  // comments.
   vector<string> headerPaths{"./deps/WinObjC/include/Foundation/Foundation.h",
                              "./deps/WinObjC/tools/include/objc/objc-arc.h",
                              "./deps/WinObjC/tools/include/objc/message.h"};
