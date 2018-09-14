@@ -64,7 +64,7 @@
 
 // Configuration.
 constexpr bool WarnUninterestingFunctions = false;
-constexpr bool OutputLLVMIR = false;
+constexpr bool OutputLLVMIR = true;
 
 using namespace clang;
 using namespace frontend;
@@ -1065,7 +1065,19 @@ int main() {
         LibModule.setTargetTriple(Triple);
         LibModule.setDataLayout(TM->createDataLayout());
 
-        // TODO: Generate function wrappers.
+        // Generate function wrappers.
+        for (const ExportEntry *Exp : DLL.Exports) {
+          if (Exp->Status != ExportStatus::Found)
+            continue;
+
+          // Declarations.
+          llvm::Function *Func =
+              llvm::Function::Create(Exp->Type, llvm::Function::ExternalLinkage,
+                                     '\01' + Exp->Name, &LibModule);
+          llvm::Function *Wrapper = llvm::Function::Create(
+              WrapperTy, llvm::Function::ExternalLinkage,
+              "\01$__ipaSim_wrapper_" + Exp->Name, &LibModule);
+        }
 
         // Print out LLVM IR.
         if constexpr (OutputLLVMIR) {
