@@ -860,12 +860,18 @@ int main() {
           auto Symbol = EnumSymbols->getChildAtIndex(I);
           auto Func = static_cast<PDBSymbolFunc *>(Symbol.get());
 
+          // Get function's name, mangled if possible.
+          string Name = Func->getUndecoratedName();
+          if (Name == "") {
+            Name = Func->getName();
+            assert(Name != "" && "A function has no name.");
+          }
+
           // Find the corresponding iOS export.
-          auto Exp = iOSExps.find(Func->getUndecoratedName());
+          auto Exp = iOSExps.find(Name);
           if (Exp == iOSExps.end() || Exp->Status != ExportStatus::Found) {
             if constexpr (WarnUninterestingFunctions & LibType::DLL) {
-              cerr << "Warning: found uninteresting function in DLL ("
-                   << Func->getUndecoratedName()
+              cerr << "Warning: found uninteresting function in DLL (" << Name
                    << "). Isn't that interesting?\n";
             }
             continue;
