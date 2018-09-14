@@ -862,9 +862,9 @@ int main() {
 
           // Get function's name, mangled if possible.
           string Name = Func->getUndecoratedName();
-          if (Name == "") {
+          if (Name.empty()) {
             Name = Func->getName();
-            assert(Name != "" && "A function has no name.");
+            assert(!Name.empty() && "A function has no name.");
           }
 
           // Find the corresponding iOS export.
