@@ -65,7 +65,8 @@
 
 // Configuration.
 enum class LibType { None = 0, Dylib = 0x1, DLL = 0x2, Both = 0x3 };
-constexpr LibType WarnUninterestingFunctions = LibType::DLL;
+constexpr LibType WarnUninterestingFunctions = LibType::None;
+constexpr bool ErrorUnimplementedFunctions = true;
 constexpr bool OutputLLVMIR = true;
 
 using namespace clang;
@@ -904,8 +905,17 @@ int main() {
       // Generate function wrappers.
       // TODO: Shouldn't we use aligned instructions?
       for (const ExportEntry *Exp : Lib.Exports) {
-        if (Exp->Status != ExportStatus::FoundInDLL)
+
+        // Ignore functions that haven't been found in any DLL.
+        if (Exp->Status != ExportStatus::FoundInDLL) {
+          if constexpr (ErrorUnimplementedFunctions) {
+            if (Exp->Status == ExportStatus::Found) {
+              cerr << "Error: function found in Dylib wasn't found in any DLL ("
+                   << Exp->Name << ").\n";
+            }
+          }
           continue;
+        }
 
         // Declaration. Note that we add prefix `\01`, so that the name doesn't
         // get mangled since it already is. LLVM will remove this prefix before
