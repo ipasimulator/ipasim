@@ -1,0 +1,8 @@
+[ver:1,total:5100]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:4260,1536919200:540,1536922800:2040,1536926400:1680,m
+src/HeadersAnalyzer/README.md:480,1536922800:450,1536926400:30,m
+src/HeadersAnalyzer/Debug/libobjc.A.ll:180,1536922800:180,r
+build/include/llvm/IR/IRBuilder.h:60,1536926400:60,r
+build/include/llvm/DebugInfo/PDB/PDBSymbolFunc.h:60,1536922800:60,r
+build/include/llvm/IR/Constants.h:30,1536926400:30,r
+build/include/llvm/DebugInfo/PDB/PDBTypes.h:30,1536922800:30,r
