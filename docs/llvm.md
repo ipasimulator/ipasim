@@ -66,6 +66,8 @@ cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_
 - `[macho]`: We want to read Mach-O object files on Windows, too.
   Alternative to this would be to emit PE/COFF instead, or just DWARF (`-gsplit-dwarf`).
   Then, we wouldn't have to read Mach-O object files.
+- `[no-lsystem]`: We added option `-no_lsystem` which, when used, tells Clang driver not to pass option `-lSystem` to linker.
+  We use this option inside our `HeadersAnalyzer` to generate `.dylib`s on Windows (where is no `libSystem.dylib` for linker to use).
 
 ### Objective-C symbols across DLLs
 
