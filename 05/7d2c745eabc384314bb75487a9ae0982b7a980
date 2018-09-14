@@ -1,0 +1,4 @@
+[ver:1,total:540]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:493,1536912000:493,m
+src/HeadersAnalyzer/Debug/libobjc.A.ll:27,1536912000:27,r
+build/include/llvm/DebugInfo/PDB/PDBSymbolFunc.h:20,1536912000:20,r
