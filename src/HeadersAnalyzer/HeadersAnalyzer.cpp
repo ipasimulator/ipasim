@@ -1022,7 +1022,7 @@ int main() {
         llvm::raw_string_ostream OS(Error);
         if (verifyFunction(*Func, &OS)) {
           OS.flush();
-          cerr << "Error while building function (" << Exp->Name
+          cerr << "Error while building Dylib function (" << Exp->Name
                << "): " << Error << '\n';
         }
       }
@@ -1143,7 +1143,8 @@ int main() {
               llvm::StructType::create("union", ContainedTy);
 
           // Our body consists of exactly one `BasicBlock`.
-          llvm::BasicBlock *BB = llvm::BasicBlock::Create(Ctx, "entry", Func);
+          llvm::BasicBlock *BB =
+              llvm::BasicBlock::Create(Ctx, "entry", Wrapper);
           Builder.SetInsertPoint(BB);
 
           // The union pointer is in the first argument.
@@ -1152,6 +1153,49 @@ int main() {
           // Get pointer to the structure inside the union.
           llvm::Value *SP =
               Builder.CreateBitCast(UP, Struct->getPointerTo(), "sp");
+
+          // Process arguments.
+          vector<llvm::Value *> Args;
+          Args.reserve(Exp->Type->getNumParams());
+          for (llvm::Argument &Arg : Func->args()) {
+            string ArgNo = to_string(Arg.getArgNo());
+
+            // Load argument from the structure.
+            llvm::Value *APP = Builder.CreateStructGEP(
+                Struct, SP, Arg.getArgNo(), "app" + ArgNo);
+            llvm::Value *AP = Builder.CreateLoad(APP, "ap" + ArgNo);
+            llvm::Value *A = Builder.CreateLoad(AP, "a" + ArgNo);
+
+            // Save the argument.
+            Args.push_back(A);
+          }
+
+          if (!RetTy->isVoidTy()) {
+            // Call the original DLL function.
+            llvm::Value *R = Builder.CreateCall(Func, Args, "r");
+
+            // Get pointer to the return value inside the union.
+            llvm::Value *RP =
+                Builder.CreateBitCast(UP, RetTy->getPointerTo(), "rp");
+
+            // Save return value back into the structure.
+            Builder.CreateStore(R, RP);
+          } else {
+            // Don't process return value of void function.
+            Builder.CreateCall(Func, Args);
+          }
+
+          // Finish.
+          Builder.CreateRetVoid();
+
+          // Verify correctness of the generated IR.
+          string Error;
+          llvm::raw_string_ostream OS(Error);
+          if (verifyFunction(*Wrapper, &OS)) {
+            OS.flush();
+            cerr << "Error while building DLL function (" << Exp->Name
+                 << "): " << Error << '\n';
+          }
         }
 
         // Print out LLVM IR.
