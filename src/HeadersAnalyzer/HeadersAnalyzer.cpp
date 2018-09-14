@@ -1118,6 +1118,40 @@ int main() {
           llvm::Function *Wrapper = llvm::Function::Create(
               WrapperTy, llvm::Function::ExternalLinkage,
               "\01$__ipaSim_wrapper_" + Exp->Name, &LibModule);
+
+          // TODO: Handle variadic functions.
+
+          // Map parameter types to their pointers.
+          vector<llvm::Type *> ParamPointers;
+          ParamPointers.reserve(Exp->Type->getNumParams());
+          for (llvm::Type *Ty : Exp->Type->params()) {
+            ParamPointers.push_back(Ty->getPointerTo());
+          }
+
+          // Create the type of union that was used to store the function's
+          // arguments and return value.
+          llvm::StructType *Struct =
+              llvm::StructType::create(ParamPointers, "struct");
+          llvm::Type *RetTy = Exp->Type->getReturnType();
+          llvm::Type *ContainedTy;
+          if (RetTy->isVoidTy() ||
+              Struct->getScalarSizeInBits() >= RetTy->getScalarSizeInBits())
+            ContainedTy = Struct;
+          else
+            ContainedTy = RetTy;
+          llvm::StructType *Union =
+              llvm::StructType::create("union", ContainedTy);
+
+          // Our body consists of exactly one `BasicBlock`.
+          llvm::BasicBlock *BB = llvm::BasicBlock::Create(Ctx, "entry", Func);
+          Builder.SetInsertPoint(BB);
+
+          // The union pointer is in the first argument.
+          llvm::Value *UP = Wrapper->args().begin();
+
+          // Get pointer to the structure inside the union.
+          llvm::Value *SP =
+              Builder.CreateBitCast(UP, Struct->getPointerTo(), "sp");
         }
 
         // Print out LLVM IR.
