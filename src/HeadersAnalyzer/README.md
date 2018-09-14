@@ -170,6 +170,14 @@ Instead, we generate an equivalent LLVM IR code.
 > And then use those object files when linking the DLLs.
 > This should be implemented after we completely migrate to Clang for building those DLLs - because then, we could use generated [`compile_commands.json` files](https://clang.llvm.org/docs/JSONCompilationDatabase.html) to configure our header analyzer correctly.
 
+#### Exporting Objective-C methods
+
+Since Objective-C methods are only called dynamically by the Objective-C runtime, they don't need to and cannot be normally exported from a DLL.
+But we need them exported so that we can link our wrapper DLL which imports those methods.
+We could (and probably should) modify Clang to support exporting those methods.
+But there is also a simpler solution - we can simply import some symbol that's guaranteed to exist (e.g., `_mh_dylib_header`) and compute runtime address of the Objective-C method from runtime address of that symbol and compile-time-known RVA of the Objective-C method.
+For now, we chose the second approach since it's easier to implement.
+
 ### Calling functions at runtime
 
 We need to be able to call any function from our DLLs based just on an address to which the emulated app jumps.

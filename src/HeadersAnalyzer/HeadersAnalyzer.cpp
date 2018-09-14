@@ -478,12 +478,14 @@ enum class ExportStatus { NotFound = 0, Found, Overloaded, FoundInDLL };
 
 struct ExportEntry {
   ExportEntry(string Name)
-      : Name(Name), Status(ExportStatus::NotFound), RVA(0), Type(nullptr) {}
+      : Name(Name), Status(ExportStatus::NotFound), RVA(0), Type(nullptr),
+        IsObjCMethod(false) {}
 
   string Name;
   mutable ExportStatus Status;
   mutable uint32_t RVA;
   mutable llvm::FunctionType *Type;
+  mutable bool IsObjCMethod;
 
   bool operator<(const ExportEntry &Other) const { return Name < Other.Name; }
 };
@@ -692,10 +694,11 @@ public:
 };
 
 struct DLLEntry {
-  DLLEntry(string Name) : Name(Name) {}
+  DLLEntry(string Name) : Name(Name), ReferenceFunc(nullptr) {}
 
   string Name;
   vector<const ExportEntry *> Exports;
+  const ExportEntry *ReferenceFunc;
 };
 
 struct DLLGroup {
@@ -771,6 +774,7 @@ int main() {
         auto Class = findClassMethod(iOSClasses, NameStr);
         if (Class != iOSClasses.end()) {
           Exp = iOSExps.insert(ExportEntry(NameStr)).first;
+          Exp->IsObjCMethod = true;
           iOSLibs[Class->second].Exports.push_back(&*Exp);
         } else {
           if constexpr (WarnUninterestingFunctions & LibType::Dylib) {
@@ -880,6 +884,12 @@ int main() {
           Exp->Status = ExportStatus::FoundInDLL;
           Exp->RVA = Func->getRelativeVirtualAddress();
           DLL.Exports.push_back(&*Exp);
+
+          // Save function that will serve as a reference for computing
+          // addresses of Objective-C methods.
+          if (!DLL.ReferenceFunc && !Exp->IsObjCMethod) {
+            DLL.ReferenceFunc = &*Exp;
+          }
 
           // Verify that the function has the same signature as the iOS one.
           if (!TC.areEquivalent(Exp->Type, *Func)) {
@@ -1127,15 +1137,27 @@ int main() {
                  "Inconsistency in endianness.");
         }
 
+        // Declare reference function.
+        llvm::Function *RefFunc =
+            !DLL.ReferenceFunc
+                ? nullptr
+                : llvm::Function::Create(
+                      DLL.ReferenceFunc->Type, llvm::Function::ExternalLinkage,
+                      '\01' + DLL.ReferenceFunc->Name, &LibModule);
+
         // Generate function wrappers.
         for (const ExportEntry *Exp : DLL.Exports) {
           assert(Exp->Status == ExportStatus::FoundInDLL &&
                  "Unexpected status of `ExportEntry`.");
 
           // Declarations.
-          llvm::Function *Func =
-              llvm::Function::Create(Exp->Type, llvm::Function::ExternalLinkage,
-                                     '\01' + Exp->Name, &LibModule);
+          llvm::Function *Func = Exp->IsObjCMethod
+                                     ? nullptr
+                                     : LibModule.getFunction('\01' + Exp->Name);
+          if (!Func && !Exp->IsObjCMethod)
+            Func = llvm::Function::Create(Exp->Type,
+                                          llvm::Function::ExternalLinkage,
+                                          '\01' + Exp->Name, &LibModule);
           llvm::Function *Wrapper = llvm::Function::Create(
               WrapperTy, llvm::Function::ExternalLinkage,
               "\01$__ipaSim_wrapper_" + Exp->Name, &LibModule);
@@ -1178,20 +1200,50 @@ int main() {
           // Process arguments.
           vector<llvm::Value *> Args;
           Args.reserve(Exp->Type->getNumParams());
-          for (llvm::Argument &Arg : Func->args()) {
-            string ArgNo = to_string(Arg.getArgNo());
+          size_t ArgIdx = 0;
+          for (llvm::Type *ArgTy : Exp->Type->params()) {
+            string ArgNo = to_string(ArgIdx);
 
             // Load argument from the structure.
-            llvm::Value *APP = Builder.CreateStructGEP(
-                Struct, SP, Arg.getArgNo(), "app" + ArgNo);
+            llvm::Value *APP =
+                Builder.CreateStructGEP(Struct, SP, ArgIdx, "app" + ArgNo);
             llvm::Value *AP = Builder.CreateLoad(APP, "ap" + ArgNo);
             llvm::Value *A = Builder.CreateLoad(AP, "a" + ArgNo);
 
             // Save the argument.
             Args.push_back(A);
+            ++ArgIdx;
           }
 
-          if (!RetTy->isVoidTy()) {
+          if (Exp->IsObjCMethod) {
+            // Objective-C methods are not exported, so we call them by
+            // computing their address using their RVA.
+            if (!DLL.ReferenceFunc) {
+              cerr << "Error: no reference function, cannot emit Objective-C "
+                      "method DLL wrappers ("
+                   << DLL.Name << ").\n";
+              continue;
+            }
+
+            // Add RVA to the reference function's address.
+            llvm::Value *Addr = llvm::ConstantInt::getSigned(
+                llvm::Type::getInt32Ty(Ctx), Exp->RVA - DLL.ReferenceFunc->RVA);
+            llvm::Value *Ptr =
+                Builder.CreateBitCast(RefFunc, llvm::Type::getInt8PtrTy(Ctx));
+            llvm::Value *ComputedPtr = Builder.CreateInBoundsGEP(
+                llvm::Type::getInt8Ty(Ctx), Ptr, Addr);
+            llvm::Value *FP = Builder.CreateBitCast(
+                ComputedPtr, Exp->Type->getPointerTo(), "fp");
+
+            // Call the original DLL function.
+            if (!RetTy->isVoidTy()) {
+              llvm::Value *R = Builder.CreateCall(Exp->Type, FP, Args, "r");
+              llvm::Value *RP =
+                  Builder.CreateBitCast(UP, RetTy->getPointerTo(), "rp");
+              Builder.CreateStore(R, RP);
+            } else
+              Builder.CreateCall(Exp->Type, FP, Args);
+          } else if (!RetTy->isVoidTy()) {
             // Call the original DLL function.
             llvm::Value *R = Builder.CreateCall(Func, Args, "r");
 
