@@ -1,0 +1,4 @@
+[ver:1,total:720]
+docs/llvm.md:480,1536933600:480,m
+src/HeadersAnalyzer/Debug/libobjc.A.ll:180,1536930000:180,r
+src/HeadersAnalyzer/analyze_ios_headers.cfg:60,1536930000:60,r
