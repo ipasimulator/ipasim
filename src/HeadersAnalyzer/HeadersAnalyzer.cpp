@@ -1325,7 +1325,7 @@ int main() {
         }
         llvm::SmallVector<std::pair<int, const driver::Command *>, 4>
             FailingCommands;
-        if (!TheDriver.ExecuteCompilation(*C, FailingCommands)) {
+        if (TheDriver.ExecuteCompilation(*C, FailingCommands)) {
           cerr << "Error while executing Clang to link a wrapper DLL ("
                << DLL.Name << ").\n";
           continue;
