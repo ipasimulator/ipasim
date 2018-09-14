@@ -1,0 +1,4 @@
+[ver:1,total:420]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:385,1536908400:240,1536912000:145,m
+build/include/llvm/Support/ErrorHandling.h:20,1536912000:20,r
+src/HeadersAnalyzer/Debug/0.ll:15,1536912000:15,r
