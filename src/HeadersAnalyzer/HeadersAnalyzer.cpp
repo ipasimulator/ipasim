@@ -963,7 +963,7 @@ int main() {
         // DLL wrapper declaration.
         llvm::Function *Wrapper = llvm::Function::Create(
             WrapperTy, llvm::Function::ExternalLinkage,
-            "\01$__ipaSim_wrapper_" + Exp->Name, &LibModule);
+            "\01$__ipaSim_wrapper_" + to_string(Exp->RVA), &LibModule);
 
         // TODO: Handle variadic functions.
 
@@ -1160,7 +1160,10 @@ int main() {
                                           '\01' + Exp->Name, &LibModule);
           llvm::Function *Wrapper = llvm::Function::Create(
               WrapperTy, llvm::Function::ExternalLinkage,
-              "\01$__ipaSim_wrapper_" + Exp->Name, &LibModule);
+              "\01$__ipaSim_wrapper_" + to_string(Exp->RVA), &LibModule);
+
+          // Export the wrapper from DLL.
+          Wrapper->setDLLStorageClass(llvm::Function::DLLExportStorageClass);
 
           // TODO: Handle variadic functions.
 
