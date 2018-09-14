@@ -1162,8 +1162,10 @@ int main() {
               WrapperTy, llvm::Function::ExternalLinkage,
               "\01$__ipaSim_wrapper_" + to_string(Exp->RVA), &LibModule);
 
-          // Export the wrapper from DLL.
+          // Export the wrapper and import the original function.
           Wrapper->setDLLStorageClass(llvm::Function::DLLExportStorageClass);
+          if (Func)
+            Func->setDLLStorageClass(llvm::Function::DLLImportStorageClass);
 
           // TODO: Handle variadic functions.
 
