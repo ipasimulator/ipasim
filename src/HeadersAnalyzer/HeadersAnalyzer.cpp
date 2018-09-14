@@ -28,6 +28,7 @@
 #include <clang/CodeGen/CodeGenABITypes.h>
 #include <clang/CodeGen/CodeGenAction.h>
 #include <clang/CodeGen/ModuleBuilder.h>
+#include <clang/Driver/Compilation.h>
 #include <clang/Driver/Driver.h>
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/Utils.h>
@@ -889,12 +890,21 @@ int main() {
       }
     }
 
-    // Create output directory.
+    // Create output directories.
     path OutputDir("./src/HeadersAnalyzer/Debug/");
     {
       error_code E;
       if (!create_directories(OutputDir, E) && E) {
         cerr << "Fatal error while creating output directory: " << E.message()
+             << '\n';
+        return 1;
+      }
+    }
+    path WrappersDir("./out/Wrappers/");
+    {
+      error_code E;
+      if (!create_directories(WrappersDir, E) && E) {
+        cerr << "Fatal error while creating wrappers directory: " << E.message()
              << '\n';
         return 1;
       }
@@ -1224,9 +1234,9 @@ int main() {
 
         // Create output file.
         error_code EC;
-        llvm::raw_fd_ostream Output(
-            (OutputDir / (DLL.Name)).replace_extension(".obj").string(), EC,
-            llvm::sys::fs::F_None);
+        string OutputPath(
+            (OutputDir / (DLL.Name)).replace_extension(".obj").string());
+        llvm::raw_fd_ostream Output(OutputPath, EC, llvm::sys::fs::F_None);
         if (EC) {
           cerr << "Error while creating output file (" << DLL.Name
                << "): " << EC.message() << '\n';
@@ -1241,6 +1251,33 @@ int main() {
           continue;
         }
         PM.run(LibModule);
+        Output.close();
+
+        // Link the wrapper DLL.
+        string OutputDLL((WrappersDir / DLL.Name).string());
+        string ImportLib(DLLPath.replace_extension(".lib").string());
+        llvm::SmallVector<const char *, 256> Argv = {
+            "clang.exe",       "-shared",          "-o",
+            OutputDLL.c_str(), OutputPath.c_str(), ImportLib.c_str()};
+        CompilerInstance DLLCI;
+        DLLCI.createDiagnostics();
+
+        // Inspired by `createInvocationFromCommandLine`.
+        driver::Driver TheDriver(Argv[0], llvm::sys::getDefaultTargetTriple(),
+                                 DLLCI.getDiagnostics());
+        unique_ptr<driver::Compilation> C(TheDriver.BuildCompilation(Argv));
+        if (!C || C->containsError()) {
+          cerr << "Error while building `Compilation` to link a wrapper DLL ("
+               << DLL.Name << ").\n";
+          continue;
+        }
+        llvm::SmallVector<std::pair<int, const driver::Command *>, 4>
+            FailingCommands;
+        if (!TheDriver.ExecuteCompilation(*C, FailingCommands)) {
+          cerr << "Error while executing Clang to link a wrapper DLL ("
+               << DLL.Name << ").\n";
+          continue;
+        }
       }
     }
 
