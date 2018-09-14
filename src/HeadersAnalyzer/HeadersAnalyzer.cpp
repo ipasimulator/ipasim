@@ -50,6 +50,7 @@
 #include <llvm/IR/ValueHandle.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/CommandLine.h>
+#include <llvm/Support/ErrorHandling.h>
 #include <llvm/Support/TargetRegistry.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Support/raw_os_ostream.h>
@@ -466,7 +467,7 @@ private:
   MangleContext *Mangle;
 };
 
-enum class ExportStatus { NotFound = 0, Found, Overloaded };
+enum class ExportStatus { NotFound = 0, Found, Overloaded, FoundInDLL };
 
 struct ExportEntry {
   ExportEntry(string Name)
@@ -784,6 +785,8 @@ int main() {
       case ExportStatus::NotFound:
         Exp->Status = ExportStatus::Found;
         break;
+      default:
+        llvm_unreachable("Unexpected status of `ExportEntry`.");
       }
 
       // Save the function's signature.
@@ -845,6 +848,7 @@ int main() {
           auto Exp = iOSExps.find(Func->getUndecoratedName());
           if (Exp == iOSExps.end() || Exp->Status != ExportStatus::Found)
             continue;
+          Exp->Status = ExportStatus::FoundInDLL;
           Exp->RVA = Func->getRelativeVirtualAddress();
           DLL.Exports.push_back(&*Exp);
 
@@ -889,7 +893,7 @@ int main() {
       // Generate function wrappers.
       // TODO: Shouldn't we use aligned instructions?
       for (const ExportEntry *Exp : Lib.Exports) {
-        if (Exp->Status != ExportStatus::Found)
+        if (Exp->Status != ExportStatus::FoundInDLL)
           continue;
 
         // Declaration. Note that we add prefix `\01`, so that the name doesn't
@@ -1067,8 +1071,8 @@ int main() {
 
         // Generate function wrappers.
         for (const ExportEntry *Exp : DLL.Exports) {
-          if (Exp->Status != ExportStatus::Found)
-            continue;
+          assert(Exp->Status == ExportStatus::FoundInDLL &&
+                 "Unexpected status of `ExportEntry`.");
 
           // Declarations.
           llvm::Function *Func =
