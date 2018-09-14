@@ -1388,7 +1388,13 @@ int main() {
             "clang.exe", "-target",
             // TODO: Don't hardcode target triple.
             "armv7s-apple-ios10", "-fuse-ld=lld", "-shared", "-o",
-            OutputDylib.c_str(), OOutputPath.c_str()};
+            OutputDylib.c_str(), OOutputPath.c_str(),
+            // Don't emit error that symbol `dyld_stub_binder` is undefined.
+            "-undefined", "warning",
+            // But to do that, we cannot use two-level namespace.
+            "-flat_namespace",
+            // See [no-lsystem].
+            "-no_lsystem"};
         CompilerInstance StubCI;
         StubCI.createDiagnostics();
         driver::Driver StubDriver(StubArgv[0],
