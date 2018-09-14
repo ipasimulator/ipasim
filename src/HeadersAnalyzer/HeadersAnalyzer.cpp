@@ -1394,7 +1394,10 @@ int main() {
             // But to do that, we cannot use two-level namespace.
             "-flat_namespace",
             // See [no-lsystem].
-            "-no_lsystem"};
+            "-no_lsystem",
+            // Let's call this as the original DLL (in the Mach-O header), so
+            // that our dynamic loader directly loads that.
+            "-install_name", DLL.Name.c_str()};
         CompilerInstance StubCI;
         StubCI.createDiagnostics();
         driver::Driver StubDriver(StubArgv[0],
