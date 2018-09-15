@@ -4,10 +4,12 @@
 #define LLVMHELPER_HPP
 
 #include <llvm/ADT/SmallVector.h>
+#include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/Support/Allocator.h>
 #include <llvm/Support/StringSaver.h>
+#include <llvm/Target/TargetMachine.h>
 
 #include <memory>
 #include <string>
@@ -47,6 +49,20 @@ public:
 private:
   llvm::BumpPtrAllocator A;
   std::unique_ptr<llvm::Module> Module;
+};
+
+class IRHelper {
+public:
+  IRHelper(LLVMHelper &LLVM, const llvm::StringRef Name,
+           const llvm::StringRef Path, const llvm::StringRef Triple);
+
+  static const char *const Windows32;
+
+private:
+  LLVMHelper &LLVM;
+  llvm::IRBuilder<> Builder;
+  llvm::Module Module;
+  std::unique_ptr<llvm::TargetMachine> TM;
 };
 
 // !defined(LLVMHELPER_HPP)

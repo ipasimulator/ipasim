@@ -333,6 +333,18 @@ public:
       }
     }
   }
+  void generateDLLs() {
+    LLVMHelper LLVM(LLVMInit);
+
+    // Generate DLL wrappers.
+    for (const DLLGroup &DLLGroup : HAC.DLLGroups) {
+      for (const DLLEntry &DLL : DLLGroup.DLLs) {
+        path DLLPath(DLLGroup.Dir / DLL.Name);
+
+        IRHelper IR(LLVM, DLL.Name, DLLPath.string(), IRHelper::Windows32);
+      }
+    }
+  }
 
 private:
   HAContext HAC;
