@@ -285,7 +285,21 @@ public:
 
     reportUnimplementedFunctions();
   }
-  void loadDLLs() { LLDBHelper LLDB; }
+  void loadDLLs() {
+    LLDBHelper LLDB;
+
+    // Load DLLs and PDBs.
+    for (DLLGroup &DLLGroup : HAC.DLLGroups) {
+      for (DLLEntry &DLL : DLLGroup.DLLs) {
+        path DLLPath(DLLGroup.Dir / DLL.Name);
+        path PDBPath(DLLPath);
+        PDBPath.replace_extension(".pdb");
+
+        auto SymbolExe =
+            LLDB.load(DLLPath.string().c_str(), PDBPath.string().c_str());
+      }
+    }
+  }
 
 private:
   HAContext HAC;
