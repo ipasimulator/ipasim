@@ -3,6 +3,7 @@
 #ifndef CLANGHELPER_HPP
 #define CLANGHELPER_HPP
 
+#include "ErrorReporting.hpp"
 #include "LLVMHelper.hpp"
 
 #include <clang/Frontend/CompilerInstance.h>
@@ -15,12 +16,11 @@ public:
   StringVector Args;
 
   void initFromInvocation();
-  template <typename ActTy> bool executeAction() {
+  template <typename ActTy> void executeAction() {
     ActTy Act(&LLVM.Ctx);
     if (!CI.ExecuteAction(Act))
-      return false;
+      reportFatalError("cannot execute action");
     LLVM.setModule(Act.takeModule());
-    return true;
   }
 
 private:

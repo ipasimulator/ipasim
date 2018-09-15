@@ -271,17 +271,12 @@ public:
   ~SBDebuggerGuard() { lldb::SBDebugger::Terminate(); }
 };
 
-int main() {
-  HAContext HAC;
-  LLVMInitializer LLVMInit;
-
-  // Parse iOS headers.
-  {
+class HeadersAnalyzer {
+public:
+  void parseAppleHeaders() {
     LLVMHelper LLVM(LLVMInit);
     ClangHelper Clang(LLVM);
-    if (!Clang.Args.loadConfigFile(
-            "./src/HeadersAnalyzer/analyze_ios_headers.cfg"))
-      return 1;
+    Clang.Args.loadConfigFile("./src/HeadersAnalyzer/analyze_ios_headers.cfg");
     Clang.initFromInvocation();
 
     // Include all declarations in the result. See [emit-all-decls].
@@ -289,10 +284,22 @@ int main() {
     Clang.CI.getLangOpts().EmitAllDecls = true;
 
     // Compile to LLVM IR.
-    if (!Clang.executeAction<EmitLLVMOnlyAction>())
-      return 1;
+    Clang.executeAction<EmitLLVMOnlyAction>();
+
+    for (const llvm::Function &Func : *LLVM.getModule()) {
+      processAppleFunction(Func);
+    }
+  }
+  void processAppleFunction(const llvm::Function &Func) {
+    // TBD.
   }
 
+private:
+  HAContext HAC;
+  LLVMInitializer LLVMInit;
+};
+
+int main() {
   ExportList iOSExps;
   auto addExp = [&](string Name) {
     return &*iOSExps.insert(ExportEntry(Name)).first;

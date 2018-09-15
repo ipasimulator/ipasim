@@ -22,7 +22,7 @@ public:
   StringVector() : A(), Saver(A) {}
 
   void add(const char *S) { Vector.emplace_back(Saver.save(S).data()); }
-  bool loadConfigFile(llvm::StringRef File);
+  void loadConfigFile(llvm::StringRef File);
   llvm::ArrayRef<const char *> get() { return Vector; }
 
 private:
