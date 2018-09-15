@@ -1,0 +1,7 @@
+[ver:1,total:720]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:393,1537002000:393,m
+src/HeadersAnalyzer/ErrorReporting.cpp:105,1537002000:105,m
+src/HeadersAnalyzer/LLVMHelper.cpp:102,1537002000:102,m
+src/HeadersAnalyzer/ClangHelper.hpp:60,1537002000:60,m
+src/HeadersAnalyzer/ErrorReporting.hpp:45,1537002000:45,m
+src/HeadersAnalyzer/LLVMHelper.hpp:15,1537002000:15,m
