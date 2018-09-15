@@ -1,0 +1,5 @@
+[ver:1,total:300]
+src/HeadersAnalyzer/Common.hpp:110,1537012800:110,m
+src/HeadersAnalyzer/LLDBHelper.hpp:80,1537012800:80,m
+src/HeadersAnalyzer/LLDBHelper.cpp:80,1537012800:80,r
+build/include/lldb/Target/Target.h:30,1537012800:30,r
