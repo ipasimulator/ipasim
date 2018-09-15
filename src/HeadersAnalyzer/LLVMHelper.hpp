@@ -19,23 +19,23 @@ public:
 
 class StringVector {
 public:
-  StringVector() : A(), Saver(A) {}
+  StringVector(llvm::StringSaver &S) : Saver(S) {}
 
   void add(const char *S) { Vector.emplace_back(Saver.save(S).data()); }
   void loadConfigFile(llvm::StringRef File);
   llvm::ArrayRef<const char *> get() { return Vector; }
 
 private:
-  llvm::BumpPtrAllocator A;
-  llvm::StringSaver Saver;
+  llvm::StringSaver &Saver;
   llvm::SmallVector<const char *, 256> Vector;
 };
 
 class LLVMHelper {
 public:
-  LLVMHelper(LLVMInitializer &) {}
+  LLVMHelper(LLVMInitializer &) : A(), Saver(A) {}
 
   llvm::LLVMContext Ctx;
+  llvm::StringSaver Saver;
 
   llvm::Module *getModule() { return Module.get(); }
   void setModule(std::unique_ptr<llvm::Module> &&Module) {
@@ -43,6 +43,7 @@ public:
   }
 
 private:
+  llvm::BumpPtrAllocator A;
   std::unique_ptr<llvm::Module> Module;
 };
 
