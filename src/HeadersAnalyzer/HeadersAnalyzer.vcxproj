@@ -201,6 +201,7 @@
     <ClCompile Include="..\..\deps\tapi\lib\Driver\SnapshotFileSystem.cpp" />
     <ClCompile Include="cc_mapper.cpp" />
     <ClCompile Include="ClangHelper.cpp" />
+    <ClCompile Include="Common.cpp" />
     <ClCompile Include="ErrorReporting.cpp" />
     <ClCompile Include="HAContext.cpp" />
     <ClCompile Include="HeadersAnalyzer.cpp" />

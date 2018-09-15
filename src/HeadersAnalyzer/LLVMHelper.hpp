@@ -55,8 +55,8 @@ private:
 
 class IRHelper {
 public:
-  IRHelper(LLVMHelper &LLVM, const llvm::StringRef Name,
-           const llvm::StringRef Path, const llvm::StringRef Triple);
+  IRHelper(LLVMHelper &LLVM, llvm::StringRef Name, llvm::StringRef Path,
+           llvm::StringRef Triple);
 
   static const char *const Windows32;
   static const char *const Apple;
@@ -78,6 +78,7 @@ public:
                           llvm::ArrayRef<llvm::Value *> Args,
                           const llvm::Twine &Name);
   void verifyFunction(llvm::Function *Func);
+  void emitObj(llvm::StringRef Path);
 
 private:
   LLVMHelper &LLVM;

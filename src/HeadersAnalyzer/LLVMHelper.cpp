@@ -2,12 +2,16 @@
 
 #include "LLVMHelper.hpp"
 
+#include "Common.hpp"
+#include "Config.hpp"
 #include "ErrorReporting.hpp"
 
 #include <llvm/ADT/None.h>
+#include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/Mangler.h>
 #include <llvm/IR/Verifier.h>
 #include <llvm/Support/CommandLine.h>
+#include <llvm/Support/FileSystem.h>
 #include <llvm/Support/TargetRegistry.h>
 #include <llvm/Support/TargetSelect.h>
 #include <llvm/Target/TargetMachine.h>
@@ -16,6 +20,7 @@
 using namespace llvm;
 using namespace llvm::cl;
 using namespace std;
+using namespace std::filesystem;
 
 LLVMInitializer::LLVMInitializer() {
   InitializeAllTargetInfos();
@@ -37,8 +42,8 @@ string LLVMHelper::mangleName(const Function &Func) {
   return Name.str().str();
 }
 
-IRHelper::IRHelper(LLVMHelper &LLVM, const StringRef Name, const StringRef Path,
-                   const StringRef Triple)
+IRHelper::IRHelper(LLVMHelper &LLVM, StringRef Name, StringRef Path,
+                   StringRef Triple)
     : LLVM(LLVM), Builder(LLVM.Ctx), Module(Name, LLVM.Ctx) {
 
   // Get target from the triple provided.
@@ -136,4 +141,27 @@ void IRHelper::verifyFunction(Function *Func) {
     OS.flush();
     reportError("invalid IR code (" + Func->getName() + "): " + Error);
   }
+}
+
+void IRHelper::emitObj(StringRef Path) {
+  path P(Path.data());
+
+  // Print out LLVM IR.
+  if constexpr (OutputLLVMIR) {
+    if (auto IROutput = createOutputFile(P.replace_extension(".ll").string()))
+      Module.print(*IROutput, nullptr);
+  }
+
+  // Create output file.
+  auto Output(createOutputFile(P.replace_extension(".obj").string()));
+  if (!Output)
+    return;
+
+  // Emit object code.
+  legacy::PassManager PM;
+  if (TM->addPassesToEmitFile(PM, *Output, TargetMachine::CGFT_ObjectFile)) {
+    reportError("cannot emit object file");
+    return;
+  }
+  PM.run(Module);
 }

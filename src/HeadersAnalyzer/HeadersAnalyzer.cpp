@@ -333,6 +333,9 @@ public:
       }
     }
   }
+  void createDirs() {
+    OutputDir = createOutputDir("./src/HeadersAnalyzer/Debug/");
+  }
   void generateDLLs() {
     LLVMHelper LLVM(LLVMInit);
 
@@ -448,6 +451,8 @@ public:
           // Finish.
           IR.Builder.CreateRetVoid();
         }
+
+        IR.emitObj((OutputDir / DLL.Name).string());
       }
     }
   }
@@ -455,6 +460,7 @@ public:
 private:
   HAContext HAC;
   LLVMInitializer LLVMInit;
+  path OutputDir;
 
   void analyzeAppleFunction(const llvm::Function &Func) {
     LLVMHelper LLVM(LLVMInit);
