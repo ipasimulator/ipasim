@@ -1,0 +1,4 @@
+[ver:1,total:240]
+src/HeadersAnalyzer/LLDBHelper.cpp:99,1537012800:99,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:96,1537012800:96,m
+src/HeadersAnalyzer/LLDBHelper.hpp:45,1537012800:45,m
