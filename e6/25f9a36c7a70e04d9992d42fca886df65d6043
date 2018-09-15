@@ -1,0 +1,5 @@
+[ver:1,total:1320]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1102,1537027200:892,1537030800:210,m
+src/HeadersAnalyzer/ClangHelper.cpp:162,1537027200:132,1537030800:30,m
+src/HeadersAnalyzer/ClangHelper.hpp:44,1537027200:44,m
+src/HeadersAnalyzer/README.md:12,1537027200:12,r
