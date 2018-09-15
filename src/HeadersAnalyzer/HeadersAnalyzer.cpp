@@ -381,7 +381,7 @@ public:
 
           auto [Struct, Union] = IR.createParamStruct(Exp);
 
-          IR.defineFunc(Wrapper);
+          FunctionGuard WrapperGuard(IR, Wrapper);
 
           // The union pointer is in the first argument.
           llvm::Value *UP = Wrapper->args().begin();
@@ -447,9 +447,6 @@ public:
 
           // Finish.
           IR.Builder.CreateRetVoid();
-
-          // Verify correctness of the generated IR.
-          IR.verifyFunction(Wrapper);
         }
       }
     }

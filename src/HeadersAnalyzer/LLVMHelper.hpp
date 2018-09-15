@@ -86,5 +86,17 @@ private:
   llvm::FunctionType *WrapperTy;
 };
 
+class FunctionGuard {
+public:
+  FunctionGuard(IRHelper &IR, llvm::Function *Func) : IR(IR), Func(Func) {
+    IR.defineFunc(Func);
+  }
+  ~FunctionGuard() { IR.verifyFunction(Func); }
+
+private:
+  IRHelper &IR;
+  llvm::Function *Func;
+};
+
 // !defined(LLVMHELPER_HPP)
 #endif
