@@ -42,6 +42,8 @@ public:
     this->Module = move(Module);
   }
 
+  std::string mangleName(const llvm::Function &Func);
+
 private:
   llvm::BumpPtrAllocator A;
   std::unique_ptr<llvm::Module> Module;

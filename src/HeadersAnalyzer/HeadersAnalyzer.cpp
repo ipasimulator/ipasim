@@ -286,12 +286,10 @@ public:
     // Compile to LLVM IR.
     Clang.executeAction<EmitLLVMOnlyAction>();
 
+    // Analyze functions.
     for (const llvm::Function &Func : *LLVM.getModule()) {
-      processAppleFunction(Func);
+      string Name = LLVM.mangleName(Func);
     }
-  }
-  void processAppleFunction(const llvm::Function &Func) {
-    // TBD.
   }
 
 private:
