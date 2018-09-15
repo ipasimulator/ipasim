@@ -108,6 +108,12 @@
     <ClCompile Include="..\..\deps\tapi\lib\Core\Symbol.cpp">
       <Filter>Source Files\tapi</Filter>
     </ClCompile>
+    <ClCompile Include="ClangHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LLVMHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
@@ -120,6 +126,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Config.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ClangHelper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LLVMHelper.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

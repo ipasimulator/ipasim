@@ -200,15 +200,19 @@
     <ClCompile Include="..\..\deps\tapi\lib\Driver\Snapshot.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Driver\SnapshotFileSystem.cpp" />
     <ClCompile Include="cc_mapper.cpp" />
+    <ClCompile Include="ClangHelper.cpp" />
     <ClCompile Include="HeadersAnalyzer.cpp" />
+    <ClCompile Include="LLVMHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cc_mapper.hpp" />
+    <ClInclude Include="ClangHelper.hpp" />
     <ClInclude Include="Config.hpp" />
     <ClInclude Include="HAContext.hpp" />
+    <ClInclude Include="LLVMHelper.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
