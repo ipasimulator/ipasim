@@ -1,0 +1,6 @@
+[ver:1,total:1260]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:884,1537020000:360,1537023600:524,m
+src/HeadersAnalyzer/LLVMHelper.cpp:177,1537023600:177,m
+src/HeadersAnalyzer/LLVMHelper.hpp:119,1537023600:119,m
+src/HeadersAnalyzer/ErrorReporting.hpp:50,1537023600:50,m
+src/HeadersAnalyzer/ErrorReporting.cpp:30,1537023600:30,m
