@@ -305,7 +305,7 @@ public:
         
         // Analyze functions.
         for (auto &Func : LLDB.enumerate<PDBSymbolFunc>()) {
-
+          string Name(LLDB.mangleName(Func));
         }
       }
     }

@@ -9,6 +9,8 @@
 #include <lldb/Symbol/ObjectFile.h>
 #include <lldb/Utility/DataBufferHeap.h>
 
+#include <llvm/DebugInfo/PDB/PDBSymbolFunc.h>
+
 #include <memory>
 
 using namespace std;
@@ -82,4 +84,14 @@ void LLDBHelper::load(const char *DLL, const char *PDB) {
       static_cast<SymbolFilePDB *>(SymbolFilePDB::CreateInstance(&Obj));
   SymbolFile->CalculateAbilities(); // Initialization, actually.
   RootSymbol = SymbolFile->GetPDBSession().getGlobalScope();
+}
+
+string LLDBHelper::mangleName(PDBSymbolFunc &Func) {
+  // Get function's name, mangled if possible.
+  string Name(Func.getUndecoratedName());
+  if (Name.empty()) {
+    Name = Func.getName();
+    assert(!Name.empty() && "A function has no name.");
+  }
+  return move(Name);
 }
