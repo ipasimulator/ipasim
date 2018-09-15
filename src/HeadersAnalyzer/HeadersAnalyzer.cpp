@@ -305,7 +305,25 @@ public:
 
         // Analyze functions.
         for (auto &Func : LLDB.enumerate<PDBSymbolFunc>()) {
-          analyzeWindowsFunction(Func);
+          string Name(LLDBHelper::mangleName(Func));
+
+          // Find the corresponding export info from TBD files.
+          ExportList::iterator Exp;
+          if (!HAC.isInterestingForWindows(Name, Exp))
+            continue;
+
+          // Update status accordingly.
+          Exp->Status = ExportStatus::FoundInDLL;
+          Exp->RVA = Func.getRelativeVirtualAddress();
+          DLL.Exports.push_back(&*Exp);
+          Exp->DLLGroup = &DLLGroup;
+          Exp->DLL = &DLL;
+
+          // Save function that will serve as a reference for computing
+          // addresses of Objective-C methods.
+          if (!DLL.ReferenceFunc && !Exp->ObjCMethod) {
+            DLL.ReferenceFunc = &*Exp;
+          }
         }
       }
     }
@@ -315,14 +333,6 @@ private:
   HAContext HAC;
   LLVMInitializer LLVMInit;
 
-  void analyzeWindowsFunction(llvm::pdb::PDBSymbolFunc &Func) {
-    string Name(LLDBHelper::mangleName(Func));
-
-    // Find the corresponding export info from TBD files.
-    ExportList::iterator Exp;
-    if (!HAC.isInterestingForWindows(Name, Exp))
-      return;
-  }
   void analyzeAppleFunction(const llvm::Function &Func) {
     LLVMHelper LLVM(LLVMInit);
 
