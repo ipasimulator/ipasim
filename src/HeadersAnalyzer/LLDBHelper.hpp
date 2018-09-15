@@ -5,9 +5,12 @@
 
 #include "Common.hpp"
 
+#include <Plugins/SymbolFile/PDB/SymbolFilePDB.h>
 #include <lldb/Core/Debugger.h>
 
 #include <llvm/DebugInfo/PDB/PDBSymbolExe.h>
+
+class ObjectFileDummy;
 
 class LLDBHelper {
 public:
@@ -16,9 +19,14 @@ public:
 
   void load(const char *DLL, const char *PDB);
   static std::string mangleName(llvm::pdb::PDBSymbolFunc &Func);
+  lldb_private::SymbolFile *getSymbolFile() { return SymbolFile.get(); }
 
 private:
   lldb::DebuggerSP Debugger;
+  lldb::ModuleSP Module;
+  lldb::DataBufferSP Buffer;
+  std::unique_ptr<ObjectFileDummy> Obj;
+  std::unique_ptr<SymbolFilePDB> SymbolFile;
   std::unique_ptr<llvm::pdb::PDBSymbolExe> RootSymbol;
 
 public:

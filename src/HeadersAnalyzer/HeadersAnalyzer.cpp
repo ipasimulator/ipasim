@@ -302,6 +302,7 @@ public:
         PDBPath.replace_extension(".pdb");
 
         LLDB.load(DLLPath.string().c_str(), PDBPath.string().c_str());
+        TypeComparer TC(*CGM, LLVM.getModule(), LLDB.getSymbolFile());
 
         // Analyze functions.
         for (auto &Func : LLDB.enumerate<PDBSymbolFunc>()) {
@@ -321,9 +322,13 @@ public:
 
           // Save function that will serve as a reference for computing
           // addresses of Objective-C methods.
-          if (!DLL.ReferenceFunc && !Exp->ObjCMethod) {
+          if (!DLL.ReferenceFunc && !Exp->ObjCMethod)
             DLL.ReferenceFunc = &*Exp;
-          }
+
+          // Verify that the function has the same signature as the iOS one.
+          if (!TC.areEquivalent(Exp->Type, Func))
+            reportError("functions' signatures are not equivalent (" +
+                        Exp->Name + ")");
         }
       }
     }

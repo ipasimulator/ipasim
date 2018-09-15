@@ -57,13 +57,14 @@ public:
   uint32_t GetPluginVersion() override { unimplemented; }
 #undef unimplemented
 };
+} // namespace
+
 class ObjectFileDummy : public ObjectFileUnimplemented {
 public:
   ObjectFileDummy(const lldb::ModuleSP &Module,
                   const lldb::DataBufferSP &Buffer)
       : ObjectFileUnimplemented(Module, Buffer) {}
 };
-} // namespace
 
 void LLDBHelper::load(const char *DLL, const char *PDB) {
   // Load PDB into LLDB. This is a hack, actually, because no simple way of
@@ -76,12 +77,11 @@ void LLDBHelper::load(const char *DLL, const char *PDB) {
   // to be solved before removing LLDB from our dependencies completely.
   ModuleSpec ModuleSpec(FileSpec(DLL, /* resolve_path */ true));
   ModuleSpec.GetSymbolFileSpec().SetFile(PDB, /* resolve_path */ true);
-  ModuleSP Module =
-      Debugger->GetSelectedOrDummyTarget()->GetSharedModule(ModuleSpec);
-  DataBufferSP Buffer(new DataBufferHeap);
-  ObjectFileDummy Obj(Module, Buffer);
-  SymbolFilePDB *SymbolFile =
-      static_cast<SymbolFilePDB *>(SymbolFilePDB::CreateInstance(&Obj));
+  Module = Debugger->GetSelectedOrDummyTarget()->GetSharedModule(ModuleSpec);
+  Buffer.reset(new DataBufferHeap);
+  Obj = std::make_unique<ObjectFileDummy>(Module, Buffer);
+  SymbolFile.reset(
+      static_cast<SymbolFilePDB *>(SymbolFilePDB::CreateInstance(Obj.get())));
   SymbolFile->CalculateAbilities(); // Initialization, actually.
   RootSymbol = SymbolFile->GetPDBSession().getGlobalScope();
 }
