@@ -203,6 +203,9 @@ public:
     // Create `clang::CodeGen::CodeGenModule` needed in our `TypeComparer`.
     Clang.Args.add("-target");
     Clang.Args.add(IRHelper::Windows32);
+    // Note that this file is not really analyzed, but it still needs to exist
+    // (because it's opened) and also its extension is important (to set
+    // language options - Objective-C for `.mm`).
     Clang.Args.add("./src/HeadersAnalyzer/iOSHeaders.mm");
     Clang.initFromInvocation();
     Clang.executeAction<InitOnlyAction>();
