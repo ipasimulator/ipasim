@@ -275,6 +275,50 @@ class HeadersAnalyzer {
 public:
   void parseAppleHeaders() {
     LLVMHelper LLVM(LLVMInit);
+
+    compileAppleHeaders(LLVM);
+
+    for (const llvm::Function &Func : *LLVM.getModule()) {
+      analyzeAppleFunction(Func);
+    }
+
+    reportUnimplementedFunctions();
+  }
+
+private:
+  HAContext HAC;
+  LLVMInitializer LLVMInit;
+
+  void analyzeAppleFunction(const llvm::Function &Func) {
+    LLVMHelper LLVM(LLVMInit);
+
+    // We use mangled names to uniquely identify functions.
+    string Name = LLVM.mangleName(Func);
+
+    // Find the corresponding export info from TBD files.
+    ExportList::iterator Exp;
+    if (!HAC.isInteresting(Name, Exp))
+      return;
+
+    // Update status accordingly.
+    switch (Exp->Status) {
+    case ExportStatus::Found:
+      Exp->Status = ExportStatus::Overloaded;
+      reportError("function overloaded (" + Name + ")");
+      return;
+    case ExportStatus::Overloaded:
+      return;
+    case ExportStatus::NotFound:
+      Exp->Status = ExportStatus::Found;
+      break;
+    default:
+      reportFatalError("unexpected status of `ExportEntry`");
+    }
+
+    // Save the function's signature.
+    Exp->Type = Func.getFunctionType();
+  }
+  void compileAppleHeaders(LLVMHelper &LLVM) {
     ClangHelper Clang(LLVM);
     Clang.Args.loadConfigFile("./src/HeadersAnalyzer/analyze_ios_headers.cfg");
     Clang.initFromInvocation();
@@ -285,42 +329,7 @@ public:
 
     // Compile to LLVM IR.
     Clang.executeAction<EmitLLVMOnlyAction>();
-
-    // Analyze functions.
-    for (const llvm::Function &Func : *LLVM.getModule()) {
-      string Name = LLVM.mangleName(Func);
-
-      // Find the corresponding export info from TBD files.
-      ExportList::iterator Exp;
-      if (!HAC.isInteresting(Name, Exp))
-        continue;
-
-      // Update status accordingly.
-      switch (Exp->Status) {
-      case ExportStatus::Found:
-        Exp->Status = ExportStatus::Overloaded;
-        reportError("function overloaded (" + Name + ")");
-        continue;
-      case ExportStatus::Overloaded:
-        continue;
-      case ExportStatus::NotFound:
-        Exp->Status = ExportStatus::Found;
-        break;
-      default:
-        reportFatalError("unexpected status of `ExportEntry`");
-      }
-
-      // Save the function's signature.
-      Exp->Type = Func.getFunctionType();
-    }
-
-    reportUnimplementedFunctions();
   }
-
-private:
-  HAContext HAC;
-  LLVMInitializer LLVMInit;
-
   void reportUnimplementedFunctions() {
     if constexpr (ErrorUnimplementedFunctions & LibType::Dylib) {
       for (const ExportEntry &Exp : HAC.iOSExps) {
