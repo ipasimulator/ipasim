@@ -286,7 +286,12 @@ public:
     reportUnimplementedFunctions();
   }
   void loadDLLs() {
+    LLVMHelper LLVM(LLVMInit);
     LLDBHelper LLDB;
+    ClangHelper Clang(LLVM);
+
+    // TODO: Clang probably isn't fully initialized.
+    auto CGM(Clang.createCodeGenModule());
 
     // Load DLLs and PDBs.
     for (DLLGroup &DLLGroup : HAC.DLLGroups) {
@@ -295,8 +300,8 @@ public:
         path PDBPath(DLLPath);
         PDBPath.replace_extension(".pdb");
 
-        auto SymbolExe =
-            LLDB.load(DLLPath.string().c_str(), PDBPath.string().c_str());
+        auto SymbolExe(
+            LLDB.load(DLLPath.string().c_str(), PDBPath.string().c_str()));
       }
     }
   }
@@ -309,7 +314,7 @@ private:
     LLVMHelper LLVM(LLVMInit);
 
     // We use mangled names to uniquely identify functions.
-    string Name = LLVM.mangleName(Func);
+    string Name(LLVM.mangleName(Func));
 
     // Find the corresponding export info from TBD files.
     ExportList::iterator Exp;

@@ -6,6 +6,7 @@
 #include "ErrorReporting.hpp"
 #include "LLVMHelper.hpp"
 
+#include <CodeGen/CodeGenModule.h>
 #include <clang/Frontend/CompilerInstance.h>
 
 class ClangHelper {
@@ -22,6 +23,7 @@ public:
       reportFatalError("cannot execute action");
     LLVM.setModule(Act.takeModule());
   }
+  std::unique_ptr<clang::CodeGen::CodeGenModule> createCodeGenModule();
 
 private:
   LLVMHelper &LLVM;
