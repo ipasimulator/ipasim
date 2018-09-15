@@ -63,7 +63,7 @@ public:
 };
 } // namespace
 
-unique_ptr<PDBSymbolExe> LLDBHelper::load(const char *DLL, const char *PDB) {
+void LLDBHelper::load(const char *DLL, const char *PDB) {
   // Load PDB into LLDB. This is a hack, actually, because no simple way of
   // loading the PDB worked for us. We do this simply because we use some LLDB
   // functions in our `TypeComparer` and they require some initialized LLDB
@@ -81,5 +81,5 @@ unique_ptr<PDBSymbolExe> LLDBHelper::load(const char *DLL, const char *PDB) {
   SymbolFilePDB *SymbolFile =
       static_cast<SymbolFilePDB *>(SymbolFilePDB::CreateInstance(&Obj));
   SymbolFile->CalculateAbilities(); // Initialization, actually.
-  return SymbolFile->GetPDBSession().getGlobalScope();
+  RootSymbol = SymbolFile->GetPDBSession().getGlobalScope();
 }

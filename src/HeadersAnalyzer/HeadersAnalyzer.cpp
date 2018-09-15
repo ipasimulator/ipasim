@@ -286,6 +286,7 @@ public:
     reportUnimplementedFunctions();
   }
   void loadDLLs() {
+    using namespace llvm::pdb;
     LLVMHelper LLVM(LLVMInit);
     LLDBHelper LLDB;
     ClangHelper Clang(LLVM);
@@ -300,8 +301,12 @@ public:
         path PDBPath(DLLPath);
         PDBPath.replace_extension(".pdb");
 
-        auto SymbolExe(
-            LLDB.load(DLLPath.string().c_str(), PDBPath.string().c_str()));
+        LLDB.load(DLLPath.string().c_str(), PDBPath.string().c_str());
+        
+        // Analyze functions.
+        for (auto &Func : LLDB.enumerate<PDBSymbolFunc>()) {
+
+        }
       }
     }
   }
