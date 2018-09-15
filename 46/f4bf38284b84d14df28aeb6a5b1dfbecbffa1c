@@ -1,0 +1,4 @@
+[ver:1,total:180]
+src/HeadersAnalyzer/LLVMHelper.hpp:90,1537002000:90,m
+src/HeadersAnalyzer/ClangHelper.cpp:45,1537002000:15,1537005600:30,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:45,1537002000:15,1537005600:30,r
