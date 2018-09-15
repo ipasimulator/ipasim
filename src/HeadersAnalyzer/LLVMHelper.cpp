@@ -77,3 +77,9 @@ Function *IRHelper::declareFunc(const ExportEntry *Exp, bool Wrapper) {
   FunctionType *Type = Wrapper ? WrapperTy : Exp->Type;
   return Function::Create(Type, Function::ExternalLinkage, Name, &Module);
 }
+
+void IRHelper::defineFunc(llvm::Function *Func) {
+  // Bodies of our simple functions consist of exactly one `BasicBlock`.
+  llvm::BasicBlock *BB = llvm::BasicBlock::Create(LLVM.Ctx, "entry", Func);
+  Builder.SetInsertPoint(BB);
+}

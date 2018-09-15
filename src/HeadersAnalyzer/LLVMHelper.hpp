@@ -61,15 +61,17 @@ public:
   static const char *const Windows32;
   static const char *const Apple;
 
+  llvm::IRBuilder<> Builder;
+
   bool isLittleEndian() const {
     return Module.getDataLayout().isLittleEndian();
   }
   bool isBigEndian() const { return Module.getDataLayout().isBigEndian(); }
   llvm::Function *declareFunc(const ExportEntry *Exp, bool Wrapper = false);
+  void defineFunc(llvm::Function *Func);
 
 private:
   LLVMHelper &LLVM;
-  llvm::IRBuilder<> Builder;
   llvm::Module Module;
   std::unique_ptr<llvm::TargetMachine> TM;
   llvm::FunctionType *WrapperTy;

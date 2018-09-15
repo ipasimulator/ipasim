@@ -366,6 +366,16 @@ public:
           llvm::Function *Func =
               Exp->ObjCMethod ? nullptr : IR.declareFunc(Exp);
           llvm::Function *Wrapper = IR.declareFunc(Exp, /* Wrapper */ true);
+          llvm::Function *Stub = DylibIR.declareFunc(Exp, /* Wrapper */ true);
+
+          // Export the wrapper and import the original function.
+          Wrapper->setDLLStorageClass(llvm::Function::DLLExportStorageClass);
+          if (Func)
+            Func->setDLLStorageClass(llvm::Function::DLLImportStorageClass);
+
+          // Generate the Dylib stub.
+          DylibIR.defineFunc(Stub);
+          DylibIR.Builder.CreateRetVoid();
         }
       }
     }
