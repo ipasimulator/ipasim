@@ -28,7 +28,7 @@ ClassExportList::const_iterator HAContext::findClassMethod(const string &Name) {
   return iOSClasses.find('_' + ClassName);
 }
 
-constexpr const char *toString(LibType LibTy) {
+constexpr static const char *toString(LibType LibTy) {
   switch (LibTy) {
   case LibType::DLL:
     return "DLL";
@@ -38,7 +38,7 @@ constexpr const char *toString(LibType LibTy) {
     reportFatalError("invalid `LibType`");
   }
 }
-template <LibType LibTy> void warnUninteresting(const string &Name) {
+template <LibType LibTy> static void warnUninteresting(const string &Name) {
   if constexpr (WarnUninterestingFunctions & LibTy) {
     constexpr const char *LibStr = toString(LibTy);
     reportWarning("found uninteresting function in " + LibStr + " (" + Name +
