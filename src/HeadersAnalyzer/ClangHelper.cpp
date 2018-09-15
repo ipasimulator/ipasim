@@ -38,8 +38,8 @@ void ClangHelper::linkDLL(StringRef Output, StringRef ObjectFile,
 
   executeArgs();
 }
-void ClangHelper::linkDylib(StringRef Output, StringRef ObjectFile,
-                            StringRef InstallName) {
+void ClangHelper::addDylibArgs(StringRef Output, StringRef ObjectFile,
+                               StringRef InstallName) {
   Args.add("-target");
   Args.add(IRHelper::Apple);
   Args.add("-fuse-ld=lld");
@@ -58,7 +58,10 @@ void ClangHelper::linkDylib(StringRef Output, StringRef ObjectFile,
   // that our dynamic loader directly loads that.
   Args.add("-install_name");
   Args.add(InstallName.data());
-
+}
+void ClangHelper::linkDylib(StringRef Output, StringRef ObjectFile,
+                            StringRef InstallName) {
+  addDylibArgs(Output, ObjectFile, InstallName);
   executeArgs();
 }
 

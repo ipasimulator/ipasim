@@ -336,6 +336,7 @@ public:
   void createDirs() {
     OutputDir = createOutputDir("./src/HeadersAnalyzer/Debug/");
     WrappersDir = createOutputDir("./out/Wrappers/");
+    DylibsDir = createOutputDir("./out/Dylibs/");
   }
   void generateDLLs() {
     LLVMHelper LLVM(LLVMInit);
@@ -475,11 +476,122 @@ public:
       }
     }
   }
+  void generateDylibs() {
+    LLVMHelper LLVM(LLVMInit);
+
+    size_t LibIdx = 0;
+    for (const Dylib &Lib : HAC.iOSLibs) {
+      string LibNo = to_string(LibIdx++);
+
+      IRHelper IR(LLVM, LibNo, Lib.Name, IRHelper::Apple);
+
+      // Generate function wrappers.
+      // TODO: Shouldn't we use aligned instructions?
+      for (const ExportEntry *Exp : Lib.Exports) {
+
+        // Ignore functions that haven't been found in any DLL.
+        if (Exp->Status != ExportStatus::FoundInDLL) {
+          if constexpr (ErrorUnimplementedFunctions & LibType::DLL) {
+            if (Exp->Status == ExportStatus::Found) {
+              reportError(Twine("found in Dylib wasn't found in any DLL (") +
+                          Exp->Name + ")");
+            }
+          }
+          continue;
+        }
+
+        // Declarations.
+        llvm::Function *Func = IR.declareFunc(Exp);
+        llvm::Function *Wrapper = IR.declareFunc(Exp, /* Wrapper */ true);
+
+        // TODO: Handle variadic functions.
+
+        auto [Struct, Union] = IR.createParamStruct(Exp);
+
+        FunctionGuard FuncGuard(IR, Func);
+
+        // Allocate the union.
+        llvm::Value *S = IR.Builder.CreateAlloca(Union, nullptr, "s");
+
+        // Get pointer to the structure inside it.
+        llvm::Value *SP =
+            IR.Builder.CreateBitCast(S, Struct->getPointerTo(), "sp");
+
+        // Process arguments.
+        for (llvm::Argument &Arg : Func->args()) {
+          string ArgNo = to_string(Arg.getArgNo());
+
+          // Load the argument.
+          llvm::Value *AP =
+              IR.Builder.CreateAlloca(Arg.getType(), nullptr, "ap" + ArgNo);
+          IR.Builder.CreateStore(&Arg, AP);
+
+          // Get pointer to the corresponding structure's element.
+          llvm::Value *EP = IR.Builder.CreateStructGEP(
+              Struct, SP, Arg.getArgNo(), "ep" + ArgNo);
+
+          // Store argument address in it.
+          IR.Builder.CreateStore(AP, EP);
+        }
+
+        // Call the DLL wrapper function.
+        llvm::Value *VP = IR.Builder.CreateBitCast(
+            SP, llvm::Type::getInt8PtrTy(LLVM.Ctx), "vp");
+        IR.Builder.CreateCall(Wrapper, {VP});
+
+        // Return.
+        llvm::Type *RetTy = Exp->Type->getReturnType();
+        if (!RetTy->isVoidTy()) {
+
+          // Get pointer to the return value inside the union.
+          llvm::Value *RP =
+              IR.Builder.CreateBitCast(S, RetTy->getPointerTo(), "rp");
+
+          // Load and return it.
+          llvm::Value *R = IR.Builder.CreateLoad(RP, "r");
+          IR.Builder.CreateRet(R);
+        } else
+          IR.Builder.CreateRetVoid();
+      }
+
+      // Emit `.o` file.
+      string ObjectFile((OutputDir / (LibNo + ".o")).string());
+      IR.emitObj(ObjectFile);
+
+      // Initialize Clang args to create the Dylib.
+      ClangHelper Clang(LLVM);
+      Clang.addDylibArgs((DylibsDir / Lib.Name).string(), ObjectFile, Lib.Name);
+      Clang.Args.add("-L");
+      Clang.Args.add(OutputDir.string().c_str());
+
+      // Add DLLs to link.
+      set<const DLLEntry *> DLLs;
+      for (const ExportEntry *Exp : Lib.Exports) {
+        if (Exp->DLL && DLLs.insert(Exp->DLL).second) {
+          string DylibName(
+              path(Exp->DLL->Name).replace_extension(".dll").string());
+
+          // Remove prefix `lib`.
+          if (!DylibName.compare(0, 3, "lib"))
+            DylibName = DylibName.substr(3);
+
+          Clang.Args.add("-l");
+          Clang.Args.add(DylibName.c_str());
+        }
+      }
+
+      // Create output directory.
+      createOutputDir(path(OutputDir).parent_path().string().c_str());
+
+      // Link the Dylib.
+      Clang.executeArgs();
+    }
+  }
 
 private:
   HAContext HAC;
   LLVMInitializer LLVMInit;
-  path OutputDir, WrappersDir;
+  path OutputDir, WrappersDir, DylibsDir;
 
   void analyzeAppleFunction(const llvm::Function &Func) {
     LLVMHelper LLVM(LLVMInit);
