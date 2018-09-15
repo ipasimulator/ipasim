@@ -344,14 +344,18 @@ public:
         IRHelper IR(LLVM, DLL.Name, DLLPath.string(), IRHelper::Windows32);
         IRHelper DylibIR(LLVM, DLL.Name, DLLPath.string(), IRHelper::Apple);
 
-        // Since we are transferring data in memory across architectures,
-        // they must have the same endianness for that to work.
+        // Since we are transferring data in memory across architectures, they
+        // must have the same endianness for that to work.
         if (IR.isLittleEndian() != DylibIR.isLittleEndian()) {
           reportError("target platforms don't have the same endianness");
         } else {
           assert(IR.isBigEndian() == DylibIR.isBigEndian() &&
                  "Inconsistency in endianness.");
         }
+
+        // Declare reference function.
+        // TODO: What if there are no non-Objective-C functions?
+        llvm::Function *RefFunc = IR.declareFunc(DLL.ReferenceFunc);
       }
     }
   }

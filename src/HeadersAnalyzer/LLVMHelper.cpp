@@ -60,3 +60,13 @@ IRHelper::IRHelper(LLVMHelper &LLVM, const StringRef Name, const StringRef Path,
 
 const char *const IRHelper::Windows32 = "i386-pc-windows-msvc";
 const char *const IRHelper::Apple = "armv7s-apple-ios10";
+
+Function *IRHelper::declareFunc(const ExportEntry *Exp) {
+  if (!Exp)
+    return nullptr;
+  // Note that we add prefix `\01`, so that the name doesn't get mangled since
+  // it already is. LLVM will remove this prefix before emitting object code for
+  // the function.
+  return Function::Create(Exp->Type, Function::ExternalLinkage,
+                          Twine("\01", Exp->Name), &Module);
+}

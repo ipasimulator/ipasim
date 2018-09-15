@@ -3,6 +3,8 @@
 #ifndef LLVMHELPER_HPP
 #define LLVMHELPER_HPP
 
+#include "HAContext.hpp"
+
 #include <llvm/ADT/SmallVector.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
@@ -63,6 +65,7 @@ public:
     return Module.getDataLayout().isLittleEndian();
   }
   bool isBigEndian() const { return Module.getDataLayout().isBigEndian(); }
+  llvm::Function *declareFunc(const ExportEntry *Exp);
 
 private:
   LLVMHelper &LLVM;
