@@ -1,0 +1,6 @@
+[ver:1,total:1800]
+src/HeadersAnalyzer/LLVMHelper.hpp:655,1537012800:390,1537016400:265,m
+src/HeadersAnalyzer/LLVMHelper.cpp:609,1537012800:241,1537016400:368,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:496,1537012800:359,1537016400:137,m
+src/HeadersAnalyzer/LLDBHelper.hpp:30,1537012800:30,r
+build/include/llvm/Support/TargetRegistry.h:10,1537016400:10,r
