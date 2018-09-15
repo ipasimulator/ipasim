@@ -38,6 +38,29 @@ void ClangHelper::linkDLL(StringRef Output, StringRef ObjectFile,
 
   executeArgs();
 }
+void ClangHelper::linkDylib(StringRef Output, StringRef ObjectFile,
+                            StringRef InstallName) {
+  Args.add("-target");
+  Args.add(IRHelper::Apple);
+  Args.add("-fuse-ld=lld");
+  Args.add("-shared");
+  Args.add("-o");
+  Args.add(Output.data());
+  Args.add(ObjectFile.data());
+  // Don't emit error that symbol `dyld_stub_binder` is undefined.
+  Args.add("-undefined");
+  Args.add("-warning");
+  // But to do that, we cannot use two-level namespace.
+  Args.add("-flat_namespace");
+  // See [no-lsystem].
+  Args.add("-no_lsystem");
+  // Let's call this as the original DLL (in the Mach-O header), so
+  // that our dynamic loader directly loads that.
+  Args.add("-install_name");
+  Args.add(InstallName.data());
+
+  executeArgs();
+}
 
 void ClangHelper::executeArgs() {
   // Inspired by `createInvocationFromCommandLine`.

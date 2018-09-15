@@ -462,6 +462,16 @@ public:
         ClangHelper(LLVM).linkDLL(
             (WrappersDir / DLL.Name).string(), ObjectFile,
             (OutputDir / DLL.Name).replace_extension(".lib").string());
+
+        // Emit `.o` file.
+        string DylibObjectFile(
+            (OutputDir / DLL.Name).replace_extension(".o").string());
+        DylibIR.emitObj(DylibObjectFile);
+
+        // Create the stub Dylib.
+        ClangHelper(LLVM).linkDylib(
+            (OutputDir / DLL.Name).replace_extension(".dll.dylib").string(),
+            DylibObjectFile, "/Wrappers/" + DLL.Name);
       }
     }
   }

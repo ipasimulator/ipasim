@@ -26,6 +26,8 @@ public:
   std::unique_ptr<clang::CodeGen::CodeGenModule> createCodeGenModule();
   void linkDLL(llvm::StringRef Output, llvm::StringRef ObjectFile,
                llvm::StringRef ImportLib);
+  void linkDylib(llvm::StringRef Output, llvm::StringRef ObjectFile,
+                 llvm::StringRef InstallName);
   void executeArgs();
 
 private:
