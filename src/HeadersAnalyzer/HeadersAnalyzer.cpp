@@ -4,6 +4,7 @@
 #include "ClangHelper.hpp"
 #include "Config.hpp"
 #include "HAContext.hpp"
+#include "LLDBHelper.hpp"
 #include "LLVMHelper.hpp"
 
 #include <Plugins/ObjectFile/PECOFF/ObjectFilePECOFF.h>
@@ -284,6 +285,7 @@ public:
 
     reportUnimplementedFunctions();
   }
+  void loadDLLs() { LLDBHelper LLDB; }
 
 private:
   HAContext HAC;

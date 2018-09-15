@@ -120,6 +120,9 @@
     <ClCompile Include="HAContext.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LLDBHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
@@ -141,6 +144,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ErrorReporting.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LLDBHelper.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
