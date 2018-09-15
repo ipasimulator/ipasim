@@ -336,12 +336,13 @@ public:
   void generateDLLs() {
     LLVMHelper LLVM(LLVMInit);
 
-    // Generate DLL wrappers.
+    // Generate DLL wrappers and also stub Dylibs for them.
     for (const DLLGroup &DLLGroup : HAC.DLLGroups) {
       for (const DLLEntry &DLL : DLLGroup.DLLs) {
         path DLLPath(DLLGroup.Dir / DLL.Name);
 
         IRHelper IR(LLVM, DLL.Name, DLLPath.string(), IRHelper::Windows32);
+        IRHelper DylibIR(LLVM, DLL.Name, DLLPath.string(), IRHelper::Apple);
       }
     }
   }

@@ -57,6 +57,7 @@ public:
            const llvm::StringRef Path, const llvm::StringRef Triple);
 
   static const char *const Windows32;
+  static const char *const Apple;
 
 private:
   LLVMHelper &LLVM;

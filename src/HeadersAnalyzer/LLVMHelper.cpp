@@ -59,3 +59,4 @@ IRHelper::IRHelper(LLVMHelper &LLVM, const StringRef Name, const StringRef Path,
 }
 
 const char *const IRHelper::Windows32 = "i386-pc-windows-msvc";
+const char *const IRHelper::Apple = "armv7s-apple-ios10";
