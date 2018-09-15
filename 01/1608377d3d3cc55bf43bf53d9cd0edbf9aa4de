@@ -1,0 +1,9 @@
+[ver:1,total:2760]
+src/HeadersAnalyzer/LLVMHelper.hpp:914,1536998400:320,1537002000:594,m
+src/HeadersAnalyzer/ClangHelper.hpp:560,1537002000:560,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:547,1536998400:30,1537002000:517,m
+src/HeadersAnalyzer/ClangHelper.cpp:386,1536998400:170,1537002000:216,m
+src/HeadersAnalyzer/LLVMHelper.cpp:257,1537002000:257,m
+build/include/llvm/ADT/SmallVector.h:40,1536998400:20,1537002000:20,r
+src/HeadersAnalyzer/ErrorReporting.hpp:32,1537002000:32,m
+src/HeadersAnalyzer/ErrorReporting.cpp:24,1537002000:24,m
