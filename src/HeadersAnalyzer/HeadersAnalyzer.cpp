@@ -376,6 +376,19 @@ public:
           // Generate the Dylib stub.
           DylibIR.defineFunc(Stub);
           DylibIR.Builder.CreateRetVoid();
+
+          // TODO: Handle variadic functions.
+
+          auto [Struct, Union] = IR.createParamStruct(Exp);
+
+          IR.defineFunc(Wrapper);
+
+          // The union pointer is in the first argument.
+          llvm::Value *UP = Wrapper->args().begin();
+
+          // Get pointer to the structure inside the union.
+          llvm::Value *SP =
+              IR.Builder.CreateBitCast(UP, Struct->getPointerTo(), "sp");
         }
       }
     }

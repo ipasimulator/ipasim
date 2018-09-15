@@ -83,3 +83,30 @@ void IRHelper::defineFunc(llvm::Function *Func) {
   llvm::BasicBlock *BB = llvm::BasicBlock::Create(LLVM.Ctx, "entry", Func);
   Builder.SetInsertPoint(BB);
 }
+
+pair<StructType *, StructType *>
+IRHelper::createParamStruct(const ExportEntry *Exp) {
+  // Map parameter types to their pointers.
+  vector<Type *> ParamPointers;
+  ParamPointers.reserve(Exp->Type->getNumParams());
+  for (Type *Ty : Exp->Type->params()) {
+    ParamPointers.push_back(Ty->getPointerTo());
+  }
+
+  // Create a structure that we use to store the function's arguments and return
+  // value. It's actually a union of a structure and of the return value where
+  // the structure in the union contains addresses of the arguments.
+  StructType *Struct = llvm::StructType::create(ParamPointers, "struct");
+
+  // In LLVM IR, union is simply a struct containing the largest element.
+  Type *RetTy = Exp->Type->getReturnType();
+  Type *ContainedTy;
+  if (RetTy->isVoidTy() ||
+      Struct->getScalarSizeInBits() >= RetTy->getScalarSizeInBits())
+    ContainedTy = Struct;
+  else
+    ContainedTy = RetTy;
+  llvm::StructType *Union = llvm::StructType::create("union", ContainedTy);
+
+  return {Struct, Union};
+}
