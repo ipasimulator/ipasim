@@ -1,0 +1,5 @@
+[ver:1,total:420]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:262,1537016400:262,m
+src/HeadersAnalyzer/LLVMHelper.cpp:90,1537016400:90,m
+src/HeadersAnalyzer/LLVMHelper.hpp:56,1537016400:56,m
+build/include/llvm/Target/TargetMachine.h:12,1537016400:12,r
