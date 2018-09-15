@@ -2,10 +2,15 @@
 
 #include "HAContext.hpp"
 
+#include "Config.hpp"
+#include "ErrorReporting.hpp"
+
 using namespace std;
 
-ClassExportList::const_iterator
-HAContext::findClassMethod(const std::string &Name) {
+ClassExportList::const_iterator HAContext::findClassMethod(const string &Name) {
+  if (iOSClasses.empty())
+    return iOSClasses.end();
+
   if (Name[0] != '+' && Name[0] != '-')
     return iOSClasses.end();
   if (Name[1] != '[')
@@ -21,4 +26,25 @@ HAContext::findClassMethod(const std::string &Name) {
 
   // On Mach systems, names are mangled with leading underscore.
   return iOSClasses.find('_' + ClassName);
+}
+
+bool HAContext::isInteresting(const string &Name) {
+  auto Exp = iOSExps.find(Name);
+  if (Exp == iOSExps.end()) {
+    // If not found among exported functions, try if it isn't an Objective-C
+    // function.
+    auto Class = findClassMethod(Name);
+    if (Class != iOSClasses.end()) {
+      Exp = iOSExps.insert(ExportEntry(Name)).first;
+      Exp->ObjCMethod = true;
+      iOSLibs[Class->second].Exports.push_back(&*Exp);
+    } else {
+      if constexpr (WarnUninterestingFunctions & LibType::Dylib) {
+        reportWarning("found uninteresting function in Dylib (" + Name +
+                      "), that's interesting");
+      }
+      return false;
+    }
+  }
+  return true;
 }

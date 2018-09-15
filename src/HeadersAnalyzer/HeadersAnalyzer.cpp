@@ -289,6 +289,8 @@ public:
     // Analyze functions.
     for (const llvm::Function &Func : *LLVM.getModule()) {
       string Name = LLVM.mangleName(Func);
+      if (!HAC.isInteresting(Name))
+        continue;
     }
   }
 
