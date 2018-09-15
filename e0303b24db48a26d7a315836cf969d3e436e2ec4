@@ -1,0 +1,6 @@
+[ver:1,total:600]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:225,1537005600:225,m
+src/HeadersAnalyzer/LLDBHelper.cpp:178,1537005600:178,m
+src/HeadersAnalyzer/LLDBHelper.hpp:167,1537005600:167,m
+build/include/lldb/lldb-forward.h:20,1537005600:20,r
+build/include/lldb/Core/Debugger.h:10,1537005600:10,r
