@@ -22,7 +22,11 @@ void ClangHelper::initFromInvocation() {
 }
 
 unique_ptr<CodeGenModule> ClangHelper::createCodeGenModule() {
-  CI.createASTContext();
+  if (!CI.hasASTContext())
+    CI.createASTContext();
+  if (!LLVM.getModule())
+    LLVM.setModule(std::make_unique<llvm::Module>("", LLVM.Ctx));
+
   return std::make_unique<CodeGenModule>(
       CI.getASTContext(), CI.getHeaderSearchOpts(), CI.getPreprocessorOpts(),
       CI.getCodeGenOpts(), *LLVM.getModule(), CI.getDiagnostics());

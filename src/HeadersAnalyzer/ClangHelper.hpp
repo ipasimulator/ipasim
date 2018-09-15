@@ -18,9 +18,12 @@ public:
 
   void initFromInvocation();
   template <typename ActTy> void executeAction() {
+    ActTy Act;
+    executeAction(Act);
+  }
+  template <typename ActTy> void executeCodeGenAction() {
     ActTy Act(&LLVM.Ctx);
-    if (!CI.ExecuteAction(Act))
-      reportFatalError("cannot execute action");
+    executeAction(Act);
     LLVM.setModule(Act.takeModule());
   }
   std::unique_ptr<clang::CodeGen::CodeGenModule> createCodeGenModule();
@@ -34,6 +37,11 @@ public:
 
 private:
   LLVMHelper &LLVM;
+
+  void executeAction(clang::FrontendAction &Act) {
+    if (!CI.ExecuteAction(Act))
+      reportFatalError("cannot execute action");
+  }
 };
 
 // !defined(CLANGHELPER_HPP)

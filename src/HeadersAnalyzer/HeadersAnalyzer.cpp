@@ -27,6 +27,7 @@
 #include <clang/Driver/Compilation.h>
 #include <clang/Driver/Driver.h>
 #include <clang/Frontend/CompilerInstance.h>
+#include <clang/Frontend/FrontendActions.h>
 #include <clang/Parse/ParseAST.h>
 
 #include <llvm/DebugInfo/PDB/PDBSymbolFunc.h>
@@ -199,7 +200,12 @@ public:
     LLDBHelper LLDB;
     ClangHelper Clang(LLVM);
 
-    // TODO: Clang probably isn't fully initialized.
+    // Create `clang::CodeGen::CodeGenModule` needed in our `TypeComparer`.
+    Clang.Args.add("-target");
+    Clang.Args.add(IRHelper::Windows32);
+    Clang.Args.add("./src/HeadersAnalyzer/iOSHeaders.mm");
+    Clang.initFromInvocation();
+    Clang.executeAction<InitOnlyAction>();
     auto CGM(Clang.createCodeGenModule());
 
     // Load DLLs and PDBs.
@@ -540,7 +546,7 @@ private:
     Clang.CI.getLangOpts().EmitAllDecls = true;
 
     // Compile to LLVM IR.
-    Clang.executeAction<EmitLLVMOnlyAction>();
+    Clang.executeCodeGenAction<EmitLLVMOnlyAction>();
   }
   void reportUnimplementedFunctions() {
     if constexpr (ErrorUnimplementedFunctions & LibType::Dylib) {
