@@ -7,14 +7,24 @@
 
 #include <clang/Frontend/CompilerInstance.h>
 
-using namespace clang;
-
 class ClangHelper {
 public:
-  ClangHelper(LLVMInitializer &);
+  ClangHelper(LLVMHelper &LLVM);
+
+  clang::CompilerInstance CI;
+  StringVector Args;
+
+  void initFromInvocation();
+  template <typename ActTy> bool executeAction() {
+    ActTy Act(&LLVM.Ctx);
+    if (!CI.ExecuteAction(Act))
+      return false;
+    LLVM.setModule(Act.takeModule());
+    return true;
+  }
 
 private:
-  CompilerInstance CI;
+  LLVMHelper &LLVM;
 };
 
 // !defined(CLANGHELPER_HPP)

@@ -2,4 +2,14 @@
 
 #include "ClangHelper.hpp"
 
-ClangHelper::ClangHelper(LLVMInitializer &) { CI.createDiagnostics(); }
+using namespace clang;
+
+ClangHelper::ClangHelper(LLVMHelper &LLVM) : LLVM(LLVM) {
+  CI.createDiagnostics();
+  // First argument is expected to be an executable name.
+  Args.add("clang.exe");
+}
+
+void ClangHelper::initFromInvocation() {
+  CI.setInvocation(createInvocationFromCommandLine(Args.get()));
+}

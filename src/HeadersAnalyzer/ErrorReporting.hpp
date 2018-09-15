@@ -5,9 +5,9 @@
 
 #include <llvm/ADT/Twine.h>
 
-void warning(llvm::Twine &Message);
-void error(llvm::Twine &Message);
-void fatalError(llvm::Twine &Message);
+void warning(llvm::Twine Message);
+void error(llvm::Twine Message);
+void fatalError(llvm::Twine Message);
 
 // !defined(ERRORREPORTING_HPP)
 #endif

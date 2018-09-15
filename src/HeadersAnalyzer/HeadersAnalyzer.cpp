@@ -1,8 +1,10 @@
 // HeadersAnalyzer.cpp : Defines the entry point for the console application.
 //
 
+#include "ClangHelper.hpp"
 #include "Config.hpp"
 #include "HAContext.hpp"
+#include "LLVMHelper.hpp"
 
 #include <Plugins/ObjectFile/PECOFF/ObjectFilePECOFF.h>
 #include <Plugins/SymbolFile/PDB/PDBASTParser.h>
@@ -271,6 +273,25 @@ public:
 
 int main() {
   HAContext HAC;
+  LLVMInitializer LLVMInit;
+
+  // Parse iOS headers.
+  {
+    LLVMHelper LLVM(LLVMInit);
+    ClangHelper Clang(LLVM);
+    if (!Clang.Args.loadConfigFile(
+            "./src/HeadersAnalyzer/analyze_ios_headers.cfg"))
+      return 1;
+    Clang.initFromInvocation();
+
+    // Include all declarations in the result. See [emit-all-decls].
+    // TODO: Maybe filter them (include only those exported from iOS Dylibs).
+    Clang.CI.getLangOpts().EmitAllDecls = true;
+
+    // Compile to LLVM IR.
+    if (!Clang.executeAction<EmitLLVMOnlyAction>())
+      return 1;
+  }
 
   ExportList iOSExps;
   auto addExp = [&](string Name) {
