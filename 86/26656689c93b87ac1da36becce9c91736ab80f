@@ -1,0 +1,7 @@
+[ver:1,total:1740]
+src/HeadersAnalyzer/LLDBHelper.hpp:1237,1537009200:1157,1537012800:80,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:374,1537009200:354,1537012800:20,m
+src/HeadersAnalyzer/LLDBHelper.cpp:44,1537009200:44,m
+build/include/llvm/DebugInfo/PDB/PDBSymbolFunc.h:35,1537009200:35,r
+build/include/llvm/DebugInfo/PDB/IPDBEnumChildren.h:30,1537009200:30,r
+src/HeadersAnalyzer/ClangHelper.cpp:20,1537012800:20,r
