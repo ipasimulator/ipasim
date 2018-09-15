@@ -116,5 +116,8 @@
     <ClInclude Include="cc_mapper.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="HAContext.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

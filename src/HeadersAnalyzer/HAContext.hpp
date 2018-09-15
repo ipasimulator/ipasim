@@ -1,0 +1,73 @@
+// HAContext.hpp
+
+#ifndef HACONTEXT_HPP
+#define HACONTEXT_HPP
+
+#include <llvm/IR/DerivedTypes.h>
+
+#include <filesystem>
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
+
+struct ExportEntry;
+
+struct DLLEntry {
+  DLLEntry(std::string Name) : Name(Name), ReferenceFunc(nullptr) {}
+
+  std::string Name;
+  std::vector<const ExportEntry *> Exports;
+  const ExportEntry *ReferenceFunc;
+};
+
+struct DLLGroup {
+  std::filesystem::path Dir;
+  std::vector<DLLEntry> DLLs;
+};
+
+enum class ExportStatus { NotFound = 0, Found, Overloaded, FoundInDLL };
+
+struct ExportEntry {
+  ExportEntry(std::string Name)
+      : Name(Name), Status(ExportStatus::NotFound), RVA(0), Type(nullptr),
+        ObjCMethod(false), DLLGroup(nullptr), DLL(nullptr) {}
+
+  std::string Name;
+  mutable ExportStatus Status;
+  mutable uint32_t RVA;
+  mutable llvm::FunctionType *Type;
+  mutable bool ObjCMethod;
+  mutable const DLLGroup *DLLGroup;
+  mutable const DLLEntry *DLL;
+
+  bool operator<(const ExportEntry &Other) const { return Name < Other.Name; }
+};
+
+using ExportList = std::set<ExportEntry>;
+
+using ClassExportList = std::map<std::string, size_t>;
+
+struct Dylib {
+  std::string Name;
+  std::vector<const ExportEntry *> Exports;
+};
+
+class HAContext {
+private:
+  const ExportEntry *addExp(std::string Name) {
+    return &*iOSExps.insert(ExportEntry(Name)).first;
+  };
+
+public:
+  ExportList iOSExps;
+  std::vector<Dylib> iOSLibs = {
+      {"/usr/lib/libobjc.A.dylib",
+       {addExp("_sel_registerName"), addExp("_object_setIvar")}}};
+  ClassExportList iOSClasses = {{"_NSObject", 0}};
+  std::vector<DLLGroup> DLLGroups = {
+      {"./src/objc/Debug/", {DLLEntry("libobjc.A.dll")}}};
+};
+
+// !defined(HACONTEXT_HPP)
+#endif

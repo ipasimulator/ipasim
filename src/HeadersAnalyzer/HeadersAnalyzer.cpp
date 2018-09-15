@@ -1,6 +1,8 @@
 // HeadersAnalyzer.cpp : Defines the entry point for the console application.
 //
 
+#include "HAContext.hpp"
+
 #include <Plugins/ObjectFile/PECOFF/ObjectFilePECOFF.h>
 #include <Plugins/SymbolFile/PDB/PDBASTParser.h>
 #include <Plugins/SymbolFile/PDB/SymbolFilePDB.h>
@@ -73,7 +75,7 @@ constexpr bool OutputLLVMIR = true;
 using namespace clang;
 using namespace frontend;
 using namespace std;
-using namespace experimental::filesystem;
+using namespace filesystem;
 using namespace tapi::internal;
 
 static constexpr bool operator&(LibType Value, LibType Flag) {
@@ -474,34 +476,6 @@ private:
   MangleContext *Mangle;
 };
 
-enum class ExportStatus { NotFound = 0, Found, Overloaded, FoundInDLL };
-
-struct DLLGroup;
-struct DLLEntry;
-
-struct ExportEntry {
-  ExportEntry(string Name)
-      : Name(Name), Status(ExportStatus::NotFound), RVA(0), Type(nullptr),
-        IsObjCMethod(false), DLLGroup(nullptr), DLL(nullptr) {}
-
-  string Name;
-  mutable ExportStatus Status;
-  mutable uint32_t RVA;
-  mutable llvm::FunctionType *Type;
-  mutable bool IsObjCMethod;
-  mutable const DLLGroup *DLLGroup;
-  mutable const DLLEntry *DLL;
-
-  bool operator<(const ExportEntry &Other) const { return Name < Other.Name; }
-};
-
-using ExportList = set<ExportEntry>;
-
-struct Dylib {
-  string Name;
-  vector<const ExportEntry *> Exports;
-};
-
 // TODO: Is this correct? See also <llvm/IR/Mangler.h>.
 class iOSMangler {
 public:
@@ -669,8 +643,6 @@ private:
   };
 };
 
-using ClassExportList = map<string, size_t>;
-
 // This is an inverse of `CGObjCCommonMac::GetNameForMethod`.
 // TODO: Find out whether there aren't any Objective-C method name parsers
 // somewhere in the LLVM ecosystem already.
@@ -698,20 +670,9 @@ public:
   ~SBDebuggerGuard() { lldb::SBDebugger::Terminate(); }
 };
 
-struct DLLEntry {
-  DLLEntry(string Name) : Name(Name), ReferenceFunc(nullptr) {}
-
-  string Name;
-  vector<const ExportEntry *> Exports;
-  const ExportEntry *ReferenceFunc;
-};
-
-struct DLLGroup {
-  path Dir;
-  vector<DLLEntry> DLLs;
-};
-
 int main() {
+  HAContext HAC;
+
   ExportList iOSExps;
   auto addExp = [&](string Name) {
     return &*iOSExps.insert(ExportEntry(Name)).first;
@@ -779,7 +740,7 @@ int main() {
         auto Class = findClassMethod(iOSClasses, NameStr);
         if (Class != iOSClasses.end()) {
           Exp = iOSExps.insert(ExportEntry(NameStr)).first;
-          Exp->IsObjCMethod = true;
+          Exp->ObjCMethod = true;
           iOSLibs[Class->second].Exports.push_back(&*Exp);
         } else {
           if constexpr (WarnUninterestingFunctions & LibType::Dylib) {
@@ -894,7 +855,7 @@ int main() {
 
           // Save function that will serve as a reference for computing
           // addresses of Objective-C methods.
-          if (!DLL.ReferenceFunc && !Exp->IsObjCMethod) {
+          if (!DLL.ReferenceFunc && !Exp->ObjCMethod) {
             DLL.ReferenceFunc = &*Exp;
           }
 
@@ -1187,10 +1148,10 @@ int main() {
                  "Unexpected status of `ExportEntry`.");
 
           // Declarations.
-          llvm::Function *Func = Exp->IsObjCMethod
+          llvm::Function *Func = Exp->ObjCMethod
                                      ? nullptr
                                      : LibModule.getFunction('\01' + Exp->Name);
-          if (!Func && !Exp->IsObjCMethod)
+          if (!Func && !Exp->ObjCMethod)
             Func = llvm::Function::Create(Exp->Type,
                                           llvm::Function::ExternalLinkage,
                                           '\01' + Exp->Name, &LibModule);
@@ -1265,7 +1226,7 @@ int main() {
             ++ArgIdx;
           }
 
-          if (Exp->IsObjCMethod) {
+          if (Exp->ObjCMethod) {
             // Objective-C methods are not exported, so we call them by
             // computing their address using their RVA.
             if (!DLL.ReferenceFunc) {
