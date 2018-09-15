@@ -5,6 +5,13 @@
 
 #include <llvm/ADT/Twine.h>
 
+#include <stdexcept>
+
+class FatalError : public std::runtime_error {
+public:
+  FatalError() : runtime_error("Fatal error encountered.") {}
+};
+
 void reportWarning(llvm::Twine Message);
 void reportError(llvm::Twine Message);
 [[noreturn]] void reportFatalError(llvm::Twine Message);
