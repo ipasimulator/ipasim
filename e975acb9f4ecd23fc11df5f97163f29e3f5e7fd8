@@ -1,0 +1,5 @@
+[ver:1,total:1200]
+src/HeadersAnalyzer/LLDBHelper.cpp:664,1537005600:84,1537009200:580,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:357,1537005600:282,1537009200:75,m
+src/HeadersAnalyzer/LLDBHelper.hpp:159,1537005600:54,1537009200:105,m
+build/include/llvm/DebugInfo/PDB/PDBSymbolExe.h:20,1537009200:20,r
