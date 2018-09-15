@@ -1,0 +1,5 @@
+[ver:1,total:840]
+src/HeadersAnalyzer/LLDBHelper.hpp:320,1537012800:320,m
+src/HeadersAnalyzer/LLDBHelper.cpp:285,1537012800:285,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:215,1537012800:215,m
+build/include/lldb/Symbol/SymbolFile.h:20,1537012800:20,r
