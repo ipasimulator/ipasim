@@ -289,8 +289,29 @@ public:
     // Analyze functions.
     for (const llvm::Function &Func : *LLVM.getModule()) {
       string Name = LLVM.mangleName(Func);
-      if (!HAC.isInteresting(Name))
+
+      // Find the corresponding export info from TBD files.
+      ExportList::iterator Exp;
+      if (!HAC.isInteresting(Name, Exp))
         continue;
+
+      // Update status accordingly.
+      switch (Exp->Status) {
+      case ExportStatus::Found:
+        Exp->Status = ExportStatus::Overloaded;
+        reportError("function overloaded (" + Name + ")");
+        continue;
+      case ExportStatus::Overloaded:
+        continue;
+      case ExportStatus::NotFound:
+        Exp->Status = ExportStatus::Found;
+        break;
+      default:
+        reportFatalError("unexpected status of `ExportEntry`");
+      }
+
+      // Save the function's signature.
+      Exp->Type = Func.getFunctionType();
     }
   }
 

@@ -72,7 +72,7 @@ public:
   // TODO: Find out whether there aren't any Objective-C method name parsers
   // somewhere in the LLVM ecosystem already.
   ClassExportList::const_iterator findClassMethod(const std::string &Name);
-  bool isInteresting(const std::string &Name);
+  bool isInteresting(const std::string &Name, ExportList::iterator &Exp);
 };
 
 // !defined(HACONTEXT_HPP)

@@ -28,8 +28,8 @@ ClassExportList::const_iterator HAContext::findClassMethod(const string &Name) {
   return iOSClasses.find('_' + ClassName);
 }
 
-bool HAContext::isInteresting(const string &Name) {
-  auto Exp = iOSExps.find(Name);
+bool HAContext::isInteresting(const string &Name, ExportList::iterator &Exp) {
+  Exp = iOSExps.find(Name);
   if (Exp == iOSExps.end()) {
     // If not found among exported functions, try if it isn't an Objective-C
     // function.
