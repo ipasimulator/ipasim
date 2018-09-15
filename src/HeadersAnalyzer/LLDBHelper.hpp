@@ -3,6 +3,8 @@
 #ifndef LLDBHELPER_HPP
 #define LLDBHELPER_HPP
 
+#include "Common.hpp"
+
 #include <lldb/Core/Debugger.h>
 
 #include <llvm/DebugInfo/PDB/PDBSymbolExe.h>
@@ -37,7 +39,7 @@ public:
     SymbolIterator(SymbolList<SymbolTy> &List, uint32_t Index)
         : List(List), Index(Index) {}
 
-    SymbolIterator &operator++() {
+    SymbolIterator prefix(++) {
       ++Index;
       Current = nullptr;
       return *this;

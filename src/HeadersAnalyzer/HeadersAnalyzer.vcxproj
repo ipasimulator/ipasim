@@ -213,6 +213,7 @@
   <ItemGroup>
     <ClInclude Include="cc_mapper.hpp" />
     <ClInclude Include="ClangHelper.hpp" />
+    <ClInclude Include="Common.hpp" />
     <ClInclude Include="Config.hpp" />
     <ClInclude Include="ErrorReporting.hpp" />
     <ClInclude Include="HAContext.hpp" />
