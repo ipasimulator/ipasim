@@ -43,7 +43,6 @@ public:
   };
   template <typename SymbolTy> class SymbolIterator {
   public:
-    SymbolIterator() {}
     SymbolIterator(SymbolList<SymbolTy> &List, uint32_t Index)
         : List(List), Index(Index) {}
 

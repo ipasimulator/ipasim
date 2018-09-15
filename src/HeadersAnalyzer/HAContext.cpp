@@ -5,7 +5,10 @@
 #include "Config.hpp"
 #include "ErrorReporting.hpp"
 
+#include <llvm/ADT/Twine.h>
+
 using namespace std;
+using namespace llvm;
 
 ClassExportList::const_iterator HAContext::findClassMethod(const string &Name) {
   if (iOSClasses.empty())
@@ -41,8 +44,8 @@ constexpr static const char *toString(LibType LibTy) {
 template <LibType LibTy> static void warnUninteresting(const string &Name) {
   if constexpr (WarnUninterestingFunctions & LibTy) {
     constexpr const char *LibStr = toString(LibTy);
-    reportWarning("found uninteresting function in " + LibStr + " (" + Name +
-                  "), that's interesting");
+    reportWarning(Twine("found uninteresting function in ") + LibStr + " (" +
+                  Name + "), that's interesting");
   }
 }
 

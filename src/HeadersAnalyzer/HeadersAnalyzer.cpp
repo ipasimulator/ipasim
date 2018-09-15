@@ -7,67 +7,38 @@
 #include "LLDBHelper.hpp"
 #include "LLVMHelper.hpp"
 
-#include <Plugins/ObjectFile/PECOFF/ObjectFilePECOFF.h>
 #include <Plugins/SymbolFile/PDB/PDBASTParser.h>
 #include <Plugins/SymbolFile/PDB/SymbolFilePDB.h>
-#include <lldb/API/SBDebugger.h>
 #include <lldb/Core/Debugger.h>
 #include <lldb/Core/Module.h>
 #include <lldb/Symbol/ClangASTContext.h>
 #include <lldb/Symbol/ClangUtil.h>
-#include <lldb/Symbol/SymbolVendor.h>
 #include <lldb/Symbol/Type.h>
-#include <lldb/Utility/DataBufferHeap.h>
 
 #include <tapi/Core/FileManager.h>
 #include <tapi/Core/InterfaceFile.h>
 #include <tapi/Core/InterfaceFileManager.h>
 
 #include <CodeGen/CodeGenModule.h>
-#include <clang/AST/ASTContext.h>
-#include <clang/AST/GlobalDecl.h>
-#include <clang/AST/Mangle.h>
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/AST/Type.h>
-#include <clang/Basic/TargetInfo.h>
-#include <clang/Basic/TargetOptions.h>
 #include <clang/CodeGen/CodeGenABITypes.h>
 #include <clang/CodeGen/CodeGenAction.h>
-#include <clang/CodeGen/ModuleBuilder.h>
 #include <clang/Driver/Compilation.h>
 #include <clang/Driver/Driver.h>
 #include <clang/Frontend/CompilerInstance.h>
-#include <clang/Frontend/Utils.h>
-#include <clang/Lex/PreprocessorOptions.h>
 #include <clang/Parse/ParseAST.h>
 
-#include <llvm/DebugInfo/PDB/IPDBSession.h>
-#include <llvm/DebugInfo/PDB/PDB.h>
-#include <llvm/DebugInfo/PDB/PDBSymbolExe.h>
 #include <llvm/DebugInfo/PDB/PDBSymbolFunc.h>
-#include <llvm/Demangle/Demangle.h>
 #include <llvm/IR/DebugInfo.h>
-#include <llvm/IR/Instructions.h>
 #include <llvm/IR/IntrinsicInst.h>
-#include <llvm/IR/Intrinsics.h>
-#include <llvm/IR/LLVMContext.h>
-#include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/Mangler.h>
 #include <llvm/IR/Module.h>
-#include <llvm/IR/ValueHandle.h>
-#include <llvm/IR/Verifier.h>
-#include <llvm/Support/CommandLine.h>
-#include <llvm/Support/ErrorHandling.h>
-#include <llvm/Support/TargetRegistry.h>
-#include <llvm/Support/TargetSelect.h>
-#include <llvm/Support/raw_os_ostream.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Transforms/Utils/FunctionComparator.h>
 
 #include <filesystem>
-#include <fstream>
 #include <iostream>
-#include <sstream>
 #include <vector>
 
 using namespace clang;
