@@ -110,3 +110,20 @@ IRHelper::createParamStruct(const ExportEntry *Exp) {
 
   return {Struct, Union};
 }
+
+Value *IRHelper::createCall(Function *Func, ArrayRef<Value *> Args,
+                            const Twine &Name) {
+  if (Func->getReturnType()->isVoidTy()) {
+    Builder.CreateCall(Func, Args);
+    return nullptr;
+  }
+  return Builder.CreateCall(Func, Args, Name);
+}
+Value *IRHelper::createCall(FunctionType *FuncTy, Value *FuncPtr,
+                            ArrayRef<Value *> Args, const Twine &Name) {
+  if (FuncTy->getReturnType()->isVoidTy()) {
+    Builder.CreateCall(FuncTy, FuncPtr, Args);
+    return nullptr;
+  }
+  return Builder.CreateCall(FuncTy, FuncPtr, Args, Name);
+}

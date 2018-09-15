@@ -71,6 +71,12 @@ public:
   void defineFunc(llvm::Function *Func);
   std::pair<llvm::StructType *, llvm::StructType *>
   createParamStruct(const ExportEntry *Exp);
+  llvm::Value *createCall(llvm::Function *Func,
+                          llvm::ArrayRef<llvm::Value *> Args,
+                          const llvm::Twine &Name);
+  llvm::Value *createCall(llvm::FunctionType *FuncTy, llvm::Value *FuncPtr,
+                          llvm::ArrayRef<llvm::Value *> Args,
+                          const llvm::Twine &Name);
 
 private:
   LLVMHelper &LLVM;

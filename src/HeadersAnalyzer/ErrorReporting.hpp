@@ -12,9 +12,9 @@ public:
   FatalError() : runtime_error("Fatal error encountered.") {}
 };
 
-void reportWarning(llvm::Twine Message);
-void reportError(llvm::Twine Message);
-[[noreturn]] void reportFatalError(llvm::Twine Message);
+void reportWarning(const llvm::Twine &Message);
+void reportError(const llvm::Twine &Message);
+[[noreturn]] void reportFatalError(const llvm::Twine &Message);
 
 // !defined(ERRORREPORTING_HPP)
 #endif

@@ -389,6 +389,64 @@ public:
           // Get pointer to the structure inside the union.
           llvm::Value *SP =
               IR.Builder.CreateBitCast(UP, Struct->getPointerTo(), "sp");
+
+          // Process arguments.
+          vector<llvm::Value *> Args;
+          Args.reserve(Exp->Type->getNumParams());
+          size_t ArgIdx = 0;
+          for (llvm::Type *ArgTy : Exp->Type->params()) {
+            string ArgNo = to_string(ArgIdx);
+
+            // Load argument from the structure.
+            llvm::Value *APP =
+                IR.Builder.CreateStructGEP(Struct, SP, ArgIdx, "app" + ArgNo);
+            llvm::Value *AP = IR.Builder.CreateLoad(APP, "ap" + ArgNo);
+            llvm::Value *A = IR.Builder.CreateLoad(AP, "a" + ArgNo);
+
+            // Save the argument.
+            Args.push_back(A);
+            ++ArgIdx;
+          }
+
+          llvm::Value *R;
+          if (Exp->ObjCMethod) {
+            // Objective-C methods are not exported, so we call them by
+            // computing their address using their RVA.
+            if (!DLL.ReferenceFunc) {
+              reportError("no reference function, cannot emit Objective-C "
+                          "method DLL wrappers (" +
+                          DLL.Name + ")");
+              continue;
+            }
+
+            // Add RVA to the reference function's address.
+            llvm::Value *Addr =
+                llvm::ConstantInt::getSigned(llvm::Type::getInt32Ty(LLVM.Ctx),
+                                             Exp->RVA - DLL.ReferenceFunc->RVA);
+            llvm::Value *RefPtr = IR.Builder.CreateBitCast(
+                RefFunc, llvm::Type::getInt8PtrTy(LLVM.Ctx));
+            llvm::Value *ComputedPtr = IR.Builder.CreateInBoundsGEP(
+                llvm::Type::getInt8Ty(LLVM.Ctx), RefPtr, Addr);
+            llvm::Value *FP = IR.Builder.CreateBitCast(
+                ComputedPtr, Exp->Type->getPointerTo(), "fp");
+
+            // Call the original DLL function.
+            R = IR.createCall(Exp->Type, FP, Args, "r");
+          } else {
+            R = IR.createCall(Func, Args, "r");
+          }
+
+          if (R) {
+            // Get pointer to the return value inside the union.
+            llvm::Value *RP = IR.Builder.CreateBitCast(
+                UP, Exp->Type->getReturnType()->getPointerTo(), "rp");
+
+            // Save return value back into the structure.
+            IR.Builder.CreateStore(R, RP);
+          }
+
+          // Finish.
+          IR.Builder.CreateRetVoid();
         }
       }
     }
