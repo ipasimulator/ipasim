@@ -313,11 +313,25 @@ public:
       // Save the function's signature.
       Exp->Type = Func.getFunctionType();
     }
+
+    reportUnimplementedFunctions();
   }
 
 private:
   HAContext HAC;
   LLVMInitializer LLVMInit;
+
+  void reportUnimplementedFunctions() {
+    if constexpr (ErrorUnimplementedFunctions & LibType::Dylib) {
+      for (const ExportEntry &Exp : HAC.iOSExps) {
+        if (Exp.Status == ExportStatus::NotFound) {
+          reportError(
+              "function found in TBD files wasn't found in any Dylib (" +
+              Exp.Name + ")");
+        }
+      }
+    }
+  }
 };
 
 int main() {
