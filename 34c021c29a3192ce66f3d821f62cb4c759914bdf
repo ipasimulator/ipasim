@@ -1,0 +1,11 @@
+[ver:1,total:1260]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:972,1537030800:972,m
+src/HeadersAnalyzer/HAContext.cpp:116,1537030800:116,m
+src/HeadersAnalyzer/LLDBHelper.hpp:54,1537030800:54,m
+IPASimulator.sln.DotSettings:30,1537030800:30,d
+src/HeadersAnalyzer/ClangHelper.cpp:20,1537030800:20,r
+src/HeadersAnalyzer/ErrorReporting.cpp:20,1537030800:20,r
+src/HeadersAnalyzer/Config.hpp:12,1537030800:12,r
+src/HeadersAnalyzer/cc_mapper.hpp:12,1537030800:12,r
+src/HeadersAnalyzer/LLVMHelper.cpp:12,1537030800:12,r
+src/HeadersAnalyzer/ClangHelper.hpp:12,1537030800:12,r
