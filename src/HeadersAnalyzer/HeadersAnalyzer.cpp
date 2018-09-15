@@ -1400,6 +1400,7 @@ int main() {
         OOutput.close();
         string OutputDylib(
             (OutputDir / DLL.Name).replace_extension(".dll.dylib").string());
+        string WrapperDLL("/Wrappers/" + DLL.Name);
         llvm::SmallVector<const char *, 256> StubArgv = {
             "clang.exe", "-target",
             // TODO: Don't hardcode target triple.
@@ -1413,7 +1414,7 @@ int main() {
             "-no_lsystem",
             // Let's call this as the original DLL (in the Mach-O header), so
             // that our dynamic loader directly loads that.
-            "-install_name", DLL.Name.c_str()};
+            "-install_name", WrapperDLL.c_str()};
         CompilerInstance StubCI;
         StubCI.createDiagnostics();
         driver::Driver StubDriver(StubArgv[0],
