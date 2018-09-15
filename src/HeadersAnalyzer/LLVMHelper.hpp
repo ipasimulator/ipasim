@@ -59,6 +59,11 @@ public:
   static const char *const Windows32;
   static const char *const Apple;
 
+  bool isLittleEndian() const {
+    return Module.getDataLayout().isLittleEndian();
+  }
+  bool isBigEndian() const { return Module.getDataLayout().isBigEndian(); }
+
 private:
   LLVMHelper &LLVM;
   llvm::IRBuilder<> Builder;
