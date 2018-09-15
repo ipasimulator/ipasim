@@ -6,6 +6,7 @@
 
 #include <llvm/ADT/None.h>
 #include <llvm/IR/Mangler.h>
+#include <llvm/IR/Verifier.h>
 #include <llvm/Support/CommandLine.h>
 #include <llvm/Support/TargetRegistry.h>
 #include <llvm/Support/TargetSelect.h>
@@ -126,4 +127,13 @@ Value *IRHelper::createCall(FunctionType *FuncTy, Value *FuncPtr,
     return nullptr;
   }
   return Builder.CreateCall(FuncTy, FuncPtr, Args, Name);
+}
+
+void IRHelper::verifyFunction(Function *Func) {
+  string Error;
+  raw_string_ostream OS(Error);
+  if (llvm::verifyFunction(*Func, &OS)) {
+    OS.flush();
+    reportError("invalid IR code (" + Func->getName() + "): " + Error);
+  }
 }

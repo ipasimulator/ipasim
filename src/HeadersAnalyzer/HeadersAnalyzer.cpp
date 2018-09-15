@@ -447,6 +447,9 @@ public:
 
           // Finish.
           IR.Builder.CreateRetVoid();
+
+          // Verify correctness of the generated IR.
+          IR.verifyFunction(Wrapper);
         }
       }
     }

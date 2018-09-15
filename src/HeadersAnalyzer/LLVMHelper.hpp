@@ -77,6 +77,7 @@ public:
   llvm::Value *createCall(llvm::FunctionType *FuncTy, llvm::Value *FuncPtr,
                           llvm::ArrayRef<llvm::Value *> Args,
                           const llvm::Twine &Name);
+  void verifyFunction(llvm::Function *Func);
 
 private:
   LLVMHelper &LLVM;
