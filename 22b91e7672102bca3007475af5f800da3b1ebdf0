@@ -1,0 +1,8 @@
+[ver:1,total:1200]
+src/HeadersAnalyzer/ClangHelper.cpp:333,1537027200:333,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:315,1537027200:315,m
+src/HeadersAnalyzer/LLVMHelper.hpp:292,1537027200:292,r
+src/HeadersAnalyzer/LLVMHelper.cpp:150,1537027200:150,m
+src/HeadersAnalyzer/ClangHelper.hpp:68,1537027200:68,m
+src/HeadersAnalyzer/Common.cpp:30,1537027200:30,r
+src/HeadersAnalyzer/cc_mapper.hpp:12,1537027200:12,r
