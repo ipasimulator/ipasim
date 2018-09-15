@@ -1,6 +1,7 @@
 // HeadersAnalyzer.cpp : Defines the entry point for the console application.
 //
 
+#include "Config.hpp"
 #include "HAContext.hpp"
 
 #include <Plugins/ObjectFile/PECOFF/ObjectFilePECOFF.h>
@@ -66,21 +67,11 @@
 #include <sstream>
 #include <vector>
 
-// Configuration.
-enum class LibType { None = 0, Dylib = 0x1, DLL = 0x2, Both = 0x3 };
-constexpr LibType WarnUninterestingFunctions = LibType::None;
-constexpr LibType ErrorUnimplementedFunctions = LibType::Both;
-constexpr bool OutputLLVMIR = true;
-
 using namespace clang;
 using namespace frontend;
 using namespace std;
 using namespace filesystem;
 using namespace tapi::internal;
-
-static constexpr bool operator&(LibType Value, LibType Flag) {
-  return ((uint32_t)Value & (uint32_t)Flag) == (uint32_t)Flag;
-}
 
 enum class export_status { NotFound = 0, Found, Overloaded, Generated };
 

@@ -207,6 +207,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cc_mapper.hpp" />
+    <ClInclude Include="Config.hpp" />
     <ClInclude Include="HAContext.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
