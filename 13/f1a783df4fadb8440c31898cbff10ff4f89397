@@ -1,0 +1,7 @@
+[ver:1,total:660]
+src/HeadersAnalyzer/ClangHelper.hpp:261,1536998400:261,m
+src/HeadersAnalyzer/ClangHelper.cpp:225,1536998400:225,m
+src/HeadersAnalyzer/LLVMHelper.cpp:60,1536998400:60,m
+src/HeadersAnalyzer/LLVMHelper.hpp:57,1536998400:57,m
+src/HeadersAnalyzer/Config.hpp:45,1536998400:45,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:12,1536998400:12,r
