@@ -24,6 +24,9 @@ public:
     LLVM.setModule(Act.takeModule());
   }
   std::unique_ptr<clang::CodeGen::CodeGenModule> createCodeGenModule();
+  void linkDLL(llvm::StringRef Output, llvm::StringRef ObjectFile,
+               llvm::StringRef ImportLib);
+  void executeArgs();
 
 private:
   LLVMHelper &LLVM;

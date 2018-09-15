@@ -143,17 +143,18 @@ void IRHelper::verifyFunction(Function *Func) {
   }
 }
 
+// Compiles the module. Inspired by LLVM tutorial:
+// https://llvm.org/docs/tutorial/LangImpl08.html.
 void IRHelper::emitObj(StringRef Path) {
-  path P(Path.data());
-
   // Print out LLVM IR.
   if constexpr (OutputLLVMIR) {
-    if (auto IROutput = createOutputFile(P.replace_extension(".ll").string()))
+    if (auto IROutput = createOutputFile(
+            path(Path.data()).replace_extension(".ll").string()))
       Module.print(*IROutput, nullptr);
   }
 
   // Create output file.
-  auto Output(createOutputFile(P.replace_extension(".obj").string()));
+  auto Output(createOutputFile(Path));
   if (!Output)
     return;
 

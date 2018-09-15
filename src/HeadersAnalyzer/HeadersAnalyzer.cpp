@@ -335,6 +335,7 @@ public:
   }
   void createDirs() {
     OutputDir = createOutputDir("./src/HeadersAnalyzer/Debug/");
+    WrappersDir = createOutputDir("./out/Wrappers/");
   }
   void generateDLLs() {
     LLVMHelper LLVM(LLVMInit);
@@ -452,7 +453,15 @@ public:
           IR.Builder.CreateRetVoid();
         }
 
-        IR.emitObj((OutputDir / DLL.Name).string());
+        // Emit `.obj` file.
+        string ObjectFile(
+            (OutputDir / DLL.Name).replace_extension(".obj").string());
+        IR.emitObj(ObjectFile);
+
+        // Create the wrapper DLL.
+        ClangHelper(LLVM).linkDLL(
+            (WrappersDir / DLL.Name).string(), ObjectFile,
+            (OutputDir / DLL.Name).replace_extension(".lib").string());
       }
     }
   }
@@ -460,7 +469,7 @@ public:
 private:
   HAContext HAC;
   LLVMInitializer LLVMInit;
-  path OutputDir;
+  path OutputDir, WrappersDir;
 
   void analyzeAppleFunction(const llvm::Function &Func) {
     LLVMHelper LLVM(LLVMInit);
