@@ -1,0 +1,10 @@
+[ver:1,total:2460]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1022,1537030800:212,1537034400:810,m
+src/HeadersAnalyzer/ClangHelper.cpp:684,1537030800:274,1537034400:410,m
+src/HeadersAnalyzer/ClangHelper.hpp:590,1537034400:590,m
+src/HeadersAnalyzer/LLVMHelper.hpp:62,1537030800:42,1537034400:20,r
+src/HeadersAnalyzer/LLDBHelper.hpp:30,1537030800:30,r
+src/HeadersAnalyzer/LLVMHelper.cpp:27,1537030800:27,r
+src/HeadersAnalyzer/LLDBHelper.cpp:15,1537034400:15,r
+src/HeadersAnalyzer/analyze_ios_headers.cfg:15,1537034400:15,r
+build/include/llvm/Support/TargetRegistry.h:15,1537030800:15,r
