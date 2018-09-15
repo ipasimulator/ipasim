@@ -1,0 +1,7 @@
+[ver:1,total:2100]
+src/HeadersAnalyzer/Common.cpp:953,1537023600:853,1537027200:100,m
+src/HeadersAnalyzer/LLVMHelper.cpp:527,1537023600:507,1537027200:20,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:249,1537023600:189,1537027200:60,m
+src/HeadersAnalyzer/Common.hpp:199,1537023600:199,m
+src/HeadersAnalyzer/LLVMHelper.hpp:142,1537023600:142,m
+build/include/llvm/Support/raw_ostream.h:30,1537023600:30,r
