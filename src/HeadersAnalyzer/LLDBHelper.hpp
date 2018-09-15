@@ -15,7 +15,7 @@ public:
   ~LLDBHelper();
 
   void load(const char *DLL, const char *PDB);
-  std::string mangleName(llvm::pdb::PDBSymbolFunc &Func);
+  static std::string mangleName(llvm::pdb::PDBSymbolFunc &Func);
 
 private:
   lldb::DebuggerSP Debugger;

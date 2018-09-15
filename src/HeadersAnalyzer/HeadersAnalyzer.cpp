@@ -302,10 +302,10 @@ public:
         PDBPath.replace_extension(".pdb");
 
         LLDB.load(DLLPath.string().c_str(), PDBPath.string().c_str());
-        
+
         // Analyze functions.
         for (auto &Func : LLDB.enumerate<PDBSymbolFunc>()) {
-          string Name(LLDB.mangleName(Func));
+          analyzeWindowsFunction(Func);
         }
       }
     }
@@ -315,6 +315,14 @@ private:
   HAContext HAC;
   LLVMInitializer LLVMInit;
 
+  void analyzeWindowsFunction(llvm::pdb::PDBSymbolFunc &Func) {
+    string Name(LLDBHelper::mangleName(Func));
+
+    // Find the corresponding export info from TBD files.
+    ExportList::iterator Exp;
+    if (!HAC.isInterestingForWindows(Name, Exp))
+      return;
+  }
   void analyzeAppleFunction(const llvm::Function &Func) {
     LLVMHelper LLVM(LLVMInit);
 

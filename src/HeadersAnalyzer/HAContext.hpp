@@ -73,6 +73,7 @@ public:
   // somewhere in the LLVM ecosystem already.
   ClassExportList::const_iterator findClassMethod(const std::string &Name);
   bool isInteresting(const std::string &Name, ExportList::iterator &Exp);
+  bool isInterestingForWindows(const std::string &Name, ExportList::iterator &Exp);
 };
 
 // !defined(HACONTEXT_HPP)

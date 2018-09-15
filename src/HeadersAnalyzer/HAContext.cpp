@@ -28,6 +28,24 @@ ClassExportList::const_iterator HAContext::findClassMethod(const string &Name) {
   return iOSClasses.find('_' + ClassName);
 }
 
+constexpr const char *toString(LibType LibTy) {
+  switch (LibTy) {
+  case LibType::DLL:
+    return "DLL";
+  case LibType::Dylib:
+    return "Dylib";
+  default:
+    reportFatalError("invalid `LibType`");
+  }
+}
+template <LibType LibTy> void warnUninteresting(const string &Name) {
+  if constexpr (WarnUninterestingFunctions & LibTy) {
+    constexpr const char *LibStr = toString(LibTy);
+    reportWarning("found uninteresting function in " + LibStr + " (" + Name +
+                  "), that's interesting");
+  }
+}
+
 bool HAContext::isInteresting(const string &Name, ExportList::iterator &Exp) {
   Exp = iOSExps.find(Name);
   if (Exp == iOSExps.end()) {
@@ -39,12 +57,18 @@ bool HAContext::isInteresting(const string &Name, ExportList::iterator &Exp) {
       Exp->ObjCMethod = true;
       iOSLibs[Class->second].Exports.push_back(&*Exp);
     } else {
-      if constexpr (WarnUninterestingFunctions & LibType::Dylib) {
-        reportWarning("found uninteresting function in Dylib (" + Name +
-                      "), that's interesting");
-      }
+      warnUninteresting<LibType::Dylib>(Name);
       return false;
     }
+  }
+  return true;
+}
+bool HAContext::isInterestingForWindows(const string &Name,
+                                        ExportList::iterator &Exp) {
+  Exp = iOSExps.find(Name);
+  if (Exp == iOSExps.end() || Exp->Status != ExportStatus::Found) {
+    warnUninteresting<LibType::DLL>(Name);
+    return false;
   }
   return true;
 }
