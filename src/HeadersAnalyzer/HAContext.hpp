@@ -67,6 +67,11 @@ public:
   ClassExportList iOSClasses = {{"_NSObject", 0}};
   std::vector<DLLGroup> DLLGroups = {
       {"./src/objc/Debug/", {DLLEntry("libobjc.A.dll")}}};
+
+  // This is an inverse of `CGObjCCommonMac::GetNameForMethod`.
+  // TODO: Find out whether there aren't any Objective-C method name parsers
+  // somewhere in the LLVM ecosystem already.
+  ClassExportList::const_iterator findClassMethod(const std::string &Name);
 };
 
 // !defined(HACONTEXT_HPP)

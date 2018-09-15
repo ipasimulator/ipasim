@@ -202,6 +202,7 @@
     <ClCompile Include="cc_mapper.cpp" />
     <ClCompile Include="ClangHelper.cpp" />
     <ClCompile Include="ErrorReporting.cpp" />
+    <ClCompile Include="HAContext.cpp" />
     <ClCompile Include="HeadersAnalyzer.cpp" />
     <ClCompile Include="LLVMHelper.cpp" />
   </ItemGroup>
