@@ -178,6 +178,9 @@ We could (and probably should) modify Clang to support exporting those methods.
 But there is also a simpler solution - we can simply import some symbol that's guaranteed to exist (e.g., `_mh_dylib_header`) and compute runtime address of the Objective-C method from runtime address of that symbol and compile-time-known RVA of the Objective-C method.
 For now, we chose the second approach since it's easier to implement.
 
+Note, though, that modifying Clang might be a problem - we should probably export those symbols by some generated numbers rather than their names, since the special Objective-C names (e.g., `[+ClassName methodName]`) cause problems with linker which thinks they are its directives.
+Maybe it's just a problem of Microsoft's linker, though, so using `lld-link` could solve the problem.
+
 ### Calling functions at runtime
 
 We need to be able to call any function from our DLLs based just on an address to which the emulated app jumps.
