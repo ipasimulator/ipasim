@@ -65,13 +65,14 @@ public:
     return Module.getDataLayout().isLittleEndian();
   }
   bool isBigEndian() const { return Module.getDataLayout().isBigEndian(); }
-  llvm::Function *declareFunc(const ExportEntry *Exp);
+  llvm::Function *declareFunc(const ExportEntry *Exp, bool Wrapper = false);
 
 private:
   LLVMHelper &LLVM;
   llvm::IRBuilder<> Builder;
   llvm::Module Module;
   std::unique_ptr<llvm::TargetMachine> TM;
+  llvm::FunctionType *WrapperTy;
 };
 
 // !defined(LLVMHELPER_HPP)

@@ -56,17 +56,24 @@ IRHelper::IRHelper(LLVMHelper &LLVM, const StringRef Name, const StringRef Path,
   Module.setSourceFileName(Path);
   Module.setTargetTriple(Triple);
   Module.setDataLayout(TM->createDataLayout());
+
+  // DLL function wrappers have all type `(void *) -> void`.
+  WrapperTy = FunctionType::get(Type::getVoidTy(LLVM.Ctx),
+                                {Type::getInt8PtrTy(LLVM.Ctx)},
+                                /* isVarArg */ false);
 }
 
 const char *const IRHelper::Windows32 = "i386-pc-windows-msvc";
 const char *const IRHelper::Apple = "armv7s-apple-ios10";
 
-Function *IRHelper::declareFunc(const ExportEntry *Exp) {
+Function *IRHelper::declareFunc(const ExportEntry *Exp, bool Wrapper) {
   if (!Exp)
     return nullptr;
   // Note that we add prefix `\01`, so that the name doesn't get mangled since
   // it already is. LLVM will remove this prefix before emitting object code for
   // the function.
-  return Function::Create(Exp->Type, Function::ExternalLinkage,
-                          Twine("\01", Exp->Name), &Module);
+  auto Name = Wrapper ? Twine("\01$__ipaSim_wrapper_", to_string(Exp->RVA))
+                      : Twine("\01", Exp->Name);
+  FunctionType *Type = Wrapper ? WrapperTy : Exp->Type;
+  return Function::Create(Type, Function::ExternalLinkage, Name, &Module);
 }

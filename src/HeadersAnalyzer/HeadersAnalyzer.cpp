@@ -356,6 +356,17 @@ public:
         // Declare reference function.
         // TODO: What if there are no non-Objective-C functions?
         llvm::Function *RefFunc = IR.declareFunc(DLL.ReferenceFunc);
+
+        // Generate function wrappers.
+        for (const ExportEntry *Exp : DLL.Exports) {
+          assert(Exp->Status == ExportStatus::FoundInDLL &&
+                 "Unexpected status of `ExportEntry`.");
+
+          // Declarations.
+          llvm::Function *Func =
+              Exp->ObjCMethod ? nullptr : IR.declareFunc(Exp);
+          llvm::Function *Wrapper = IR.declareFunc(Exp, /* Wrapper */ true);
+        }
       }
     }
   }
