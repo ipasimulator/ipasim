@@ -53,7 +53,7 @@ void ClangHelper::addDylibArgs(StringRef Output, StringRef ObjectFile,
   Args.add(ObjectFile.data());
   // Don't emit error that symbol `dyld_stub_binder` is undefined.
   Args.add("-undefined");
-  Args.add("-warning");
+  Args.add("warning");
   // But to do that, we cannot use two-level namespace.
   Args.add("-flat_namespace");
   // See [no-lsystem].
