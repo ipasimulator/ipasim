@@ -14,6 +14,7 @@ constexpr bool operator&(LibType Value, LibType Flag) {
 constexpr LibType WarnUninterestingFunctions = LibType::None;
 constexpr LibType ErrorUnimplementedFunctions = LibType::Both;
 constexpr bool OutputLLVMIR = true;
+constexpr bool VerboseClang = false;
 
 // !defined(CONFIG_HPP)
 #endif

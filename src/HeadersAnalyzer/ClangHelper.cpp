@@ -2,6 +2,8 @@
 
 #include "ClangHelper.hpp"
 
+#include "Config.hpp"
+
 #include <clang/Driver/Compilation.h>
 #include <clang/Driver/Driver.h>
 
@@ -15,6 +17,8 @@ ClangHelper::ClangHelper(LLVMHelper &LLVM) : LLVM(LLVM), Args(LLVM.Saver) {
   CI.createDiagnostics();
   // First argument is expected to be an executable name.
   Args.add("clang.exe");
+  if constexpr (VerboseClang)
+    Args.add("-v");
 }
 
 void ClangHelper::initFromInvocation() {
