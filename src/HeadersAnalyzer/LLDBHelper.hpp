@@ -6,11 +6,16 @@
 #include "Common.hpp"
 #include "ErrorReporting.hpp"
 
+#include <Plugins/SymbolFile/PDB/PDBASTParser.h>
 #include <Plugins/SymbolFile/PDB/SymbolFilePDB.h>
 #include <lldb/Core/Debugger.h>
+#include <lldb/Symbol/ClangASTContext.h>
 #include <lldb/Symbol/ObjectFile.h>
 
+#include <CodeGen/CodeGenModule.h>
+
 #include <llvm/DebugInfo/PDB/PDBSymbolExe.h>
+#include <llvm/Transforms/Utils/FunctionComparator.h>
 
 class ObjectFileUnimplemented : public lldb_private::ObjectFile {
 public:
@@ -125,6 +130,46 @@ template <typename SymbolTy>
 LLDBHelper::SymbolIterator<SymbolTy> LLDBHelper::SymbolList<SymbolTy>::end() {
   return SymbolIterator<SymbolTy>(*this, Enum->getChildCount());
 }
+
+class TypeComparer {
+public:
+  // Note that if we got `PDBAstParser` from `Module` rather then created it,
+  // `CreateLLDBTypeFromPDBType` wouldn't work - see branch `cg_got_clang_ctx`.
+  TypeComparer(clang::CodeGen::CodeGenModule &CGM, llvm::Module *Module,
+               lldb_private::SymbolFile *SymbolFile)
+      : CGM(CGM), Module(Module), ClangCtx(), Parser(ClangCtx) {
+    ClangCtx.SetSymbolFile(SymbolFile);
+  }
+
+  llvm::Type *getLLVMType(const llvm::pdb::PDBSymbol &Symbol);
+  bool areEqual(const llvm::Type *Type, const llvm::pdb::PDBSymbol &Symbol) {
+    return Type == getLLVMType(Symbol);
+  }
+  bool areEquivalent(llvm::FunctionType *Func,
+                     const llvm::pdb::PDBSymbolFunc &SymbolFunc);
+
+private:
+  clang::CodeGen::CodeGenModule &CGM;
+  llvm::Module *Module;
+  lldb_private::ClangASTContext ClangCtx;
+  PDBASTParser Parser;
+
+  // Just to get access to protected function `cmpTypes`.
+  class FunctionComparer : llvm::FunctionComparator {
+  public:
+    static int compareTypes(llvm::Module *Module, llvm::FunctionType *FTy1,
+                            llvm::FunctionType *FTy2) {
+      return FunctionComparer(Module, FTy1).cmpTypes(FTy1, FTy2);
+    }
+
+  private:
+    FunctionComparer(llvm::Module *Module, llvm::FunctionType *FTy)
+        : FunctionComparator(
+              llvm::Function::Create(FTy, llvm::GlobalValue::ExternalLinkage,
+                                     "", Module),
+              nullptr, nullptr) {}
+  };
+};
 
 // !defined(LLDBHELPER_HPP)
 #endif

@@ -4,16 +4,19 @@
 
 #include <Plugins/SymbolFile/PDB/SymbolFilePDB.h>
 #include <lldb/API/SBDebugger.h>
+#include <lldb/Symbol/ClangUtil.h>
 #include <lldb/Utility/DataBufferHeap.h>
+
+#include <clang/CodeGen/CodeGenABITypes.h>
 
 #include <llvm/DebugInfo/PDB/PDBSymbolFunc.h>
 
 #include <memory>
 
-using namespace std;
 using namespace lldb;
 using namespace lldb_private;
 using namespace llvm::pdb;
+using namespace std;
 
 // We do `SBDebugger` initialization in a class separate from `LLDBHelper`, so
 // that `SBDebugger::Terminate` is called after everything else has been
@@ -49,4 +52,18 @@ string LLDBHelper::mangleName(PDBSymbolFunc &Func) {
     assert(!Name.empty() && "A function has no name.");
   }
   return move(Name);
+}
+
+llvm::Type *TypeComparer::getLLVMType(const PDBSymbol &Symbol) {
+  using namespace clang;
+
+  TypeSP LLDBType = Parser.CreateLLDBTypeFromPDBType(Symbol);
+  QualType CanonType =
+      ClangUtil::GetCanonicalQualType(LLDBType->GetFullCompilerType());
+  return convertTypeForMemory(CGM, CanonType);
+}
+bool TypeComparer::areEquivalent(llvm::FunctionType *Func,
+                                 const PDBSymbolFunc &SymbolFunc) {
+  auto *Func2 = static_cast<llvm::FunctionType *>(getLLVMType(SymbolFunc));
+  return FunctionComparer::compareTypes(Module, Func, Func2) == 0;
 }

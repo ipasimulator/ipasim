@@ -130,57 +130,6 @@ private:
   InterfaceFileManager ifm_;
 };
 
-class TypeComparer {
-public:
-  // Note that if we got `PDBAstParser` from `Module` rather then created it,
-  // `CreateLLDBTypeFromPDBType` wouldn't work - see branch `cg_got_clang_ctx`.
-  TypeComparer(CodeGen::CodeGenModule &CGM, llvm::Module *Module,
-               lldb_private::SymbolFile *SymbolFile)
-      : CGM(CGM), Module(Module), ClangCtx(), Parser(ClangCtx) {
-    ClangCtx.SetSymbolFile(SymbolFile);
-  }
-
-  llvm::Type *getLLVMType(const llvm::pdb::PDBSymbol &Symbol) {
-    using namespace lldb;
-    using namespace lldb_private;
-
-    TypeSP LLDBType = Parser.CreateLLDBTypeFromPDBType(Symbol);
-    QualType CanonType =
-        ClangUtil::GetCanonicalQualType(LLDBType->GetFullCompilerType());
-    return convertTypeForMemory(CGM, CanonType);
-  }
-  bool areEqual(const llvm::Type *Type, const llvm::pdb::PDBSymbol &Symbol) {
-    return Type == getLLVMType(Symbol);
-  }
-  bool areEquivalent(llvm::FunctionType *Func,
-                     const llvm::pdb::PDBSymbolFunc &SymbolFunc) {
-    auto *Func2 = static_cast<llvm::FunctionType *>(getLLVMType(SymbolFunc));
-    return FunctionComparer::compareTypes(Module, Func, Func2) == 0;
-  }
-
-private:
-  CodeGen::CodeGenModule &CGM;
-  llvm::Module *Module;
-  lldb_private::ClangASTContext ClangCtx;
-  PDBASTParser Parser;
-
-  // Just to get access to protected function `cmpTypes`.
-  class FunctionComparer : llvm::FunctionComparator {
-  public:
-    static int compareTypes(llvm::Module *Module, llvm::FunctionType *FTy1,
-                            llvm::FunctionType *FTy2) {
-      return FunctionComparer(Module, FTy1).cmpTypes(FTy1, FTy2);
-    }
-
-  private:
-    FunctionComparer(llvm::Module *Module, llvm::FunctionType *FTy)
-        : FunctionComparator(
-              llvm::Function::Create(FTy, llvm::GlobalValue::ExternalLinkage,
-                                     "", Module),
-              nullptr, nullptr) {}
-  };
-};
-
 class HeadersAnalyzer {
 public:
   HeadersAnalyzer() : LLVM(LLVMInit) {}
