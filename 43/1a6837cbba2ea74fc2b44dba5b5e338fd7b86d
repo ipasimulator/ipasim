@@ -1,0 +1,6 @@
+[ver:1,total:2100]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1560,1537110000:540,1537113600:450,1537117200:180,1537120800:390,m
+src/HeadersAnalyzer/Debug/libobjc.A.obj.ll:210,1537113600:30,1537120800:180,r
+build/lib/clang/7.0.0/include/varargs.h:150,1537113600:150,r
+build/lib/clang/7.0.0/include/stdarg.h:150,1537120800:150,r
+src/HeadersAnalyzer/Common.hpp:30,1537113600:30,r
