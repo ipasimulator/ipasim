@@ -1,0 +1,5 @@
+[ver:1,total:420]
+src/HeadersAnalyzer/LLVMHelper.cpp:220,1537088400:220,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:120,1537088400:120,r
+src/HeadersAnalyzer/ClangHelper.cpp:60,1537088400:60,r
+build/include/llvm/ADT/Twine.h:20,1537088400:20,r
