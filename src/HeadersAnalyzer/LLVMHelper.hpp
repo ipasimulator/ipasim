@@ -10,6 +10,7 @@
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/IR/Module.h>
 #include <llvm/Support/Allocator.h>
+#include <llvm/Support/COM.h>
 #include <llvm/Support/StringSaver.h>
 #include <llvm/Target/TargetMachine.h>
 
@@ -19,6 +20,11 @@
 class LLVMInitializer {
 public:
   LLVMInitializer();
+
+private:
+  // We need COM initialized so that the DIA SDK can be loaded (see
+  // `LLDBHelper`).
+  llvm::sys::InitializeCOMRAII COM;
 };
 
 class StringVector {

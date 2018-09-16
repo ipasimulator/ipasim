@@ -72,9 +72,7 @@ void LLDBHelper::load(const char *DLL, const char *PDB) {
   // functions in our `TypeComparer` and they require some initialized LLDB
   // structures (like `SymbolFile`). Otherwise, we wouldn't need LLDB at all,
   // since we work directly with `IPDBSession` which is a LLVM object that can
-  // work without LLDB. Although, for some reason, the DIA SDK is not registered
-  // properly when we don't use `Debugger::Initialize`, so this would also have
-  // to be solved before removing LLDB from our dependencies completely.
+  // work without LLDB.
   ModuleSpec ModuleSpec(FileSpec(DLL, /* resolve_path */ true));
   ModuleSpec.GetSymbolFileSpec().SetFile(PDB, /* resolve_path */ true);
   Module = Debugger->GetSelectedOrDummyTarget()->GetSharedModule(ModuleSpec);

@@ -19,10 +19,11 @@
 
 using namespace llvm;
 using namespace llvm::cl;
+using namespace llvm::sys;
 using namespace std;
 using namespace std::filesystem;
 
-LLVMInitializer::LLVMInitializer() {
+LLVMInitializer::LLVMInitializer() : COM(COMThreadingMode::MultiThreaded) {
   InitializeAllTargetInfos();
   InitializeAllTargets();
   InitializeAllTargetMCs();
