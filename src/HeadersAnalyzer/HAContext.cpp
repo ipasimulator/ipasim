@@ -2,6 +2,7 @@
 
 #include "HAContext.hpp"
 
+#include "Common.hpp"
 #include "Config.hpp"
 #include "ErrorReporting.hpp"
 

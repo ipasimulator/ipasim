@@ -235,17 +235,22 @@ public:
           assert(Exp->Status == ExportStatus::FoundInDLL &&
                  "Unexpected status of `ExportEntry`.");
 
-          // Handle variadic functions specially.
-          // TODO: Share code for this.
+          // Handle Objective-C messengers specially. Note that they used to be
+          // variadic, but that's deprecated and so we cannot rely on that.
+          if (!Exp->Name.compare(0, HAContext::MsgSendLength,
+                                 HAContext::MsgSendPrefix)) {
+            // Remember it, so that we don't have to do expensive string
+            // comparison when generating Dylibs later.
+            Exp->Messenger = true;
+
+            // Don't generate wrappers for those functions.
+            continue;
+          }
+
+          // TODO: Handle variadic functions specially.
           if (Exp->Type->isVarArg()) {
-            constexpr const char *MsgSendPrefix = "_objc_msgSend";
-            constexpr size_t MsgSendLength = length(MsgSendPrefix);
-            if (!Exp->Name.compare(0, MsgSendLength, MsgSendPrefix)) {
-              // Don't generate wrappers for those functions.
-              continue;
-            } else
-              reportError(Twine("unhandled variadic function (") + Exp->Name +
-                          ")");
+            reportError(Twine("unhandled variadic function (") + Exp->Name +
+                        ")");
           }
 
           // Declarations.
@@ -378,21 +383,15 @@ public:
           continue;
         }
 
-        // Handle variadic functions specially.
-        if (Exp->Type->isVarArg()) {
-          constexpr const char *MsgSendPrefix = "_objc_msgSend";
-          constexpr size_t MsgSendLength = length(MsgSendPrefix);
-          if (!Exp->Name.compare(0, MsgSendLength, MsgSendPrefix)) {
-            // Construct name of the corresponding lookup function.
-            string LookupName("_objc_msgLookup" +
-                              Exp->Name.substr(MsgSendLength));
+        // Handle Objective-C messengers specially.
+        if (Exp->Messenger) {
+          // Construct name of the corresponding lookup function.
+          string LookupName("_objc_msgLookup" +
+                            Exp->Name.substr(HAContext::MsgSendLength));
 
-            // And let's call the lookup function instead.
-            // TODO: Wrong, this should be RVA instead of name.
-            Exp->WrapperRVA = move(LookupName);
-          } else
-            reportError(Twine("unhandled variadic function (") + Exp->Name +
-                        ")");
+          // And let's call the lookup function instead.
+          // TODO: Wrong, this should be RVA instead of name.
+          Exp->WrapperRVA = move(LookupName);
         }
 
         // Declarations.
