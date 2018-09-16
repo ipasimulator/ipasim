@@ -1,0 +1,14 @@
+[ver:1,total:3560]
+src/HeadersAnalyzer/LLDBHelper.cpp:1787,1537088400:762,1537092000:1025,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:910,1537088400:444,1537092000:466,m
+src/HeadersAnalyzer/LLDBHelper.hpp:379,1537088400:104,1537092000:275,m
+src/HeadersAnalyzer/HAContext.hpp:130,1537088400:130,m
+src/HeadersAnalyzer/HAContext.cpp:105,1537092000:105,m
+src/objc/stubs.mm:60,1537088400:60,r
+src/HeadersAnalyzer/LLVMHelper.cpp:40,1537092000:40,r
+build/include/llvm/DebugInfo/PDB/PDBSymbol.h:39,1537092000:39,r
+src/HeadersAnalyzer/Debug/0.ll:30,1537088400:30,r
+src/HeadersAnalyzer/iOSHeaders.mm:30,1537088400:10,1537092000:20,m
+build/include/llvm/DebugInfo/PDB/PDBSymbolFunc.h:20,1537088400:20,r
+build/include/llvm/DebugInfo/PDB/PDBTypes.h:20,1537088400:20,r
+src/HeadersAnalyzer/LLVMHelper.hpp:10,1537092000:10,r
