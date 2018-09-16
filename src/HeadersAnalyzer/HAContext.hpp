@@ -75,7 +75,8 @@ public:
   ClassExportList::const_iterator findClassMethod(const std::string &Name);
   bool isInteresting(const std::string &Name, ExportList::iterator &Exp);
   bool isInterestingForWindows(const std::string &Name,
-                               ExportList::iterator &Exp);
+                               ExportList::iterator &Exp,
+                               bool IgnoreDuplicates = false);
 };
 
 // !defined(HACONTEXT_HPP)

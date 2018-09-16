@@ -171,12 +171,12 @@ public:
         TypeComparer TC(*CGM, LLVM.getModule(), LLDB.getSymbolFile());
 
         // Analyze functions.
-        auto Analyzer = [&](auto &&Func) {
+        auto Analyzer = [&](auto &&Func, bool IgnoreDuplicates = false) {
           string Name(LLDBHelper::mangleName(Func));
 
           // Find the corresponding export info from TBD files.
           ExportList::iterator Exp;
-          if (!HAC.isInterestingForWindows(Name, Exp))
+          if (!HAC.isInterestingForWindows(Name, Exp, IgnoreDuplicates))
             return;
 
           // Update status accordingly.
@@ -199,7 +199,7 @@ public:
         for (auto &Func : LLDB.enumerate<PDBSymbolFunc>())
           Analyzer(Func);
         for (auto &Func : LLDB.enumerate<PDBSymbolPublicSymbol>())
-          Analyzer(Func);
+          Analyzer(Func, /* IgnoreDuplicates */ true);
       }
     }
   }
