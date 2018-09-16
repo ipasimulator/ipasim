@@ -10,6 +10,7 @@
 #include <clang/CodeGen/CodeGenABITypes.h>
 
 #include <llvm/DebugInfo/PDB/PDBSymbolFunc.h>
+#include <llvm/DebugInfo/PDB/PDBSymbolPublicSymbol.h>
 
 #include <memory>
 
@@ -44,7 +45,7 @@ void LLDBHelper::load(const char *DLL, const char *PDB) {
   RootSymbol = SymbolFile->GetPDBSession().getGlobalScope();
 }
 
-string LLDBHelper::mangleName(PDBSymbolFunc &Func) {
+template <typename SymbolTy> string LLDBHelper::mangleName(SymbolTy &Func) {
   // Get function's name, mangled if possible.
   string Name(Func.getUndecoratedName());
   if (Name.empty()) {
@@ -53,17 +54,34 @@ string LLDBHelper::mangleName(PDBSymbolFunc &Func) {
   }
   return move(Name);
 }
+template string LLDBHelper::mangleName(PDBSymbolFunc &);
+template string LLDBHelper::mangleName(PDBSymbolPublicSymbol &);
 
 llvm::Type *TypeComparer::getLLVMType(const PDBSymbol &Symbol) {
   using namespace clang;
 
   TypeSP LLDBType = Parser.CreateLLDBTypeFromPDBType(Symbol);
+  if (!LLDBType)
+    return nullptr;
   QualType CanonType =
       ClangUtil::GetCanonicalQualType(LLDBType->GetFullCompilerType());
   return convertTypeForMemory(CGM, CanonType);
 }
+template <typename SymbolTy>
 bool TypeComparer::areEquivalent(llvm::FunctionType *Func,
-                                 const PDBSymbolFunc &SymbolFunc) {
+                                 const SymbolTy &SymbolFunc) {
   auto *Func2 = static_cast<llvm::FunctionType *>(getLLVMType(SymbolFunc));
+  if (!Func2) {
+    reportError(
+        llvm::Twine(
+            "cannot compare signatures of a function and non-typed symbol `") +
+        LLDBHelper::mangleName(SymbolFunc) + "'");
+    return true;
+  }
   return FunctionComparer::compareTypes(Module, Func, Func2) == 0;
 }
+template bool TypeComparer::areEquivalent(llvm::FunctionType *Func,
+                                          const PDBSymbolFunc &SymbolFunc);
+template bool
+TypeComparer::areEquivalent(llvm::FunctionType *Func,
+                            const PDBSymbolPublicSymbol &SymbolFunc);

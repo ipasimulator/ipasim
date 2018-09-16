@@ -31,6 +31,7 @@
 #include <clang/Parse/ParseAST.h>
 
 #include <llvm/DebugInfo/PDB/PDBSymbolFunc.h>
+#include <llvm/DebugInfo/PDB/PDBSymbolPublicSymbol.h>
 #include <llvm/IR/DebugInfo.h>
 #include <llvm/IR/IntrinsicInst.h>
 #include <llvm/IR/Mangler.h>
@@ -170,13 +171,13 @@ public:
         TypeComparer TC(*CGM, LLVM.getModule(), LLDB.getSymbolFile());
 
         // Analyze functions.
-        for (auto &Func : LLDB.enumerate<PDBSymbolFunc>()) {
+        auto Analyzer = [&](auto &&Func) {
           string Name(LLDBHelper::mangleName(Func));
 
           // Find the corresponding export info from TBD files.
           ExportList::iterator Exp;
           if (!HAC.isInterestingForWindows(Name, Exp))
-            continue;
+            return;
 
           // Update status accordingly.
           Exp->Status = ExportStatus::FoundInDLL;
@@ -194,7 +195,11 @@ public:
           if (!TC.areEquivalent(Exp->Type, Func))
             reportError("functions' signatures are not equivalent (" +
                         Exp->Name + ")");
-        }
+        };
+        for (auto &Func : LLDB.enumerate<PDBSymbolFunc>())
+          Analyzer(Func);
+        for (auto &Func : LLDB.enumerate<PDBSymbolPublicSymbol>())
+          Analyzer(Func);
       }
     }
   }

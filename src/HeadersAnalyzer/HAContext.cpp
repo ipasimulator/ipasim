@@ -73,5 +73,5 @@ bool HAContext::isInterestingForWindows(const string &Name,
     warnUninteresting<LibType::DLL>(Name);
     return false;
   }
-  return true;
+  return Exp->Status != ExportStatus::FoundInDLL;
 }

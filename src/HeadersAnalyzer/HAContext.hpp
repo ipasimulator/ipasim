@@ -63,7 +63,8 @@ public:
   ExportList iOSExps;
   std::vector<Dylib> iOSLibs = {
       {"/usr/lib/libobjc.A.dylib",
-       {addExp("_sel_registerName"), addExp("_object_setIvar")}}};
+       {addExp("_sel_registerName"), addExp("_object_setIvar"),
+        addExp("_objc_msgSend")}}};
   ClassExportList iOSClasses = {{"_NSObject", 0}};
   std::vector<DLLGroup> DLLGroups = {
       {"./src/objc/Debug/", {DLLEntry("libobjc.A.dll")}}};
@@ -73,7 +74,8 @@ public:
   // somewhere in the LLVM ecosystem already.
   ClassExportList::const_iterator findClassMethod(const std::string &Name);
   bool isInteresting(const std::string &Name, ExportList::iterator &Exp);
-  bool isInterestingForWindows(const std::string &Name, ExportList::iterator &Exp);
+  bool isInterestingForWindows(const std::string &Name,
+                               ExportList::iterator &Exp);
 };
 
 // !defined(HACONTEXT_HPP)

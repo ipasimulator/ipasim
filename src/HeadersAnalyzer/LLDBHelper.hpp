@@ -65,7 +65,7 @@ public:
   LLDBHelper();
 
   void load(const char *DLL, const char *PDB);
-  static std::string mangleName(llvm::pdb::PDBSymbolFunc &Func);
+  template <typename SymbolTy> static std::string mangleName(SymbolTy &Func);
   lldb_private::SymbolFile *getSymbolFile() { return SymbolFile.get(); }
 
 private:
@@ -145,8 +145,8 @@ public:
   bool areEqual(const llvm::Type *Type, const llvm::pdb::PDBSymbol &Symbol) {
     return Type == getLLVMType(Symbol);
   }
-  bool areEquivalent(llvm::FunctionType *Func,
-                     const llvm::pdb::PDBSymbolFunc &SymbolFunc);
+  template <typename SymbolTy>
+  bool areEquivalent(llvm::FunctionType *Func, const SymbolTy &SymbolFunc);
 
 private:
   clang::CodeGen::CodeGenModule &CGM;
