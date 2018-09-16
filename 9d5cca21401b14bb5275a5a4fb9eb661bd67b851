@@ -1,0 +1,9 @@
+[ver:1,total:1740]
+src/HeadersAnalyzer/LLVMHelper.cpp:785,1537106400:765,1537110000:20,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:664,1537106400:560,1537110000:104,m
+src/HeadersAnalyzer/LLVMHelper.hpp:175,1537106400:155,1537110000:20,m
+src/HeadersAnalyzer/iOSHeaders.mm:52,1537106400:40,1537110000:12,m
+src/HeadersAnalyzer/HAContext.hpp:20,1537106400:20,m
+src/HeadersAnalyzer/HAContext.cpp:20,1537106400:20,r
+src/HeadersAnalyzer/Debug/libobjc.A.obj.ll:12,1537110000:12,r
+src/HeadersAnalyzer/Debug/0.o.ll:12,1537110000:12,r
