@@ -25,7 +25,7 @@ unique_ptr<CodeGenModule> ClangHelper::createCodeGenModule() {
   if (!CI.hasASTContext())
     CI.createASTContext();
   if (!LLVM.getModule())
-    LLVM.setModule(std::make_unique<llvm::Module>("", LLVM.Ctx));
+    LLVM.setModule(std::make_unique<llvm::Module>("CGM", LLVM.Ctx));
 
   return std::make_unique<CodeGenModule>(
       CI.getASTContext(), CI.getHeaderSearchOpts(), CI.getPreprocessorOpts(),

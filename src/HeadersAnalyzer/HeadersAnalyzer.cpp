@@ -183,10 +183,10 @@ private:
 
 class HeadersAnalyzer {
 public:
-  void parseAppleHeaders() {
-    LLVMHelper LLVM(LLVMInit);
+  HeadersAnalyzer() : LLVM(LLVMInit) {}
 
-    compileAppleHeaders(LLVM);
+  void parseAppleHeaders() {
+    compileAppleHeaders();
 
     for (const llvm::Function &Func : *LLVM.getModule()) {
       analyzeAppleFunction(Func);
@@ -196,7 +196,6 @@ public:
   }
   void loadDLLs() {
     using namespace llvm::pdb;
-    LLVMHelper LLVM(LLVMInit);
     LLDBHelper LLDB;
     ClangHelper Clang(LLVM);
 
@@ -256,8 +255,6 @@ public:
     DylibsDir = createOutputDir("./out/Dylibs/");
   }
   void generateDLLs() {
-    LLVMHelper LLVM(LLVMInit);
-
     // Generate DLL wrappers and also stub Dylibs for them.
     for (const DLLGroup &DLLGroup : HAC.DLLGroups) {
       for (const DLLEntry &DLL : DLLGroup.DLLs) {
@@ -394,8 +391,6 @@ public:
     }
   }
   void generateDylibs() {
-    LLVMHelper LLVM(LLVMInit);
-
     size_t LibIdx = 0;
     for (const Dylib &Lib : HAC.iOSLibs) {
       string LibNo = to_string(LibIdx++);
@@ -508,11 +503,10 @@ public:
 private:
   HAContext HAC;
   LLVMInitializer LLVMInit;
+  LLVMHelper LLVM;
   path OutputDir, WrappersDir, DylibsDir;
 
   void analyzeAppleFunction(const llvm::Function &Func) {
-    LLVMHelper LLVM(LLVMInit);
-
     // We use mangled names to uniquely identify functions.
     string Name(LLVM.mangleName(Func));
 
@@ -539,7 +533,7 @@ private:
     // Save the function's signature.
     Exp->Type = Func.getFunctionType();
   }
-  void compileAppleHeaders(LLVMHelper &LLVM) {
+  void compileAppleHeaders() {
     ClangHelper Clang(LLVM);
     Clang.Args.loadConfigFile("./src/HeadersAnalyzer/analyze_ios_headers.cfg");
     Clang.initFromInvocation();
