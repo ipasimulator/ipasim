@@ -235,6 +235,19 @@ public:
           assert(Exp->Status == ExportStatus::FoundInDLL &&
                  "Unexpected status of `ExportEntry`.");
 
+          // Handle variadic functions specially.
+          // TODO: Share code for this.
+          if (Exp->Type->isVarArg()) {
+            constexpr const char *MsgSendPrefix = "_objc_msgSend";
+            constexpr size_t MsgSendLength = length(MsgSendPrefix);
+            if (!Exp->Name.compare(0, MsgSendLength, MsgSendPrefix)) {
+              // Don't generate wrappers for those functions.
+              continue;
+            } else
+              reportError(Twine("unhandled variadic function (") + Exp->Name +
+                          ")");
+          }
+
           // Declarations.
           llvm::Function *Func =
               Exp->ObjCMethod ? nullptr : IR.declareFunc(Exp);
@@ -249,8 +262,6 @@ public:
           // Generate the Dylib stub.
           DylibIR.defineFunc(Stub);
           DylibIR.Builder.CreateRetVoid();
-
-          // TODO: Handle variadic functions.
 
           auto [Struct, Union] = IR.createParamStruct(Exp);
 
@@ -367,11 +378,26 @@ public:
           continue;
         }
 
+        // Handle variadic functions specially.
+        if (Exp->Type->isVarArg()) {
+          constexpr const char *MsgSendPrefix = "_objc_msgSend";
+          constexpr size_t MsgSendLength = length(MsgSendPrefix);
+          if (!Exp->Name.compare(0, MsgSendLength, MsgSendPrefix)) {
+            // Construct name of the corresponding lookup function.
+            string LookupName("_objc_msgLookup" +
+                              Exp->Name.substr(MsgSendLength));
+
+            // And let's call the lookup function instead.
+            // TODO: Wrong, this should be RVA instead of name.
+            Exp->WrapperRVA = move(LookupName);
+          } else
+            reportError(Twine("unhandled variadic function (") + Exp->Name +
+                        ")");
+        }
+
         // Declarations.
         llvm::Function *Func = IR.declareFunc(Exp);
         llvm::Function *Wrapper = IR.declareFunc(Exp, /* Wrapper */ true);
-
-        // TODO: Handle variadic functions.
 
         auto [Struct, Union] = IR.createParamStruct(Exp);
 

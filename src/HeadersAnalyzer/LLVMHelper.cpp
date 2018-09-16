@@ -77,12 +77,17 @@ Function *IRHelper::declareFunc(const ExportEntry *Exp, bool Wrapper) {
   if (!Exp)
     return nullptr;
   // This is needed to keep `to_string(Exp->RVA)` alive.
-  auto CoreName = Wrapper ? to_string(Exp->RVA) : Exp->Name;
+  string WrapperRVA;
+  if (Wrapper && Exp->WrapperRVA.empty())
+    WrapperRVA = to_string(Exp->RVA);
+
   // Note that we add prefix `\01`, so that the name doesn't get mangled since
   // it already is. LLVM will remove this prefix before emitting object code for
   // the function.
-  auto Name = Wrapper ? Twine("\01$__ipaSim_wrapper_", CoreName)
-                      : Twine("\01", CoreName);
+  auto Name =
+      Wrapper ? Twine("\01$__ipaSim_wrapper_",
+                      Exp->WrapperRVA.empty() ? WrapperRVA : Exp->WrapperRVA)
+              : Twine("\01", Exp->Name);
 
   // Check whether this function hasn't already been declared.
   if (Function *Func = Module.getFunction(Name.str()))
