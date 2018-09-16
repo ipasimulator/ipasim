@@ -70,13 +70,17 @@ bool HAContext::isInterestingForWindows(const string &Name,
                                         ExportList::iterator &Exp,
                                         bool IgnoreDuplicates) {
   Exp = iOSExps.find(Name);
-  if (Exp == iOSExps.end() || Exp->Status != ExportStatus::Found) {
+  if (Exp == iOSExps.end()) {
     warnUninteresting<LibType::DLL>(Name);
     return false;
   }
   if (Exp->Status == ExportStatus::FoundInDLL) {
     if (!IgnoreDuplicates)
       reportError(Twine("found duplicate DLL export (") + Name + ")");
+    return false;
+  }
+  if (Exp->Status != ExportStatus::Found) {
+    warnUninteresting<LibType::DLL>(Name);
     return false;
   }
   return true;
