@@ -1,0 +1,6 @@
+[ver:1,total:660]
+src/HeadersAnalyzer/LLDBHelper.hpp:312,1537088400:312,m
+src/HeadersAnalyzer/LLDBHelper.cpp:243,1537088400:243,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:81,1537088400:81,m
+build/include/lldb/Symbol/ClangUtil.h:12,1537088400:12,r
+build/include/lldb/Symbol/ClangASTContext.h:12,1537088400:12,r
