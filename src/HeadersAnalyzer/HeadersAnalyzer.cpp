@@ -448,7 +448,7 @@ public:
       }
 
       // Create output directory.
-      createOutputDir(path(OutputDir).parent_path().string().c_str());
+      createOutputDir((DylibsDir / Lib.Name).parent_path().string().c_str());
 
       // Link the Dylib.
       Clang.executeArgs();
