@@ -391,7 +391,20 @@ public:
           string LookupName("_objc_msgLookup" +
                             Exp->Name.substr(HAContext::MsgSendLength));
 
-          // TODO: Call the lookup function instead.
+          // If it's a normal messenger, it has two parameters (`id` and `SEL`,
+          // both actually `void *`). If it's a `stret` messenger, it has one
+          // more parameter at the front (a `void *` for struct return).
+          // TODO: Test this.
+          bool Stret =
+              !Exp->Name.compare(Exp->Name.size() - HAContext::StretLength,
+                                 HAContext::StretLength, "_stret");
+
+          // TODO: Declare the lookup function as `void -> void`. Then declare
+          // the `msgSend` function with its few first arguments needed (`void
+          // *` x 2 -> `void *` or `void *` x 3 -> `void` for `stret`
+          // messengers). Then bitcast the lookup function to the same
+          // signature, only returning `void (*)(void)`. Then call it and jump
+          // to it's return value immediately after that.
         }
 
         // Declarations.
