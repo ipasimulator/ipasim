@@ -547,7 +547,7 @@ private:
       for (const ExportEntry &Exp : HAC.iOSExps) {
         if (Exp.Status == ExportStatus::NotFound) {
           reportError(
-              "function found in TBD files wasn't found in any Dylib (" +
+              "function found in TBD files wasn't found in any Apple header (" +
               Exp.Name + ")");
         }
       }
