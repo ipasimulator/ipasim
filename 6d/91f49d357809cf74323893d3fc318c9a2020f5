@@ -1,0 +1,10 @@
+[ver:1,total:1260]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:655,1537084800:655,m
+src/HeadersAnalyzer/LLVMHelper.hpp:185,1537084800:185,r
+build/include/llvm/IR/Type.h:120,1537084800:120,r
+src/HeadersAnalyzer/ClangHelper.cpp:90,1537084800:90,m
+build/include/llvm/IR/Function.h:60,1537084800:60,r
+build/include/llvm/IR/Constant.h:60,1537084800:60,r
+build/include/llvm/IR/LLVMContext.h:45,1537084800:45,r
+src/HeadersAnalyzer/LLVMHelper.cpp:30,1537084800:30,r
+build/include/llvm/IR/Module.h:15,1537084800:15,r
