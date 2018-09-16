@@ -1,0 +1,5 @@
+[ver:1,total:780]
+src/HeadersAnalyzer/LLDBHelper.cpp:382,1537084800:382,m
+src/HeadersAnalyzer/LLDBHelper.hpp:318,1537084800:318,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:70,1537084800:70,r
+build/include/llvm/DebugInfo/PDB/IPDBSession.h:10,1537084800:10,r
