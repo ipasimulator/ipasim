@@ -427,7 +427,9 @@ public:
 
       // Initialize Clang args to create the Dylib.
       ClangHelper Clang(LLVM);
-      Clang.addDylibArgs((DylibsDir / Lib.Name).string(), ObjectFile, Lib.Name);
+      // We add `./` to the library name to convert it to a relative path.
+      Clang.addDylibArgs((DylibsDir / ("./" + Lib.Name)).string(), ObjectFile,
+                         Lib.Name);
       Clang.Args.add("-L");
       Clang.Args.add(OutputDir.string().c_str());
 
