@@ -391,9 +391,7 @@ public:
           string LookupName("_objc_msgLookup" +
                             Exp->Name.substr(HAContext::MsgSendLength));
 
-          // And let's call the lookup function instead.
-          // TODO: Wrong, this should be RVA instead of name.
-          Exp->WrapperRVA = move(LookupName);
+          // TODO: Call the lookup function instead.
         }
 
         // Declarations.

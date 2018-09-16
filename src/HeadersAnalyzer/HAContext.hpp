@@ -38,11 +38,6 @@ struct ExportEntry {
   std::string Name;
   mutable ExportStatus Status;
   mutable uint32_t RVA;
-  // This is usually empty (indicating that `to_string(RVA)` should be used
-  // instead), but not for Objective-C messengers (e.g., `objc_msgSend`). There
-  // it's equal to the corresponding lookup function's RVA, so that that gets
-  // called instead.
-  mutable std::string WrapperRVA;
   mutable llvm::FunctionType *Type;
   mutable bool ObjCMethod : 1;
   mutable bool Messenger : 1;
