@@ -268,33 +268,41 @@ public:
           DylibIR.defineFunc(Stub);
           DylibIR.Builder.CreateRetVoid();
 
-          auto [Struct, Union] = IR.createParamStruct(Exp);
-
           FunctionGuard WrapperGuard(IR, Wrapper);
 
-          // The union pointer is in the first argument.
-          llvm::Value *UP = Wrapper->args().begin();
-
-          // Get pointer to the structure inside the union.
-          llvm::Value *SP =
-              IR.Builder.CreateBitCast(UP, Struct->getPointerTo(), "sp");
-
-          // Process arguments.
+          llvm::Value *UP;
           vector<llvm::Value *> Args;
-          Args.reserve(Exp->Type->getNumParams());
-          size_t ArgIdx = 0;
-          for (llvm::Type *ArgTy : Exp->Type->params()) {
-            string ArgNo = to_string(ArgIdx);
+          if (Exp->isTrivial()) {
+            // Trivial functions (`void -> void`) have no arguments, so no union
+            // pointer exists - we set it to `nullptr` to check that we don't
+            // use it anywhere in the following code.
+            UP = nullptr;
+          } else {
+            auto [Struct, Union] = IR.createParamStruct(Exp);
 
-            // Load argument from the structure.
-            llvm::Value *APP =
-                IR.Builder.CreateStructGEP(Struct, SP, ArgIdx, "app" + ArgNo);
-            llvm::Value *AP = IR.Builder.CreateLoad(APP, "ap" + ArgNo);
-            llvm::Value *A = IR.Builder.CreateLoad(AP, "a" + ArgNo);
+            // The union pointer is in the first argument.
+            UP = Wrapper->args().begin();
 
-            // Save the argument.
-            Args.push_back(A);
-            ++ArgIdx;
+            // Get pointer to the structure inside the union.
+            llvm::Value *SP =
+                IR.Builder.CreateBitCast(UP, Struct->getPointerTo(), "sp");
+
+            // Process arguments.
+            Args.reserve(Exp->Type->getNumParams());
+            size_t ArgIdx = 0;
+            for (llvm::Type *ArgTy : Exp->Type->params()) {
+              string ArgNo = to_string(ArgIdx);
+
+              // Load argument from the structure.
+              llvm::Value *APP =
+                  IR.Builder.CreateStructGEP(Struct, SP, ArgIdx, "app" + ArgNo);
+              llvm::Value *AP = IR.Builder.CreateLoad(APP, "ap" + ArgNo);
+              llvm::Value *A = IR.Builder.CreateLoad(AP, "a" + ArgNo);
+
+              // Save the argument.
+              Args.push_back(A);
+              ++ArgIdx;
+            }
           }
 
           llvm::Value *R;
@@ -398,9 +406,16 @@ public:
         llvm::Function *Func = IR.declareFunc(Exp);
         llvm::Function *Wrapper = IR.declareFunc(Exp, /* Wrapper */ true);
 
-        auto [Struct, Union] = IR.createParamStruct(Exp);
-
         FunctionGuard FuncGuard(IR, Func);
+
+        // Handle trivial `void -> void` functions specially.
+        if (Exp->isTrivial()) {
+          IR.Builder.CreateCall(Wrapper);
+          IR.Builder.CreateRetVoid();
+          continue;
+        }
+
+        auto [Struct, Union] = IR.createParamStruct(Exp);
 
         // Allocate the union.
         llvm::Value *S = IR.Builder.CreateAlloca(Union, nullptr, "s");

@@ -64,10 +64,14 @@ IRHelper::IRHelper(LLVMHelper &LLVM, StringRef Name, StringRef Path,
   Module.setTargetTriple(Triple);
   Module.setDataLayout(TM->createDataLayout());
 
-  // DLL function wrappers have all type `(void *) -> void`.
-  WrapperTy = FunctionType::get(Type::getVoidTy(LLVM.Ctx),
-                                {Type::getInt8PtrTy(LLVM.Ctx)},
+  // DLL function wrappers have mostly type `(void *) -> void`.
+  Type *VoidTy = Type::getVoidTy(LLVM.Ctx);
+  WrapperTy = FunctionType::get(VoidTy, {Type::getInt8PtrTy(LLVM.Ctx)},
                                 /* isVarArg */ false);
+
+  // Although, wrappers for trivial functions (`void -> void`) have also trivial
+  // signature `void -> void`.
+  TrivialWrapperTy = FunctionType::get(VoidTy, /* isVarArg */ false);
 }
 
 const char *const IRHelper::Windows32 = "i386-pc-windows-msvc";
@@ -89,12 +93,17 @@ Function *IRHelper::declareFunc(const ExportEntry *Exp, bool Wrapper) {
                       Exp->WrapperRVA.empty() ? WrapperRVA : Exp->WrapperRVA)
               : Twine("\01", Exp->Name);
 
+  FunctionType *Type =
+      Wrapper ? (Exp->isTrivial() ? TrivialWrapperTy : WrapperTy) : Exp->Type;
+
   // Check whether this function hasn't already been declared.
-  if (Function *Func = Module.getFunction(Name.str()))
+  if (Function *Func = Module.getFunction(Name.str())) {
+    assert(Func->getFunctionType() == Type &&
+           "The already-declared function has a wrong type.");
     return Func;
+  }
 
   // If not, create new declaration.
-  FunctionType *Type = Wrapper ? WrapperTy : Exp->Type;
   return Function::Create(Type, Function::ExternalLinkage, Name, &Module);
 }
 
@@ -106,6 +115,17 @@ void IRHelper::defineFunc(llvm::Function *Func) {
 
 pair<StructType *, StructType *>
 IRHelper::createParamStruct(const ExportEntry *Exp) {
+  Type *RetTy = Exp->Type->getReturnType();
+
+  // If the function has no arguments, we don't really need a struct, we just
+  // want to use the return value. We create a trivial structure type for
+  // compatibility with and simplicity of our callers, though.
+  if (!Exp->Type->getNumParams()) {
+    StructType *Struct = StructType::create(RetTy, "struct");
+    StructType *Union = StructType::create(Struct, "union");
+    return {Struct, Union};
+  }
+
   // Map parameter types to their pointers.
   vector<Type *> ParamPointers;
   ParamPointers.reserve(Exp->Type->getNumParams());
@@ -116,17 +136,16 @@ IRHelper::createParamStruct(const ExportEntry *Exp) {
   // Create a structure that we use to store the function's arguments and return
   // value. It's actually a union of a structure and of the return value where
   // the structure in the union contains addresses of the arguments.
-  StructType *Struct = llvm::StructType::create(ParamPointers, "struct");
+  StructType *Struct = StructType::create(ParamPointers, "struct");
 
   // In LLVM IR, union is simply a struct containing the largest element.
-  Type *RetTy = Exp->Type->getReturnType();
   Type *ContainedTy;
   if (RetTy->isVoidTy() ||
       Struct->getScalarSizeInBits() >= RetTy->getScalarSizeInBits())
     ContainedTy = Struct;
   else
     ContainedTy = RetTy;
-  llvm::StructType *Union = llvm::StructType::create("union", ContainedTy);
+  StructType *Union = StructType::create("union", ContainedTy);
 
   return {Struct, Union};
 }

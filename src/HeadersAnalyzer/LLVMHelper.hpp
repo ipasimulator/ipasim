@@ -90,7 +90,7 @@ private:
   LLVMHelper &LLVM;
   llvm::Module Module;
   std::unique_ptr<llvm::TargetMachine> TM;
-  llvm::FunctionType *WrapperTy;
+  llvm::FunctionType *WrapperTy, *TrivialWrapperTy;
 };
 
 class FunctionGuard {

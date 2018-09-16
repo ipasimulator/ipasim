@@ -50,6 +50,9 @@ struct ExportEntry {
   mutable const DLLEntry *DLL;
 
   bool operator<(const ExportEntry &Other) const { return Name < Other.Name; }
+  bool isTrivial() const {
+    return !Type->getNumParams() && Type->getReturnType()->isVoidTy();
+  }
 };
 
 using ExportList = std::set<ExportEntry>;
