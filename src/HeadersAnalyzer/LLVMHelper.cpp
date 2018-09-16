@@ -76,11 +76,13 @@ const char *const IRHelper::Apple = "armv7s-apple-ios10";
 Function *IRHelper::declareFunc(const ExportEntry *Exp, bool Wrapper) {
   if (!Exp)
     return nullptr;
+  // This is needed to keep `to_string(Exp->RVA)` alive.
+  auto CoreName = Wrapper ? to_string(Exp->RVA) : Exp->Name;
   // Note that we add prefix `\01`, so that the name doesn't get mangled since
   // it already is. LLVM will remove this prefix before emitting object code for
   // the function.
-  auto Name = Wrapper ? Twine("\01$__ipaSim_wrapper_", to_string(Exp->RVA))
-                      : Twine("\01", Exp->Name);
+  auto Name = Wrapper ? Twine("\01$__ipaSim_wrapper_", CoreName)
+                      : Twine("\01", CoreName);
   FunctionType *Type = Wrapper ? WrapperTy : Exp->Type;
   return Function::Create(Type, Function::ExternalLinkage, Name, &Module);
 }
