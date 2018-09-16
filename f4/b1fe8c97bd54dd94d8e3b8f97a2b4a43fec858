@@ -1,0 +1,6 @@
+[ver:1,total:540]
+src/HeadersAnalyzer/LLVMHelper.cpp:210,1537095600:210,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:210,1537095600:210,r
+src/HeadersAnalyzer/Debug/0.ll:60,1537095600:60,r
+src/HeadersAnalyzer/Debug/libobjc.A.ll:45,1537095600:45,r
+src/HeadersAnalyzer/Debug/libobjc.A.o.ll:15,1537095600:15,r
