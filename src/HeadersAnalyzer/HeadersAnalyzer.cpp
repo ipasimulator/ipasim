@@ -354,8 +354,9 @@ public:
         if (Exp->Status != ExportStatus::FoundInDLL) {
           if constexpr (ErrorUnimplementedFunctions & LibType::DLL) {
             if (Exp->Status == ExportStatus::Found) {
-              reportError(Twine("found in Dylib wasn't found in any DLL (") +
-                          Exp->Name + ")");
+              reportError(
+                  Twine("function found in Dylib wasn't found in any DLL (") +
+                  Exp->Name + ")");
             }
           }
           continue;
