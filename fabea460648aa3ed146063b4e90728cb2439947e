@@ -1,0 +1,11 @@
+[ver:1,total:2340]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:852,1537034400:180,1537038000:180,1537041600:180,1537081200:300,1537084800:12,r
+src/HeadersAnalyzer/LLDBHelper.cpp:460,1537081200:360,1537084800:100,m
+src/HeadersAnalyzer/LLVMHelper.cpp:314,1537084800:314,m
+build/include/llvm/ADT/StringRef.h:200,1537081200:200,r
+src/HeadersAnalyzer/LLVMHelper.hpp:140,1537084800:140,m
+src/HeadersAnalyzer/analyze_ios_headers.cfg:120,1537084800:120,r
+.clang-format:82,1537084800:82,r
+src/HeadersAnalyzer/LLDBHelper.hpp:72,1537084800:72,r
+build/include/llvm/Support/COM.h:60,1537084800:60,r
+build/include/llvm/Support/Error.h:40,1537081200:40,r
