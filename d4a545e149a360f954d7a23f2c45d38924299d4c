@@ -1,0 +1,7 @@
+[ver:1,total:2820]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1746,1537095600:720,1537099200:1026,m
+src/HeadersAnalyzer/Common.hpp:513,1537095600:505,1537099200:8,m
+src/HeadersAnalyzer/HAContext.hpp:326,1537099200:326,m
+src/HeadersAnalyzer/LLVMHelper.cpp:110,1537099200:110,m
+src/HeadersAnalyzer/ClangHelper.cpp:75,1537095600:45,1537099200:30,r
+src/HeadersAnalyzer/Debug/libobjc.A.obj.ll:50,1537095600:50,r
