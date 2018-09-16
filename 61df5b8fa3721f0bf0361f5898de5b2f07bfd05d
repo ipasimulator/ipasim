@@ -1,0 +1,4 @@
+[ver:1,total:1380]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1035,1537131600:1035,m
+src/HeadersAnalyzer/iOSHeaders.mm:180,1537131600:180,r
+src/HeadersAnalyzer/HAContext.hpp:165,1537131600:165,m
