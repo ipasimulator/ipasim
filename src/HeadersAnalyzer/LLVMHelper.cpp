@@ -83,6 +83,12 @@ Function *IRHelper::declareFunc(const ExportEntry *Exp, bool Wrapper) {
   // the function.
   auto Name = Wrapper ? Twine("\01$__ipaSim_wrapper_", CoreName)
                       : Twine("\01", CoreName);
+
+  // Check whether this function hasn't already been declared.
+  if (Function *Func = Module.getFunction(Name.str()))
+    return Func;
+
+  // If not, create new declaration.
   FunctionType *Type = Wrapper ? WrapperTy : Exp->Type;
   return Function::Create(Type, Function::ExternalLinkage, Name, &Module);
 }
