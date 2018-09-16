@@ -1,0 +1,4 @@
+[ver:1,total:480]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:240,1537095600:240,m
+src/HeadersAnalyzer/ClangHelper.cpp:120,1537095600:120,r
+src/HeadersAnalyzer/HAContext.cpp:120,1537095600:120,r
