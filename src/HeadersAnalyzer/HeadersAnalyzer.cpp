@@ -117,11 +117,10 @@ public:
 
       // Save export.
       auto it = exps_.find(name);
-      if (it != exps_.end()) {
+      if (it != exps_.end())
         it->second.libs.insert(ifile->getInstallName());
-      } else {
+      else
         exps_[name] = export_entry(ifile->getInstallName());
-      }
     }
   }
 
@@ -138,9 +137,8 @@ public:
   void parseAppleHeaders() {
     compileAppleHeaders();
 
-    for (const llvm::Function &Func : *LLVM.getModule()) {
+    for (const llvm::Function &Func : *LLVM.getModule())
       analyzeAppleFunction(Func);
-    }
 
     reportUnimplementedFunctions();
   }
@@ -219,12 +217,11 @@ public:
 
         // Since we are transferring data in memory across architectures, they
         // must have the same endianness for that to work.
-        if (IR.isLittleEndian() != DylibIR.isLittleEndian()) {
+        if (IR.isLittleEndian() != DylibIR.isLittleEndian())
           reportError("target platforms don't have the same endianness");
-        } else {
+        else
           assert(IR.isBigEndian() == DylibIR.isBigEndian() &&
                  "Inconsistency in endianness.");
-        }
 
         // Declare reference function.
         // TODO: What if there are no non-Objective-C functions?
@@ -248,10 +245,9 @@ public:
           }
 
           // TODO: Handle variadic functions specially.
-          if (Exp->Type->isVarArg()) {
+          if (Exp->Type->isVarArg())
             reportError(Twine("unhandled variadic function (") + Exp->Name +
                         ")");
-          }
 
           // Declarations.
           llvm::Function *Func =
@@ -329,9 +325,8 @@ public:
 
             // Call the original DLL function.
             R = IR.createCall(Exp->Type, FP, Args, "r");
-          } else {
+          } else
             R = IR.createCall(Func, Args, "r");
-          }
 
           if (R) {
             // Get pointer to the return value inside the union.
@@ -382,11 +377,10 @@ public:
         // Ignore functions that haven't been found in any DLL.
         if (Exp->Status != ExportStatus::FoundInDLL) {
           if constexpr (ErrorUnimplementedFunctions & LibType::DLL) {
-            if (Exp->Status == ExportStatus::Found) {
+            if (Exp->Status == ExportStatus::Found)
               reportError(
                   Twine("function found in Dylib wasn't found in any DLL (") +
                   Exp->Name + ")");
-            }
           }
           continue;
         }
@@ -475,7 +469,7 @@ public:
 
       // Add DLLs to link.
       set<const DLLEntry *> DLLs;
-      for (const ExportEntry *Exp : Lib.Exports) {
+      for (const ExportEntry *Exp : Lib.Exports)
         if (Exp->DLL && DLLs.insert(Exp->DLL).second) {
           string DylibName(
               path(Exp->DLL->Name).replace_extension(".dll").string());
@@ -487,7 +481,6 @@ public:
           Clang.Args.add("-l");
           Clang.Args.add(DylibName.c_str());
         }
-      }
 
       // Create output directory.
       createOutputDir((DylibsDir / Lib.Name).parent_path().string().c_str());
@@ -545,11 +538,10 @@ private:
   void reportUnimplementedFunctions() {
     if constexpr (ErrorUnimplementedFunctions & LibType::Dylib) {
       for (const ExportEntry &Exp : HAC.iOSExps) {
-        if (Exp.Status == ExportStatus::NotFound) {
+        if (Exp.Status == ExportStatus::NotFound)
           reportError(
               "function found in TBD files wasn't found in any Apple header (" +
               Exp.Name + ")");
-        }
       }
     }
   }
@@ -580,22 +572,18 @@ int main() {
     vector<string> tbdDirs{
         "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
         "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/TextInput/"};
-    for (auto &&dir : tbdDirs) {
-      for (auto &&file : directory_iterator(dir)) {
+    for (auto &&dir : tbdDirs)
+      for (auto &&file : directory_iterator(dir))
         tbdh.handle_tbd_file(file.path().string());
-      }
-    }
     // Discover `.tbd` files inside frameworks.
     string frameworksDir =
         "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/";
-    for (auto &&entry : directory_iterator(frameworksDir)) {
+    for (auto &&entry : directory_iterator(frameworksDir))
       if (entry.status().type() == file_type::directory &&
-          !entry.path().extension().compare(".framework")) {
+          !entry.path().extension().compare(".framework"))
         tbdh.handle_tbd_file(
             (entry.path() / entry.path().filename().replace_extension(".tbd"))
                 .string());
-      }
-    }
     cout << endl;
   }
 
