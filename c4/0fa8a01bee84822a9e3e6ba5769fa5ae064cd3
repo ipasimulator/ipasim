@@ -1,0 +1,6 @@
+[ver:1,total:1500]
+src/HeadersAnalyzer/HAContext.hpp:619,1537099200:330,1537106400:289,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:611,1537099200:390,1537106400:221,m
+src/HeadersAnalyzer/Debug/libobjc.A.obj.ll:150,1537099200:150,r
+src/HeadersAnalyzer/iOSHeaders.mm:60,1537099200:30,1537106400:30,m
+src/HeadersAnalyzer/HAContext.cpp:60,1537106400:60,m
