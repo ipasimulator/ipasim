@@ -157,8 +157,7 @@ void IRHelper::verifyFunction(Function *Func) {
 void IRHelper::emitObj(StringRef Path) {
   // Print out LLVM IR.
   if constexpr (OutputLLVMIR) {
-    if (auto IROutput = createOutputFile(
-            path(Path.data()).replace_extension(".ll").string()))
+    if (auto IROutput = createOutputFile(Path.str() + ".ll"))
       Module.print(*IROutput, nullptr);
   }
 
