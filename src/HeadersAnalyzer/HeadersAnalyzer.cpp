@@ -402,10 +402,6 @@ public:
 
         // Handle Objective-C messengers specially.
         if (Exp->Messenger) {
-          // Construct name of the corresponding lookup function.
-          string LookupName("_objc_msgLookup" +
-                            Exp->Name.substr(HAContext::MsgSendLength));
-
           // If it's a normal messenger, it has two parameters (`id` and `SEL`,
           // both actually `void *`). If it's a `stret` messenger, it has one
           // more parameter at the front (a `void *` for struct return).
@@ -414,12 +410,36 @@ public:
               !Exp->Name.compare(Exp->Name.size() - HAContext::StretLength,
                                  HAContext::StretLength, "_stret");
 
-          // TODO: Declare the lookup function as `void -> void`. Then declare
-          // the `msgSend` function with its few first arguments needed (`void
-          // *` x 2 -> `void *` or `void *` x 3 -> `void` for `stret`
-          // messengers). Then bitcast the lookup function to the same
-          // signature, only returning `void (*)(void)`. Then call it and jump
-          // to it's return value immediately after that.
+          // Declare the messenger with its callable signature.
+          llvm::Function *MessengerFunc =
+              IR.declareFunc(Stret ? StretFn : MessengerFn, Exp->Name);
+
+          FunctionGuard MessengerGuard(IR, MessengerFunc);
+
+          // Construct name of the corresponding lookup function.
+          Twine LookupName(Twine("_objc_msgLookup") +
+                           (Exp->Name.c_str() + HAContext::MsgSendLength));
+
+          // Declare the lookup function.
+          llvm::Function *LookupFunc = IR.declareFunc(VoidToVoidFn, LookupName);
+
+          // In iOS headers, it's declared as `void -> void`, so we need to
+          // bitcast it to it's callable signature.
+          llvm::FunctionType *LookupTy = Stret ? StretLookupFn : LookupFn;
+          llvm::Value *FP = IR.Builder.CreateBitCast(
+              LookupFunc, LookupTy->getPointerTo(), "fp");
+
+          // Get arguments.
+          vector<llvm::Value *> Args;
+          Args.reserve(MessengerFunc->arg_size());
+          for (llvm::Argument &Arg : MessengerFunc->args())
+            Args.push_back(&Arg);
+
+          // Call the lookup function and jump to its result.
+          llvm::Value *IMP = IR.Builder.CreateCall(LookupTy, FP, Args, "imp");
+          // TODO: Wrong, we have to jump.
+          IR.Builder.CreateCall(VoidToVoidFn, IMP, {});
+          IR.Builder.CreateRetVoid();
         }
 
         // Declarations.

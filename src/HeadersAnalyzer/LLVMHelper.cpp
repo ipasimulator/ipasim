@@ -86,24 +86,30 @@ Function *IRHelper::declareFunc(const ExportEntry *Exp, bool Wrapper) {
   if (Wrapper)
     WrapperRVA = to_string(Exp->RVA);
 
-  // Note that we add prefix `\01`, so that the name doesn't get mangled since
-  // it already is. LLVM will remove this prefix before emitting object code for
-  // the function.
-  auto Name = Wrapper ? Twine("\01$__ipaSim_wrapper_", WrapperRVA)
-                      : Twine("\01", Exp->Name);
+  auto Name =
+      Wrapper ? Twine("$__ipaSim_wrapper_") + WrapperRVA : Twine(Exp->Name);
 
   FunctionType *Type =
       Wrapper ? (Exp->isTrivial() ? TrivialWrapperTy : WrapperTy) : Exp->Type;
 
+  return declareFunc(Type, Name);
+}
+
+Function *IRHelper::declareFunc(FunctionType *Type, const Twine &Name) {
+  // Note that we add prefix `\01`, so that the name doesn't get mangled since
+  // it already is. LLVM will remove this prefix before emitting object code for
+  // the function.
+  Twine RawName(Twine('\01') + Name);
+
   // Check whether this function hasn't already been declared.
-  if (Function *Func = Module.getFunction(Name.str())) {
+  if (Function *Func = Module.getFunction(RawName.str())) {
     assert(Func->getFunctionType() == Type &&
            "The already-declared function has a wrong type.");
     return Func;
   }
 
   // If not, create new declaration.
-  return Function::Create(Type, Function::ExternalLinkage, Name, &Module);
+  return Function::Create(Type, Function::ExternalLinkage, RawName, &Module);
 }
 
 void IRHelper::defineFunc(llvm::Function *Func) {
