@@ -398,10 +398,12 @@ public:
           // function as `void -> void`, then call `msgLookup` as `void -> void`
           // inside of it and immediately return after that. That way, the
           // generated machine instructions shouldn't touch any registers (other
-          // than the one for return address), so it should work correctly.
-
-          // TODO: Maybe generate assembly instead, so that we can be really
-          // sure.
+          // than the one for return address), so it should work correctly. Note
+          // that we could use `PreserveMost` CC to seemingly keep the registers
+          // untouched, but be aware that the function could actually touch
+          // those registers, it would just restore them back upon return. So
+          // that wouldn't be really helpful for us since we need those
+          // registers to be preserved until we jump to the `IMP`.
 
           // Declare the messenger.
           llvm::Function *MessengerFunc =
@@ -429,6 +431,8 @@ public:
 
           continue;
         }
+
+        // TODO: Generate wrappers for lookup functions with arguments.
 
         // Declarations.
         llvm::Function *Func = IR.declareFunc(Exp);
