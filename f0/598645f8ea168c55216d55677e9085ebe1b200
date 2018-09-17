@@ -1,0 +1,4 @@
+[ver:1,total:480]
+src/HeadersAnalyzer/LLVMHelper.cpp:270,1537174800:270,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:120,1537174800:120,m
+build/include/llvm/IR/Module.h:90,1537174800:90,r
