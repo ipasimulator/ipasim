@@ -440,6 +440,8 @@ public:
           // TODO: Wrong, we have to jump.
           IR.Builder.CreateCall(VoidToVoidFn, IMP, {});
           IR.Builder.CreateRetVoid();
+
+          continue;
         }
 
         // Declarations.
