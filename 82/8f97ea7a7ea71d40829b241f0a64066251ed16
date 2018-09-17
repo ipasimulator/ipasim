@@ -1,0 +1,8 @@
+[ver:1,total:2160]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1521,1537171200:951,1537174800:570,m
+src/HeadersAnalyzer/LLVMHelper.cpp:372,1537171200:312,1537174800:60,m
+src/HeadersAnalyzer/Debug/libobjc.A.obj.ll:100,1537174800:100,r
+src/HeadersAnalyzer/LLVMHelper.hpp:70,1537171200:70,m
+src/HeadersAnalyzer/Debug/0.o.ll:50,1537174800:50,r
+build/include/llvm/ADT/Twine.h:35,1537171200:35,r
+build/include/llvm/ADT/ArrayRef.h:12,1537171200:12,r
