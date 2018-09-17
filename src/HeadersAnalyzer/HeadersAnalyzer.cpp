@@ -366,18 +366,10 @@ public:
   void generateDylibs() {
     // Some common types.
     llvm::Type *VoidTy = llvm::Type::getVoidTy(LLVM.Ctx);
-    llvm::FunctionType *VoidToVoidFn =
+    llvm::FunctionType *VoidToVoidTy =
         llvm::FunctionType::get(VoidTy, /* isVarArg */ false);
-    llvm::Type *VoidPtr = llvm::Type::getInt8PtrTy(LLVM.Ctx);
-    llvm::FunctionType *MessengerFn = llvm::FunctionType::get(
-        VoidPtr, {VoidPtr, VoidPtr}, /* isVarArg */ false);
-    llvm::FunctionType *StretFn = llvm::FunctionType::get(
-        VoidTy, {VoidPtr, VoidPtr, VoidPtr}, /* isVarArg */ false);
-    llvm::Type *TrivialFnPtr = VoidToVoidFn->getPointerTo();
-    llvm::FunctionType *LookupFn = llvm::FunctionType::get(
-        TrivialFnPtr, {VoidPtr, VoidPtr}, /* isVarArg */ false);
-    llvm::FunctionType *StretLookupFn = llvm::FunctionType::get(
-        TrivialFnPtr, {VoidPtr, VoidPtr, VoidPtr}, /* isVarArg */ false);
+    llvm::FunctionType *LookupTy = llvm::FunctionType::get(
+        VoidToVoidTy->getPointerTo(), /* isVarArg */ false);
 
     size_t LibIdx = 0;
     for (const Dylib &Lib : HAC.iOSLibs) {
@@ -402,17 +394,18 @@ public:
 
         // Handle Objective-C messengers specially.
         if (Exp->Messenger) {
-          // If it's a normal messenger, it has two parameters (`id` and `SEL`,
-          // both actually `void *`). If it's a `stret` messenger, it has one
-          // more parameter at the front (a `void *` for struct return).
-          // TODO: Test this.
-          bool Stret =
-              !Exp->Name.compare(Exp->Name.size() - HAContext::StretLength,
-                                 HAContext::StretLength, "_stret");
+          // Now here comes the trick. We actually declare the `msgSend`
+          // function as `void -> void`, then call `msgLookup` as `void -> void`
+          // inside of it and immediately return after that. That way, the
+          // generated machine instructions shouldn't touch any registers (other
+          // than the one for return address), so it should work correctly.
 
-          // Declare the messenger with its callable signature.
+          // TODO: Maybe generate assembly instead, so that we can be really
+          // sure.
+
+          // Declare the messenger.
           llvm::Function *MessengerFunc =
-              IR.declareFunc(Stret ? StretFn : MessengerFn, Exp->Name);
+              IR.declareFunc(VoidToVoidTy, Exp->Name);
 
           FunctionGuard MessengerGuard(IR, MessengerFunc);
 
@@ -421,24 +414,17 @@ public:
                            (Exp->Name.c_str() + HAContext::MsgSendLength));
 
           // Declare the lookup function.
-          llvm::Function *LookupFunc = IR.declareFunc(VoidToVoidFn, LookupName);
+          llvm::Function *LookupFunc = IR.declareFunc(VoidToVoidTy, LookupName);
 
           // In iOS headers, it's declared as `void -> void`, so we need to
-          // bitcast it to it's callable signature.
-          llvm::FunctionType *LookupTy = Stret ? StretLookupFn : LookupFn;
+          // bitcast it, so that it returns `IMP` (i.e., `void (*)(void)`).
           llvm::Value *FP = IR.Builder.CreateBitCast(
               LookupFunc, LookupTy->getPointerTo(), "fp");
 
-          // Get arguments.
-          vector<llvm::Value *> Args;
-          Args.reserve(MessengerFunc->arg_size());
-          for (llvm::Argument &Arg : MessengerFunc->args())
-            Args.push_back(&Arg);
-
           // Call the lookup function and jump to its result.
-          llvm::Value *IMP = IR.Builder.CreateCall(LookupTy, FP, Args, "imp");
-          // TODO: Wrong, we have to jump.
-          IR.Builder.CreateCall(VoidToVoidFn, IMP, {});
+          llvm::Value *IMP = IR.Builder.CreateCall(LookupTy, FP, {}, "imp");
+          llvm::CallInst *Call = IR.Builder.CreateCall(VoidToVoidTy, IMP, {});
+          Call->setTailCallKind(llvm::CallInst::TCK_MustTail);
           IR.Builder.CreateRetVoid();
 
           continue;

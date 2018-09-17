@@ -77,8 +77,6 @@ public:
 
   static constexpr const char *MsgSendPrefix = "_objc_msgSend";
   static constexpr size_t MsgSendLength = length(MsgSendPrefix);
-  static constexpr const char *StretPostfix = "_stret";
-  static constexpr size_t StretLength = length(StretPostfix);
 
   // This is an inverse of `CGObjCCommonMac::GetNameForMethod`.
   // TODO: Find out whether there aren't any Objective-C method name parsers
