@@ -364,6 +364,21 @@ public:
     }
   }
   void generateDylibs() {
+    // Some common types.
+    llvm::Type *VoidTy = llvm::Type::getVoidTy(LLVM.Ctx);
+    llvm::FunctionType *VoidToVoidFn =
+        llvm::FunctionType::get(VoidTy, /* isVarArg */ false);
+    llvm::Type *VoidPtr = llvm::Type::getInt8PtrTy(LLVM.Ctx);
+    llvm::FunctionType *MessengerFn = llvm::FunctionType::get(
+        VoidPtr, {VoidPtr, VoidPtr}, /* isVarArg */ false);
+    llvm::FunctionType *StretFn = llvm::FunctionType::get(
+        VoidTy, {VoidPtr, VoidPtr, VoidPtr}, /* isVarArg */ false);
+    llvm::Type *TrivialFnPtr = VoidToVoidFn->getPointerTo();
+    llvm::FunctionType *LookupFn = llvm::FunctionType::get(
+        TrivialFnPtr, {VoidPtr, VoidPtr}, /* isVarArg */ false);
+    llvm::FunctionType *StretLookupFn = llvm::FunctionType::get(
+        TrivialFnPtr, {VoidPtr, VoidPtr, VoidPtr}, /* isVarArg */ false);
+
     size_t LibIdx = 0;
     for (const Dylib &Lib : HAC.iOSLibs) {
       string LibNo = to_string(LibIdx++);
