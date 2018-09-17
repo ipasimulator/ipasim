@@ -1,0 +1,5 @@
+[ver:1,total:1380]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1150,1537174800:1150,m
+src/HeadersAnalyzer/Debug/libobjc.A.obj.ll:180,1537174800:180,r
+src/HeadersAnalyzer/HAContext.hpp:30,1537174800:30,m
+src/HeadersAnalyzer/Debug/0.o.ll:20,1537174800:20,r
