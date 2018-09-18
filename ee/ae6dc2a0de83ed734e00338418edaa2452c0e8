@@ -1,0 +1,7 @@
+[ver:1,total:4860]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:3100,1537207200:180,1537210800:180,1537214400:180,1537218000:30,1537221600:180,1537254000:60,1537257600:2290,m
+src/HeadersAnalyzer/LLDBHelper.cpp:990,1537218000:390,1537221600:600,r
+src/IpaSimulator/MainPage.xaml.cpp:570,1537218000:570,r
+src/HeadersAnalyzer/HAContext.hpp:110,1537257600:110,m
+src/HeadersAnalyzer/Debug/0.o.ll:60,1537257600:60,r
+src/HeadersAnalyzer/LLDBHelper.hpp:30,1537218000:30,r
