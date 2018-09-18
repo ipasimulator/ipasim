@@ -384,9 +384,10 @@ public:
         DylibIR.emitObj(DylibObjectFile);
 
         // Create the stub Dylib.
-        ClangHelper(LLVM).linkDylib(
-            (OutputDir / DLL.Name).replace_extension(".dll.dylib").string(),
-            DylibObjectFile, "/Wrappers/" + DLL.Name);
+        ClangHelper(LLVM).linkDylib((OutputDir / ("lib" + DLL.Name))
+                                        .replace_extension(".dll.dylib")
+                                        .string(),
+                                    DylibObjectFile, "/Wrappers/" + DLL.Name);
       }
     }
   }
@@ -533,15 +534,9 @@ public:
       set<const DLLEntry *> DLLs;
       for (const ExportEntry *Exp : Lib.Exports)
         if (Exp->DLL && DLLs.insert(Exp->DLL).second) {
-          string DylibName(
-              path(Exp->DLL->Name).replace_extension(".dll").string());
-
-          // Remove prefix `lib`.
-          if (!DylibName.compare(0, 3, "lib"))
-            DylibName = DylibName.substr(3);
-
           Clang.Args.add("-l");
-          Clang.Args.add(DylibName.c_str());
+          Clang.Args.add(
+              path(Exp->DLL->Name).replace_extension(".dll").string().c_str());
         }
 
       // Create output directory.
