@@ -235,4 +235,7 @@ If the result is inside the emulated code, it simply continues execution, otherw
 
 **Loggers** are functions like `printf`, `NSLog`, etc.
 Their arguments can be completely determined from the format string, usually their first argument.
-**TODO: Implement wrappers for those.**
+We have a C++ function that uses [`boost::format`](https://www.boost.org/doc/libs/1_58_0/libs/format/doc/format.html) to analyze a format string and create a dynamic structure holding the arguments.
+This function is compiled to a Dylib and called from all the `printf`-like functions.
+On the other side (in native wrapper DLLs), this structure is extracted and the original variadic function is called via [ffcall library](https://www.haible.de/bruno/packages-ffcall.html).
+Again, we have a helper function for this, it's written in C++ and compiled into a common DLL referenced by all `printf`-like wrappers.
