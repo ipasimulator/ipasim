@@ -72,7 +72,8 @@ public:
   std::vector<Dylib> iOSLibs = {
       {"/usr/lib/libobjc.A.dylib",
        {addExp("_sel_registerName"), addExp("_object_setIvar"),
-        addExp("_objc_msgSend"), addExp("_objc_msgLookup")}}};
+        addExp("_objc_msgSend"), addExp("_objc_msgLookup"),
+        addExp("_objc_msgSend_stret"), addExp("_objc_msgLookup_stret")}}};
   ClassExportList iOSClasses = {{"_NSObject", 0}};
   std::vector<DLLGroup> DLLGroups = {
       {"./src/objc/Debug/", {DLLEntry("libobjc.A.dll")}}};

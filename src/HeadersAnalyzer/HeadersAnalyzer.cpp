@@ -237,7 +237,6 @@ public:
             // `SEL`, both actually `void *`). If it's a `stret` messenger, it
             // has one more parameter at the front (a `void *` for struct
             // return).
-            // TODO: Test this.
             Exp->Stret = !Exp->Name.compare(
                 Exp->Name.size() - HAContext::StretLength,
                 HAContext::StretLength, HAContext::StretPostfix);
