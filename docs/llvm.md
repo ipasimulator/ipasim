@@ -68,6 +68,10 @@ cmake -G "Ninja" -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_EXTERNAL_CLANG_SOURCE_
   Then, we wouldn't have to read Mach-O object files.
 - `[no-lsystem]`: We added option `-no_lsystem` which, when used, tells Clang driver not to pass option `-lSystem` to linker.
   We use this option inside our `HeadersAnalyzer` to generate `.dylib`s on Windows (where is no `libSystem.dylib` for linker to use).
+- `[emit-bodies]`: We don't want to emit bodies in our `HeadersAnalyzer` since we are only interested in declarations.
+  So we added and used this option to speed up the compilation by skipping body emission.
+  If ever pushed upstream, this should be changed to emit just declarations, though.
+  Because now it emits invalid almost-empty definitions.
 
 ### Objective-C symbols across DLLs
 
