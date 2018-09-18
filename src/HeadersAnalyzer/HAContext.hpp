@@ -73,10 +73,14 @@ public:
       {"/usr/lib/libobjc.A.dylib",
        {addExp("_sel_registerName"), addExp("_object_setIvar"),
         addExp("_objc_msgSend"), addExp("_objc_msgLookup"),
-        addExp("_objc_msgSend_stret"), addExp("_objc_msgLookup_stret")}}};
+        addExp("_objc_msgSend_stret"), addExp("_objc_msgLookup_stret")}},
+      {"/System/Library/Frameworks/Foundation.framework/Foundation",
+       {addExp("_NSLog")}}};
   ClassExportList iOSClasses = {{"_NSObject", 0}};
   std::vector<DLLGroup> DLLGroups = {
-      {"./src/objc/Debug/", {DLLEntry("libobjc.A.dll")}}};
+      {"./src/objc/Debug/", {DLLEntry("libobjc.A.dll")}},
+      {"./deps/WinObjC/build/Win32/Debug/Universal Windows/",
+       {DLLEntry("Foundation.dll")}}};
 
   static constexpr const char *MsgSendPrefix = "_objc_msgSend";
   static constexpr size_t MsgSendLength = length(MsgSendPrefix);
