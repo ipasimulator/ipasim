@@ -33,7 +33,8 @@ enum class ExportStatus { NotFound = 0, Found, Overloaded, FoundInDLL };
 struct ExportEntry {
   ExportEntry(std::string Name)
       : Name(Name), Status(ExportStatus::NotFound), RVA(0), Type(nullptr),
-        ObjCMethod(false), Messenger(false), DLLGroup(nullptr), DLL(nullptr) {}
+        ObjCMethod(false), Messenger(false), Stret(false), DLLGroup(nullptr),
+        DLL(nullptr) {}
 
   std::string Name;
   mutable ExportStatus Status;
@@ -41,6 +42,7 @@ struct ExportEntry {
   mutable llvm::FunctionType *Type;
   mutable bool ObjCMethod : 1;
   mutable bool Messenger : 1;
+  mutable bool Stret : 1;
   mutable const DLLGroup *DLLGroup;
   mutable const DLLEntry *DLL;
 
@@ -77,6 +79,10 @@ public:
 
   static constexpr const char *MsgSendPrefix = "_objc_msgSend";
   static constexpr size_t MsgSendLength = length(MsgSendPrefix);
+  static constexpr const char *StretPostfix = "_stret";
+  static constexpr size_t StretLength = length(StretPostfix);
+  static constexpr const char *MsgLookupPrefix = "_objc_msgLookup";
+  static constexpr size_t MsgLookupLength = length(MsgLookupPrefix);
 
   // This is an inverse of `CGObjCCommonMac::GetNameForMethod`.
   // TODO: Find out whether there aren't any Objective-C method name parsers

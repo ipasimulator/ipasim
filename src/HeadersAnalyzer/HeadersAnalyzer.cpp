@@ -232,6 +232,17 @@ public:
           assert(Exp->Status == ExportStatus::FoundInDLL &&
                  "Unexpected status of `ExportEntry`.");
 
+          auto IsStretSetter = [&]() {
+            // If it's a normal messenger, it has two parameters (`id` and
+            // `SEL`, both actually `void *`). If it's a `stret` messenger, it
+            // has one more parameter at the front (a `void *` for struct
+            // return).
+            // TODO: Test this.
+            Exp->Stret = !Exp->Name.compare(
+                Exp->Name.size() - HAContext::StretLength,
+                HAContext::StretLength, HAContext::StretPostfix);
+          };
+
           // Handle Objective-C messengers specially. Note that they used to be
           // variadic, but that's deprecated and so we cannot rely on that.
           if (!Exp->Name.compare(0, HAContext::MsgSendLength,
@@ -239,9 +250,20 @@ public:
             // Remember it, so that we don't have to do expensive string
             // comparison when generating Dylibs later.
             Exp->Messenger = true;
+            IsStretSetter();
 
             // Don't generate wrappers for those functions.
             continue;
+          }
+
+          // Also, change types of the lookup functions. In Apple headers, they
+          // are declared as `void -> void`, but we need them to have the few
+          // first arguments they base their lookup on, so that we transfer them
+          // correctly.
+          if (!Exp->Name.compare(0, HAContext::MsgLookupLength,
+                                 HAContext::MsgLookupPrefix)) {
+            IsStretSetter();
+            Exp->Type = Exp->Stret ? LookupStretTy : LookupTy;
           }
 
           // TODO: Handle variadic functions specially.
@@ -364,13 +386,6 @@ public:
     }
   }
   void generateDylibs() {
-    // Some common types.
-    llvm::Type *VoidTy = llvm::Type::getVoidTy(LLVM.Ctx);
-    llvm::FunctionType *VoidToVoidTy =
-        llvm::FunctionType::get(VoidTy, /* isVarArg */ false);
-    llvm::FunctionType *LookupTy = llvm::FunctionType::get(
-        VoidToVoidTy->getPointerTo(), /* isVarArg */ false);
-
     size_t LibIdx = 0;
     for (const Dylib &Lib : HAC.iOSLibs) {
       string LibNo = to_string(LibIdx++);
@@ -394,45 +409,60 @@ public:
 
         // Handle Objective-C messengers specially.
         if (Exp->Messenger) {
-          // Now here comes the trick. We actually declare the `msgSend`
-          // function as `void -> void`, then call `msgLookup` as `void -> void`
-          // inside of it and immediately return after that. That way, the
-          // generated machine instructions shouldn't touch any registers (other
-          // than the one for return address), so it should work correctly. Note
-          // that we could use `PreserveMost` CC to seemingly keep the registers
-          // untouched, but be aware that the function could actually touch
-          // those registers, it would just restore them back upon return. So
-          // that wouldn't be really helpful for us since we need those
-          // registers to be preserved until we jump to the `IMP`.
+          // Now here comes the trick. The `msgSend` function that we generate
+          // here gets actually more arguments than we can possibly know. And we
+          // need to preserve the registers those arguments are in for the real
+          // function (`IMP`) we jump to in the end. So, the arguments we know
+          // that will be there, we actually declare and pass along, so that's
+          // OK. The other argument registers are preserved thanks to
+          // `PreserveMost` calling convention used along with `musttail` call
+          // of the `IMP`. This ensures that the generated code will restore all
+          // registers to their original state before returning from the
+          // function which is also before calling the `IMP` here, since it's a
+          // tail call. And that's what we wanted - preserve argument registers
+          // for the `IMP` call.
+          // TODO: There is one little inefficiency with the current
+          // implementation, though. Because the lookup function could actually
+          // change the argument registers, LLVM generates machine instructions
+          // to save those registers and restore them afterwards. This might be
+          // unnecessary, at least for the argument registers, since the lookup
+          // function is guaranteed not to touch them. But it might do whatever
+          // it wants to other caller-saved registers. Although, maybe it
+          // doesn't and we should declare it with `PreserveMost` CC, as well,
+          // to avoid these additional instructions.
 
           // Declare the messenger.
           llvm::Function *MessengerFunc =
-              IR.declareFunc(VoidToVoidTy, Exp->Name);
+              IR.declareFunc(Exp->Stret ? SendStretTy : SendTy, Exp->Name);
+          MessengerFunc->setCallingConv(llvm::CallingConv::PreserveMost);
 
+          // And define it, too.
           FunctionGuard MessengerGuard(IR, MessengerFunc);
 
           // Construct name of the corresponding lookup function.
-          Twine LookupName(Twine("_objc_msgLookup") +
+          Twine LookupName(Twine(HAContext::MsgLookupPrefix) +
                            (Exp->Name.c_str() + HAContext::MsgSendLength));
 
           // Declare the lookup function.
-          llvm::Function *LookupFunc = IR.declareFunc(VoidToVoidTy, LookupName);
+          llvm::Function *LookupFunc =
+              IR.declareFunc(Exp->Stret ? LookupStretTy : LookupTy, LookupName);
 
-          // In iOS headers, it's declared as `void -> void`, so we need to
-          // bitcast it, so that it returns `IMP` (i.e., `void (*)(void)`).
-          llvm::Value *FP = IR.Builder.CreateBitCast(
-              LookupFunc, LookupTy->getPointerTo(), "fp");
+          // Get arguments.
+          vector<llvm::Value *> Args;
+          Args.reserve(MessengerFunc->arg_size());
+          for (llvm::Argument &Arg : MessengerFunc->args())
+            Args.push_back(&Arg);
 
           // Call the lookup function and jump to its result.
-          llvm::Value *IMP = IR.Builder.CreateCall(LookupTy, FP, {}, "imp");
-          llvm::CallInst *Call = IR.Builder.CreateCall(VoidToVoidTy, IMP, {});
+          llvm::Value *IMP = IR.Builder.CreateCall(LookupFunc, Args, "imp");
+          llvm::CallInst *Call = IR.Builder.CreateCall(
+              MessengerFunc->getFunctionType(), IMP, Args);
+          Call->setCallingConv(llvm::CallingConv::PreserveMost);
           Call->setTailCallKind(llvm::CallInst::TCK_MustTail);
           IR.Builder.CreateRetVoid();
 
           continue;
         }
-
-        // TODO: Generate wrappers for lookup functions with arguments.
 
         // Declarations.
         llvm::Function *Func = IR.declareFunc(Exp);
@@ -533,6 +563,21 @@ private:
   LLVMInitializer LLVMInit;
   LLVMHelper LLVM;
   path OutputDir, WrappersDir, DylibsDir;
+
+  // Some common types.
+  llvm::Type *VoidTy = llvm::Type::getVoidTy(LLVM.Ctx);
+  llvm::Type *VoidPtrTy = llvm::Type::getInt8PtrTy(LLVM.Ctx);
+  llvm::FunctionType *VoidToVoidTy =
+      llvm::FunctionType::get(VoidTy, /* isVarArg */ false);
+  llvm::FunctionType *SendTy = llvm::FunctionType::get(
+      VoidTy, {VoidPtrTy, VoidPtrTy}, /* isVarArg */ false);
+  llvm::FunctionType *SendStretTy = llvm::FunctionType::get(
+      VoidTy, {VoidPtrTy, VoidPtrTy, VoidPtrTy}, /* isVarArg */ false);
+  llvm::FunctionType *LookupTy = llvm::FunctionType::get(
+      SendTy->getPointerTo(), {VoidPtrTy, VoidPtrTy}, /* isVarArg */ false);
+  llvm::FunctionType *LookupStretTy = llvm::FunctionType::get(
+      SendStretTy->getPointerTo(), {VoidPtrTy, VoidPtrTy, VoidPtrTy},
+      /* isVarArg */ false);
 
   void analyzeAppleFunction(const llvm::Function &Func) {
     // We use mangled names to uniquely identify functions.
