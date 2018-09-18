@@ -1,0 +1,4 @@
+[ver:1,total:240]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:140,1537261200:140,m
+src/HeadersAnalyzer/HAContext.hpp:70,1537261200:70,m
+src/HeadersAnalyzer/Debug/libobjc.A.obj.ll:30,1537261200:30,r
