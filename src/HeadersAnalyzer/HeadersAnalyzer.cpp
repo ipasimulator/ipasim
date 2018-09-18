@@ -189,6 +189,40 @@ public:
           if (!DLL.ReferenceFunc && !Exp->ObjCMethod)
             DLL.ReferenceFunc = &*Exp;
 
+          auto IsStretSetter = [&]() {
+            // If it's a normal messenger, it has two parameters (`id` and
+            // `SEL`, both actually `void *`). If it's a `stret` messenger, it
+            // has one more parameter at the front (a `void *` for struct
+            // return).
+            Exp->Stret = !Exp->Name.compare(
+                Exp->Name.size() - HAContext::StretLength,
+                HAContext::StretLength, HAContext::StretPostfix);
+          };
+
+          // Find Objective-C messengers. Note that they used to be variadic,
+          // but that's deprecated and so we cannot rely on that.
+          if (!Exp->Name.compare(0, HAContext::MsgSendLength,
+                                 HAContext::MsgSendPrefix)) {
+            Exp->Messenger = true;
+            IsStretSetter();
+
+            // Don't verify their types.
+            return;
+          }
+
+          // Also, change type of the lookup functions. In Apple headers, they
+          // are declared as `void -> void`, but we need them to have the few
+          // first arguments they base their lookup on, so that we transfer them
+          // correctly.
+          if (!Exp->Name.compare(0, HAContext::MsgLookupLength,
+                                 HAContext::MsgLookupPrefix)) {
+            IsStretSetter();
+            Exp->Type = Exp->Stret ? LookupStretTy : LookupTy;
+
+            // Don't verify their types.
+            return;
+          }
+
           // Verify that the function has the same signature as the iOS one.
           if (!TC.areEquivalent(Exp->Type, Func))
             reportError("functions' signatures are not equivalent (" +
@@ -232,38 +266,10 @@ public:
           assert(Exp->Status == ExportStatus::FoundInDLL &&
                  "Unexpected status of `ExportEntry`.");
 
-          auto IsStretSetter = [&]() {
-            // If it's a normal messenger, it has two parameters (`id` and
-            // `SEL`, both actually `void *`). If it's a `stret` messenger, it
-            // has one more parameter at the front (a `void *` for struct
-            // return).
-            Exp->Stret = !Exp->Name.compare(
-                Exp->Name.size() - HAContext::StretLength,
-                HAContext::StretLength, HAContext::StretPostfix);
-          };
-
-          // Handle Objective-C messengers specially. Note that they used to be
-          // variadic, but that's deprecated and so we cannot rely on that.
-          if (!Exp->Name.compare(0, HAContext::MsgSendLength,
-                                 HAContext::MsgSendPrefix)) {
-            // Remember it, so that we don't have to do expensive string
-            // comparison when generating Dylibs later.
-            Exp->Messenger = true;
-            IsStretSetter();
-
-            // Don't generate wrappers for those functions.
+          // Don't generate wrappers for Objective-C messengers. We handle those
+          // specially.
+          if (Exp->Messenger)
             continue;
-          }
-
-          // Also, change types of the lookup functions. In Apple headers, they
-          // are declared as `void -> void`, but we need them to have the few
-          // first arguments they base their lookup on, so that we transfer them
-          // correctly.
-          if (!Exp->Name.compare(0, HAContext::MsgLookupLength,
-                                 HAContext::MsgLookupPrefix)) {
-            IsStretSetter();
-            Exp->Type = Exp->Stret ? LookupStretTy : LookupTy;
-          }
 
           // TODO: Handle variadic functions specially.
           if (Exp->Type->isVarArg())
