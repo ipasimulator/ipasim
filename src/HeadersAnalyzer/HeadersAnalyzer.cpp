@@ -607,6 +607,9 @@ private:
     // TODO: Maybe filter them (include only those exported from iOS Dylibs).
     Clang.CI.getLangOpts().EmitAllDecls = true;
 
+    // But don't emit bodies, we don't need them. See [emit-bodies].
+    Clang.CI.getLangOpts().EmitBodies = false;
+
     // Compile to LLVM IR.
     Clang.executeCodeGenAction<EmitLLVMOnlyAction>();
   }
