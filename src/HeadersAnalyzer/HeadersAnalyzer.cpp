@@ -386,6 +386,13 @@ public:
     }
   }
   void generateDylibs() {
+    // Some common types.
+    llvm::FunctionType *VoidToVoidTy =
+        llvm::FunctionType::get(VoidTy, /* isVarArg */ false);
+    llvm::FunctionType *SimpleLookupTy = llvm::FunctionType::get(
+        VoidToVoidTy->getPointerTo(), /* isVarArg */ false);
+    llvm::Type *SimpleLookupPtrTy = SimpleLookupTy->getPointerTo();
+
     size_t LibIdx = 0;
     for (const Dylib &Lib : HAC.iOSLibs) {
       string LibNo = to_string(LibIdx++);
@@ -409,32 +416,17 @@ public:
 
         // Handle Objective-C messengers specially.
         if (Exp->Messenger) {
-          // Now here comes the trick. The `msgSend` function that we generate
-          // here gets actually more arguments than we can possibly know. And we
-          // need to preserve the registers those arguments are in for the real
-          // function (`IMP`) we jump to in the end. So, the arguments we know
-          // that will be there, we actually declare and pass along, so that's
-          // OK. The other argument registers are preserved thanks to
-          // `PreserveMost` calling convention used along with `musttail` call
-          // of the `IMP`. This ensures that the generated code will restore all
-          // registers to their original state before returning from the
-          // function which is also before calling the `IMP` here, since it's a
-          // tail call. And that's what we wanted - preserve argument registers
-          // for the `IMP` call.
-          // TODO: There is one little inefficiency with the current
-          // implementation, though. Because the lookup function could actually
-          // change the argument registers, LLVM generates machine instructions
-          // to save those registers and restore them afterwards. This might be
-          // unnecessary, at least for the argument registers, since the lookup
-          // function is guaranteed not to touch them. But it might do whatever
-          // it wants to other caller-saved registers. Although, maybe it
-          // doesn't and we should declare it with `PreserveMost` CC, as well,
-          // to avoid these additional instructions.
+          // Now here comes the trick. We actually declare the `msgSend`
+          // function as `void -> void`, then call `msgLookup` as `void ->
+          // void(*)(void)` inside of it and tail-call the result. That way, the
+          // generated machine instructions shouldn't touch any registers (other
+          // than the one for return address), so it should work correctly.
+          // TODO: Ideally, we would like to use `PreserveMost` CC (see commit
+          // `eeae6dc2`), but it's only for `x86_64` right now.
 
           // Declare the messenger.
           llvm::Function *MessengerFunc =
-              IR.declareFunc(Exp->Stret ? SendStretTy : SendTy, Exp->Name);
-          MessengerFunc->setCallingConv(llvm::CallingConv::PreserveMost);
+              IR.declareFunc(VoidToVoidTy, Exp->Name);
 
           // And define it, too.
           FunctionGuard MessengerGuard(IR, MessengerFunc);
@@ -447,17 +439,14 @@ public:
           llvm::Function *LookupFunc =
               IR.declareFunc(Exp->Stret ? LookupStretTy : LookupTy, LookupName);
 
-          // Get arguments.
-          vector<llvm::Value *> Args;
-          Args.reserve(MessengerFunc->arg_size());
-          for (llvm::Argument &Arg : MessengerFunc->args())
-            Args.push_back(&Arg);
+          // And bitcast it to `void -> void(*)(void)`.
+          llvm::Value *FP =
+              IR.Builder.CreateBitCast(LookupFunc, SimpleLookupPtrTy, "fp");
 
           // Call the lookup function and jump to its result.
-          llvm::Value *IMP = IR.Builder.CreateCall(LookupFunc, Args, "imp");
-          llvm::CallInst *Call = IR.Builder.CreateCall(
-              MessengerFunc->getFunctionType(), IMP, Args);
-          Call->setCallingConv(llvm::CallingConv::PreserveMost);
+          llvm::Value *IMP =
+              IR.Builder.CreateCall(SimpleLookupTy, FP, {}, "imp");
+          llvm::CallInst *Call = IR.Builder.CreateCall(VoidToVoidTy, IMP, {});
           Call->setTailCallKind(llvm::CallInst::TCK_MustTail);
           IR.Builder.CreateRetVoid();
 
@@ -567,8 +556,6 @@ private:
   // Some common types.
   llvm::Type *VoidTy = llvm::Type::getVoidTy(LLVM.Ctx);
   llvm::Type *VoidPtrTy = llvm::Type::getInt8PtrTy(LLVM.Ctx);
-  llvm::FunctionType *VoidToVoidTy =
-      llvm::FunctionType::get(VoidTy, /* isVarArg */ false);
   llvm::FunctionType *SendTy = llvm::FunctionType::get(
       VoidTy, {VoidPtrTy, VoidPtrTy}, /* isVarArg */ false);
   llvm::FunctionType *SendStretTy = llvm::FunctionType::get(
