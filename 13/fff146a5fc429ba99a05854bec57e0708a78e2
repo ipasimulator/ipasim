@@ -1,0 +1,3 @@
+[ver:1,total:720]
+src/HeadersAnalyzer/LLDBHelper.cpp:540,1537290000:80,1537293600:460,m
+build/include/llvm/ADT/ArrayRef.h:180,1537293600:180,r
