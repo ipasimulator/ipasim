@@ -236,7 +236,7 @@ public:
     }
   }
   void createDirs() {
-    OutputDir = createOutputDir("./src/HeadersAnalyzer/Debug/");
+    OutputDir = createOutputDir("./src/HeadersAnalyzer/Debug/CG/");
     WrappersDir = createOutputDir("./out/Wrappers/");
     DylibsDir = createOutputDir("./out/Dylibs/");
   }
