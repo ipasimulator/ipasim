@@ -1,0 +1,4 @@
+[ver:1,total:480]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:375,1537261200:375,m
+src/HeadersAnalyzer/HAContext.hpp:85,1537261200:85,r
+src/HeadersAnalyzer/Debug/0.o.ll:20,1537261200:20,r
