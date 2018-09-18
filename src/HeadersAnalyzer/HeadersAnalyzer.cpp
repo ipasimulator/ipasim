@@ -522,11 +522,12 @@ public:
       string ObjectFile((OutputDir / (LibNo + ".o")).string());
       IR.emitObj(ObjectFile);
 
+      // We add `./` to the library name to convert it to a relative path.
+      path DylibPath(DylibsDir / ("./" + Lib.Name));
+
       // Initialize Clang args to create the Dylib.
       ClangHelper Clang(LLVM);
-      // We add `./` to the library name to convert it to a relative path.
-      Clang.addDylibArgs((DylibsDir / ("./" + Lib.Name)).string(), ObjectFile,
-                         Lib.Name);
+      Clang.addDylibArgs(DylibPath.string(), ObjectFile, Lib.Name);
       Clang.Args.add("-L");
       Clang.Args.add(OutputDir.string().c_str());
 
@@ -540,7 +541,7 @@ public:
         }
 
       // Create output directory.
-      createOutputDir((DylibsDir / Lib.Name).parent_path().string().c_str());
+      createOutputDir(DylibPath.parent_path().string().c_str());
 
       // Link the Dylib.
       Clang.executeArgs();
