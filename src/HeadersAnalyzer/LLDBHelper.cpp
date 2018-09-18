@@ -64,7 +64,7 @@ llvm::Type *TypeComparer::getLLVMType(const PDBSymbol &Symbol) {
   if (!LLDBType)
     return nullptr;
   QualType CanonType =
-      ClangUtil::GetCanonicalQualType(LLDBType->GetFullCompilerType());
+      ClangUtil::GetCanonicalQualType(LLDBType->GetLayoutCompilerType());
   return convertTypeForMemory(CGM, CanonType);
 }
 template <typename SymbolTy>
