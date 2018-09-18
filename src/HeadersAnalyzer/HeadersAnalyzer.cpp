@@ -223,6 +223,16 @@ public:
             return;
           }
 
+          // Skip type verification of vararg functions. It doesn't work well -
+          // at least for `_NSLog`. There is a weird bug that happens randomly -
+          // sometimes everything works fine, sometimes there is an assertion
+          // failure `Assertion failed: isValidArgumentType(Params[i]) && "Not a
+          // valid type for function argument!", file ..\..\lib\IR\Type.cpp,
+          // line 288`.
+          // TODO: Investigate and fix this bug.
+          if (Exp->Type->isVarArg())
+            return;
+
           // Verify that the function has the same signature as the iOS one.
           if (!TC.areEquivalent(Exp->Type, Func))
             reportError("functions' signatures are not equivalent (" +
