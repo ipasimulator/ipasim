@@ -35,8 +35,13 @@ void TBDHandler::HandleFile(const string &Path) {
   }
 
   // Save the Dylib.
-  DylibPtr Lib =
-      HAC.iOSLibs.insert(HAC.iOSLibs.end(), {File->getInstallName()});
+  auto InsertPair(HAC.iOSLibs.insert({File->getInstallName()}));
+  if (!InsertPair.second) {
+    // Ignore Dylibs with already-found install name, the corresponding TBD
+    // files should be identical.
+    return;
+  }
+  DylibPtr Lib(InsertPair.first);
 
   // Find exports.
   for (Symbol *Sym : File->exports()) {
@@ -45,11 +50,11 @@ void TBDHandler::HandleFile(const string &Path) {
     switch (Sym->getKind()) {
     case SymbolKind::ObjectiveCClass: {
       // Save class.
-      auto Result(HAC.iOSClasses.insert({Sym->getName(), Lib}));
+      auto InsertPair(HAC.iOSClasses.insert({Sym->getName(), Lib}));
       // TODO: There are duplicate exports from the same Dylib, why?
-      if (!Result.second)
+      if (!InsertPair.second)
         reportError(Twine("duplicate class `") + Sym->getName() + "' in `" +
-                    Result.first->second->Name + "' and in `" + Lib->Name +
+                    InsertPair.first->second->Name + "' and in `" + Lib->Name +
                     "' (" + Path + ")");
       continue;
     }

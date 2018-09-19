@@ -46,7 +46,7 @@ struct Dylib;
 // (or iterators) to their items are always valid.
 // TODO: Maybe use `vector`s of `unique_ptr`s instead. And then use normal
 // pointers instead of `ContainerPtr` since they are guaranteed to be valid...
-using DylibList = std::list<Dylib>;
+using DylibList = std::set<Dylib>;
 using DylibPtr = ContainerPtr<DylibList>;
 using ExportList = std::set<ExportEntry>;
 using ExportPtr = ContainerPtr<ExportList>;
@@ -74,7 +74,7 @@ enum class ExportStatus { NotFound = 0, Found, Overloaded, FoundInDLL };
 
 struct ExportEntry {
   ExportEntry(std::string Name)
-      : Name(Name), Status(ExportStatus::NotFound), RVA(0), Type(nullptr),
+      : Name(move(Name)), Status(ExportStatus::NotFound), RVA(0), Type(nullptr),
         ObjCMethod(false), Messenger(false), Stret(false) {}
 
   std::string Name;
@@ -95,7 +95,9 @@ struct ExportEntry {
 
 struct Dylib {
   std::string Name;
-  std::vector<ExportPtr> Exports;
+  mutable std::vector<ExportPtr> Exports;
+
+  bool operator<(const Dylib &Other) const { return Name < Other.Name; }
 };
 
 class HAContext {
