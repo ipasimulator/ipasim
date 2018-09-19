@@ -1,0 +1,6 @@
+[ver:1,total:420]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:165,1537358400:165,r
+src/HeadersAnalyzer/Config.hpp:115,1537358400:115,m
+src/HeadersAnalyzer/TapiHelper.cpp:95,1537358400:95,m
+src/HeadersAnalyzer/HAContext.hpp:30,1537358400:30,r
+src/HeadersAnalyzer/ErrorReporting.cpp:15,1537358400:15,m
