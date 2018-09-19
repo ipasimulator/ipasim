@@ -1,0 +1,5 @@
+[ver:1,total:300]
+src/HeadersAnalyzer/ErrorReporting.cpp:186,1537358400:186,m
+src/HeadersAnalyzer/Config.hpp:42,1537358400:42,m
+src/HeadersAnalyzer/ErrorReporting.hpp:42,1537358400:42,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:30,1537358400:30,r
