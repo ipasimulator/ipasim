@@ -1,0 +1,5 @@
+[ver:1,total:480]
+src/HeadersAnalyzer/ErrorReporting.cpp:240,1537354800:180,1537358400:60,m
+src/HeadersAnalyzer/TapiHelper.cpp:170,1537354800:170,r
+src/HeadersAnalyzer/HAContext.hpp:40,1537354800:40,r
+src/HeadersAnalyzer/LLVMHelper.hpp:30,1537354800:30,r
