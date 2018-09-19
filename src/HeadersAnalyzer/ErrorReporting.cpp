@@ -2,14 +2,18 @@
 
 #include "ErrorReporting.hpp"
 
+#include "Config.hpp"
+
 #include <llvm/Support/raw_ostream.h>
 
 using namespace llvm;
 
 static void print(const char *Prefix, const Twine &Message) {
-  outs().flush();
-  errs() << Prefix << ": " << Message << ".\n";
-  errs().flush();
+  if constexpr (!IgnoreErrors) {
+    outs().flush();
+    errs() << Prefix << ": " << Message << ".\n";
+    errs().flush();
+  }
 }
 
 void reportWarning(const Twine &Message) { print("Warning", Message); }

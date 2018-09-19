@@ -15,6 +15,7 @@ constexpr LibType WarnUninterestingFunctions = LibType::None;
 constexpr LibType ErrorUnimplementedFunctions = LibType::Both;
 constexpr bool OutputLLVMIR = true;
 constexpr bool VerboseClang = false;
+constexpr bool IgnoreErrors = true;
 
 // !defined(CONFIG_HPP)
 #endif
