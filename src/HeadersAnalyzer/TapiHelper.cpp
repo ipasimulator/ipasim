@@ -33,7 +33,6 @@ void TBDHandler::HandleFile(const string &Path) {
     reportError(Twine("interface file expected (") + Path + ")");
     return;
   }
-  outs() << "Found TBD file (" << Path << ").\n";
 
   // Save the Dylib.
   DylibPtr Lib =

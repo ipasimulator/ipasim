@@ -10,7 +10,6 @@ using namespace llvm;
 
 static void print(const char *Prefix, const Twine &Message) {
   if constexpr (!IgnoreErrors) {
-    outs().flush();
     errs() << Prefix << ": " << Message << ".\n";
     errs().flush();
   }
