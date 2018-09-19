@@ -1,0 +1,4 @@
+[ver:1,total:540]
+src/HeadersAnalyzer/TapiHelper.cpp:240,1537358400:140,1537362000:100,m
+src/HeadersAnalyzer/HAContext.hpp:200,1537358400:180,1537362000:20,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:100,1537358400:100,r
