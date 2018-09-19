@@ -17,14 +17,14 @@ template <typename T> class ContainerPtr {
 public:
   using VTy = typename T::iterator;
 
-  ContainerPtr() = default;
-  ContainerPtr(const VTy &Value) : Value(Value) {}
-  ContainerPtr(VTy &&Value) : Value(std::move(Value)) {}
+  ContainerPtr() : Valid(false) {}
+  ContainerPtr(const VTy &Value) : Valid(true), Value(Value) {}
+  ContainerPtr(VTy &&Value) : Valid(true), Value(std::move(Value)) {}
 
   operator VTy() const { return Value; }
   auto operator*() const { return Value.operator*(); }
   auto operator-> () const { return Value.operator->(); }
-  operator bool() const { return Value != VTy(); }
+  operator bool() const { return Valid; }
   bool operator==(const ContainerPtr &Other) const {
     return Value == Other.Value;
   }
@@ -33,6 +33,7 @@ public:
   }
 
 private:
+  bool Valid;
   VTy Value;
 };
 
@@ -43,7 +44,8 @@ struct Dylib;
 
 // We use `list`s instead of `vector`s, so that it's guaranteed that pointers
 // (or iterators) to their items are always valid.
-// TODO: Maybe use `vector`s of `unique_ptr`s instead.
+// TODO: Maybe use `vector`s of `unique_ptr`s instead. And then use normal
+// pointers instead of `ContainerPtr` since they are guaranteed to be valid...
 using DylibList = std::list<Dylib>;
 using DylibPtr = ContainerPtr<DylibList>;
 using ExportList = std::set<ExportEntry>;
