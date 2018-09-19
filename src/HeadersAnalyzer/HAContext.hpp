@@ -43,11 +43,12 @@ struct DLLEntry;
 struct DLLGroup;
 struct ExportEntry;
 struct Dylib;
+struct ClassExport;
 using DylibList = std::set<Dylib>;
 using DylibPtr = ContainerPtr<DylibList>;
 using ExportList = std::set<ExportEntry>;
 using ExportPtr = ContainerPtr<ExportList>;
-using ClassExportList = std::map<std::string, DylibPtr>;
+using ClassExportList = std::set<ClassExport>;
 using ClassExportPtr = ContainerPtr<ClassExportList>;
 using GroupList = std::vector<DLLGroup>;
 using GroupPtr = size_t;
@@ -68,6 +69,12 @@ struct DLLGroup {
 };
 
 enum class ExportStatus { NotFound = 0, Found, Overloaded, FoundInDLL };
+
+// The following structs are used in `std::set`s, so they have one key field and
+// `operator<` that compares just this field. Other fields are values and hence
+// marked `mutable` (because otherwise, `std::set` returns everyhing as `const`,
+// so that we don't change the ordering which would break internal structures of
+// `std::set`).
 
 struct ExportEntry {
   ExportEntry(std::string Name)
@@ -91,10 +98,21 @@ struct ExportEntry {
 };
 
 struct Dylib {
+  Dylib(std::string Name) : Name(move(Name)) {}
+
   std::string Name;
   mutable std::vector<ExportPtr> Exports;
 
   bool operator<(const Dylib &Other) const { return Name < Other.Name; }
+};
+
+struct ClassExport {
+  ClassExport(std::string Name) : Name(move(Name)) {}
+
+  std::string Name;
+  mutable std::vector<DylibPtr> Dylibs;
+
+  bool operator<(const ClassExport &Other) const { return Name < Other.Name; }
 };
 
 class HAContext {

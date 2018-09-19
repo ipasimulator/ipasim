@@ -50,13 +50,8 @@ void TBDHandler::HandleFile(const string &Path) {
     switch (Sym->getKind()) {
     case SymbolKind::ObjectiveCClass: {
       // Save class.
-      auto InsertPair(HAC.iOSClasses.insert({Sym->getName(), Lib}));
-      // TODO: Save all the Dylibs to `HAC` and then export class methods from
-      // all of them.
-      if (!InsertPair.second)
-        reportError(Twine("duplicate class `") + Sym->getName() + "' in `" +
-                    InsertPair.first->second->Name + "' and in `" + Lib->Name +
-                    "' (" + Path + ")");
+      auto Class = HAC.iOSClasses.insert(Sym->getName().str()).first;
+      Class->Dylibs.push_back(Lib);
       continue;
     }
     case SymbolKind::ObjectiveCInstanceVariable:
