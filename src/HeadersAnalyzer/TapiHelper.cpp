@@ -46,10 +46,11 @@ void TBDHandler::HandleFile(const string &Path) {
     case SymbolKind::ObjectiveCClass: {
       // Save class.
       auto Result(HAC.iOSClasses.insert({Sym->getName(), Lib}));
+      // TODO: There are duplicate exports from the same Dylib, why?
       if (!Result.second)
         reportError(Twine("duplicate class `") + Sym->getName() + "' in `" +
                     Result.first->second->Name + "' and in `" + Lib->Name +
-                    "'");
+                    "' (" + Path + ")");
       continue;
     }
     case SymbolKind::ObjectiveCInstanceVariable:
