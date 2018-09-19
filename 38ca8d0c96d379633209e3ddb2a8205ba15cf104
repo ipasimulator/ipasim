@@ -1,0 +1,11 @@
+[ver:1,total:9840]
+src/HeadersAnalyzer/Common.hpp:3695,1537351200:1545,1537354800:2150,m
+src/HeadersAnalyzer/HAContext.hpp:2179,1537347600:754,1537351200:1062,1537354800:363,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1513,1537347600:402,1537351200:684,1537354800:427,m
+src/HeadersAnalyzer/TapiHelper.cpp:1401,1537347600:1321,1537351200:80,m
+src/HeadersAnalyzer/README.md:360,1537344000:180,1537347600:180,r
+src/HeadersAnalyzer/TapiHelper.hpp:223,1537347600:223,m
+src/HeadersAnalyzer/HAContext.cpp:214,1537347600:150,1537351200:64,m
+src/HeadersAnalyzer/LLVMHelper.cpp:90,1537351200:90,m
+src/HeadersAnalyzer/ErrorReporting.cpp:90,1537347600:90,r
+src/HeadersAnalyzer/LLVMHelper.hpp:75,1537351200:75,m
