@@ -268,7 +268,6 @@ public:
 
               // Save the argument.
               Args.push_back(A);
-              ++ArgIdx;
             }
           }
 
@@ -343,9 +342,9 @@ public:
         VoidToVoidTy->getPointerTo(), /* isVarArg */ false);
     llvm::Type *SimpleLookupPtrTy = SimpleLookupTy->getPointerTo();
 
-    size_t LibIdx = 0;
-    for (const Dylib &Lib : HAC.iOSLibs) {
-      string LibNo = to_string(LibIdx++);
+    size_t Unimplemented = 0;
+    for (auto [LibIdx, Lib] : withIndices(HAC.iOSLibs)) {
+      string LibNo = to_string(LibIdx);
 
       IRHelper IR(LLVM, LibNo, Lib.Name, IRHelper::Apple);
 
@@ -355,12 +354,14 @@ public:
 
         // Ignore functions that haven't been found in any DLL.
         if (Exp.Status != ExportStatus::FoundInDLL) {
-          if constexpr (ErrorUnimplementedFunctions & LibType::DLL) {
+          if constexpr (ErrorUnimplementedFunctions & LibType::DLL)
             if (Exp.Status == ExportStatus::Found)
               reportError(
                   Twine("function found in Dylib wasn't found in any DLL (") +
                   Exp.Name + ")");
-          }
+          if constexpr (SumUnimplementedFunctions & LibType::DLL)
+            if (Exp.Status == ExportStatus::Found)
+              ++Unimplemented;
           continue;
         }
 
@@ -493,6 +494,12 @@ public:
       // Link the Dylib.
       Clang.executeArgs();
     }
+
+    if constexpr (SumUnimplementedFunctions & LibType::DLL)
+      if (Unimplemented)
+        reportError(
+            Twine("functions found in Dylibs weren't found in any DLL (") +
+            to_string(Unimplemented) + ")");
   }
 
 private:
@@ -557,13 +564,21 @@ private:
     Clang.executeCodeGenAction<EmitLLVMOnlyAction>();
   }
   void reportUnimplementedFunctions() {
-    if constexpr (ErrorUnimplementedFunctions & LibType::Dylib) {
-      for (const ExportEntry &Exp : HAC.iOSExps) {
+    if constexpr (ErrorUnimplementedFunctions & LibType::Dylib)
+      for (const ExportEntry &Exp : HAC.iOSExps)
         if (Exp.Status == ExportStatus::NotFound)
           reportError(
               "function found in TBD files wasn't found in any Apple header (" +
               Exp.Name + ")");
-      }
+    if constexpr (SumUnimplementedFunctions & LibType::Dylib) {
+      size_t Count = 0;
+      for (const ExportEntry &Exp : HAC.iOSExps)
+        if (Exp.Status == ExportStatus::NotFound)
+          ++Count;
+      if (Count)
+        reportError(
+            "functions found in TBD files weren't found in any Apple header (" +
+            to_string(Count) + ")");
     }
   }
 };
