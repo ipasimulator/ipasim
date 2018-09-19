@@ -27,29 +27,34 @@ template <typename T, typename FTy> class MappedContainer {
 public:
   using ItTy = decltype(std::declval<T>().begin());
 
-  MappedContainer(T &Container, FTy &&Func)
-      : Container(Container), Func(std::forward<FTy>(Func)) {}
+  MappedContainer(T &&Container, FTy &&Func)
+      : Container(std::forward<T>(Container)), Func(std::forward<FTy>(Func)) {}
 
   auto begin() { return Func(Container.begin()); }
   auto end() { return Func(Container.end()); }
 
 private:
-  T &Container;
+  T &&Container;
   FTy Func;
 };
 template <typename T, typename FTy>
-auto mapContainer(T &Container, FTy &&Func) {
-  return MappedContainer<T, FTy>(Container, std::forward<FTy>(Func));
+auto mapContainer(T &&Container, FTy &&Func) {
+  return MappedContainer<T, FTy>(std::forward<T>(Container),
+                                 std::forward<FTy>(Func));
 }
-template <typename T, typename FTy> auto mapIterator(T &Container, FTy &&Func) {
-  return mapContainer(Container, [&Func](auto It) {
-    return llvm::map_iterator(std::move(It), std::forward<FTy>(Func));
-  });
+template <typename T, typename FTy>
+auto mapIterator(T &&Container, FTy &&Func) {
+  return mapContainer(std::forward<T>(Container),
+                      [Func(std::forward<FTy>(Func))](auto It) {
+                        return llvm::map_iterator(std::move(It), Func);
+                      });
 }
 
 // Should work for, e.g., `T = std::vector<std::vector<uint32_t>::iterator>`.
-template <typename T> auto deref(T &Container) {
-  return mapIterator(Container, [](auto It) { return *It; });
+// Dereferences iterated values.
+template <typename T> auto deref(T &&Container) {
+  return mapIterator(std::forward<T>(Container),
+                     [](auto Value) { return *Value; });
 }
 
 template <typename ItTy>
@@ -63,10 +68,26 @@ public:
   auto operator*() { return std::make_pair(this->I, *this->I); }
 };
 
-// Should work for, e.g., `T = std::vector<uint32_t>`.
-template <typename T> auto withPtrs(T &Container) {
-  return mapContainer(Container,
+// Should work for, e.g., `T = std::vector<uint32_t>`. Maps iterated values to
+// pairs of their iterators and themselves.
+template <typename T> auto withPtrs(T &&Container) {
+  return mapContainer(std::forward<T>(Container),
                       [](auto It) { return WithPtrsIterator(std::move(It)); });
+}
+
+class Counter {
+public:
+  template <typename T> auto operator()(T &&Value) {
+    return std::make_pair(Idx++, std::forward<T>(Value));
+  }
+
+private:
+  size_t Idx = 0;
+};
+
+// Maps iterated values to pairs of their indices and themselves.
+template <typename T> auto withIndices(T &&Container) {
+  return mapIterator(std::forward<T>(Container), Counter());
 }
 
 // !defined(COMMON_HPP)

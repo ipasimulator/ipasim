@@ -94,8 +94,8 @@ public:
     auto CGM(Clang.createCodeGenModule());
 
     // Load DLLs and PDBs.
-    for (auto [GroupPtr, DLLGroup] : withPtrs(HAC.DLLGroups)) {
-      for (auto [DLLPtr, DLL] : withPtrs(DLLGroup.DLLs)) {
+    for (auto [GroupIdx, DLLGroup] : withIndices(HAC.DLLGroups)) {
+      for (auto [DLLIdx, DLL] : withIndices(DLLGroup.DLLs)) {
         path DLLPath(DLLGroup.Dir / DLL.Name);
         path PDBPath(DLLPath);
         PDBPath.replace_extension(".pdb");
@@ -116,8 +116,8 @@ public:
           Exp->Status = ExportStatus::FoundInDLL;
           Exp->RVA = Func.getRelativeVirtualAddress();
           DLL.Exports.push_back(Exp);
-          Exp->DLLGroup = GroupPtr;
-          Exp->DLL = DLLPtr;
+          Exp->DLLGroup = GroupIdx;
+          Exp->DLL = DLLIdx;
 
           // Save function that will serve as a reference for computing
           // addresses of Objective-C methods.
@@ -257,8 +257,7 @@ public:
 
             // Process arguments.
             Args.reserve(Exp.Type->getNumParams());
-            size_t ArgIdx = 0;
-            for (llvm::Type *ArgTy : Exp.Type->params()) {
+            for (auto [ArgIdx, ArgTy] : withIndices(Exp.Type->params())) {
               string ArgNo = to_string(ArgIdx);
 
               // Load argument from the structure.
@@ -479,10 +478,13 @@ public:
       // Add DLLs to link.
       set<DLLPtr> DLLs;
       for (const ExportEntry &Exp : deref(Lib.Exports))
-        if (Exp.DLL && DLLs.insert(Exp.DLL).second) {
+        if (Exp.Status == ExportStatus::FoundInDLL &&
+            DLLs.insert(Exp.DLL).second) {
           Clang.Args.add("-l");
-          Clang.Args.add(
-              path(Exp.DLL->Name).replace_extension(".dll").string().c_str());
+          Clang.Args.add(path(HAC.DLLGroups[Exp.DLLGroup].DLLs[Exp.DLL].Name)
+                             .replace_extension(".dll")
+                             .string()
+                             .c_str());
         }
 
       // Create output directory.

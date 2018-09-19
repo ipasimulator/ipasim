@@ -7,12 +7,14 @@
 
 #include <llvm/IR/DerivedTypes.h>
 
+#include <cstdint>
 #include <filesystem>
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
 
+// Wrapper over container iterator. Plus extra `operator bool`.
 template <typename T> class ContainerPtr {
 public:
   using VTy = typename T::iterator;
@@ -41,21 +43,16 @@ struct DLLEntry;
 struct DLLGroup;
 struct ExportEntry;
 struct Dylib;
-
-// We use `list`s instead of `vector`s, so that it's guaranteed that pointers
-// (or iterators) to their items are always valid.
-// TODO: Maybe use `vector`s of `unique_ptr`s instead. And then use normal
-// pointers instead of `ContainerPtr` since they are guaranteed to be valid...
 using DylibList = std::set<Dylib>;
 using DylibPtr = ContainerPtr<DylibList>;
 using ExportList = std::set<ExportEntry>;
 using ExportPtr = ContainerPtr<ExportList>;
 using ClassExportList = std::map<std::string, DylibPtr>;
 using ClassExportPtr = ContainerPtr<ClassExportList>;
-using GroupList = std::list<DLLGroup>;
-using GroupPtr = ContainerPtr<GroupList>;
-using DLLEntryList = std::list<DLLEntry>;
-using DLLPtr = ContainerPtr<DLLEntryList>;
+using GroupList = std::vector<DLLGroup>;
+using GroupPtr = size_t;
+using DLLEntryList = std::vector<DLLEntry>;
+using DLLPtr = size_t;
 
 struct DLLEntry {
   DLLEntry(std::string Name) : Name(Name) {}
