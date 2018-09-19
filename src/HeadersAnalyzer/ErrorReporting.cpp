@@ -7,7 +7,9 @@
 using namespace llvm;
 
 static void print(const char *Prefix, const Twine &Message) {
+  outs().flush();
   errs() << Prefix << ": " << Message << ".\n";
+  errs().flush();
 }
 
 void reportWarning(const Twine &Message) { print("Warning", Message); }
