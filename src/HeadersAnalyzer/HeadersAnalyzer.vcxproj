@@ -207,6 +207,7 @@
     <ClCompile Include="HeadersAnalyzer.cpp" />
     <ClCompile Include="LLDBHelper.cpp" />
     <ClCompile Include="LLVMHelper.cpp" />
+    <ClCompile Include="TapiHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
@@ -220,6 +221,7 @@
     <ClInclude Include="HAContext.hpp" />
     <ClInclude Include="LLDBHelper.hpp" />
     <ClInclude Include="LLVMHelper.hpp" />
+    <ClInclude Include="TapiHelper.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -6,6 +6,7 @@
 #include "HAContext.hpp"
 #include "LLDBHelper.hpp"
 #include "LLVMHelper.hpp"
+#include "TapiHelper.hpp"
 
 #include <Plugins/SymbolFile/PDB/PDBASTParser.h>
 #include <Plugins/SymbolFile/PDB/SymbolFilePDB.h>
@@ -14,10 +15,6 @@
 #include <lldb/Symbol/ClangASTContext.h>
 #include <lldb/Symbol/ClangUtil.h>
 #include <lldb/Symbol/Type.h>
-
-#include <tapi/Core/FileManager.h>
-#include <tapi/Core/InterfaceFile.h>
-#include <tapi/Core/InterfaceFileManager.h>
 
 #include <CodeGen/CodeGenModule.h>
 #include <clang/AST/RecursiveASTVisitor.h>
@@ -49,91 +46,29 @@ using namespace std;
 using namespace filesystem;
 using namespace tapi::internal;
 
-enum class export_status { NotFound = 0, Found, Overloaded, Generated };
-
-struct export_entry {
-  export_entry() : status(export_status::NotFound), decl(nullptr) {}
-  export_entry(string firstLib)
-      : status(export_status::NotFound), decl(nullptr) {
-    libs.insert(move(firstLib));
-  }
-
-  set<string> libs;
-  export_status status;
-  const FunctionDecl *decl;
-};
-
-// Key is symbol name.
-using export_list = map<string, export_entry>;
-
-class tbd_handler {
-public:
-  tbd_handler(export_list &exps)
-      : exps_(exps), fm_(FileSystemOptions()), ifm_(fm_) {}
-  void handle_tbd_file(const string &path) {
-    // Check file.
-    auto fileOrError = ifm_.readFile(path);
-    if (!fileOrError) {
-      cerr << "Error: " << llvm::toString(fileOrError.takeError()) << " ("
-           << path << ")." << endl;
-      return;
-    }
-    auto file = *fileOrError;
-    if (!file->getArchitectures().contains(Architecture::armv7)) {
-      cerr << "TBD file does not contain architecture ARMv7 (" << path << ")."
-           << endl;
-      return;
-    }
-    auto ifile = dynamic_cast<InterfaceFile *>(file);
-    if (!ifile) {
-      cerr << "Interface file expected (" << path << ")." << endl;
-      return;
-    }
-    cout << "Found TBD file (" << path << ")." << endl;
-
-    // Find exports.
-    for (auto sym : ifile->exports()) {
-      // Determine symbol name.
-      // TODO: Skip `ObjectiveC*` symbols, since they aren't functions.
-      string name;
-      switch (sym->getKind()) {
-      case SymbolKind::ObjectiveCClass:
-        name = ("_OBJC_CLASS_$_" + sym->getName()).str();
-        break;
-      case SymbolKind::ObjectiveCInstanceVariable:
-        name = ("_OBJC_IVAR_$_" + sym->getName()).str();
-        break;
-      case SymbolKind::ObjectiveCClassEHType:
-        name = ("_OBJC_EHTYPE_$_" + sym->getName()).str();
-        break;
-      case SymbolKind::GlobalSymbol:
-        name = sym->getName();
-        break;
-      default:
-        cerr << "Unrecognized symbol type (" << sym->getAnnotatedName() << ")."
-             << endl;
-        continue;
-      }
-
-      // Save export.
-      auto it = exps_.find(name);
-      if (it != exps_.end())
-        it->second.libs.insert(ifile->getInstallName());
-      else
-        exps_[name] = export_entry(ifile->getInstallName());
-    }
-  }
-
-private:
-  export_list &exps_;
-  tapi::internal::FileManager fm_;
-  InterfaceFileManager ifm_;
-};
-
 class HeadersAnalyzer {
 public:
   HeadersAnalyzer() : LLVM(LLVMInit) {}
 
+  void discoverTBDs() {
+    TBDHandler TH(HAC);
+    vector<string> Dirs{
+        "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
+        "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/TextInput/"};
+    for (const string &Dir : Dirs)
+      for (auto &File : directory_iterator(Dir))
+        TH.HandleFile(File.path().string());
+    // Discover `.tbd` files inside frameworks.
+    string FrameworksDir =
+        "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/";
+    for (auto &File : directory_iterator(FrameworksDir))
+      if (File.status().type() == file_type::directory &&
+          !File.path().extension().compare(".framework"))
+        TH.HandleFile(
+            (File.path() / File.path().filename().replace_extension(".tbd"))
+                .string());
+    llvm::outs() << '\n';
+  }
   void parseAppleHeaders() {
     compileAppleHeaders();
 
@@ -159,8 +94,8 @@ public:
     auto CGM(Clang.createCodeGenModule());
 
     // Load DLLs and PDBs.
-    for (DLLGroup &DLLGroup : HAC.DLLGroups) {
-      for (DLLEntry &DLL : DLLGroup.DLLs) {
+    for (auto [GroupPtr, DLLGroup] : withPtrs(HAC.DLLGroups)) {
+      for (auto [DLLPtr, DLL] : withPtrs(DLLGroup.DLLs)) {
         path DLLPath(DLLGroup.Dir / DLL.Name);
         path PDBPath(DLLPath);
         PDBPath.replace_extension(".pdb");
@@ -173,21 +108,21 @@ public:
           string Name(LLDBHelper::mangleName(Func));
 
           // Find the corresponding export info from TBD files.
-          ExportList::iterator Exp;
+          ExportPtr Exp;
           if (!HAC.isInterestingForWindows(Name, Exp, IgnoreDuplicates))
             return;
 
           // Update status accordingly.
           Exp->Status = ExportStatus::FoundInDLL;
           Exp->RVA = Func.getRelativeVirtualAddress();
-          DLL.Exports.push_back(&*Exp);
-          Exp->DLLGroup = &DLLGroup;
-          Exp->DLL = &DLL;
+          DLL.Exports.push_back(Exp);
+          Exp->DLLGroup = GroupPtr;
+          Exp->DLL = DLLPtr;
 
           // Save function that will serve as a reference for computing
           // addresses of Objective-C methods.
           if (!DLL.ReferenceFunc && !Exp->ObjCMethod)
-            DLL.ReferenceFunc = &*Exp;
+            DLL.ReferenceFunc = Exp;
 
           auto IsStretSetter = [&]() {
             // If it's a normal messenger, it has two parameters (`id` and
@@ -269,26 +204,25 @@ public:
 
         // Declare reference function.
         // TODO: What if there are no non-Objective-C functions?
-        llvm::Function *RefFunc = IR.declareFunc(DLL.ReferenceFunc);
+        llvm::Function *RefFunc = IR.declareFunc(*DLL.ReferenceFunc);
 
         // Generate function wrappers.
-        for (const ExportEntry *Exp : DLL.Exports) {
-          assert(Exp->Status == ExportStatus::FoundInDLL &&
+        for (const ExportEntry &Exp : deref(DLL.Exports)) {
+          assert(Exp.Status == ExportStatus::FoundInDLL &&
                  "Unexpected status of `ExportEntry`.");
 
           // Don't generate wrappers for Objective-C messengers. We handle those
           // specially.
-          if (Exp->Messenger)
+          if (Exp.Messenger)
             continue;
 
           // TODO: Handle variadic functions specially.
-          if (Exp->Type->isVarArg())
-            reportError(Twine("unhandled variadic function (") + Exp->Name +
+          if (Exp.Type->isVarArg())
+            reportError(Twine("unhandled variadic function (") + Exp.Name +
                         ")");
 
           // Declarations.
-          llvm::Function *Func =
-              Exp->ObjCMethod ? nullptr : IR.declareFunc(Exp);
+          llvm::Function *Func = Exp.ObjCMethod ? nullptr : IR.declareFunc(Exp);
           llvm::Function *Wrapper = IR.declareFunc(Exp, /* Wrapper */ true);
           llvm::Function *Stub = DylibIR.declareFunc(Exp, /* Wrapper */ true);
 
@@ -305,7 +239,7 @@ public:
 
           llvm::Value *UP;
           vector<llvm::Value *> Args;
-          if (Exp->isTrivial()) {
+          if (Exp.isTrivial()) {
             // Trivial functions (`void -> void`) have no arguments, so no union
             // pointer exists - we set it to `nullptr` to check that we don't
             // use it anywhere in the following code.
@@ -321,9 +255,9 @@ public:
                 IR.Builder.CreateBitCast(UP, Struct->getPointerTo(), "sp");
 
             // Process arguments.
-            Args.reserve(Exp->Type->getNumParams());
+            Args.reserve(Exp.Type->getNumParams());
             size_t ArgIdx = 0;
-            for (llvm::Type *ArgTy : Exp->Type->params()) {
+            for (llvm::Type *ArgTy : Exp.Type->params()) {
               string ArgNo = to_string(ArgIdx);
 
               // Load argument from the structure.
@@ -339,7 +273,7 @@ public:
           }
 
           llvm::Value *R;
-          if (Exp->ObjCMethod) {
+          if (Exp.ObjCMethod) {
             // Objective-C methods are not exported, so we call them by
             // computing their address using their RVA.
             if (!DLL.ReferenceFunc) {
@@ -352,23 +286,23 @@ public:
             // Add RVA to the reference function's address.
             llvm::Value *Addr =
                 llvm::ConstantInt::getSigned(llvm::Type::getInt32Ty(LLVM.Ctx),
-                                             Exp->RVA - DLL.ReferenceFunc->RVA);
+                                             Exp.RVA - DLL.ReferenceFunc->RVA);
             llvm::Value *RefPtr = IR.Builder.CreateBitCast(
                 RefFunc, llvm::Type::getInt8PtrTy(LLVM.Ctx));
             llvm::Value *ComputedPtr = IR.Builder.CreateInBoundsGEP(
                 llvm::Type::getInt8Ty(LLVM.Ctx), RefPtr, Addr);
             llvm::Value *FP = IR.Builder.CreateBitCast(
-                ComputedPtr, Exp->Type->getPointerTo(), "fp");
+                ComputedPtr, Exp.Type->getPointerTo(), "fp");
 
             // Call the original DLL function.
-            R = IR.createCall(Exp->Type, FP, Args, "r");
+            R = IR.createCall(Exp.Type, FP, Args, "r");
           } else
             R = IR.createCall(Func, Args, "r");
 
           if (R) {
             // Get pointer to the return value inside the union.
             llvm::Value *RP = IR.Builder.CreateBitCast(
-                UP, Exp->Type->getReturnType()->getPointerTo(), "rp");
+                UP, Exp.Type->getReturnType()->getPointerTo(), "rp");
 
             // Save return value back into the structure.
             IR.Builder.CreateStore(R, RP);
@@ -417,21 +351,21 @@ public:
 
       // Generate function wrappers.
       // TODO: Shouldn't we use aligned instructions?
-      for (const ExportEntry *Exp : Lib.Exports) {
+      for (const ExportEntry &Exp : deref(Lib.Exports)) {
 
         // Ignore functions that haven't been found in any DLL.
-        if (Exp->Status != ExportStatus::FoundInDLL) {
+        if (Exp.Status != ExportStatus::FoundInDLL) {
           if constexpr (ErrorUnimplementedFunctions & LibType::DLL) {
-            if (Exp->Status == ExportStatus::Found)
+            if (Exp.Status == ExportStatus::Found)
               reportError(
                   Twine("function found in Dylib wasn't found in any DLL (") +
-                  Exp->Name + ")");
+                  Exp.Name + ")");
           }
           continue;
         }
 
         // Handle Objective-C messengers specially.
-        if (Exp->Messenger) {
+        if (Exp.Messenger) {
           // Now here comes the trick. We actually declare the `msgSend`
           // function as `void -> void`, then call `msgLookup` as `void ->
           // void(*)(void)` inside of it and tail-call the result. That way, the
@@ -442,18 +376,18 @@ public:
 
           // Declare the messenger.
           llvm::Function *MessengerFunc =
-              IR.declareFunc(VoidToVoidTy, Exp->Name);
+              IR.declareFunc(VoidToVoidTy, Exp.Name);
 
           // And define it, too.
           FunctionGuard MessengerGuard(IR, MessengerFunc);
 
           // Construct name of the corresponding lookup function.
           Twine LookupName(Twine(HAContext::MsgLookupPrefix) +
-                           (Exp->Name.c_str() + HAContext::MsgSendLength));
+                           (Exp.Name.c_str() + HAContext::MsgSendLength));
 
           // Declare the lookup function.
           llvm::Function *LookupFunc =
-              IR.declareFunc(Exp->Stret ? LookupStretTy : LookupTy, LookupName);
+              IR.declareFunc(Exp.Stret ? LookupStretTy : LookupTy, LookupName);
 
           // And bitcast it to `void -> void(*)(void)`.
           llvm::Value *FP =
@@ -476,7 +410,7 @@ public:
         FunctionGuard FuncGuard(IR, Func);
 
         // Handle trivial `void -> void` functions specially.
-        if (Exp->isTrivial()) {
+        if (Exp.isTrivial()) {
           IR.Builder.CreateCall(Wrapper);
           IR.Builder.CreateRetVoid();
           continue;
@@ -514,7 +448,7 @@ public:
         IR.Builder.CreateCall(Wrapper, {VP});
 
         // Return.
-        llvm::Type *RetTy = Exp->Type->getReturnType();
+        llvm::Type *RetTy = Exp.Type->getReturnType();
         if (!RetTy->isVoidTy()) {
 
           // Get pointer to the return value inside the union.
@@ -542,12 +476,12 @@ public:
       Clang.Args.add(OutputDir.string().c_str());
 
       // Add DLLs to link.
-      set<const DLLEntry *> DLLs;
-      for (const ExportEntry *Exp : Lib.Exports)
-        if (Exp->DLL && DLLs.insert(Exp->DLL).second) {
+      set<DLLPtr> DLLs;
+      for (const ExportEntry &Exp : deref(Lib.Exports))
+        if (Exp.DLL && DLLs.insert(Exp.DLL).second) {
           Clang.Args.add("-l");
           Clang.Args.add(
-              path(Exp->DLL->Name).replace_extension(".dll").string().c_str());
+              path(Exp.DLL->Name).replace_extension(".dll").string().c_str());
         }
 
       // Create output directory.
@@ -582,7 +516,7 @@ private:
     string Name(LLVM.mangleName(Func));
 
     // Find the corresponding export info from TBD files.
-    ExportList::iterator Exp;
+    ExportPtr Exp;
     if (!HAC.isInteresting(Name, Exp))
       return;
 
@@ -632,10 +566,9 @@ private:
 };
 
 int main() {
-  // TODO: This is so up here just for testing. In production, it should be
-  // lower.
   try {
     HeadersAnalyzer HA;
+    HA.discoverTBDs();
     HA.parseAppleHeaders();
     HA.loadDLLs();
     HA.createDirs();
@@ -643,32 +576,6 @@ int main() {
     HA.generateDylibs();
   } catch (const FatalError &) {
     return 1;
-  }
-
-  // TODO: Again, just for testing.
-  return 0;
-
-  export_list exps;
-
-  // Discover `.tbd` files.
-  {
-    tbd_handler tbdh(exps);
-    vector<string> tbdDirs{
-        "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
-        "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/TextInput/"};
-    for (auto &&dir : tbdDirs)
-      for (auto &&file : directory_iterator(dir))
-        tbdh.handle_tbd_file(file.path().string());
-    // Discover `.tbd` files inside frameworks.
-    string frameworksDir =
-        "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/";
-    for (auto &&entry : directory_iterator(frameworksDir))
-      if (entry.status().type() == file_type::directory &&
-          !entry.path().extension().compare(".framework"))
-        tbdh.handle_tbd_file(
-            (entry.path() / entry.path().filename().replace_extension(".tbd"))
-                .string());
-    cout << endl;
   }
 
   return 0;

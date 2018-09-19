@@ -77,20 +77,17 @@ IRHelper::IRHelper(LLVMHelper &LLVM, StringRef Name, StringRef Path,
 const char *const IRHelper::Windows32 = "i386-pc-windows-msvc";
 const char *const IRHelper::Apple = "armv7s-apple-ios10";
 
-Function *IRHelper::declareFunc(const ExportEntry *Exp, bool Wrapper) {
-  if (!Exp)
-    return nullptr;
-
+Function *IRHelper::declareFunc(const ExportEntry &Exp, bool Wrapper) {
   // This is needed to keep `to_string(Exp->RVA)` alive.
   string WrapperRVA;
   if (Wrapper)
-    WrapperRVA = to_string(Exp->RVA);
+    WrapperRVA = to_string(Exp.RVA);
 
   auto Name =
-      Wrapper ? Twine("$__ipaSim_wrapper_") + WrapperRVA : Twine(Exp->Name);
+      Wrapper ? Twine("$__ipaSim_wrapper_") + WrapperRVA : Twine(Exp.Name);
 
   FunctionType *Type =
-      Wrapper ? (Exp->isTrivial() ? TrivialWrapperTy : WrapperTy) : Exp->Type;
+      Wrapper ? (Exp.isTrivial() ? TrivialWrapperTy : WrapperTy) : Exp.Type;
 
   return declareFunc(Type, Name);
 }
@@ -119,13 +116,13 @@ void IRHelper::defineFunc(llvm::Function *Func) {
 }
 
 pair<StructType *, StructType *>
-IRHelper::createParamStruct(const ExportEntry *Exp) {
-  Type *RetTy = Exp->Type->getReturnType();
+IRHelper::createParamStruct(const ExportEntry &Exp) {
+  Type *RetTy = Exp.Type->getReturnType();
 
   // If the function has no arguments, we don't really need a struct, we just
   // want to use the return value. We create a trivial structure type for
   // compatibility with and simplicity of our callers, though.
-  if (!Exp->Type->getNumParams()) {
+  if (!Exp.Type->getNumParams()) {
     StructType *Struct = StructType::create(RetTy, "struct");
     StructType *Union = StructType::create(Struct, "union");
     return {Struct, Union};
@@ -133,8 +130,8 @@ IRHelper::createParamStruct(const ExportEntry *Exp) {
 
   // Map parameter types to their pointers.
   vector<Type *> ParamPointers;
-  ParamPointers.reserve(Exp->Type->getNumParams());
-  for (Type *Ty : Exp->Type->params()) {
+  ParamPointers.reserve(Exp.Type->getNumParams());
+  for (Type *Ty : Exp.Type->params()) {
     ParamPointers.push_back(Ty->getPointerTo());
   }
 

@@ -11,7 +11,7 @@
 using namespace std;
 using namespace llvm;
 
-ClassExportList::const_iterator HAContext::findClassMethod(const string &Name) {
+ClassExportPtr HAContext::findClassMethod(const string &Name) {
   if (iOSClasses.empty())
     return iOSClasses.end();
 
@@ -50,7 +50,7 @@ template <LibType LibTy> static void warnUninteresting(const string &Name) {
   }
 }
 
-bool HAContext::isInteresting(const string &Name, ExportList::iterator &Exp) {
+bool HAContext::isInteresting(const string &Name, ExportPtr &Exp) {
   Exp = iOSExps.find(Name);
   if (Exp == iOSExps.end()) {
     // If not found among exported functions, try if it isn't an Objective-C
@@ -59,7 +59,7 @@ bool HAContext::isInteresting(const string &Name, ExportList::iterator &Exp) {
     if (Class != iOSClasses.end()) {
       Exp = iOSExps.insert(ExportEntry(Name)).first;
       Exp->ObjCMethod = true;
-      iOSLibs[Class->second].Exports.push_back(&*Exp);
+      Class->second->Exports.push_back(Exp);
     } else {
       warnUninteresting<LibType::Dylib>(Name);
       return false;
@@ -67,8 +67,7 @@ bool HAContext::isInteresting(const string &Name, ExportList::iterator &Exp) {
   }
   return true;
 }
-bool HAContext::isInterestingForWindows(const string &Name,
-                                        ExportList::iterator &Exp,
+bool HAContext::isInterestingForWindows(const string &Name, ExportPtr &Exp,
                                         bool IgnoreDuplicates) {
   Exp = iOSExps.find(Name);
   if (Exp == iOSExps.end()) {

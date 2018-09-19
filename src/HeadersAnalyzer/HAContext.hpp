@@ -13,19 +13,55 @@
 #include <string>
 #include <vector>
 
+template <typename T> class ContainerPtr {
+public:
+  using VTy = typename T::iterator;
+
+  ContainerPtr() = default;
+  ContainerPtr(const VTy &Value) : Value(Value) {}
+  ContainerPtr(VTy &&Value) : Value(std::move(Value)) {}
+
+  operator VTy() const { return Value; }
+  auto operator*() const { return Value.operator*(); }
+  auto operator-> () const { return Value.operator->(); }
+  operator bool() const { return Value != VTy(); }
+  bool operator==(const ContainerPtr &Other) const {
+    return Value == Other.Value;
+  }
+  bool operator!=(const ContainerPtr &Other) const {
+    return Value != Other.Value;
+  }
+
+private:
+  VTy Value;
+};
+
+struct DLLEntry;
+struct DLLGroup;
 struct ExportEntry;
+struct Dylib;
+using DylibList = std::vector<Dylib>;
+using DylibPtr = ContainerPtr<DylibList>;
+using ExportList = std::set<ExportEntry>;
+using ExportPtr = ContainerPtr<ExportList>;
+using ClassExportList = std::map<std::string, DylibPtr>;
+using ClassExportPtr = ContainerPtr<ClassExportList>;
+using GroupList = std::vector<DLLGroup>;
+using GroupPtr = ContainerPtr<GroupList>;
+using DLLEntryList = std::vector<DLLEntry>;
+using DLLPtr = ContainerPtr<DLLEntryList>;
 
 struct DLLEntry {
-  DLLEntry(std::string Name) : Name(Name), ReferenceFunc(nullptr) {}
+  DLLEntry(std::string Name) : Name(Name) {}
 
   std::string Name;
-  std::vector<const ExportEntry *> Exports;
-  const ExportEntry *ReferenceFunc;
+  std::vector<ExportPtr> Exports;
+  ExportPtr ReferenceFunc;
 };
 
 struct DLLGroup {
   std::filesystem::path Dir;
-  std::vector<DLLEntry> DLLs;
+  DLLEntryList DLLs;
 };
 
 enum class ExportStatus { NotFound = 0, Found, Overloaded, FoundInDLL };
@@ -33,8 +69,7 @@ enum class ExportStatus { NotFound = 0, Found, Overloaded, FoundInDLL };
 struct ExportEntry {
   ExportEntry(std::string Name)
       : Name(Name), Status(ExportStatus::NotFound), RVA(0), Type(nullptr),
-        ObjCMethod(false), Messenger(false), Stret(false), DLLGroup(nullptr),
-        DLL(nullptr) {}
+        ObjCMethod(false), Messenger(false), Stret(false) {}
 
   std::string Name;
   mutable ExportStatus Status;
@@ -43,8 +78,8 @@ struct ExportEntry {
   mutable bool ObjCMethod : 1;
   mutable bool Messenger : 1;
   mutable bool Stret : 1;
-  mutable const DLLGroup *DLLGroup;
-  mutable const DLLEntry *DLL;
+  mutable GroupPtr DLLGroup;
+  mutable DLLPtr DLL;
 
   bool operator<(const ExportEntry &Other) const { return Name < Other.Name; }
   bool isTrivial() const {
@@ -52,35 +87,19 @@ struct ExportEntry {
   }
 };
 
-using ExportList = std::set<ExportEntry>;
-
-using ClassExportList = std::map<std::string, size_t>;
-
 struct Dylib {
   std::string Name;
-  std::vector<const ExportEntry *> Exports;
+  std::vector<ExportPtr> Exports;
 };
 
 class HAContext {
-private:
-  const ExportEntry *addExp(std::string Name) {
-    return &*iOSExps.insert(ExportEntry(Name)).first;
-  };
-
 public:
   ExportList iOSExps;
-  std::vector<Dylib> iOSLibs = {
-      {"/usr/lib/libobjc.A.dylib",
-       {addExp("_sel_registerName"), addExp("_object_setIvar"),
-        addExp("_objc_msgSend"), addExp("_objc_msgLookup"),
-        addExp("_objc_msgSend_stret"), addExp("_objc_msgLookup_stret")}},
-      {"/System/Library/Frameworks/Foundation.framework/Foundation",
-       {addExp("_NSLog")}}};
-  ClassExportList iOSClasses = {{"_NSObject", 0}};
-  std::vector<DLLGroup> DLLGroups = {
-      {"./src/objc/Debug/", {DLLEntry("libobjc.A.dll")}},
-      {"./deps/WinObjC/build/Win32/Debug/Universal Windows/",
-       {DLLEntry("Foundation.dll")}}};
+  DylibList iOSLibs;
+  ClassExportList iOSClasses;
+  GroupList DLLGroups = {{"./src/objc/Debug/", {DLLEntry("libobjc.A.dll")}},
+                         {"./deps/WinObjC/build/Win32/Debug/Universal Windows/",
+                          {DLLEntry("Foundation.dll")}}};
 
   static constexpr const char *MsgSendPrefix = "_objc_msgSend";
   static constexpr size_t MsgSendLength = length(MsgSendPrefix);
@@ -92,11 +111,13 @@ public:
   // This is an inverse of `CGObjCCommonMac::GetNameForMethod`.
   // TODO: Find out whether there aren't any Objective-C method name parsers
   // somewhere in the LLVM ecosystem already.
-  ClassExportList::const_iterator findClassMethod(const std::string &Name);
-  bool isInteresting(const std::string &Name, ExportList::iterator &Exp);
-  bool isInterestingForWindows(const std::string &Name,
-                               ExportList::iterator &Exp,
+  ClassExportPtr findClassMethod(const std::string &Name);
+  bool isInteresting(const std::string &Name, ExportPtr &Exp);
+  bool isInterestingForWindows(const std::string &Name, ExportPtr &Exp,
                                bool IgnoreDuplicates = false);
+  ExportPtr addExport(std::string &&Name) {
+    return iOSExps.insert(ExportEntry(move(Name))).first;
+  };
 };
 
 // !defined(HACONTEXT_HPP)

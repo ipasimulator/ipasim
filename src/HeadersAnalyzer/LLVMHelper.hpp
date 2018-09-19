@@ -73,12 +73,12 @@ public:
     return Module.getDataLayout().isLittleEndian();
   }
   bool isBigEndian() const { return Module.getDataLayout().isBigEndian(); }
-  llvm::Function *declareFunc(const ExportEntry *Exp, bool Wrapper = false);
+  llvm::Function *declareFunc(const ExportEntry &Exp, bool Wrapper = false);
   llvm::Function *declareFunc(llvm::FunctionType *Type,
                               const llvm::Twine &Name);
   void defineFunc(llvm::Function *Func);
   std::pair<llvm::StructType *, llvm::StructType *>
-  createParamStruct(const ExportEntry *Exp);
+  createParamStruct(const ExportEntry &Exp);
   llvm::Value *createCall(llvm::Function *Func,
                           llvm::ArrayRef<llvm::Value *> Args,
                           const llvm::Twine &Name);
