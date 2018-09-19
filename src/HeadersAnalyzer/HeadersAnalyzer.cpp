@@ -204,7 +204,8 @@ public:
 
         // Declare reference function.
         // TODO: What if there are no non-Objective-C functions?
-        llvm::Function *RefFunc = IR.declareFunc(*DLL.ReferenceFunc);
+        llvm::Function *RefFunc =
+            !DLL.ReferenceFunc ? nullptr : IR.declareFunc(*DLL.ReferenceFunc);
 
         // Generate function wrappers.
         for (const ExportEntry &Exp : deref(DLL.Exports)) {
