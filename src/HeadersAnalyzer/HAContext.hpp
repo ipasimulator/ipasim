@@ -40,15 +40,19 @@ struct DLLEntry;
 struct DLLGroup;
 struct ExportEntry;
 struct Dylib;
-using DylibList = std::vector<Dylib>;
+
+// We use `list`s instead of `vector`s, so that it's guaranteed that pointers
+// (or iterators) to their items are always valid.
+// TODO: Maybe use `vector`s of `unique_ptr`s instead.
+using DylibList = std::list<Dylib>;
 using DylibPtr = ContainerPtr<DylibList>;
 using ExportList = std::set<ExportEntry>;
 using ExportPtr = ContainerPtr<ExportList>;
 using ClassExportList = std::map<std::string, DylibPtr>;
 using ClassExportPtr = ContainerPtr<ClassExportList>;
-using GroupList = std::vector<DLLGroup>;
+using GroupList = std::list<DLLGroup>;
 using GroupPtr = ContainerPtr<GroupList>;
-using DLLEntryList = std::vector<DLLEntry>;
+using DLLEntryList = std::list<DLLEntry>;
 using DLLPtr = ContainerPtr<DLLEntryList>;
 
 struct DLLEntry {
