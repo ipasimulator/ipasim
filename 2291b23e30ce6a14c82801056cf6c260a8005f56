@@ -1,0 +1,3 @@
+[ver:1,total:600]
+src/HeadersAnalyzer/ClangHelper.cpp:360,1537534800:360,m
+src/HeadersAnalyzer/ClangHelper.hpp:240,1537534800:240,r
