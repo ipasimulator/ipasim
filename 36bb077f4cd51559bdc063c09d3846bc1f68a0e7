@@ -1,0 +1,12 @@
+[ver:1,total:4020]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1878,1537538400:1160,1537542000:718,m
+src/HeadersAnalyzer/HAContext.cpp:1135,1537534800:390,1537538400:715,1537542000:30,m
+src/objc/Debug/libobjc.A.map:390,1537542000:390,r
+build/include/llvm/DebugInfo/PDB/PDBSymbolFunc.h:180,1537538400:60,1537542000:120,r
+src/HeadersAnalyzer/HAContext.hpp:135,1537538400:135,m
+build/include/llvm/DebugInfo/PDB/PDBExtras.h:90,1537542000:90,r
+build/include/llvm/DebugInfo/PDB/PDBSymbol.h:90,1537538400:90,r
+build/include/llvm/DebugInfo/PDB/PDBTypes.h:42,1537538400:30,1537542000:12,r
+build/include/llvm/DebugInfo/PDB/PDBSymbolPublicSymbol.h:30,1537538400:30,r
+docs/llvm.md:30,1537534800:30,r
+src/HeadersAnalyzer/LLDBHelper.hpp:20,1537542000:20,r
