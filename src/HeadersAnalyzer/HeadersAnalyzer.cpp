@@ -215,8 +215,13 @@ public:
             reportError("functions' signatures are not equivalent (" +
                         Exp->Name + ")");
         };
-        for (auto &Func : LLDB.enumerate<PDBSymbolFunc>())
+        for (auto &Func : LLDB.enumerate<PDBSymbolFunc>()) {
+          // Ignore `static` (i.e., private to their module) functions.
+          if (Func.isStatic())
+            return;
+
           Analyzer(Func);
+        }
         for (auto &Func : LLDB.enumerate<PDBSymbolPublicSymbol>())
           Analyzer(Func, /* IgnoreDuplicates */ true, /* IgnoreImports */ true);
       }
