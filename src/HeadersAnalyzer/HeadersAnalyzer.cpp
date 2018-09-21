@@ -33,6 +33,8 @@
 #include <llvm/IR/IntrinsicInst.h>
 #include <llvm/IR/Mangler.h>
 #include <llvm/IR/Module.h>
+#include <llvm/Object/COFF.h>
+#include <llvm/Object/ObjectFile.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Transforms/Utils/FunctionComparator.h>
 
@@ -100,12 +102,51 @@ public:
         path PDBPath(DLLPath);
         PDBPath.replace_extension(".pdb");
 
-        LLDB.load(DLLPath.string().c_str(), PDBPath.string().c_str());
+        string DLLPathStr(DLLPath.string());
+        LLDB.load(DLLPathStr.c_str(), PDBPath.string().c_str());
         TypeComparer TC(*CGM, LLVM.getModule(), LLDB.getSymbolFile());
 
+        // Load DLL.
+        auto DLLFile(llvm::object::ObjectFile::createObjectFile(DLLPathStr));
+        if (!DLLFile) {
+          reportError(Twine(toString(DLLFile.takeError())) + " (" + DLLPathStr +
+                      ")");
+          continue;
+        }
+        auto COFF =
+            dyn_cast<llvm::object::COFFObjectFile>(DLLFile->getBinary());
+        if (!COFF) {
+          reportError(Twine("expected COFF (") + DLLPathStr + ")");
+          continue;
+        }
+
+        // Discover imports.
+        std::set<llvm::StringRef> Imports;
+        for (auto &ImportDir : COFF->import_directories()) {
+          for (auto &Import : ImportDir.imported_symbols()) {
+            llvm::StringRef ImportName;
+            if (error_code Error = Import.getSymbolName(ImportName)) {
+              reportError(Twine("couldn't get name of an import symbol (") +
+                          DLLPathStr + "): " + Error.message());
+              continue;
+            }
+            if (!ImportName.empty() && !Imports.insert(ImportName).second)
+              reportError(Twine("duplicate import (") + ImportName + ")");
+          }
+        }
+
         // Analyze functions.
-        auto Analyzer = [&](auto &&Func, bool IgnoreDuplicates = false) {
+        auto Analyzer = [&](auto &&Func, bool IgnoreDuplicates = false,
+                            bool IgnoreImports = false) {
           string Name(LLDBHelper::mangleName(Func));
+
+          // Ignore imports, with or without leading underscode.
+          // TODO: Deterministically add or remove the underscore.
+          if (IgnoreImports &&
+              (Imports.find(Name) != Imports.end() ||
+               (Name[0] == '_' &&
+                Imports.find(Name.c_str() + 1) != Imports.end())))
+            return;
 
           // Find the corresponding export info from TBD files.
           ExportPtr Exp;
@@ -176,7 +217,7 @@ public:
         for (auto &Func : LLDB.enumerate<PDBSymbolFunc>())
           Analyzer(Func);
         for (auto &Func : LLDB.enumerate<PDBSymbolPublicSymbol>())
-          Analyzer(Func, /* IgnoreDuplicates */ true);
+          Analyzer(Func, /* IgnoreDuplicates */ true, /* IgnoreImports */ true);
       }
     }
   }
