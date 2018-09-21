@@ -15,12 +15,21 @@ TBDHandler::TBDHandler(HAContext &HAC)
     : HAC(HAC), FM(FileSystemOptions()), IFM(FM) {}
 
 void TBDHandler::HandleFile(const string &Path) {
+  bool HasTBDExtension = filesystem::path(Path).extension() == ".tbd";
+
   // Check file.
   auto FileOrError = IFM.readFile(Path);
   if (!FileOrError) {
-    reportError(Twine(toString(FileOrError.takeError())) + " (" + Path + ")");
+    // If the file hasn't `.tbd` extension, it's OK that we cannot read it.
+    if (HasTBDExtension)
+      reportError(Twine(toString(FileOrError.takeError())) + " (" + Path + ")");
+    else
+      consumeError(FileOrError.takeError());
     return;
   }
+  // If we can read it and it hasn't `.tbd` extensions, well, that's weird.
+  if (!HasTBDExtension)
+    reportWarning(Twine("TBD file without `.tbd` extension (") + Path + ")");
   InterfaceFileBase *FileBase = *FileOrError;
   // TODO: Shouldn't this be `armv7s`?
   if (!FileBase->getArchitectures().contains(Architecture::armv7)) {
