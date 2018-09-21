@@ -66,6 +66,9 @@ void ClangHelper::addDylibArgs(StringRef Output, StringRef ObjectFile,
   // that our dynamic loader directly loads that.
   Args.add("-install_name");
   Args.add(InstallName.data());
+  // To suppress warning `-sdk_version is required when emitting min version
+  // load command.  Setting sdk version to match provided min version`.
+  Args.add("-Wl,-no_version_load_command");
 }
 void ClangHelper::linkDylib(StringRef Output, StringRef ObjectFile,
                             StringRef InstallName) {
