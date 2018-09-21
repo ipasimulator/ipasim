@@ -1,0 +1,12 @@
+[ver:1,total:10440]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:6274,1537380000:180,1537434000:30,1537437600:20,1537516800:30,1537520400:960,1537524000:744,1537527600:960,1537531200:1630,1537534800:1720,m
+src/HeadersAnalyzer/LLDBHelper.cpp:2995,1537434000:960,1537437600:1015,1537516800:910,1537520400:60,1537534800:50,r
+build/include/llvm/Object/COFF.h:510,1537531200:510,r
+build/include/llvm/DebugInfo/PDB/PDBTypes.h:230,1537437600:20,1537516800:210,r
+build/include/llvm/DebugInfo/PDB/PDBSymbol.h:220,1537437600:220,r
+build/include/llvm/DebugInfo/PDB/PDBSymbolPublicSymbol.h:75,1537434000:30,1537437600:45,r
+src/HeadersAnalyzer/TapiHelper.cpp:36,1537524000:36,r
+build/include/llvm/DebugInfo/PDB/PDBSymbolExe.h:30,1537516800:30,r
+build/include/llvm/ADT/StringRef.h:30,1537534800:30,r
+build/include/llvm/Object/ObjectFile.h:20,1537531200:20,r
+src/HeadersAnalyzer/LLDBHelper.hpp:20,1537516800:20,r
