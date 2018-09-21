@@ -69,14 +69,16 @@ bool HAContext::isInteresting(const string &Name, ExportPtr &Exp) {
   return true;
 }
 bool HAContext::isInterestingForWindows(const string &Name, ExportPtr &Exp,
-                                        bool IgnoreDuplicates) {
+                                        uint32_t RVA, bool IgnoreDuplicates) {
   Exp = iOSExps.find(Name);
   if (Exp == iOSExps.end()) {
     warnUninteresting<LibType::DLL>(Name);
     return false;
   }
   if (Exp->Status == ExportStatus::FoundInDLL) {
-    if (!IgnoreDuplicates)
+    // It's not an error if we find multiple symbols for the exactly same
+    // function (i.e., symbols have the same RVA).
+    if (!IgnoreDuplicates && Exp->RVA != RVA)
       reportError(Twine("found duplicate DLL export (") + Name + ")");
     return false;
   }

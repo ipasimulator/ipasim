@@ -139,6 +139,7 @@ public:
         auto Analyzer = [&](auto &&Func, bool IgnoreDuplicates = false,
                             bool IgnoreImports = false) {
           string Name(LLDBHelper::mangleName(Func));
+          uint32_t RVA = Func.getRelativeVirtualAddress();
 
           // Ignore imports, with or without leading underscode.
           // TODO: Deterministically add or remove the underscore.
@@ -150,12 +151,12 @@ public:
 
           // Find the corresponding export info from TBD files.
           ExportPtr Exp;
-          if (!HAC.isInterestingForWindows(Name, Exp, IgnoreDuplicates))
+          if (!HAC.isInterestingForWindows(Name, Exp, RVA, IgnoreDuplicates))
             return;
 
           // Update status accordingly.
           Exp->Status = ExportStatus::FoundInDLL;
-          Exp->RVA = Func.getRelativeVirtualAddress();
+          Exp->RVA = RVA;
           DLL.Exports.push_back(Exp);
           Exp->DLLGroup = GroupIdx;
           Exp->DLL = DLLIdx;

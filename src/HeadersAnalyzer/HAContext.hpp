@@ -137,7 +137,7 @@ public:
   ClassExportPtr findClassMethod(const std::string &Name);
   bool isInteresting(const std::string &Name, ExportPtr &Exp);
   bool isInterestingForWindows(const std::string &Name, ExportPtr &Exp,
-                               bool IgnoreDuplicates = false);
+                               uint32_t RVA, bool IgnoreDuplicates = false);
   ExportPtr addExport(std::string &&Name) {
     return iOSExps.insert(ExportEntry(move(Name))).first;
   };
