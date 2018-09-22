@@ -129,9 +129,9 @@ public:
                         DLLPathStr + "): " + Error.message());
             continue;
           }
-          if (!Exports.insert(ExportRVA).second)
-            reportError(Twine("duplicate export (") + to_string(ExportRVA) +
-                        ")");
+          // Note that there can be aliases, so the current `ExportRVA` can
+          // already be present in `Exports`, but that's OK.
+          Exports.insert(ExportRVA);
         }
 
         // Analyze functions.
