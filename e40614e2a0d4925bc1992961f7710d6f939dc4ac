@@ -1,0 +1,5 @@
+[ver:1,total:3000]
+src/HeadersAnalyzer/ErrorReporting.cpp:1684,1537621200:484,1537624800:180,1537639200:180,1537642800:180,1537646400:660,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1252,1537621200:192,1537646400:340,1537650000:720,m
+src/HeadersAnalyzer/ErrorReporting.hpp:44,1537621200:24,1537646400:20,m
+build/include/llvm/Support/raw_ostream.h:20,1537621200:20,r
