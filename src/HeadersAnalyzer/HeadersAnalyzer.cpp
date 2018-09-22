@@ -136,10 +136,17 @@ public:
         }
 
         // Analyze functions.
-        auto Analyzer = [&](auto &&Func, bool IgnoreDuplicates = false,
+        auto Analyzer = [&](auto &&Func, bool Static,
+                            bool IgnoreDuplicates = false,
                             bool IgnoreImports = false) {
           string Name(LLDBHelper::mangleName(Func));
           uint32_t RVA = Func.getRelativeVirtualAddress();
+
+          // Ignore `static` (i.e., private to their module) functions unless
+          // they are Objective-C methods (which seems to be always `static`,
+          // but we still need to generate wrappers for them).
+          if (Static && !HAC.isClassMethod(Name))
+            return;
 
           // Ignore imports, with or without leading underscode.
           // TODO: Deterministically add or remove the underscore.
@@ -216,14 +223,11 @@ public:
                         Exp->Name + ")");
         };
         for (auto &Func : LLDB.enumerate<PDBSymbolFunc>()) {
-          // Ignore `static` (i.e., private to their module) functions.
-          if (Func.isStatic())
-            return;
-
-          Analyzer(Func);
+          Analyzer(Func, Func.isStatic());
         }
         for (auto &Func : LLDB.enumerate<PDBSymbolPublicSymbol>())
-          Analyzer(Func, /* IgnoreDuplicates */ true, /* IgnoreImports */ true);
+          Analyzer(Func, /* Static */ false, /* IgnoreDuplicates */ true,
+                   /* IgnoreImports */ true);
       }
     }
   }
