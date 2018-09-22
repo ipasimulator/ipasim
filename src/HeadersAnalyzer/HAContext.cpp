@@ -11,13 +11,11 @@
 using namespace std;
 using namespace llvm;
 
+bool HAContext::isClassMethod(const string &Name) {
+  return (Name[0] == '+' || Name[0] == '-') && Name[1] == '[';
+}
 ClassExportPtr HAContext::findClassMethod(const string &Name) {
-  if (iOSClasses.empty())
-    return iOSClasses.end();
-
-  if (Name[0] != '+' && Name[0] != '-')
-    return iOSClasses.end();
-  if (Name[1] != '[')
+  if (iOSClasses.empty() || !isClassMethod(Name))
     return iOSClasses.end();
 
   // Find the first space.

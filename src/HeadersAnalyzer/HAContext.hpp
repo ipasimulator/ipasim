@@ -131,6 +131,7 @@ public:
   static constexpr const char *MsgLookupPrefix = "_objc_msgLookup";
   static constexpr size_t MsgLookupLength = length(MsgLookupPrefix);
 
+  bool isClassMethod(const std::string &Name);
   // This is an inverse of `CGObjCCommonMac::GetNameForMethod`.
   // TODO: Find out whether there aren't any Objective-C method name parsers
   // somewhere in the LLVM ecosystem already.
