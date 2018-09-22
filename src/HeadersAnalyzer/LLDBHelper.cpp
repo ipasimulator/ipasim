@@ -72,6 +72,7 @@ bool TypeComparer::areEquivalent(llvm::FunctionType *Func,
                                  const SymbolTy &SymbolFunc) {
   auto *Func2 = static_cast<llvm::FunctionType *>(getLLVMType(SymbolFunc));
   if (!Func2) {
+    // TODO: Compare signatures from header files, then.
     reportError(
         llvm::Twine(
             "cannot compare signatures of a function and non-typed symbol `") +
