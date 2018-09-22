@@ -120,9 +120,7 @@ public:
   ExportList iOSExps;
   DylibList iOSLibs;
   ClassExportList iOSClasses;
-  GroupList DLLGroups = {{"./src/objc/Debug/", {DLLEntry("libobjc.A.dll")}},
-                         {"./deps/WinObjC/build/Win32/Debug/Universal Windows/",
-                          {DLLEntry("Foundation.dll")}}};
+  GroupList DLLGroups;
 
   static constexpr const char *MsgSendPrefix = "_objc_msgSend";
   static constexpr size_t MsgSendLength = length(MsgSendPrefix);

@@ -74,6 +74,25 @@ public:
                 .string());
     llvm::outs() << '\n';
   }
+  void discoverDLLs() {
+    // Our Objective-C runtime.
+    HAC.DLLGroups.push_back({"./src/objc/Debug/", {DLLEntry("libobjc.A.dll")}});
+
+    // WinObjC DLLs (i.e., Windows versions of Apple's frameworks).
+    HAC.DLLGroups.push_back(
+        {"./deps/WinObjC/build/Win32/Debug/Universal Windows/"});
+    DLLGroup &WinObjCGroup = HAC.DLLGroups[HAC.DLLGroups.size() - 1];
+    for (auto &File : directory_iterator(WinObjCGroup.Dir)) {
+      path FilePath(File.path());
+
+      // We are only interested in DLLs that have accompanying PDBs with them.
+      if (FilePath.extension() == ".pdb") {
+        path DLLPath(FilePath.replace_extension(".dll"));
+        if (exists(DLLPath))
+          WinObjCGroup.DLLs.push_back(DLLEntry(DLLPath.filename().string()));
+      }
+    }
+  }
   void parseAppleHeaders() {
     compileAppleHeaders();
 
@@ -626,6 +645,7 @@ int main() {
   try {
     HeadersAnalyzer HA;
     HA.discoverTBDs();
+    HA.discoverDLLs();
     HA.parseAppleHeaders();
     HA.loadDLLs();
     HA.createDirs();
