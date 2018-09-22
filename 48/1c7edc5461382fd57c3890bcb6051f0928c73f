@@ -1,0 +1,4 @@
+[ver:1,total:720]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:675,1537606800:675,m
+src/HeadersAnalyzer/HAContext.cpp:30,1537606800:30,r
+build/include/llvm/Object/COFF.h:15,1537606800:15,r
