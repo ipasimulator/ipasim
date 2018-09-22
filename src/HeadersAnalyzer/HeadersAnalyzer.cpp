@@ -48,6 +48,9 @@ using namespace std;
 using namespace filesystem;
 using namespace tapi::internal;
 
+// TODO: Generate distinct wrappers only for functions with distinct signatures.
+// And then export those wrappers as aliases for all functions with the same
+// signature.
 class HeadersAnalyzer {
 public:
   HeadersAnalyzer() : LLVM(LLVMInit) {}
