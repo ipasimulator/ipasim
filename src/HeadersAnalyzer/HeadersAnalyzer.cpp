@@ -56,6 +56,8 @@ public:
   HeadersAnalyzer() : LLVM(LLVMInit) {}
 
   void discoverTBDs() {
+    reportStatus("discovering TBDs");
+
     TBDHandler TH(HAC);
     vector<string> Dirs{
         "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
@@ -72,9 +74,10 @@ public:
         TH.HandleFile(
             (File.path() / File.path().filename().replace_extension(".tbd"))
                 .string());
-    llvm::outs() << '\n';
   }
   void discoverDLLs() {
+    reportStatus("discovering DLLs");
+
     // Our Objective-C runtime.
     HAC.DLLGroups.push_back({"./src/objc/Debug/", {DLLEntry("libobjc.A.dll")}});
 
@@ -94,6 +97,8 @@ public:
     }
   }
   void parseAppleHeaders() {
+    reportStatus("parsing Apple headers");
+
     compileAppleHeaders();
 
     for (const llvm::Function &Func : *LLVM.getModule())
@@ -102,6 +107,8 @@ public:
     reportUnimplementedFunctions();
   }
   void loadDLLs() {
+    reportStatus("loading DLLs");
+
     using namespace llvm::pdb;
     LLDBHelper LLDB;
     ClangHelper Clang(LLVM);
@@ -244,6 +251,8 @@ public:
     DylibsDir = createOutputDir("./out/Dylibs/");
   }
   void generateDLLs() {
+    reportStatus("generating DLLs");
+
     // Generate DLL wrappers and also stub Dylibs for them.
     for (const DLLGroup &DLLGroup : HAC.DLLGroups) {
       for (const DLLEntry &DLL : DLLGroup.DLLs) {
@@ -393,6 +402,8 @@ public:
     }
   }
   void generateDylibs() {
+    reportStatus("generating Dylibs");
+
     // Some common types.
     llvm::FunctionType *VoidToVoidTy =
         llvm::FunctionType::get(VoidTy, /* isVarArg */ false);

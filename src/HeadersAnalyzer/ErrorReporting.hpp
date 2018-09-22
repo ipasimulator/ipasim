@@ -15,6 +15,7 @@ public:
 void reportWarning(const llvm::Twine &Message);
 void reportError(const llvm::Twine &Message);
 [[noreturn]] void reportFatalError(const llvm::Twine &Message);
+void reportStatus(const llvm::Twine &Message);
 
 // !defined(ERRORREPORTING_HPP)
 #endif
