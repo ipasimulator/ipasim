@@ -1,0 +1,4 @@
+[ver:1,total:480]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:360,1537606800:360,m
+build/include/llvm/DebugInfo/PDB/PDBSymbolPublicSymbol.h:90,1537606800:90,r
+src/HeadersAnalyzer/HAContext.cpp:30,1537606800:30,r
