@@ -120,40 +120,27 @@ public:
           continue;
         }
 
-        // Discover imports.
-        std::set<llvm::StringRef> Imports;
-        for (auto &ImportDir : COFF->import_directories()) {
-          for (auto &Import : ImportDir.imported_symbols()) {
-            llvm::StringRef ImportName;
-            if (error_code Error = Import.getSymbolName(ImportName)) {
-              reportError(Twine("couldn't get name of an import symbol (") +
-                          DLLPathStr + "): " + Error.message());
-              continue;
-            }
-            if (!ImportName.empty() && !Imports.insert(ImportName).second)
-              reportError(Twine("duplicate import (") + ImportName + ")");
+        // Discover exports.
+        std::set<uint32_t> Exports;
+        for (auto &Export : COFF->export_directories()) {
+          uint32_t ExportRVA;
+          if (error_code Error = Export.getExportRVA(ExportRVA)) {
+            reportError(Twine("cannot get RVA of an export symbol (") +
+                        DLLPathStr + "): " + Error.message());
+            continue;
           }
+          if (!Exports.insert(ExportRVA).second)
+            reportError(Twine("duplicate export (") + to_string(ExportRVA) +
+                        ")");
         }
 
         // Analyze functions.
-        auto Analyzer = [&](auto &&Func, bool Static,
-                            bool IgnoreDuplicates = false,
-                            bool IgnoreImports = false) {
+        auto Analyzer = [&](auto &&Func, bool IgnoreDuplicates = false) {
           string Name(LLDBHelper::mangleName(Func));
           uint32_t RVA = Func.getRelativeVirtualAddress();
 
-          // Ignore `static` (i.e., private to their module) functions unless
-          // they are Objective-C methods (which seems to be always `static`,
-          // but we still need to generate wrappers for them).
-          if (Static && !HAC.isClassMethod(Name))
-            return;
-
-          // Ignore imports, with or without leading underscode.
-          // TODO: Deterministically add or remove the underscore.
-          if (IgnoreImports &&
-              (Imports.find(Name) != Imports.end() ||
-               (Name[0] == '_' &&
-                Imports.find(Name.c_str() + 1) != Imports.end())))
+          // We are only interested in exported symbols or Objective-C methods.
+          if (!HAC.isClassMethod(Name) && Exports.find(RVA) == Exports.end())
             return;
 
           // Find the corresponding export info from TBD files.
@@ -222,12 +209,10 @@ public:
             reportError("functions' signatures are not equivalent (" +
                         Exp->Name + ")");
         };
-        for (auto &Func : LLDB.enumerate<PDBSymbolFunc>()) {
-          Analyzer(Func, Func.isStatic());
-        }
+        for (auto &Func : LLDB.enumerate<PDBSymbolFunc>())
+          Analyzer(Func);
         for (auto &Func : LLDB.enumerate<PDBSymbolPublicSymbol>())
-          Analyzer(Func, /* Static */ false, /* IgnoreDuplicates */ true,
-                   /* IgnoreImports */ true);
+          Analyzer(Func, /* IgnoreDuplicates */ true);
       }
     }
   }
