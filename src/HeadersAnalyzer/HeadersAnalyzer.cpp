@@ -51,6 +51,9 @@ using namespace tapi::internal;
 // TODO: Generate distinct wrappers only for functions with distinct signatures.
 // And then export those wrappers as aliases for all functions with the same
 // signature.
+// TODO: Also analyze WinObjC's header files to find API status information and
+// also our DLLs, e.g., our Objective-C runtime to find types of
+// assembly-implemented functions.
 class HeadersAnalyzer {
 public:
   HeadersAnalyzer() : LLVM(LLVMInit) {}

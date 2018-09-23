@@ -22,6 +22,8 @@ ClangHelper::ClangHelper(LLVMHelper &LLVM) : LLVM(LLVM), Args(LLVM.Saver) {
 }
 
 void ClangHelper::initFromInvocation() {
+  // TODO: No diagnostics options set at the beginning (like ignore unknown
+  // arguments, etc.). How should that be done?
   CI.setInvocation(createInvocationFromCommandLine(Args.get()));
 }
 
