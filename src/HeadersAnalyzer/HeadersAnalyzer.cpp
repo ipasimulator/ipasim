@@ -570,6 +570,12 @@ public:
             Twine("functions found in Dylibs weren't found in any DLL (") +
             to_string(Unimplemented) + ")");
   }
+  void writeReport() {
+    if (auto OS = createOutputFile((OutputDir / "exports.txt").string()))
+      for (const ExportEntry &Exp : HAC.iOSExps)
+        if (Exp.Status == ExportStatus::FoundInDLL)
+          *OS << Exp.Name << '\n';
+  }
 
 private:
   HAContext HAC;
@@ -662,6 +668,7 @@ int main() {
     HA.createDirs();
     HA.generateDLLs();
     HA.generateDylibs();
+    HA.writeReport();
   } catch (const FatalError &) {
     return 1;
   }
