@@ -1,0 +1,7 @@
+[ver:1,total:960]
+src/HeadersAnalyzer/HAContext.cpp:240,1537693200:240,r
+src/HeadersAnalyzer/Config.hpp:210,1537696800:210,m
+src/HeadersAnalyzer/LLDBHelper.cpp:190,1537693200:160,1537696800:30,r
+src/HeadersAnalyzer/HAContext.hpp:170,1537693200:110,1537696800:60,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:90,1537693200:30,1537696800:60,m
+src/HeadersAnalyzer/Debug/CG/exports.txt:60,1537693200:60,r
