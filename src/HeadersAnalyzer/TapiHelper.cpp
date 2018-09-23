@@ -58,8 +58,13 @@ void TBDHandler::HandleFile(const string &Path) {
     string Name;
     switch (Sym->getKind()) {
     case SymbolKind::ObjectiveCClass: {
+      // Get original name with leading underscore that was dropped - see
+      // `TextStub_v2.cpp`, line 301, commit `a92576e0`.
+      llvm::StringRef OriginalName(Sym->getName().data() - 1,
+                                   Sym->getName().size() + 1);
+
       // Save class.
-      auto Class = HAC.iOSClasses.insert(Sym->getName().str()).first;
+      auto Class = HAC.iOSClasses.insert(OriginalName.str()).first;
       Class->Dylibs.push_back(Lib);
       continue;
     }
