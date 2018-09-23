@@ -1,0 +1,8 @@
+[ver:1,total:2820]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1530,1537696800:1130,1537700400:400,r
+src/HeadersAnalyzer/HAContext.cpp:680,1537696800:680,r
+src/HeadersAnalyzer/Common.hpp:260,1537700400:260,m
+src/HeadersAnalyzer/HAContext.hpp:160,1537700400:160,r
+src/HeadersAnalyzer/Debug/CG/exports.txt:80,1537696800:80,r
+build/include/llvm/ADT/STLExtras.h:80,1537700400:80,r
+src/HeadersAnalyzer/ErrorReporting.cpp:30,1537696800:30,r
