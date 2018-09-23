@@ -18,6 +18,8 @@ constexpr bool OutputLLVMIR = false;
 constexpr bool VerboseClang = false;
 constexpr bool IgnoreErrors = false;
 constexpr bool Sample = true;
+// TODO: Fix `TypeComparer` and then turn this on.
+constexpr bool CompareTypes = false;
 
 // !defined(CONFIG_HPP)
 #endif

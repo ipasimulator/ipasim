@@ -247,9 +247,10 @@ public:
             return;
 
           // Verify that the function has the same signature as the iOS one.
-          if (!TC.areEquivalent(Exp->Type, Func))
-            reportError("functions' signatures are not equivalent (" +
-                        Exp->Name + ")");
+          if constexpr (CompareTypes)
+            if (!TC.areEquivalent(Exp->Type, Func))
+              reportError("functions' signatures are not equivalent (" +
+                          Exp->Name + ")");
         };
         for (auto &Func : LLDB.enumerate<PDBSymbolFunc>())
           Analyzer(Func);
