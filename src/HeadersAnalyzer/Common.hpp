@@ -77,8 +77,8 @@ template <typename T> auto withPtrs(T &&Container) {
 
 class Counter {
 public:
-  template <typename T> auto operator()(T &&Value) {
-    return std::make_pair(Idx++, std::forward<T>(Value));
+  template <typename T> auto operator()(T &Value) {
+    return std::pair<size_t, T &>(Idx++, Value);
   }
 
 private:
