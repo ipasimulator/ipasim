@@ -199,7 +199,6 @@
     <ClCompile Include="..\..\deps\tapi\lib\Driver\Options.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Driver\Snapshot.cpp" />
     <ClCompile Include="..\..\deps\tapi\lib\Driver\SnapshotFileSystem.cpp" />
-    <ClCompile Include="cc_mapper.cpp" />
     <ClCompile Include="ClangHelper.cpp" />
     <ClCompile Include="Common.cpp" />
     <ClCompile Include="ErrorReporting.cpp" />
@@ -213,7 +212,6 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cc_mapper.hpp" />
     <ClInclude Include="ClangHelper.hpp" />
     <ClInclude Include="Common.hpp" />
     <ClInclude Include="Config.hpp" />

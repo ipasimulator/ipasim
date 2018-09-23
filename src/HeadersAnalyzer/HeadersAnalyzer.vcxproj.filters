@@ -21,9 +21,6 @@
     <ClCompile Include="HeadersAnalyzer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cc_mapper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\deps\tapi\lib\Core\Architecture.cpp">
       <Filter>Source Files\tapi</Filter>
     </ClCompile>
@@ -134,9 +131,6 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cc_mapper.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="HAContext.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
