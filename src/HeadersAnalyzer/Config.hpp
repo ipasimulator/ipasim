@@ -17,6 +17,7 @@ constexpr LibType SumUnimplementedFunctions = LibType::Both;
 constexpr bool OutputLLVMIR = false;
 constexpr bool VerboseClang = false;
 constexpr bool IgnoreErrors = false;
+constexpr bool Sample = true;
 
 // !defined(CONFIG_HPP)
 #endif

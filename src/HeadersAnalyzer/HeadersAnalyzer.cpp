@@ -62,21 +62,28 @@ public:
     reportStatus("discovering TBDs");
 
     TBDHandler TH(HAC);
-    vector<string> Dirs{
-        "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
-        "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/TextInput/"};
-    for (const string &Dir : Dirs)
-      for (auto &File : directory_iterator(Dir))
-        TH.HandleFile(File.path().string());
-    // Discover `.tbd` files inside frameworks.
-    string FrameworksDir =
-        "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/";
-    for (auto &File : directory_iterator(FrameworksDir))
-      if (File.status().type() == file_type::directory &&
-          !File.path().extension().compare(".framework"))
-        TH.HandleFile(
-            (File.path() / File.path().filename().replace_extension(".tbd"))
-                .string());
+    if constexpr (Sample) {
+      TH.HandleFile(
+          "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libobjc.A.tbd");
+      TH.HandleFile("./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/"
+                    "Frameworks/Foundation.framework/Foundation.tbd");
+    } else {
+      vector<string> Dirs{
+          "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
+          "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/TextInput/"};
+      for (const string &Dir : Dirs)
+        for (auto &File : directory_iterator(Dir))
+          TH.HandleFile(File.path().string());
+      // Discover `.tbd` files inside frameworks.
+      string FrameworksDir =
+          "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/";
+      for (auto &File : directory_iterator(FrameworksDir))
+        if (File.status().type() == file_type::directory &&
+            !File.path().extension().compare(".framework"))
+          TH.HandleFile(
+              (File.path() / File.path().filename().replace_extension(".tbd"))
+                  .string());
+    }
   }
   void discoverDLLs() {
     reportStatus("discovering DLLs");
@@ -88,16 +95,19 @@ public:
     HAC.DLLGroups.push_back(
         {"./deps/WinObjC/build/Win32/Debug/Universal Windows/"});
     DLLGroup &WinObjCGroup = HAC.DLLGroups[HAC.DLLGroups.size() - 1];
-    for (auto &File : directory_iterator(WinObjCGroup.Dir)) {
-      path FilePath(File.path());
+    if constexpr (Sample)
+      WinObjCGroup.DLLs.push_back(DLLEntry("Foundation.dll"));
+    else
+      for (auto &File : directory_iterator(WinObjCGroup.Dir)) {
+        path FilePath(File.path());
 
-      // We are only interested in DLLs that have accompanying PDBs with them.
-      if (FilePath.extension() == ".pdb") {
-        path DLLPath(FilePath.replace_extension(".dll"));
-        if (exists(DLLPath))
-          WinObjCGroup.DLLs.push_back(DLLEntry(DLLPath.filename().string()));
+        // We are only interested in DLLs that have accompanying PDBs with them.
+        if (FilePath.extension() == ".pdb") {
+          path DLLPath(FilePath.replace_extension(".dll"));
+          if (exists(DLLPath))
+            WinObjCGroup.DLLs.push_back(DLLEntry(DLLPath.filename().string()));
+        }
       }
-    }
   }
   void parseAppleHeaders() {
     reportStatus("parsing Apple headers");
