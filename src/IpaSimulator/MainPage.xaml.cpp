@@ -181,6 +181,7 @@ std::wstring s2ws(const std::string& s)
 #define UC(arg) if (arg) { throw 1; }
 
 // TODO: Maybe LLVM JIT could help us - see http://llvm.org/doxygen/classllvm_1_1RuntimeDyld.html.
+// TODO: Automatically try to load `/Wrappers/*.dll` (and also associated maps, etc.) for every `*.dll`.
 class DynamicLoader {
 public:
     DynamicLoader(unique_ptr<FatBinary>&& fat, const Binary& bin, uc_engine *uc) : fat_(move(fat)), bin_(bin), uc_(uc), libs_(), odd_addrs_() {}
