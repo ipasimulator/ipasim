@@ -115,6 +115,9 @@ void IRHelper::defineFunc(llvm::Function *Func) {
   Builder.SetInsertPoint(BB);
 }
 
+// TODO: Store types with size less than pointer size directly in the structure
+// (instead of storing pointer to it as we are doing now). But make sure it'll
+// be aligned equally on both architectures.
 pair<StructType *, StructType *>
 IRHelper::createParamStruct(const ExportEntry &Exp) {
   Type *RetTy = Exp.Type->getReturnType();

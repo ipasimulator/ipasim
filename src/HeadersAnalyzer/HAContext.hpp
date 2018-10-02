@@ -110,6 +110,9 @@ struct ClassExport {
   ClassExport(std::string Name) : Name(move(Name)) {}
 
   std::string Name;
+  // TODO: It is allowed for multiple libraries to export the same class. But
+  // currently, we generate wrappers and stubs for all the class's methods in
+  // all the wrapper libraries. We should reexport them instead.
   mutable std::vector<DylibPtr> Dylibs;
 
   bool operator<(const ClassExport &Other) const { return Name < Other.Name; }
