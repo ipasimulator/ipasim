@@ -263,3 +263,7 @@ Generated Files/
 
 # Git Time Metric
 /.gtm/
+
+# Temporary CMake build files directory. TODO: Change this to `build` when we
+# are ready.
+/cmake/
