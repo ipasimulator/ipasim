@@ -1,0 +1,11 @@
+[ver:1,total:1440]
+src/link/CMakeLists.txt:477,1538510400:447,1538517600:30,m
+src/HeadersAnalyzer/Debug/CG/exports.txt:210,1538510400:210,r
+cmake/compile_commands.json:180,1538510400:180,r
+CMakeLists.txt:153,1538510400:138,1538517600:15,m
+src/CMakeLists.txt:135,1538510400:120,1538517600:15,m
+src/link/main.cpp:120,1538510400:120,r
+readme.txt:90,1538510400:90,r
+.gitignore:30,1538517600:30,m
+docs/git.md:30,1538517600:30,r
+src/objc/CMakeLists.txt:15,1538510400:15,d
