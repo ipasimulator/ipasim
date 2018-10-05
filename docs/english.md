@@ -2,6 +2,11 @@
 
 This is not in any way a complete documentation, it's just a draft containing some ideas that I could forgot until the final documentation is written.
 
+## Building
+
+Install Docker and run `docker-compose up`.
+**TODO: Is `.dockerignore` necessary?**
+
 ## Updating dependencies
 
 There are some third-party dependencies that can be updated whenever new version comes out.
