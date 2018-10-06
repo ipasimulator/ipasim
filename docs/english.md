@@ -6,6 +6,9 @@ This is not in any way a complete documentation, it's just a draft containing so
 
 Install and run Docker for Windows with Windows containers enabled and run `docker-compose up`.
 If you change `Dockerfile`, you'll need to run `docker-compose up --build` to rebuild the Docker image.
+To run some other commands instead of `build.ps1`, run `docker-compose run --rm ipasimulator powershell`.
+To re-build, delete the folder `cmake` (`rm -r cmake` from PowerShell).
+To build manually, just execute the script `build.ps1` (`.\scripts\build.ps1` from PowerShell inside the container).
 
 Why we use Windows and not Linux containers?
 That's because we need some Windows-dependent build tools.
