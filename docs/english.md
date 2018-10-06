@@ -103,3 +103,7 @@ In contrast, only `__imp__NSConcreteGlobalBlock` is exported from our `libobjc.A
 **TODO: Debug the original code to see how does it work even though there is an added level of indirection.**
 **TODO: Build `libobjc2` and see how does it get `_NSConcreteGlobalBlock` into exports.**
 We solved this by marking the symbol as non-constant and fixing it up at runtime, but we still don't know how could it work in the original code.
+
+## Comment tags
+
+- `[docker-script]`: This script is referenced from `Dockerfile`. It's not meant to be run manually.

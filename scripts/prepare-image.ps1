@@ -1,3 +1,5 @@
+## See [docker-script].
+
 # Install Chocolatey.
 $env:chocolateyVersion = '0.10.11'
 $env:chocolateyUseWindowsCompression='false'
@@ -14,8 +16,3 @@ Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 # Install build tools.
 choco install cmake --version 3.12.2 -y --installargs 'ADD_CMAKE_TO_PATH=User'
 refreshenv
-
-# Run CMake
-mkdir -p cmake
-cd cmake
-cmake -G Ninja ..
