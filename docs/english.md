@@ -4,8 +4,7 @@ This is not in any way a complete documentation, it's just a draft containing so
 
 ## Building
 
-Install Docker and run `docker-compose up`.
-**TODO: Is `.dockerignore` necessary?**
+Install and run Docker for Windows with Windows containers enabled and run `docker-compose up`.
 
 ## Updating dependencies
 

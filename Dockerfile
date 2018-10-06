@@ -1,18 +1,7 @@
-FROM alpine:latest
+FROM microsoft/windowsservercore:1803
 LABEL Name=ipasimulator Version=0.0.1
 
-# The following was inspired by
-# https://hub.docker.com/r/madduci/docker-cpp-env/~/dockerfile/.
+VOLUME "c:/project"
+WORKDIR "c:/project"
 
-VOLUME "/project"
-WORKDIR "/project"
-RUN apk update && \
-    apk upgrade && \
-    apk --update add \
-        cmake \
-        bash \
-        ninja \
-        clang && \
-    rm -rf /var/cache/apk/*
-
-ENTRYPOINT ["bash", "-c", "mkdir -p cmake && cd cmake && cmake -G Ninja .."]
+CMD powershell -f scripts/docker.ps1

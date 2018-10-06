@@ -1,8 +1,10 @@
-version: '2.1'
+version: "3.2"
 
 services:
   ipasimulator:
     image: ipasimulator
     build: .
     volumes:
-      - .:/project
+      - type: bind
+        source: .
+        target: c:/project
