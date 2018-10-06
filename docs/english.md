@@ -5,6 +5,7 @@ This is not in any way a complete documentation, it's just a draft containing so
 ## Building
 
 Install and run Docker for Windows with Windows containers enabled and run `docker-compose up`.
+If you change `Dockerfile`, you'll need to run `docker-compose up --build` to rebuild the Docker image.
 
 ## Updating dependencies
 
