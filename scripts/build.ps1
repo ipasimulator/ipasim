@@ -1,6 +1,7 @@
 ## See [docker-script].
 
-# Run CMake
+# Run CMake.
 mkdir -Force cmake >$null
-cd cmake
-cmake -G Ninja ..
+pushd cmake
+cmake -GNinja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DCMAKE_RC_COMPILER=llvm-rc ..
+popd
