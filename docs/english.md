@@ -7,6 +7,15 @@ This is not in any way a complete documentation, it's just a draft containing so
 Install and run Docker for Windows with Windows containers enabled and run `docker-compose up`.
 If you change `Dockerfile`, you'll need to run `docker-compose up --build` to rebuild the Docker image.
 
+Why we use Windows and not Linux containers?
+That's because we need some Windows-dependent build tools.
+One is the DIA SDK used by LLVM's PDB parser which is in turn used by our `HeadersAnalyzer`.
+Currently, there aren't any other dependencies IIRC.
+**TODO: When we get rid of all of them, we should migrate to Linux containers.**
+
+> In the future, we might need to install Visual Studio build tools into our build containers.
+> See [these Microsoft docs](https://docs.microsoft.com/en-us/visualstudio/install/build-tools-container?view=vs-2017) for useful information about that.
+
 ## Updating dependencies
 
 There are some third-party dependencies that can be updated whenever new version comes out.
