@@ -16,4 +16,7 @@ RUN powershell -c " \
     choco install cmake --version 3.12.2 -y --installargs 'ADD_CMAKE_TO_PATH=User'; \
     choco install ninja --version 1.7.2 -y"
 
+# Install LLVM + Clang.
+RUN powershell -c "choco install llvm --version 7.0.0 -y"
+
 CMD powershell -f scripts/build.ps1
