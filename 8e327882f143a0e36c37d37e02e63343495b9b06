@@ -1,0 +1,6 @@
+[ver:1,total:480]
+docs/english.md:200,1538845200:200,m
+Dockerfile:190,1538845200:190,m
+scripts/prepare-image.ps1:50,1538845200:50,d
+.dockerignore:25,1538845200:25,m
+docker-compose.yml:15,1538845200:15,r
