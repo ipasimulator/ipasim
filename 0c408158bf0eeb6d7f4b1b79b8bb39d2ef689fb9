@@ -1,0 +1,8 @@
+[ver:1,total:1440]
+Dockerfile:653,1538841600:653,m
+scripts/build.ps1:346,1538841600:346,m
+.dockerignore:283,1538841600:283,m
+scripts/prepare-image.ps1:105,1538841600:105,m
+scripts/docker.ps1:30,1538841600:30,d
+docs/english.md:15,1538841600:15,m
+docs/git.md:8,1538841600:8,r
