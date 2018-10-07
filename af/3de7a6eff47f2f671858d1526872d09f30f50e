@@ -1,0 +1,7 @@
+[ver:1,total:1260]
+scripts/build.ps1:461,1538906400:461,m
+CMakeLists.txt:365,1538906400:365,r
+Dockerfile:283,1538906400:283,m
+.dockerignore:83,1538906400:83,m
+scripts/rc.cmd:60,1538906400:60,d
+docker-compose.yml:8,1538906400:8,r
