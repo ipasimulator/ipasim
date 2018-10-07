@@ -1,0 +1,4 @@
+[ver:1,total:1200]
+Dockerfile:940,1538902800:360,1538906400:580,m
+scripts/rc.cmd:200,1538902800:180,1538906400:20,m
+contrib/cmake/rc.patch:60,1538902800:60,d
