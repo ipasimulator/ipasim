@@ -1,5 +1,7 @@
 @echo off
 
+echo RC wrapper script invoked.
+
 set firstarg=%1
 
 if "%firstarg:~0,3%"=="/fo" (
