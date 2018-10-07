@@ -25,6 +25,6 @@ ADD https://download.visualstudio.microsoft.com/download/pr/aa60dff5-bcbb-411c-8
 ADD https://download.visualstudio.microsoft.com/download/pr/d80c9e2f-b6f4-47cc-bc8b-1bb40ec4c92d/7189a68796aed20aabb13985c49d530b/vs_buildtools.exe C:/temp/vs_buildtools.exe
 RUN powershell -c "C:/temp/vs_buildtools.exe --quiet --wait --norestart --nocache \
     --channelUri C:/temp/visualstudio.chman --installChannelUri C:/temp/visualstudio.chman \
-    --add Microsoft.VisualStudio.Workload.VCTools"
+    --add \"Microsoft.VisualStudio.Workload.VCTools;includeRecommended\""
 
 CMD powershell -f scripts/build.ps1
