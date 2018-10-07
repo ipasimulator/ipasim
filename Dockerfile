@@ -22,7 +22,7 @@ RUN powershell -c "choco install llvm --version 7.0.0 -y"
 # HACK: Ideally, we would like to use `-DCMAKE_RC_COMPILER=llvm-rc`, but it
 # currently doesn't work - see
 # <https://gitlab.kitware.com/cmake/cmake/issues/17804>. So, at least for now,
-# we add a symlink `rc` -> `llvm-rc`.
-RUN mklink "C:/Program Files/LLVM/bin/rc.exe" "C:/Program Files/LLVM/bin/llvm-rc.exe"
+# we add a wrapper script named `rc` that wraps `llvm-rc`.
+COPY ["scripts/rc.cmd", "C:/Program Files/LLVM/bin/rc.cmd"]
 
 CMD powershell -f scripts/build.ps1
