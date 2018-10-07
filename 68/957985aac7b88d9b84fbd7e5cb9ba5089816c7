@@ -1,0 +1,9 @@
+[ver:1,total:3060]
+Dockerfile:2015,1538899200:1190,1538902800:825,m
+contrib/cmake/rc.patch:630,1538899200:330,1538902800:300,m
+scripts/rc.cmd:180,1538899200:180,d
+.dockerignore:105,1538899200:90,1538902800:15,m
+contrib/cmake/diff.txt:50,1538899200:50,d
+CMakeLists.txt:30,1538899200:30,r
+diff.txt:30,1538899200:30,d
+.gitattributes:20,1538899200:20,r
