@@ -26,7 +26,11 @@ RUN powershell -c "choco install llvm --version 7.0.0 -y"
 ADD https://download.visualstudio.microsoft.com/download/pr/aa60dff5-bcbb-411c-8265-824e52a9d72f/9fa06a9b8d1721c72a87d5ae895e067f/visualstudio.15.release.chman C:/temp/visualstudio.chman
 ADD https://download.visualstudio.microsoft.com/download/pr/d80c9e2f-b6f4-47cc-bc8b-1bb40ec4c92d/7189a68796aed20aabb13985c49d530b/vs_buildtools.exe C:/temp/vs_buildtools.exe
 RUN powershell -c "C:/temp/vs_buildtools.exe --quiet --wait --norestart --nocache \
+    --installPath C:/BuildTools \
     --channelUri C:/temp/visualstudio.chman --installChannelUri C:/temp/visualstudio.chman \
     --add \"Microsoft.VisualStudio.Workload.VCTools;includeRecommended\""
+
+# Start developer command prompt.
+ENTRYPOINT C:/BuildTools/Common7/Tools/VsDevCmd.bat &&
 
 CMD powershell -f scripts/build.ps1
