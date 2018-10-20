@@ -1,4 +1,3 @@
-project(link)
 project (link)
 
 add_executable (link main.cpp)
