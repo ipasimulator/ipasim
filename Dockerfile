@@ -30,6 +30,9 @@ RUN powershell -c "C:/temp/vs_buildtools.exe --quiet --wait --norestart --nocach
     --channelUri C:/temp/visualstudio.chman --installChannelUri C:/temp/visualstudio.chman \
     --add \"Microsoft.VisualStudio.Workload.VCTools;includeRecommended\""
 
+# Install Python. It's needed to build LLVM and Clang.
+RUN powershell -c "choco install python --version 3.7.0 -y"
+
 # Start developer command prompt.
 ENTRYPOINT C:/BuildTools/Common7/Tools/VsDevCmd.bat -arch=amd64 -host_arch=amd64 &&
 

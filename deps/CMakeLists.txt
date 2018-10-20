@@ -1,0 +1,12 @@
+# Configure LLVM.
+set (LLVM_TARGETS_TO_BUILD X86 ARM)
+set (LLVM_EXTERNAL_CLANG_SOURCE_DIR "${CMAKE_SOURCE_DIR}/deps/clang")
+set (LLVM_EXTERNAL_LLD_SOURCE_DIR "${CMAKE_SOURCE_DIR}/deps/lld")
+set (LLVM_EXTERNAL_LLDB_SOURCE_DIR "${CMAKE_SOURCE_DIR}/deps/lldb")
+set (LLVM_EXTERNAL_CLANG_SOURCE_DIR "${CMAKE_SOURCE_DIR}/deps/clang")
+
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    # TODO: Use optimized tablegens.
+endif (CMAKE_BUILD_TYPE MATCHES Debug)
+
+add_subdirectory (llvm)
