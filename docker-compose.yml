@@ -1,4 +1,6 @@
-version: "3.2"
+# We don't use version 3.x, so that memory limits work. Versions 3.x are
+# intended to be used with "swarm mode" which we don't use anyway.
+version: "2.4"
 
 services:
   ipasimulator:
@@ -8,8 +10,4 @@ services:
       - type: bind
         source: .
         target: c:/project
-    # For this to work, we need option `--compatibility`.
-    deploy:
-      resources:
-        limits:
-          memory: 2G
+    mem_limit: 2G
