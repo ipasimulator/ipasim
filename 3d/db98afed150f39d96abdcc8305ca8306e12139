@@ -1,0 +1,17 @@
+[ver:1,total:1200]
+src/dyld/CMakeLists.txt:479,1540029600:479,m
+docker-compose.yml:135,1540029600:135,r
+src/link/CMakeLists.txt:127,1540029600:127,m
+src/dyld/dyld.vcxproj:81,1540029600:81,r
+src/dyld/dyld.h:69,1540029600:69,r
+src/CMakeLists.txt:63,1540029600:63,m
+src/dyld/targetver.h:61,1540029600:61,m
+.dockerignore:60,1540029600:60,r
+src/dyld/dyld.cpp:31,1540029600:31,r
+scripts/build.ps1:30,1540029600:30,r
+src/dyld/dyld_initializer.cpp:18,1540029600:18,r
+docs/assignment.txt:15,1540029600:15,r
+CMakeLists.txt:10,1540029600:10,r
+src/dyld/stdafx.cpp:8,1540029600:8,r
+src/dyld/stdafx.h:8,1540029600:8,r
+src/link/main.cpp:5,1540029600:5,r
