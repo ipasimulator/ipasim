@@ -9,6 +9,7 @@ If you change `Dockerfile`, you'll need to run `docker-compose up --build` to re
 To run some other commands instead of `build.ps1`, run `docker-compose run --rm ipasimulator powershell`.
 To re-build, delete the folder `cmake` (`rm -r cmake` from PowerShell).
 To build manually, just execute the script `build.ps1` (`.\scripts\build.ps1` from PowerShell inside the container).
+To run commands in a container repeatedly, first run `docker-compose run --name ipasim ipasimulator powershell` (i.e., without option `--rm`) and then (after exiting the container) run `docker start -ai ipasim`.
 
 Why we use Windows and not Linux containers?
 That's because we need some Windows-dependent build tools.
