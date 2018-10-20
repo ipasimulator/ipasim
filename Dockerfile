@@ -31,6 +31,6 @@ RUN powershell -c "C:/temp/vs_buildtools.exe --quiet --wait --norestart --nocach
     --add \"Microsoft.VisualStudio.Workload.VCTools;includeRecommended\""
 
 # Start developer command prompt.
-ENTRYPOINT C:/BuildTools/Common7/Tools/VsDevCmd.bat &&
+ENTRYPOINT C:/BuildTools/Common7/Tools/VsDevCmd.bat -arch=amd64 -host_arch=amd64 &&
 
 CMD powershell -f scripts/build.ps1

@@ -7,6 +7,5 @@
 # build platform (because we don't need them).
 mkdir -Force cmake >$null
 pushd cmake
-cmake -GNinja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl `
-    -DCMAKE_LINKER=lld-link -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY ..
+cmake -GNinja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl ..
 popd
