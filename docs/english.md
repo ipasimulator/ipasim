@@ -4,9 +4,9 @@ This is not in any way a complete documentation, it's just a draft containing so
 
 ## Building
 
-Install and run Docker for Windows (tested with version `18.06.1-ce-win73`), enable Windows containers and run `docker-compose up`.
-If you change `Dockerfile`, you'll need to run `docker-compose up --build` to rebuild the Docker image.
-To run some other commands instead of `build.ps1`, run `docker-compose run --rm ipasimulator powershell`.
+Install and run Docker for Windows (tested with version `18.06.1-ce-win73`), enable Windows containers and run `docker-compose --compatibility up`.
+If you change `Dockerfile`, you'll need to run `docker-compose --compatibility up --build` to rebuild the Docker image.
+To run some other commands instead of `build.ps1`, run `docker-compose --compatibility run --rm ipasimulator powershell`.
 To re-build, delete the folder `cmake` (`rm -r cmake` from PowerShell).
 To build manually, just execute the script `build.ps1` (`.\scripts\build.ps1` from PowerShell inside the container).
 

@@ -8,3 +8,8 @@ services:
       - type: bind
         source: .
         target: c:/project
+    # For this to work, we need option `--compatibility`.
+    deploy:
+      resources:
+        limits:
+          memory: 2G
