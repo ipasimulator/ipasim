@@ -1,0 +1,7 @@
+[ver:1,total:720]
+src/RTObjCInterop/CMakeLists.txt:290,1540047600:290,m
+src/CMakeLists.txt:200,1540047600:200,m
+src/RTObjCInterop/build.cmd:150,1540044000:150,r
+src/RTObjCInterop/build_one.cmd:30,1540047600:30,r
+docs/english.md:30,1540044000:30,r
+CMakeLists.txt:20,1540047600:20,r
