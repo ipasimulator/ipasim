@@ -1,4 +1,7 @@
-FROM microsoft/windowsservercore:1803
+# We use `microsoft/windowsservercore:ltsc2016` instead of
+# `microsoft/windowsservercore:1803` because of this issue:
+# https://github.com/moby/moby/issues/37283.
+FROM microsoft/windowsservercore@sha256:9081c52809e4a7e66b6746137a6172eff36c30d52a30ee8f185829f6a867235c
 LABEL Name=ipasimulator Version=0.0.1
 
 WORKDIR "c:/project"
