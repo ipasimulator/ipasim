@@ -10,6 +10,12 @@ There is one Stack Overflow question ([Compile a compiler as an external project
 The answer there actually lists possible solutions pretty well.
 We decided to use the one with two `ExternalProject_Add`s (one for Clang, the other one for the rest).
 
+Other related sites:
+
+- SO: [Using CMake with multiple compilers for the same language](https://stackoverflow.com/q/9542971).
+- SO: [Building a tool immediately so it can be used later in same CMake run](https://stackoverflow.com/q/36084785).
+- Kitware Blog: [CMake Superbuilds and Git Submodules](https://blog.kitware.com/cmake-superbuilds-git-submodules/).
+
 ## How to compile with `clang`, not `clang-cl`?
 
 This is a known issue: [Add support for Clang targeting MSVC ABI but with GNU-like command line](https://gitlab.kitware.com/cmake/cmake/issues/16439).

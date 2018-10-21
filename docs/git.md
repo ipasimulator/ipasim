@@ -50,3 +50,7 @@ For Visual Studio, there is no official plugin, so we wrote [a simple one](https
 
 We run `gtm init` not only inside the root directory of the project, but also inside folders of our forked dependencies.
 This adds a line into their `.gitignore` files and we tag it with `[gtm]`.
+
+## Submodules
+
+**TODO: Use [Subrepos](https://github.com/ingydotnet/git-subrepo/blob/master/Intro.pod) instead?**
