@@ -15,6 +15,7 @@ Other related sites:
 - SO: [Using CMake with multiple compilers for the same language](https://stackoverflow.com/q/9542971).
 - SO: [Building a tool immediately so it can be used later in same CMake run](https://stackoverflow.com/q/36084785).
 - Kitware Blog: [CMake Superbuilds and Git Submodules](https://blog.kitware.com/cmake-superbuilds-git-submodules/).
+- SO: [How to use CMake ExternalProject_Add or alternatives in a cross platform way?](https://stackoverflow.com/a/30011890).
 
 ## How to compile with `clang`, not `clang-cl`?
 
