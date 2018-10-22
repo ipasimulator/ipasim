@@ -8,7 +8,7 @@ This is inherently problematic in CMake because it expects only one C++ compiler
 See [[CMake] One build, multiple compilers and packages](https://cmake.org/pipermail/cmake/2013-August/055574.html).
 There is one Stack Overflow question ([Compile a compiler as an external project and use it?](https://stackoverflow.com/q/39178338)) of a person with similar problem.
 The answer there actually lists possible solutions pretty well.
-We decided to use the one with two `ExternalProject_Add`s (one for Clang, the other one for the rest).
+We decided to manually invoke CMake for Clang at configure time and to add `clang.exe` as a custom target that runs Ninja for Clang.
 
 Other related sites:
 
