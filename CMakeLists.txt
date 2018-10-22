@@ -1,8 +1,13 @@
 cmake_minimum_required (VERSION 3.11)
 
-option (SUPERBUILD "Build Clang and then the project itself." ON)
+option (SUPERBUILD "Configure Clang and then the project itself." ON)
 
 if (SUPERBUILD)
+
+    # This branch is actually just something that could be written in Bash. But
+    # this way it's at least more cross-platform.
+
+    set (LLVM_BIN_DIR "C:/Program Files/LLVM/bin")
 
     # Configure Clang if it hasn't been configured yet.
     set (CLANG_CMAKE_DIR "${CMAKE_BINARY_DIR}/clang-x64-Release")
@@ -16,9 +21,9 @@ if (SUPERBUILD)
                 "-DLLVM_EXTERNAL_LLD_SOURCE_DIR=${CMAKE_SOURCE_DIR}/deps/lld"
                 "-DLLVM_EXTERNAL_LLDB_SOURCE_DIR=${CMAKE_SOURCE_DIR}/deps/lldb"
                 -DCMAKE_BUILD_TYPE=Release
-                "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-                "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-                "-DCMAKE_LINKER=${CMAKE_LINKER}"
+                "-DCMAKE_C_COMPILER=${LLVM_BIN_DIR}/clang-cl.exe"
+                "-DCMAKE_CXX_COMPILER=${LLVM_BIN_DIR}/clang-cl.exe"
+                "-DCMAKE_LINKER=${LLVM_BIN_DIR}/lld-link.exe"
                 "-DCMAKE_INSTALL_PREFIX=${CLANG_INSTALL_DIR}"
                 -DCMAKE_INSTALL_MESSAGE=LAZY
                 "${CMAKE_SOURCE_DIR}/deps/llvm"
@@ -27,9 +32,9 @@ if (SUPERBUILD)
 
     # TODO: Use this when we're ready.
     #set (CLANG_EXE "${CLANG_INSTALL_DIR}/bin/clang.exe")
-    set (CLANG_EXE "C:/Program Files/LLVM/bin/clang.exe")
+    set (CLANG_EXE "${LLVM_BIN_DIR}/clang.exe")
     # TODO: Also build and set linker.
-    set (LLD_LINK_EXE "C:/Program Files/LLVM/bin/lld-link.exe")
+    set (LLD_LINK_EXE "${LLVM_BIN_DIR}/lld-link.exe")
 
     # Configure ipaSim project itself.
     set (IPASIM_CMAKE_DIR "${CMAKE_BINARY_DIR}/ipasim-x86-Debug")
