@@ -1,6 +1,3 @@
-# TODO: Make the super build run only once as discussed here:
-# https://stackoverflow.com/q/48339178.
-
 cmake_minimum_required (VERSION 3.11)
 project (ipaSim LANGUAGES NONE)
 
