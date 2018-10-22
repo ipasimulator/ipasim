@@ -30,6 +30,19 @@ add_custom_target (clang
     WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
     USES_TERMINAL)
 
+# TODO: Use this when we're ready.
+#set (CMAKE_EXE "${CLANG_INSTALL_DIR}/bin/clang.exe")
+set (CMAKE_EXE "C:/Program Files/LLVM/bin/clang.exe")
+
+set (CMAKE_C_COMPILER "${CMAKE_EXE}")
+set (CMAKE_C_COMPILER_ID "Clang")
+set (CMAKE_CXX_COMPILER "${CMAKE_EXE}")
+set (CMAKE_CXX_COMPILER_ID "Clang")
+# TODO: Also build and set linker.
+
+enable_language (C)
+enable_language (CXX)
+
 # This will generate `compile_commands.json`.
 set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
