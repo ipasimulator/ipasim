@@ -44,6 +44,7 @@ if (SUPERBUILD)
                 "-DCMAKE_CXX_COMPILER=${CLANG_EXE}"
                 -DCMAKE_CXX_COMPILER_ID=Clang
                 "-DCMAKE_LINKER=${LLD_LINK_EXE}"
+                "-DCMAKE_AR=C:/Program Files/LLVM/bin/llvm-ar.exe"
                 -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
                 "-DCMAKE_INSTALL_PREFIX=${IPASIM_INSTALL_DIR}"
                 -DCMAKE_INSTALL_MESSAGE=LAZY
