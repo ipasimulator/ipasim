@@ -9,8 +9,4 @@ set (SOURCE_FILES
 
 add_library (RTObjCInterop SHARED ${SOURCE_FILES})
 
-add_dependencies(RTObjCInterop clang)
-
-# add_custom_target (RTObjCInterop
-#     DEPENDS clang
-#     COMMAND "${CLANG_EXE}" -fsyntax-only InteropBase.mm)
+add_dependencies (RTObjCInterop clang)
