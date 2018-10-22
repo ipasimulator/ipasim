@@ -82,8 +82,14 @@ else (SUPERBUILD)
 
     # Simplify `CMAKE_CXX_LINK_EXECUTABLE` so that it actually works. (The
     # original also set some `-Wl` options which weren't compatible with MSVC
-    # nor LLVM's MSVC-like linker.)
-    set (CMAKE_CXX_LINK_EXECUTABLE "<CMAKE_CXX_COMPILER> <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+    # nor LLVM's MSVC-like linker.) The values were copied from
+    # `C:\Program Files\CMake\share\cmake-3.11\Modules\CMakeCXXInformation.cmake`.
+    # The original values were probably from
+    # `Modules\Platform\Windows-GNU.cmake`.
+    set (CMAKE_CXX_LINK_EXECUTABLE
+        "<CMAKE_CXX_COMPILER> <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+    set (CMAKE_CXX_CREATE_SHARED_LIBRARY
+        "<CMAKE_CXX_COMPILER> <CMAKE_SHARED_LIBRARY_CXX_FLAGS> <LANGUAGE_COMPILE_FLAGS> <LINK_FLAGS> <CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS> <SONAME_FLAG><TARGET_SONAME> -o <TARGET> <OBJECTS> <LINK_LIBRARIES>")
 
     add_subdirectory (src)
 
