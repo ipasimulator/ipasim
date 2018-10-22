@@ -1,49 +1,72 @@
 cmake_minimum_required (VERSION 3.11)
-project (ipaSim LANGUAGES NONE)
 
-# Configure Clang if it hasn't been configured yet.
-set (CLANG_CMAKE_DIR "${CMAKE_BINARY_DIR}/clang-x64-Release")
-set (CLANG_INSTALL_DIR "${CMAKE_SOURCE_DIR}/build/clang-x64-Release")
-if (NOT EXISTS "${CLANG_CMAKE_DIR}")
-    file (MAKE_DIRECTORY "${CLANG_CMAKE_DIR}")
-    execute_process (
-        COMMAND cmake -G Ninja
-            -DLLVM_TARGETS_TO_BUILD=X86;ARM
-            "-DLLVM_EXTERNAL_CLANG_SOURCE_DIR=${CMAKE_SOURCE_DIR}/deps/clang"
-            "-DLLVM_EXTERNAL_LLD_SOURCE_DIR=${CMAKE_SOURCE_DIR}/deps/lld"
-            "-DLLVM_EXTERNAL_LLDB_SOURCE_DIR=${CMAKE_SOURCE_DIR}/deps/lldb"
-            -DCMAKE_BUILD_TYPE=Release
-            "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-            "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
-            "-DCMAKE_LINKER=${CMAKE_LINKER}"
-            "-DCMAKE_INSTALL_PREFIX=${CLANG_INSTALL_DIR}"
-            -DCMAKE_INSTALL_MESSAGE=LAZY
-            "${CMAKE_SOURCE_DIR}/deps/llvm"
-        WORKING_DIRECTORY "${CLANG_CMAKE_DIR}")
-endif (NOT EXISTS "${CLANG_CMAKE_DIR}")
+option (SUPERBUILD "Build Clang and then the project itself." ON)
 
-# Build `clang.exe`.
-add_custom_target (clang
-    COMMENT "Clang"
-    # TODO: Change this to `install-clang` when we are ready.
-    COMMAND ninja install-llvm-headers
-    WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
-    USES_TERMINAL)
+if (SUPERBUILD)
 
-# TODO: Use this when we're ready.
-#set (CMAKE_EXE "${CLANG_INSTALL_DIR}/bin/clang.exe")
-set (CMAKE_EXE "C:/Program Files/LLVM/bin/clang.exe")
+    # Configure Clang if it hasn't been configured yet.
+    set (CLANG_CMAKE_DIR "${CMAKE_BINARY_DIR}/clang-x64-Release")
+    set (CLANG_INSTALL_DIR "${CMAKE_SOURCE_DIR}/build/clang-x64-Release")
+    if (NOT EXISTS "${CLANG_CMAKE_DIR}")
+        file (MAKE_DIRECTORY "${CLANG_CMAKE_DIR}")
+        execute_process (
+            COMMAND cmake -G Ninja
+                -DLLVM_TARGETS_TO_BUILD=X86;ARM
+                "-DLLVM_EXTERNAL_CLANG_SOURCE_DIR=${CMAKE_SOURCE_DIR}/deps/clang"
+                "-DLLVM_EXTERNAL_LLD_SOURCE_DIR=${CMAKE_SOURCE_DIR}/deps/lld"
+                "-DLLVM_EXTERNAL_LLDB_SOURCE_DIR=${CMAKE_SOURCE_DIR}/deps/lldb"
+                -DCMAKE_BUILD_TYPE=Release
+                "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
+                "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}"
+                "-DCMAKE_LINKER=${CMAKE_LINKER}"
+                "-DCMAKE_INSTALL_PREFIX=${CLANG_INSTALL_DIR}"
+                -DCMAKE_INSTALL_MESSAGE=LAZY
+                "${CMAKE_SOURCE_DIR}/deps/llvm"
+            WORKING_DIRECTORY "${CLANG_CMAKE_DIR}")
+    endif (NOT EXISTS "${CLANG_CMAKE_DIR}")
 
-set (CMAKE_C_COMPILER "${CMAKE_EXE}")
-set (CMAKE_C_COMPILER_ID "Clang")
-set (CMAKE_CXX_COMPILER "${CMAKE_EXE}")
-set (CMAKE_CXX_COMPILER_ID "Clang")
-# TODO: Also build and set linker.
+    # TODO: Use this when we're ready.
+    #set (CLANG_EXE "${CLANG_INSTALL_DIR}/bin/clang.exe")
+    set (CLANG_EXE "C:/Program Files/LLVM/bin/clang.exe")
+    # TODO: Also build and set linker.
+    set (LLD_LINK_EXE "C:/Program Files/LLVM/bin/lld-link.exe")
 
-enable_language (C)
-enable_language (CXX)
+    # Configure ipaSim project itself.
+    set (IPASIM_CMAKE_DIR "${CMAKE_BINARY_DIR}/ipasim-x86-Debug")
+    set (IPASIM_INSTALL_DIR "${CMAKE_SOURCE_DIR}/build/ipasim-x86-Debug")
+    if (NOT EXISTS "${IPASIM_CMAKE_DIR}")
+        file (MAKE_DIRECTORY "${IPASIM_CMAKE_DIR}")
+        execute_process (
+            COMMAND cmake -G Ninja
+                -DSUPERBUILD=Off
+                "-DCMAKE_C_COMPILER=${CLANG_EXE}"
+                -DCMAKE_C_COMPILER_ID=Clang
+                "-DCMAKE_CXX_COMPILER=${CLANG_EXE}"
+                -DCMAKE_CXX_COMPILER_ID=Clang
+                "-DCMAKE_LINKER=${LLD_LINK_EXE}"
+                -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
+                "-DCMAKE_INSTALL_PREFIX=${IPASIM_INSTALL_DIR}"
+                -DCMAKE_INSTALL_MESSAGE=LAZY
+                "-DCLANG_CMAKE_DIR=${CLANG_CMAKE_DIR}"
+                "${CMAKE_SOURCE_DIR}"
+            WORKING_DIRECTORY "${IPASIM_CMAKE_DIR}")
+    endif (NOT EXISTS "${IPASIM_CMAKE_DIR}")
 
-# This will generate `compile_commands.json`.
-set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
+else (SUPERBUILD)
 
-add_subdirectory (src)
+    project (ipaSim)
+
+    # Build `clang.exe`.
+    add_custom_target (clang
+        COMMENT "Clang"
+        # TODO: Change this to `install-clang` when we are ready.
+        COMMAND ninja install-llvm-headers
+        WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
+        USES_TERMINAL)
+
+    # This will generate `compile_commands.json`.
+    set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+    add_subdirectory (src)
+
+endif (SUPERBUILD)
