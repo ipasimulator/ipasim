@@ -66,6 +66,10 @@ else (SUPERBUILD)
     project (ipaSim)
 
     # Build `clang.exe`.
+    # TODO: How to make CMake to actually use it after compiling it? Maybe
+    # simply changing `CMAKE_CXX_COMPILER` could work. Or try creating a
+    # symlink (to `${LLVM_BIN_DIR}/clang.exe`) and replacing it after building
+    # our patched Clang.
     add_custom_target (clang
         COMMENT "Clang"
         # TODO: Change this to `install-clang` when we are ready.
