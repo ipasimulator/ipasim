@@ -58,6 +58,9 @@ if (SUPERBUILD)
             WORKING_DIRECTORY "${IPASIM_CMAKE_DIR}")
     endif (NOT EXISTS "${IPASIM_CMAKE_DIR}")
 
+    # TODO: Maybe add custom targets as shortcuts to targets inside folder
+    # `ipasim-x86-Debug` and others.
+
 else (SUPERBUILD)
 
     project (ipaSim)
