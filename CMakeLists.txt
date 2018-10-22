@@ -72,13 +72,18 @@ else (SUPERBUILD)
     # our patched Clang.
     add_custom_target (clang
         COMMENT "Clang"
-        # TODO: Change this to `install-clang` when we are ready.
-        COMMAND ninja install-llvm-headers
+        # TODO: Change this to `ninja install-clang` when we are ready.
+        COMMAND echo TBD.
         WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
         USES_TERMINAL)
 
     # This will generate `compile_commands.json`.
     set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+    # Simplify `CMAKE_CXX_LINK_EXECUTABLE` so that it actually works. (The
+    # original also set some `-Wl` options which weren't compatible with MSVC
+    # nor LLVM's MSVC-like linker.)
+    set (CMAKE_CXX_LINK_EXECUTABLE "<CMAKE_CXX_COMPILER> <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
 
     add_subdirectory (src)
 

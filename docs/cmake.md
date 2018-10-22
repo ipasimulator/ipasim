@@ -27,3 +27,8 @@ See also [Building with CMake, Ninja and Clang on Windows](https://stackoverflow
 Or maybe [cmake-toolchains(7)](https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html) could be useful.
 Anyway, in general, here are the ways to specify custom compiler in CMake: [How do I use a different compiler?](https://gitlab.kitware.com/cmake/community/wikis/FAQ#how-do-i-use-a-different-compiler).
 Also see [this SO answer](https://stackoverflow.com/a/13089688) which references that article.
+
+## How to use `lld-link` instead of `clang` to link `.obj` files?
+
+- SO: [CMake custom Link executable command, how to extract linker options?](https://stackoverflow.com/q/37368434).
+- SO: [CMake: use a custom linker](https://stackoverflow.com/a/25274328).
