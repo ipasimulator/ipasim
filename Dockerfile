@@ -31,7 +31,8 @@ ADD https://download.visualstudio.microsoft.com/download/pr/d80c9e2f-b6f4-47cc-b
 RUN powershell -c "C:/temp/vs_buildtools.exe --quiet --wait --norestart --nocache \
     --installPath C:/BuildTools \
     --channelUri C:/temp/visualstudio.chman --installChannelUri C:/temp/visualstudio.chman \
-    --add \"Microsoft.VisualStudio.Workload.VCTools;includeRecommended\""
+    --add \"Microsoft.VisualStudio.Workload.VCTools;includeOptional\" \
+    --add Microsoft.VisualCpp.DIA.SDK"
 
 # Install Python. It's needed to build LLVM and Clang.
 RUN powershell -c "choco install python --version 3.7.0 -y"
