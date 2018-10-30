@@ -1,0 +1,8 @@
+[ver:1,total:1380]
+CMakeLists.txt:465,1540897200:465,m
+docs/english.md:330,1540839600:180,1540897200:150,r
+src/CMakeLists.txt:210,1540897200:210,r
+docs/issues/1.md:180,1540839600:180,r
+Dockerfile:150,1540897200:150,r
+src/link/CMakeLists.txt:30,1540897200:30,r
+src/dyld/CMakeLists.txt:15,1540897200:15,r
