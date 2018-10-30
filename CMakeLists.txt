@@ -74,6 +74,9 @@ else (SUPERBUILD)
     set (LLD_LINK_EXE "${CLANG_CMAKE_DIR}/bin/lld-link.exe")
     set (CMAKE_C_COMPILER "${CLANG_EXE}")
     set (CMAKE_CXX_COMPILER "${CLANG_EXE}")
+    # Note that this is probably not actually used, but we keep it here for
+    # consistency. Why is this not used? See below where we manually set
+    # `-fuse-ld=lld-link`.
     set (CMAKE_LINKER "${LLD_LINK_EXE}")
 
     # Build `clang.exe`.
@@ -91,12 +94,12 @@ else (SUPERBUILD)
     # nor LLVM's MSVC-like linker.) The values were copied from
     # `C:\Program Files\CMake\share\cmake-3.11\Modules\CMakeCXXInformation.cmake`.
     # The original values were probably from
-    # `Modules\Platform\Windows-GNU.cmake`. Also, we want to use `CMAKE_LINKER`
+    # `Modules\Platform\Windows-GNU.cmake`. Also, we want to use `lld-link.exe`
     # instead of `CMAKE_CXX_COMPILER` for linking.
     set (CMAKE_CXX_LINK_EXECUTABLE
-        "<CMAKE_LINKER> <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+        "<CMAKE_CXX_COMPILER> -fuse-ld=lld-link <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
     set (CMAKE_CXX_CREATE_SHARED_LIBRARY
-        "<CMAKE_LINKER> <CMAKE_SHARED_LIBRARY_CXX_FLAGS> <LANGUAGE_COMPILE_FLAGS> <LINK_FLAGS> <CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS> <SONAME_FLAG><TARGET_SONAME> -o <TARGET> <OBJECTS> <LINK_LIBRARIES>")
+        "<CMAKE_CXX_COMPILER> -fuse-ld=lld-link <CMAKE_SHARED_LIBRARY_CXX_FLAGS> <LANGUAGE_COMPILE_FLAGS> <LINK_FLAGS> <CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS> <SONAME_FLAG><TARGET_SONAME> -o <TARGET> <OBJECTS> <LINK_LIBRARIES>")
 
     add_subdirectory (src)
 
