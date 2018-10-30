@@ -1,5 +1,3 @@
-project (dyld)
-
 add_library (dyld SHARED dyld.cpp)
 
 add_dependencies (dyld clang)

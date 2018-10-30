@@ -9,6 +9,9 @@ if (SUPERBUILD)
 
     set (LLVM_BIN_DIR "C:/Program Files/LLVM/bin")
 
+    # TODO: Maybe re-run nested CMakes every time (not only if the corresponding
+    # folder doesn't exist).
+
     # Configure Clang if it hasn't been configured yet.
     set (CLANG_CMAKE_DIR "${CMAKE_BINARY_DIR}/clang-x64-Release")
     set (CLANG_INSTALL_DIR "${CMAKE_SOURCE_DIR}/build/clang-x64-Release")
@@ -30,9 +33,11 @@ if (SUPERBUILD)
             WORKING_DIRECTORY "${CLANG_CMAKE_DIR}")
     endif (NOT EXISTS "${CLANG_CMAKE_DIR}")
 
-    # TODO: This won't work if Clang is not yet built.
-    set (CLANG_EXE "${CLANG_CMAKE_DIR}/bin/clang.exe")
-    set (LLD_LINK_EXE "${CLANG_CMAKE_DIR}/bin/lld-link.exe")
+    # First we set the compiler to the original Clang, because at least it
+    # exists. We will change this after the project is configured (and
+    # compiler is tested). See #2.
+    set (CLANG_EXE "${LLVM_BIN_DIR}/clang.exe")
+    set (LLD_LINK_EXE "${LLVM_BIN_DIR}/lld-link.exe")
 
     # Configure ipaSim project itself.
     set (IPASIM_CMAKE_DIR "${CMAKE_BINARY_DIR}/ipasim-x86-Debug")
@@ -62,6 +67,14 @@ if (SUPERBUILD)
 else (SUPERBUILD)
 
     project (ipaSim)
+    
+    # Now, the compiler was tested, so we can change it to our
+    # possibly-not-yet-existing patched Clang. See #2.
+    set (CLANG_EXE "${CLANG_CMAKE_DIR}/bin/clang.exe")
+    set (LLD_LINK_EXE "${CLANG_CMAKE_DIR}/bin/lld-link.exe")
+    set (CMAKE_C_COMPILER "${CLANG_EXE}" CACHE PATH "" FORCE)
+    set (CMAKE_CXX_COMPILER "${CLANG_EXE}" CACHE PATH "" FORCE)
+    set (CMAKE_LINKER "${LLD_LINK_EXE}" CACHE PATH "" FORCE)
 
     # Build `clang.exe`.
     # TODO: How to make CMake to actually use it after compiling it? Maybe

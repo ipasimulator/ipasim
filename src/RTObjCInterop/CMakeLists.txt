@@ -1,5 +1,3 @@
-project (RTObjCInterop)
-
 set (SOURCE_FILES
     dllmain.cpp
     InteropBase.mm
