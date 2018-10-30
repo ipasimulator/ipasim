@@ -30,11 +30,9 @@ if (SUPERBUILD)
             WORKING_DIRECTORY "${CLANG_CMAKE_DIR}")
     endif (NOT EXISTS "${CLANG_CMAKE_DIR}")
 
-    # TODO: Use this when we're ready.
-    #set (CLANG_EXE "${CLANG_INSTALL_DIR}/bin/clang.exe")
-    set (CLANG_EXE "${LLVM_BIN_DIR}/clang.exe")
-    # TODO: Also build and set linker.
-    set (LLD_LINK_EXE "${LLVM_BIN_DIR}/lld-link.exe")
+    # TODO: This won't work if Clang is not yet built.
+    set (CLANG_EXE "${CLANG_CMAKE_DIR}/bin/clang.exe")
+    set (LLD_LINK_EXE "${CLANG_CMAKE_DIR}/bin/lld-link.exe")
 
     # Configure ipaSim project itself.
     set (IPASIM_CMAKE_DIR "${CMAKE_BINARY_DIR}/ipasim-x86-Debug")
@@ -49,7 +47,7 @@ if (SUPERBUILD)
                 "-DCMAKE_CXX_COMPILER=${CLANG_EXE}"
                 -DCMAKE_CXX_COMPILER_ID=Clang
                 "-DCMAKE_LINKER=${LLD_LINK_EXE}"
-                "-DCMAKE_AR=C:/Program Files/LLVM/bin/llvm-ar.exe"
+                "-DCMAKE_AR=${LLVM_BIN_DIR}/llvm-ar.exe"
                 -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
                 "-DCMAKE_INSTALL_PREFIX=${IPASIM_INSTALL_DIR}"
                 -DCMAKE_INSTALL_MESSAGE=LAZY
@@ -72,8 +70,7 @@ else (SUPERBUILD)
     # our patched Clang.
     add_custom_target (clang
         COMMENT "Clang"
-        # TODO: Change this to `ninja install-clang` when we are ready.
-        COMMAND echo TBD.
+        COMMAND ninja clang lld
         WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
         USES_TERMINAL)
 
