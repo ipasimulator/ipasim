@@ -72,6 +72,8 @@ else (SUPERBUILD)
     # possibly-not-yet-existing patched Clang. See #2.
     set (CLANG_EXE "${CLANG_CMAKE_DIR}/bin/clang.exe")
     set (LLD_LINK_EXE "${CLANG_CMAKE_DIR}/bin/lld-link.exe")
+    # TODO: With the original Clang, it works, with ours, it doesn't. What do
+    # we miss here?
     set (CMAKE_C_COMPILER "${CLANG_EXE}")
     set (CMAKE_CXX_COMPILER "${CLANG_EXE}")
     # Note that this is probably not actually used, but we keep it here for
