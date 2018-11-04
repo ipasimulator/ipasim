@@ -1,0 +1,6 @@
+[ver:1,total:420]
+scripts/ipaSim-x86-Debug.cmake:200,1541358000:200,m
+CMakeLists.txt:110,1541358000:110,m
+scripts/clang-x86-Debug.cmake:60,1541358000:60,m
+scripts/build.ps1:30,1541358000:30,r
+scripts/clang-x86-Release.cmake:20,1541358000:20,m
