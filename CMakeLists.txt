@@ -12,9 +12,13 @@ if (SUPERBUILD)
     # TODO: Maybe re-run nested CMakes every time (not only if the corresponding
     # folder doesn't exist).
 
+    # See https://gitlab.kitware.com/cmake/cmake/issues/16259#note_158150.
+    set (ENV{CFLAGS} -m32)
+    set (ENV{CXXFLAGS} -m32)
+
     # Configure Clang if it hasn't been configured yet.
-    set (CLANG_CMAKE_DIR "${CMAKE_BINARY_DIR}/clang-x64-Release")
-    set (CLANG_INSTALL_DIR "${CMAKE_SOURCE_DIR}/build/clang-x64-Release")
+    set (CLANG_CMAKE_DIR "${CMAKE_BINARY_DIR}/clang-x86-Release")
+    set (CLANG_INSTALL_DIR "${CMAKE_SOURCE_DIR}/build/clang-x86-Release")
     if (NOT EXISTS "${CLANG_CMAKE_DIR}")
         file (MAKE_DIRECTORY "${CLANG_CMAKE_DIR}")
         execute_process (
@@ -35,12 +39,13 @@ if (SUPERBUILD)
 
     # Also configure Debug version of Clang.
     # TODO: Refactor this into a function.
-    set (DEBUG_CLANG_CMAKE_DIR "${CMAKE_BINARY_DIR}/clang-x64-Debug")
-    set (DEBUG_CLANG_INSTALL_DIR "${CMAKE_SOURCE_DIR}/build/clang-x64-Debug")
+    set (DEBUG_CLANG_CMAKE_DIR "${CMAKE_BINARY_DIR}/clang-x86-Debug")
+    set (DEBUG_CLANG_INSTALL_DIR "${CMAKE_SOURCE_DIR}/build/clang-x86-Debug")
     if (NOT EXISTS "${DEBUG_CLANG_CMAKE_DIR}")
         file (MAKE_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}")
         execute_process (
             COMMAND ninja llvm-tblgen clang-tblgen
+            OUTPUT_QUIET
             WORKING_DIRECTORY "${CLANG_CMAKE_DIR}")
         execute_process (
             COMMAND cmake -G Ninja
@@ -71,11 +76,6 @@ if (SUPERBUILD)
     set (IPASIM_INSTALL_DIR "${CMAKE_SOURCE_DIR}/build/ipasim-x86-Debug")
     if (NOT EXISTS "${IPASIM_CMAKE_DIR}")
         file (MAKE_DIRECTORY "${IPASIM_CMAKE_DIR}")
-
-        # See https://gitlab.kitware.com/cmake/cmake/issues/16259#note_158150.
-        set (ENV{CFLAGS} -m32)
-        set (ENV{CXXFLAGS} -m32)
-        
         execute_process (
             COMMAND cmake -G Ninja
                 -DSUPERBUILD=Off

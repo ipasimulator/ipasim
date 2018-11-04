@@ -38,6 +38,6 @@ RUN powershell -c "C:/temp/vs_buildtools.exe --quiet --wait --norestart --nocach
 RUN powershell -c "choco install python --version 3.7.0 -y"
 
 # Start developer command prompt.
-ENTRYPOINT C:/BuildTools/Common7/Tools/VsDevCmd.bat -arch=amd64 -host_arch=amd64 &&
+ENTRYPOINT C:/BuildTools/Common7/Tools/VsDevCmd.bat -arch=x86 -host_arch=x86 &&
 
 CMD powershell -f scripts/build.ps1
