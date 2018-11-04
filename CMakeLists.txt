@@ -4,108 +4,64 @@ option (SUPERBUILD "Configure Clang and then the project itself." ON)
 
 if (SUPERBUILD)
 
-    # This branch is actually just something that could be written in Bash. But
-    # this way it's at least more cross-platform.
+    project (ipaSim-superbuild LANGUAGES NONE)
 
-    set (LLVM_BIN_DIR "C:/Program Files/LLVM/bin")
+    set (SOURCE_DIR "${CMAKE_SOURCE_DIR}")
+    set (BINARY_DIR "${CMAKE_BINARY_DIR}")
 
-    # TODO: Maybe re-run nested CMakes every time (not only if the corresponding
-    # folder doesn't exist).
+    list (APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/scripts")
+    include (CommonVariables)
 
-    # See https://gitlab.kitware.com/cmake/cmake/issues/16259#note_158150.
-    set (ENV{CFLAGS} -m32)
-    set (ENV{CXXFLAGS} -m32)
+    function (add_superbuild_target name cmakeDir)
+        add_custom_command (
+            OUTPUT "${cmakeDir}/CMakeCache.txt"
+            COMMAND "${CMAKE_COMMAND}"
+                "-DSOURCE_DIR=${CMAKE_SOURCE_DIR}"
+                "-DBINARY_DIR=${CMAKE_BINARY_DIR}"
+                -P "${CMAKE_SOURCE_DIR}/scripts/${name}.cmake"
+            USES_TERMINAL)
+        add_custom_target ("config-${name}"
+            DEPENDS "${cmakeDir}/CMakeCache.txt")
+    endfunction (add_superbuild_target)
 
-    # Configure Clang if it hasn't been configured yet.
-    set (CLANG_CMAKE_DIR "${CMAKE_BINARY_DIR}/clang-x86-Release")
-    set (CLANG_INSTALL_DIR "${CMAKE_SOURCE_DIR}/build/clang-x86-Release")
-    if (NOT EXISTS "${CLANG_CMAKE_DIR}")
-        file (MAKE_DIRECTORY "${CLANG_CMAKE_DIR}")
-        execute_process (
-            COMMAND cmake -G Ninja
-                -DLLVM_TARGETS_TO_BUILD=X86;ARM
-                "-DLLVM_EXTERNAL_CLANG_SOURCE_DIR=${CMAKE_SOURCE_DIR}/deps/clang"
-                "-DLLVM_EXTERNAL_LLD_SOURCE_DIR=${CMAKE_SOURCE_DIR}/deps/lld"
-                "-DLLVM_EXTERNAL_LLDB_SOURCE_DIR=${CMAKE_SOURCE_DIR}/deps/lldb"
-                -DCMAKE_BUILD_TYPE=Release
-                "-DCMAKE_C_COMPILER=${LLVM_BIN_DIR}/clang-cl.exe"
-                "-DCMAKE_CXX_COMPILER=${LLVM_BIN_DIR}/clang-cl.exe"
-                "-DCMAKE_LINKER=${LLVM_BIN_DIR}/lld-link.exe"
-                "-DCMAKE_INSTALL_PREFIX=${CLANG_INSTALL_DIR}"
-                -DCMAKE_INSTALL_MESSAGE=LAZY
-                "${CMAKE_SOURCE_DIR}/deps/llvm"
-            WORKING_DIRECTORY "${CLANG_CMAKE_DIR}")
-    endif (NOT EXISTS "${CLANG_CMAKE_DIR}")
+    add_superbuild_target (clang-x86-Release "${CLANG_CMAKE_DIR}")
+    add_superbuild_target (clang-x86-Debug "${DEBUG_CLANG_CMAKE_DIR}")
+    add_superbuild_target (ipaSim-x86-Debug "${IPASIM_CMAKE_DIR}")
 
-    # Also configure Debug version of Clang.
-    # TODO: Refactor this into a function.
-    set (DEBUG_CLANG_CMAKE_DIR "${CMAKE_BINARY_DIR}/clang-x86-Debug")
-    set (DEBUG_CLANG_INSTALL_DIR "${CMAKE_SOURCE_DIR}/build/clang-x86-Debug")
-    if (NOT EXISTS "${DEBUG_CLANG_CMAKE_DIR}")
-        file (MAKE_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}")
-        execute_process (
-            COMMAND ninja llvm-tblgen clang-tblgen
-            OUTPUT_QUIET
-            WORKING_DIRECTORY "${CLANG_CMAKE_DIR}")
-        execute_process (
-            COMMAND cmake -G Ninja
-                -DLLVM_TARGETS_TO_BUILD=X86;ARM
-                "-DLLVM_EXTERNAL_CLANG_SOURCE_DIR=${CMAKE_SOURCE_DIR}/deps/clang"
-                "-DLLVM_EXTERNAL_LLD_SOURCE_DIR=${CMAKE_SOURCE_DIR}/deps/lld"
-                "-DLLVM_EXTERNAL_LLDB_SOURCE_DIR=${CMAKE_SOURCE_DIR}/deps/lldb"
-                -DCMAKE_BUILD_TYPE=Release
-                "-DCMAKE_C_COMPILER=${LLVM_BIN_DIR}/clang-cl.exe"
-                "-DCMAKE_CXX_COMPILER=${LLVM_BIN_DIR}/clang-cl.exe"
-                "-DCMAKE_LINKER=${LLVM_BIN_DIR}/lld-link.exe"
-                "-DCMAKE_INSTALL_PREFIX=${DEBUG_CLANG_INSTALL_DIR}"
-                -DCMAKE_INSTALL_MESSAGE=LAZY
-                "${CMAKE_SOURCE_DIR}/deps/llvm"
-                "-DLLVM_TABLEGEN=${CLANG_CMAKE_DIR}/bin/llvm-tblgen.exe"
-                "-DCLANG_TABLEGEN=${CLANG_CMAKE_DIR}/bin/clang-tblgen.exe"
-            WORKING_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}")
-    endif (NOT EXISTS "${DEBUG_CLANG_CMAKE_DIR}")
+    add_custom_target (tblgens-x86-Release
+        COMMENT "Tablegens"
+        COMMAND ninja llvm-tblgen clang-tblgen
+        WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
+        USES_TERMINAL
+        DEPENDS config-clang-x86-Release)
 
-    # First we set the compiler to the original Clang, because at least it
-    # exists. We will change this after the project is configured (and
-    # compiler is tested). See #2.
-    set (CLANG_EXE "${LLVM_BIN_DIR}/clang.exe")
-    set (LLD_LINK_EXE "${LLVM_BIN_DIR}/lld-link.exe")
+    add_dependencies (config-clang-x86-Debug tblgens-x86-Release)
 
-    # Configure ipaSim project itself.
-    set (IPASIM_CMAKE_DIR "${CMAKE_BINARY_DIR}/ipasim-x86-Debug")
-    set (IPASIM_INSTALL_DIR "${CMAKE_SOURCE_DIR}/build/ipasim-x86-Debug")
-    if (NOT EXISTS "${IPASIM_CMAKE_DIR}")
-        file (MAKE_DIRECTORY "${IPASIM_CMAKE_DIR}")
-        execute_process (
-            COMMAND cmake -G Ninja
-                -DSUPERBUILD=Off
-                "-DCMAKE_C_COMPILER=${CLANG_EXE}"
-                -DCMAKE_C_COMPILER_ID=Clang
-                "-DCMAKE_CXX_COMPILER=${CLANG_EXE}"
-                -DCMAKE_CXX_COMPILER_ID=Clang
-                "-DCMAKE_LINKER=${LLD_LINK_EXE}"
-                "-DCMAKE_AR=${LLVM_BIN_DIR}/llvm-ar.exe"
-                -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
-                "-DCMAKE_INSTALL_PREFIX=${IPASIM_INSTALL_DIR}"
-                -DCMAKE_INSTALL_MESSAGE=LAZY
-                "-DCLANG_CMAKE_DIR=${CLANG_CMAKE_DIR}"
-                "${CMAKE_SOURCE_DIR}"
-            WORKING_DIRECTORY "${IPASIM_CMAKE_DIR}")
-    endif (NOT EXISTS "${IPASIM_CMAKE_DIR}")
+    add_custom_target (clang-x86-Release
+        COMMENT "Clang"
+        COMMAND ninja clang lld
+        WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
+        USES_TERMINAL
+        DEPENDS config-clang-x86-Release)
 
-    # TODO: Maybe add custom targets as shortcuts to targets inside folder
-    # `ipasim-x86-Debug` and others.
+    add_custom_target (ipaSim-x86-Debug
+        COMMENT "ipaSim"
+        COMMAND ninja all
+        WORKING_DIRECTORY "${IPASIM_CMAKE_DIR}"
+        USES_TERMINAL
+        DEPENDS config-ipaSim-x86-Debug clang-x86-Release)
 
 else (SUPERBUILD)
 
     project (ipaSim)
     
+    list (APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/scripts")
+    include (CommonVariables)
+    
     # Now, the compiler was tested, so we can change it to our
     # possibly-not-yet-existing patched Clang. See #2.
     set (CLANG_EXE "${CLANG_CMAKE_DIR}/bin/clang.exe")
     set (LLD_LINK_EXE "${CLANG_CMAKE_DIR}/bin/lld-link.exe")
-    # TODO: With the original Clang, it works, with ours, it doesn't. What do
-    # we miss here?
     set (CMAKE_C_COMPILER "${CLANG_EXE}")
     set (CMAKE_CXX_COMPILER "${CLANG_EXE}")
     # Note that this is probably not actually used, but we keep it here for
@@ -113,14 +69,8 @@ else (SUPERBUILD)
     # `-fuse-ld=lld-link`.
     set (CMAKE_LINKER "${LLD_LINK_EXE}")
 
-    # Build `clang.exe`.
-    add_custom_target (clang
-        COMMENT "Clang"
-        COMMAND ninja clang lld
-        WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
-        USES_TERMINAL)
-
     # This will generate `compile_commands.json`.
+    # TODO: Is this correct place for this?
     set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
     # Simplify `CMAKE_CXX_LINK_EXECUTABLE` so that it actually works. (The
