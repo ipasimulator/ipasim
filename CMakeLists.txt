@@ -71,6 +71,11 @@ if (SUPERBUILD)
     set (IPASIM_INSTALL_DIR "${CMAKE_SOURCE_DIR}/build/ipasim-x86-Debug")
     if (NOT EXISTS "${IPASIM_CMAKE_DIR}")
         file (MAKE_DIRECTORY "${IPASIM_CMAKE_DIR}")
+
+        # See https://gitlab.kitware.com/cmake/cmake/issues/16259#note_158150.
+        set (ENV{CFLAGS} -m32)
+        set (ENV{CXXFLAGS} -m32)
+        
         execute_process (
             COMMAND cmake -G Ninja
                 -DSUPERBUILD=Off
