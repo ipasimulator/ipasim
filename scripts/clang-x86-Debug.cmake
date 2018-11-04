@@ -12,7 +12,8 @@ execute_process (
         "-DCMAKE_C_COMPILER=${LLVM_BIN_DIR}/clang-cl.exe"
         "-DCMAKE_CXX_COMPILER=${LLVM_BIN_DIR}/clang-cl.exe"
         "-DCMAKE_LINKER=${LLVM_BIN_DIR}/lld-link.exe"
-        "${SOURCE_DIR}/deps/llvm"
         "-DLLVM_TABLEGEN=${CLANG_CMAKE_DIR}/bin/llvm-tblgen.exe"
         "-DCLANG_TABLEGEN=${CLANG_CMAKE_DIR}/bin/clang-tblgen.exe"
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=On
+        "${SOURCE_DIR}/deps/llvm"
     WORKING_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}")

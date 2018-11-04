@@ -19,7 +19,8 @@ if (SUPERBUILD)
                 "-DSOURCE_DIR=${CMAKE_SOURCE_DIR}"
                 "-DBINARY_DIR=${CMAKE_BINARY_DIR}"
                 -P "${CMAKE_SOURCE_DIR}/scripts/${name}.cmake"
-            USES_TERMINAL)
+            USES_TERMINAL
+            DEPENDS "${CMAKE_SOURCE_DIR}/scripts/${name}.cmake")
         add_custom_target ("config-${name}"
             DEPENDS "${cmakeDir}/CMakeCache.txt")
     endfunction (add_superbuild_target)
@@ -68,10 +69,6 @@ else (SUPERBUILD)
     # consistency. Why is this not used? See below where we manually set
     # `-fuse-ld=lld-link`.
     set (CMAKE_LINKER "${LLD_LINK_EXE}")
-
-    # This will generate `compile_commands.json`.
-    # TODO: Is this correct place for this?
-    set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
     # Simplify `CMAKE_CXX_LINK_EXECUTABLE` so that it actually works. (The
     # original also set some `-Wl` options which weren't compatible with MSVC
