@@ -33,6 +33,33 @@ if (SUPERBUILD)
             WORKING_DIRECTORY "${CLANG_CMAKE_DIR}")
     endif (NOT EXISTS "${CLANG_CMAKE_DIR}")
 
+    # Also configure Debug version of Clang.
+    # TODO: Refactor this into a function.
+    set (DEBUG_CLANG_CMAKE_DIR "${CMAKE_BINARY_DIR}/clang-x64-Debug")
+    set (DEBUG_CLANG_INSTALL_DIR "${CMAKE_SOURCE_DIR}/build/clang-x64-Debug")
+    if (NOT EXISTS "${DEBUG_CLANG_CMAKE_DIR}")
+        file (MAKE_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}")
+        execute_process (
+            COMMAND ninja llvm-tblgen clang-tblgen
+            WORKING_DIRECTORY "${CLANG_CMAKE_DIR}")
+        execute_process (
+            COMMAND cmake -G Ninja
+                -DLLVM_TARGETS_TO_BUILD=X86;ARM
+                "-DLLVM_EXTERNAL_CLANG_SOURCE_DIR=${CMAKE_SOURCE_DIR}/deps/clang"
+                "-DLLVM_EXTERNAL_LLD_SOURCE_DIR=${CMAKE_SOURCE_DIR}/deps/lld"
+                "-DLLVM_EXTERNAL_LLDB_SOURCE_DIR=${CMAKE_SOURCE_DIR}/deps/lldb"
+                -DCMAKE_BUILD_TYPE=Release
+                "-DCMAKE_C_COMPILER=${LLVM_BIN_DIR}/clang-cl.exe"
+                "-DCMAKE_CXX_COMPILER=${LLVM_BIN_DIR}/clang-cl.exe"
+                "-DCMAKE_LINKER=${LLVM_BIN_DIR}/lld-link.exe"
+                "-DCMAKE_INSTALL_PREFIX=${DEBUG_CLANG_INSTALL_DIR}"
+                -DCMAKE_INSTALL_MESSAGE=LAZY
+                "${CMAKE_SOURCE_DIR}/deps/llvm"
+                "-DLLVM_TABLEGEN=${CLANG_CMAKE_DIR}/bin/llvm-tblgen.exe"
+                "-DCLANG_TABLEGEN=${CLANG_CMAKE_DIR}/bin/clang-tblgen.exe"
+            WORKING_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}")
+    endif (NOT EXISTS "${DEBUG_CLANG_CMAKE_DIR}")
+
     # First we set the compiler to the original Clang, because at least it
     # exists. We will change this after the project is configured (and
     # compiler is tested). See #2.
