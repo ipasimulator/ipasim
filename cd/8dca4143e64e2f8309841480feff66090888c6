@@ -1,0 +1,12 @@
+[ver:1,total:4620]
+CMakeLists.txt:2607,1541350800:180,1541354400:1367,1541358000:1060,m
+scripts/clang-x86-Release.cmake:566,1541354400:467,1541358000:99,m
+scripts/CommonVariables.cmake:435,1541354400:93,1541358000:342,m
+scripts/build.ps1:356,1541350800:300,1541354400:45,1541358000:11,m
+docs/issues/3.md:180,1541350800:180,r
+scripts/clang-x86-Debug.cmake:155,1541358000:155,m
+scripts/ipaSim-x86-Debug.cmake:111,1541358000:111,m
+src/CMakeLists.txt:100,1541358000:100,m
+src/link/CMakeLists.txt:78,1541354400:8,1541358000:70,m
+src/dyld/CMakeLists.txt:16,1541358000:16,m
+src/RTObjCInterop/CMakeLists.txt:16,1541358000:16,m
