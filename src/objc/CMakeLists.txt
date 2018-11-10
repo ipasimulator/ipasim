@@ -62,6 +62,8 @@ target_compile_definitions (objc
         OBJC_PORT
         __OBJC2__=1)
 
+target_compile_options (objc PRIVATE "-fblocks")
+
 target_include_directories (objc PUBLIC
     "${SOURCE_DIR}/src/objc/include"
     "${SOURCE_DIR}/deps/apple-headers"
