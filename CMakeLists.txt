@@ -89,6 +89,12 @@ else (SUPERBUILD)
         WORKING_DIRECTORY "${BINARY_DIR}"
         USES_TERMINAL)
 
+    # See https://medium.com/@alasher/colored-c-compiler-output-with-ninja-clang-gcc-10bfe7f2b949.
+    option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output." ON)
+    if (FORCE_COLORED_OUTPUT)
+        add_compile_options (-fcolor-diagnostics -fansi-escape-codes)
+    endif ()
+
     add_subdirectory (src)
 
 endif (SUPERBUILD)
