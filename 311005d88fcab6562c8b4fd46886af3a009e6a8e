@@ -1,0 +1,9 @@
+[ver:1,total:1140]
+build.ps1:540,1541880000:540,d
+CMakeLists.txt:250,1541880000:250,m
+.git/COMMIT_EDITMSG:120,1541880000:120,r
+scripts/ipaSim-x86-Debug.cmake:70,1541880000:70,m
+.git/hooks/prepare-commit-msg.sample:60,1541880000:60,r
+.git/hooks/post-merge:60,1541880000:60,r
+scripts/clang-x86-Debug.cmake:30,1541880000:30,m
+scripts/clang-x86-Release.cmake:10,1541880000:10,r
