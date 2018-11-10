@@ -16,5 +16,6 @@ execute_process (
         "-DSOURCE_DIR=${SOURCE_DIR}"
         "-DBINARY_DIR=${BINARY_DIR}"
         -DCMAKE_EXPORT_COMPILE_COMMANDS=On
+        -DCMAKE_BUILD_TYPE=Debug
         "${SOURCE_DIR}"
     WORKING_DIRECTORY "${IPASIM_CMAKE_DIR}")

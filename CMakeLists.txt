@@ -45,6 +45,13 @@ if (SUPERBUILD)
         USES_TERMINAL
         DEPENDS config-clang-x86-Release)
 
+    add_custom_target (clang-x86-Debug
+        COMMENT "Clang"
+        COMMAND ninja clang lld
+        WORKING_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}"
+        USES_TERMINAL
+        DEPENDS config-clang-x86-Debug)
+
     add_custom_target (prep-ipaSim-x86-Debug
         COMMENT "Prepare ipaSim"
         DEPENDS config-ipaSim-x86-Debug clang-x86-Release)
