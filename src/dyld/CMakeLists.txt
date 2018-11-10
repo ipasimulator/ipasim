@@ -6,3 +6,5 @@ target_include_directories (dyld PUBLIC
     "${CLANG_CMAKE_DIR}/include")
 
 target_compile_definitions (dyld PRIVATE BUILDING_DYLD)
+
+add_dependencies (dyld prep)

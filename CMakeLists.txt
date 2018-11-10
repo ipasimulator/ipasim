@@ -45,11 +45,8 @@ if (SUPERBUILD)
         USES_TERMINAL
         DEPENDS config-clang-x86-Release)
 
-    add_custom_target (ipaSim-x86-Debug
-        COMMENT "ipaSim"
-        COMMAND ninja all
-        WORKING_DIRECTORY "${IPASIM_CMAKE_DIR}"
-        USES_TERMINAL
+    add_custom_target (prep-ipaSim-x86-Debug
+        COMMENT "Prepare ipaSim"
         DEPENDS config-ipaSim-x86-Debug clang-x86-Release)
 
 else (SUPERBUILD)
@@ -81,6 +78,12 @@ else (SUPERBUILD)
         "<CMAKE_CXX_COMPILER> -fuse-ld=lld-link <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
     set (CMAKE_CXX_CREATE_SHARED_LIBRARY
         "<CMAKE_CXX_COMPILER> -fuse-ld=lld-link <CMAKE_SHARED_LIBRARY_CXX_FLAGS> <LANGUAGE_COMPILE_FLAGS> <LINK_FLAGS> <CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS> <SONAME_FLAG><TARGET_SONAME> -o <TARGET> <OBJECTS> <LINK_LIBRARIES>")
+
+    add_custom_target (prep
+        COMMENT "Superbuild"
+        COMMAND ninja prep-ipaSim-x86-Debug # TODO: Don't hardcode this.
+        WORKING_DIRECTORY "${BINARY_DIR}"
+        USES_TERMINAL)
 
     add_subdirectory (src)
 

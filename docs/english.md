@@ -20,6 +20,12 @@ Currently, there aren't any other dependencies IIRC.
 > In the future, we might need to install Visual Studio build tools into our build containers.
 > See [these Microsoft docs](https://docs.microsoft.com/en-us/visualstudio/install/build-tools-container?view=vs-2017) for useful information about that.
 
+When we have our Docker machine up and running, we can start building.
+First, run `.\scripts\build.ps1` inside `C:\project`.
+That script creates build directory `C:\build`.
+Inside that directory, run `ninja config-ipaSim-x86-Debug` to prepare building of that configuration (x86 Debug).
+Then, move to `C:\build\ipaSim-x86-Debug` and continue using Ninja from there (e.g., run `ninja -t targets` to see list of possible build targets).
+
 ## Updating dependencies
 
 There are some third-party dependencies that can be updated whenever new version comes out.

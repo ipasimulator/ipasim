@@ -6,3 +6,5 @@ set (SOURCE_FILES
     RTObject.mm)
 
 add_library (RTObjCInterop SHARED ${SOURCE_FILES})
+
+add_dependencies (RTObjCInterop prep)
