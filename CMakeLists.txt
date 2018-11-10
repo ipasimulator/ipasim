@@ -65,6 +65,8 @@ else (SUPERBUILD)
     
     # Now, the compiler was tested, so we can change it to our
     # possibly-not-yet-existing patched Clang. See #2.
+    set (ORIG_CLANG_EXE "${CLANG_EXE}")
+    set (ORIG_LLD_LINK_EXE "${LLD_LINK_EXE}")
     set (CLANG_EXE "${CLANG_CMAKE_DIR}/bin/clang.exe")
     set (LLD_LINK_EXE "${CLANG_CMAKE_DIR}/bin/lld-link.exe")
     set (CMAKE_C_COMPILER "${CLANG_EXE}")

@@ -50,6 +50,11 @@ set (ORIG_SOURCE_FILES
     objc-sel-table.s)
 list (TRANSFORM ORIG_SOURCE_FILES PREPEND "${SOURCE_DIR}/deps/objc4/runtime/")
 
+# Use the non-patched version of Clang due to a bug in the patched one. See #4.
+set (CMAKE_C_COMPILER "${ORIG_CLANG_EXE}")
+set (CMAKE_CXX_COMPILER "${ORIG_CLANG_EXE}")
+set (CMAKE_LINKER "${ORIG_LLD_LINK_EXE}")
+
 add_library (objc SHARED ${ORIG_SOURCE_FILES})
 
 add_dependencies (objc prep)
