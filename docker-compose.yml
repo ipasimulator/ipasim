@@ -10,4 +10,10 @@ services:
       - type: bind
         source: .
         target: c:/project
+      - type: volume
+        source: build-vol
+        target: c:/build
     mem_limit: 16G
+
+volumes:
+  build-vol:
