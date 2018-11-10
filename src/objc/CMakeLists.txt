@@ -57,6 +57,7 @@ add_dependencies (objc prep)
 target_compile_definitions (objc
     PRIVATE
         BUILDING_OBJC=1
+        NOMINMAX
     PUBLIC
         OBJC_PORT
         __OBJC2__=1)
