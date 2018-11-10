@@ -1,0 +1,10 @@
+[ver:1,total:1080]
+docker-compose.yml:342,1541880000:342,m
+build.ps1:220,1541880000:220,r
+scripts/restore.ps1:160,1541880000:160,r
+scripts/backup.ps1:144,1541880000:144,r
+.git/COMMIT_EDITMSG:80,1541880000:80,r
+scripts/build.ps1:62,1541880000:62,m
+CMakeLists.txt:30,1541880000:30,r
+docs/english.md:30,1541880000:30,r
+Dockerfile:12,1541880000:12,r
