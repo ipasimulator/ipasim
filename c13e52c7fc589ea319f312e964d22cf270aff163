@@ -1,0 +1,10 @@
+[ver:1,total:1500]
+src/pthread/CMakeLists.txt:661,1541854800:180,1541862000:481,m
+src/pthread/pthread.vcxproj:441,1541854800:342,1541862000:99,r
+CMakeLists.txt:180,1541862000:180,m
+src/objc/CMakeLists.txt:78,1541854800:78,r
+src/CMakeLists.txt:45,1541854800:30,1541862000:15,m
+src/dyld/CMakeLists.txt:30,1541862000:30,r
+docs/english.md:30,1541854800:30,r
+deps/pthreads.2/ChangeLog:20,1541862000:20,r
+docs/git.md:15,1541862000:15,r
