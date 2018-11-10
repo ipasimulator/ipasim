@@ -1,0 +1,11 @@
+[ver:1,total:1740]
+CMakeLists.txt:580,1541361600:180,1541844000:340,1541847600:60,m
+docs/english.md:415,1541844000:415,m
+scripts/build.ps1:375,1541361600:180,1541844000:195,r
+docs/issues/3.md:200,1541361600:180,1541844000:20,r
+src/RTObjCInterop/CMakeLists.txt:40,1541844000:40,m
+src/link/CMakeLists.txt:40,1541844000:40,m
+src/dyld/CMakeLists.txt:30,1541844000:30,m
+src/CMakeLists.txt:20,1541844000:20,r
+docs/issues/2.md:20,1541844000:20,r
+scripts/CommonVariables.cmake:20,1541844000:20,r
