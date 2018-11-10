@@ -74,10 +74,14 @@ else (SUPERBUILD)
     # The original values were probably from
     # `Modules\Platform\Windows-GNU.cmake`. Also, we want to use `lld-link.exe`
     # instead of `CMAKE_CXX_COMPILER` for linking.
-    set (CMAKE_CXX_LINK_EXECUTABLE
-        "<CMAKE_CXX_COMPILER> -fuse-ld=lld-link <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
-    set (CMAKE_CXX_CREATE_SHARED_LIBRARY
-        "<CMAKE_CXX_COMPILER> -fuse-ld=lld-link <CMAKE_SHARED_LIBRARY_CXX_FLAGS> <LANGUAGE_COMPILE_FLAGS> <LINK_FLAGS> <CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS> <SONAME_FLAG><TARGET_SONAME> -o <TARGET> <OBJECTS> <LINK_LIBRARIES>")
+    macro (update_commands lang)
+        set ("CMAKE_${lang}_LINK_EXECUTABLE"
+            "<CMAKE_CXX_COMPILER> -fuse-ld=lld-link <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+        set ("CMAKE_${lang}_CREATE_SHARED_LIBRARY"
+            "<CMAKE_CXX_COMPILER> -fuse-ld=lld-link <CMAKE_SHARED_LIBRARY_CXX_FLAGS> <LANGUAGE_COMPILE_FLAGS> <LINK_FLAGS> <CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS> <SONAME_FLAG><TARGET_SONAME> -o <TARGET> <OBJECTS> <LINK_LIBRARIES>")
+    endmacro ()
+    update_commands (C)
+    update_commands (CXX)
 
     add_custom_target (prep
         COMMENT "Superbuild"
