@@ -50,11 +50,6 @@ set (ORIG_SOURCE_FILES
     objc-sel-table.s)
 list (TRANSFORM ORIG_SOURCE_FILES PREPEND "${SOURCE_DIR}/deps/objc4/runtime/")
 
-# Use the non-patched version of Clang due to a bug in the patched one. See #4.
-set (CMAKE_C_COMPILER "${ORIG_CLANG_EXE}")
-set (CMAKE_CXX_COMPILER "${ORIG_CLANG_EXE}")
-set (CMAKE_LINKER "${ORIG_LLD_LINK_EXE}")
-
 add_library (objc SHARED ${ORIG_SOURCE_FILES})
 
 add_dependencies (objc prep)
@@ -67,7 +62,9 @@ target_compile_definitions (objc
         OBJC_PORT
         __OBJC2__=1)
 
-target_compile_options (objc PRIVATE "-fblocks")
+target_compile_options (objc PRIVATE
+    -fblocks
+    -fobjc-runtime=macosx-10.13.0)
 
 target_include_directories (objc PUBLIC
     "${SOURCE_DIR}/src/objc/include"
