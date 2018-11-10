@@ -17,3 +17,5 @@ target_compile_definitions (objc
 target_include_directories (objc PUBLIC
     "${SOURCE_DIR}/src/objc/include/"
     "${SOURCE_DIR}/deps/apple-headers/")
+
+target_link_libraries (objc pthread)
