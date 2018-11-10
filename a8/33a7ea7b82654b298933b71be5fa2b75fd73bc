@@ -1,0 +1,7 @@
+[ver:1,total:1680]
+src/objc/CMakeLists.txt:630,1541883600:540,1541887200:90,m
+test.ps1:630,1541883600:420,1541887200:210,d
+Dockerfile:210,1541883600:210,r
+.git/COMMIT_EDITMSG:120,1541887200:120,r
+src/objc/build_one.cmd:60,1541887200:60,r
+docs/english.md:30,1541883600:30,r
