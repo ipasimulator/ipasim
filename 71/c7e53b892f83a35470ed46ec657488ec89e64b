@@ -1,0 +1,12 @@
+[ver:1,total:1320]
+src/objc/CMakeLists.txt:484,1541854800:484,m
+docs/english.md:180,1541854800:180,r
+src/objc/build_one.cmd:167,1541854800:167,r
+src/RTObjCInterop/CMakeLists.txt:157,1541854800:157,r
+src/dyld/CMakeLists.txt:142,1541854800:142,r
+src/objc/dllmain.cpp:67,1541854800:67,r
+src/CMakeLists.txt:50,1541854800:50,m
+CMakeLists.txt:39,1541854800:39,r
+src/objc/cxxabi.mm:14,1541854800:14,r
+src/link/CMakeLists.txt:13,1541854800:13,r
+src/objc/build.cmd:7,1541854800:7,r
