@@ -8,5 +8,6 @@
         "TAPI",
         "dylib",
         "roadmap"
-    ]
+    ],
+    "editor.rulers": [80]
 }
