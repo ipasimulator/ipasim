@@ -50,7 +50,21 @@ set (ORIG_SOURCE_FILES
     objc-sel-table.s)
 list (TRANSFORM ORIG_SOURCE_FILES PREPEND "${SOURCE_DIR}/deps/objc4/runtime/")
 
-add_library (objc SHARED ${ORIG_SOURCE_FILES})
+# Sources from `/deps/libclosure/`.
+set (LIBCLOSURE_SOURCE_FILES
+    data.c
+    runtime.c)
+list (TRANSFORM LIBCLOSURE_SOURCE_FILES PREPEND
+    "${SOURCE_DIR}/deps/libclosure/")
+
+add_library (objc SHARED
+    ${ORIG_SOURCE_FILES}
+    ${LIBCLOSURE_SOURCE_FILES})
+
+# `runtime.c` needs to be compiled as C++ since there are errors otherwise.
+# TODO: Why?
+set_source_files_properties ("${SOURCE_DIR}/deps/libclosure/runtime.c"
+    PROPERTIES COMPILE_OPTIONS -xc++)
 
 add_dependencies (objc prep)
 
