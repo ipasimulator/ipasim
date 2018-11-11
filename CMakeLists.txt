@@ -58,7 +58,7 @@ if (SUPERBUILD)
 
 else (SUPERBUILD)
 
-    project (ipaSim)
+    project (ipaSim LANGUAGES C CXX ASM)
     
     list (APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/scripts")
     include (CommonVariables)

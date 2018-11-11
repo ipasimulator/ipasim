@@ -33,7 +33,8 @@ set (ORIG_SOURCE_FILES
     objc-weak.mm
     Object.mm
     Protocol.mm
-    OldClasses.subproj/List.m
+    OldClasses.subproj/List.m)
+set (ORIG_ASM_FILES
     Messengers.subproj/objc-msg-arm.s
     Messengers.subproj/objc-msg-arm64.s
     Messengers.subproj/objc-msg-i386.s
@@ -49,6 +50,7 @@ set (ORIG_SOURCE_FILES
     a2a3-blocktramps-x86_64.s
     objc-sel-table.s)
 list (TRANSFORM ORIG_SOURCE_FILES PREPEND "${SOURCE_DIR}/deps/objc4/runtime/")
+list (TRANSFORM ORIG_ASM_FILES PREPEND "${SOURCE_DIR}/deps/objc4/runtime/")
 
 # Sources from `/deps/libclosure/`.
 set (LIBCLOSURE_SOURCE_FILES
@@ -65,6 +67,7 @@ set (SOURCE_FILES
 
 add_library (objc SHARED
     ${ORIG_SOURCE_FILES}
+    ${ORIG_ASM_FILES}
     ${LIBCLOSURE_SOURCE_FILES}
     ${SOURCE_FILES})
 
@@ -72,6 +75,9 @@ add_library (objc SHARED
 # TODO: Why?
 set_source_files_properties ("${SOURCE_DIR}/deps/libclosure/runtime.c"
     PROPERTIES COMPILE_OPTIONS -xc++)
+
+set_source_files_properties (${ORIG_ASM_FILES}
+    PROPERTIES COMPILE_OPTIONS "-target;i386-apple-macosx10.13.0")
 
 add_dependencies (objc prep)
 
