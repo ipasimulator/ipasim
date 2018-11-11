@@ -122,3 +122,7 @@ macro (config_target target)
 endmacro (config_target)
 config_target (objc)
 config_target (objc-asm)
+
+# Specify module definition file `libobjc.def`.
+set_property (TARGET objc APPEND PROPERTY
+    LINK_FLAGS "-Wl,/def:${CMAKE_CURRENT_SOURCE_DIR}/libobjc.def")
