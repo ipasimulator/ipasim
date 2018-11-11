@@ -1,0 +1,9 @@
+[ver:1,total:420]
+src/objc/CMakeLists.txt:140,1541930400:140,r
+src/objc/build_one.cmd:80,1541930400:80,r
+docs/objc.md:60,1541930400:60,r
+.git/COMMIT_EDITMSG:60,1541930400:60,r
+docs/llvm.md:20,1541930400:20,r
+src/objc/type_encoding_cases.h:20,1541930400:20,r
+docs/english.md:20,1541930400:20,r
+src/objc/build.cmd:20,1541930400:20,r
