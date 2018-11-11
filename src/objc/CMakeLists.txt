@@ -92,4 +92,4 @@ target_include_directories (objc PUBLIC
     "${SOURCE_DIR}/deps/apple-headers"
     "${SOURCE_DIR}/deps/libclosure")
 
-target_link_libraries (objc pthread)
+target_link_libraries (objc pthread dyld)
