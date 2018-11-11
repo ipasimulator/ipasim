@@ -57,9 +57,16 @@ set (LIBCLOSURE_SOURCE_FILES
 list (TRANSFORM LIBCLOSURE_SOURCE_FILES PREPEND
     "${SOURCE_DIR}/deps/libclosure/")
 
+set (SOURCE_FILES
+    dladdr.mm
+    getsecbyname.mm
+    cxxabi.mm
+    stubs.mm)
+
 add_library (objc SHARED
     ${ORIG_SOURCE_FILES}
-    ${LIBCLOSURE_SOURCE_FILES})
+    ${LIBCLOSURE_SOURCE_FILES}
+    ${SOURCE_FILES})
 
 # `runtime.c` needs to be compiled as C++ since there are errors otherwise.
 # TODO: Why?
