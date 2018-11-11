@@ -80,13 +80,21 @@ set_source_files_properties ("${SOURCE_DIR}/deps/libclosure/runtime.c"
 add_library (objc-asm OBJECT ${ORIG_ASM_FILES})
 set_target_properties (objc-asm PROPERTIES
     COMPILE_OPTIONS "-target;i386-apple-macosx10.13.0")
-add_custom_target (conv-asm-obj
+set (CONV_OBJS "")
+list (LENGTH ORIG_ASM_FILES N_ASM)
+foreach (I RANGE 1 "${N_ASM}")
+    list (APPEND CONV_OBJS "${CMAKE_BINARY_DIR}/conv/${I}.obj")
+endforeach (I)
+add_custom_command (
+    OUTPUT ${CONV_OBJS}
     COMMAND "${CMAKE_COMMAND}"
         "-DSOURCE_DIR=${SOURCE_DIR}"
+        "-DTARGET_DIR=${CMAKE_BINARY_DIR}/conv"
         "-DASM_OBJECTS=$<TARGET_OBJECTS:objc-asm>"
         -P "${CMAKE_SOURCE_DIR}/src/objc/ConvAsmObj.cmake"
     USES_TERMINAL
     DEPENDS "${CMAKE_SOURCE_DIR}/src/objc/ConvAsmObj.cmake" objc-asm)
+target_sources (objc PUBLIC ${CONV_OBJS})
 
 # Common configuration for normal sources (target `objc`) and `.s` files (target
 # `objc-asm`).
@@ -114,10 +122,3 @@ macro (config_target target)
 endmacro (config_target)
 config_target (objc)
 config_target (objc-asm)
-
-# First convert `.s.obj` files from Mach-O to PE/COFF format.
-add_dependencies (objc conv-asm-obj)
-# Then link them into the result. The trick here is that names of the converted
-# files (in PE/COFF format) are the same as of the original ones from target
-# `objc-asm` (which were in Mach-O format).
-target_link_libraries (objc objc-asm)
