@@ -1,0 +1,10 @@
+[ver:1,total:4020]
+src/objc/CMakeLists.txt:3181,1541930400:783,1541934000:1140,1541937600:440,1541941200:818,m
+src/objc/ConvAsmObj.cmake:293,1541937600:70,1541941200:223,m
+.gitmodules:270,1541937600:270,r
+CMakeLists.txt:95,1541941200:95,r
+src/objc/build_one.cmd:77,1541930400:77,r
+scripts/clang-x86-Debug.cmake:44,1541941200:44,r
+deps/objconv/README.md:20,1541930400:20,r
+.git/COMMIT_EDITMSG:20,1541941200:20,r
+.gitattributes:20,1541930400:20,r
