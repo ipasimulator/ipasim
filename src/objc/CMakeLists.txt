@@ -68,7 +68,8 @@ set (SOURCE_FILES
 add_library (objc SHARED
     ${ORIG_SOURCE_FILES}
     ${LIBCLOSURE_SOURCE_FILES}
-    ${SOURCE_FILES})
+    ${SOURCE_FILES}
+    "${DYLD_INITIALIZER}")
 
 # `runtime.c` needs to be compiled as C++ since there are errors otherwise.
 # TODO: Why?

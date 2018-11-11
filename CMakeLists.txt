@@ -104,6 +104,9 @@ else (SUPERBUILD)
         add_compile_options (-fcolor-diagnostics -fansi-escape-codes)
     endif ()
 
+    # Common file used by many libraries.
+    set (DYLD_INITIALIZER "${SOURCE_DIR}/src/dyld/dyld_initializer.cpp")
+
     add_subdirectory (src)
 
 endif (SUPERBUILD)
