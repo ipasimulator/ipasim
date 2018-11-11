@@ -67,7 +67,6 @@ set (SOURCE_FILES
 
 add_library (objc SHARED
     ${ORIG_SOURCE_FILES}
-    ${ORIG_ASM_FILES}
     ${LIBCLOSURE_SOURCE_FILES}
     ${SOURCE_FILES})
 
@@ -76,26 +75,49 @@ add_library (objc SHARED
 set_source_files_properties ("${SOURCE_DIR}/deps/libclosure/runtime.c"
     PROPERTIES COMPILE_OPTIONS -xc++)
 
-set_source_files_properties (${ORIG_ASM_FILES}
-    PROPERTIES COMPILE_OPTIONS "-target;i386-apple-macosx10.13.0")
+# Build `.s` files specially. First compile them to Mach-O object files and then
+# convert those to PE/COFF object files using utility `objconv.exe`.
+add_library (objc-asm OBJECT ${ORIG_ASM_FILES})
+set_target_properties (objc-asm PROPERTIES
+    COMPILE_OPTIONS "-target;i386-apple-macosx10.13.0")
+add_custom_target (conv-asm-obj
+    COMMAND "${CMAKE_COMMAND}"
+        "-DSOURCE_DIR=${SOURCE_DIR}"
+        "-DASM_OBJECTS=$<TARGET_OBJECTS:objc-asm>"
+        -P "${CMAKE_SOURCE_DIR}/src/objc/ConvAsmObj.cmake"
+    USES_TERMINAL
+    DEPENDS "${CMAKE_SOURCE_DIR}/src/objc/ConvAsmObj.cmake" objc-asm)
 
-add_dependencies (objc prep)
+# Common configuration for normal sources (target `objc`) and `.s` files (target
+# `objc-asm`).
+macro (config_target target)
+    add_dependencies ("${target}" prep)
 
-target_compile_definitions (objc
-    PRIVATE
-        BUILDING_OBJC=1
-        NOMINMAX
-    PUBLIC
-        OBJC_PORT
-        __OBJC2__=1)
+    target_compile_definitions ("${target}"
+        PRIVATE
+            BUILDING_OBJC=1
+            NOMINMAX
+        PUBLIC
+            OBJC_PORT
+            __OBJC2__=1)
 
-target_compile_options (objc PRIVATE
-    -fblocks
-    -fobjc-runtime=macosx-10.13.0)
+    target_compile_options ("${target}" PRIVATE
+        -fblocks
+        -fobjc-runtime=macosx-10.13.0)
 
-target_include_directories (objc PUBLIC
-    "${SOURCE_DIR}/src/objc/include"
-    "${SOURCE_DIR}/deps/apple-headers"
-    "${SOURCE_DIR}/deps/libclosure")
+    target_include_directories ("${target}" PUBLIC
+        "${SOURCE_DIR}/src/objc/include"
+        "${SOURCE_DIR}/deps/apple-headers"
+        "${SOURCE_DIR}/deps/libclosure")
 
-target_link_libraries (objc pthread dyld)
+    target_link_libraries ("${target}" pthread dyld)
+endmacro (config_target)
+config_target (objc)
+config_target (objc-asm)
+
+# First convert `.s.obj` files from Mach-O to PE/COFF format.
+add_dependencies (objc conv-asm-obj)
+# Then link them into the result. The trick here is that names of the converted
+# files (in PE/COFF format) are the same as of the original ones from target
+# `objc-asm` (which were in Mach-O format).
+target_link_libraries (objc objc-asm)
