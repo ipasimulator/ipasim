@@ -11,6 +11,14 @@ To re-build, delete the folder `cmake` (`rm -r cmake` from PowerShell).
 To build manually, just execute the script `build.ps1` (`.\scripts\build.ps1` from PowerShell inside the container).
 To run commands in a container repeatedly, first run `docker-compose run --name ipasim ipasimulator powershell` (i.e., without option `--rm`) and then (after exiting the container) run `docker start -ai ipasim`.
 
+> If there is an error starting the container that reads
+>
+> ```
+> Error response from daemon: network ee600d7a7709f2c42090c7cd88666383d191a2f916ae213c52f70e62bf34528d not found
+> ```
+>
+> or something similar, run `docker network connect ipasimulator_default ipasim`.
+
 Why we use Windows and not Linux containers?
 That's because we need some Windows-dependent build tools.
 One is the DIA SDK used by LLVM's PDB parser which is in turn used by our `HeadersAnalyzer`.
