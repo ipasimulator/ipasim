@@ -1,0 +1,12 @@
+[ver:1,total:60]
+.editorconfig:30,1542139200:30,r
+.git/COMMIT_EDITMSG:30,1542139200:30,r
+
+[ver:1,total:858]
+.git/COMMIT_EDITMSG:222,1542121200:30,1542124800:132,1542139200:60,r
+docs/winobjc.md:180,1542121200:180,r
+src/objc/CMakeLists.txt:180,1542121200:60,1542124800:120,r
+docs/issues/5.md:174,1542124800:174,m
+.editorconfig:60,1542139200:60,r
+docs/issues/3.md:30,1542124800:30,r
+deps/CMakeLists.txt:12,1542124800:12,r
