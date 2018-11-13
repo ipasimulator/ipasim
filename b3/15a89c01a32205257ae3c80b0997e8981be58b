@@ -1,3 +1,17 @@
 [ver:1,total:120]
 .git/rebase-merge/git-rebase-todo:60,1542139200:60,r
 .git/COMMIT_EDITMSG:60,1542139200:60,r
+
+[ver:1,total:840]
+deps/CMakeLists.txt:200,1542121200:200,r
+src/HeadersAnalyzer/build_tapi.cmd:180,1541952000:120,1541955600:60,r
+src/HeadersAnalyzer/tblgen_one.cmd:120,1541952000:120,r
+src/objc/CMakeLists.txt:75,1541952000:75,r
+src/CMakeLists.txt:70,1541952000:50,1542121200:20,r
+src/RTObjCInterop/CMakeLists.txt:65,1541952000:65,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:30,1541952000:30,r
+src/RTObjCInterop/link.cmd:30,1541952000:30,r
+.editorconfig:20,1542121200:20,m
+src/objc/link.cmd:20,1541952000:20,r
+src/HeadersAnalyzer/iOSHeaders.mm:15,1541952000:15,r
+src/RTObjCInterop/build.cmd:15,1541952000:15,r
