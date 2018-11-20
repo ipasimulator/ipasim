@@ -4,11 +4,9 @@ include (CommonVariables)
 file (MAKE_DIRECTORY "${WINOBJC_CMAKE_DIR}")
 execute_process (
     COMMAND "${CMAKE_COMMAND}" -G Ninja
-        -DSUPERBUILD=Off
-        -DBUILD_WINOBJC=On
         "-DSOURCE_DIR=${SOURCE_DIR}"
         "-DBINARY_DIR=${BINARY_DIR}"
         -DCMAKE_EXPORT_COMPILE_COMMANDS=On
         -DCMAKE_BUILD_TYPE=Debug
-        "${SOURCE_DIR}"
+        "${SOURCE_DIR}/deps/WinObjC"
     WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}")

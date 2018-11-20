@@ -1,7 +1,6 @@
 cmake_minimum_required (VERSION 3.11)
 
 option (SUPERBUILD "Configure Clang and then the project itself." ON)
-option (BUILD_WINOBJC "Build WinObjC." OFF)
 
 if (SUPERBUILD)
 
@@ -54,31 +53,12 @@ if (SUPERBUILD)
         USES_TERMINAL
         DEPENDS config-clang-x86-Debug)
 
-    add_custom_target (winobjc-x86-Debug
-        COMMENT "WinObjC"
-        COMMAND ninja all
-        WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
-        USES_TERMINAL
-        DEPENDS config-winobjc-x86-Debug)
-
     add_custom_target (prep-ipaSim-x86-Debug
         COMMENT "Prepare ipaSim"
         DEPENDS config-ipaSim-x86-Debug config-winobjc-x86-Debug
             clang-x86-Release)
 
-elseif (BUILD_WINOBJC)
-
-    project (winobjc)
-
-    # TODO: Share this with the following `if` branch.
-    list (APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/scripts")
-    include (CommonVariables)
-
-    # TODO: Add and depend on target `prep`.
-
-    add_subdirectory (deps)
-
-else (BUILD_WINOBJC)
+else (SUPERBUILD)
 
     project (ipaSim LANGUAGES C CXX ASM)
 
