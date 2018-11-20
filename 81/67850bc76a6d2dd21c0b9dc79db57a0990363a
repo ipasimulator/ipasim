@@ -1,0 +1,10 @@
+[ver:1,total:2160]
+CMakeLists.txt:1170,1542139200:30,1542718800:900,1542722400:240,m
+deps/CMakeLists.txt:390,1542139200:150,1542718800:240,m
+scripts/CommonVariables.cmake:268,1542718800:88,1542722400:180,m
+scripts/winobjc-x86-Debug.cmake:150,1542718800:150,m
+docs/english.md:60,1542718800:60,r
+.git/COMMIT_EDITMSG:60,1542722400:60,r
+scripts/clang-x86-Debug.cmake:25,1542718800:25,m
+scripts/ipaSim-x86-Debug.cmake:23,1542718800:23,m
+scripts/clang-x86-Release.cmake:14,1542718800:14,r
