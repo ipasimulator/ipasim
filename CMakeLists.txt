@@ -1,6 +1,7 @@
 cmake_minimum_required (VERSION 3.11)
 
 option (SUPERBUILD "Configure Clang and then the project itself." ON)
+option (BUILD_WINOBJC "Build WinObjC." OFF)
 
 if (SUPERBUILD)
 
@@ -28,6 +29,7 @@ if (SUPERBUILD)
     add_superbuild_target (clang-x86-Release "${CLANG_CMAKE_DIR}")
     add_superbuild_target (clang-x86-Debug "${DEBUG_CLANG_CMAKE_DIR}")
     add_superbuild_target (ipaSim-x86-Debug "${IPASIM_CMAKE_DIR}")
+    add_superbuild_target (winobjc-x86-Debug "${WINOBJC_CMAKE_DIR}")
 
     add_custom_target (tblgens-x86-Release
         COMMENT "Tablegens"
@@ -52,17 +54,37 @@ if (SUPERBUILD)
         USES_TERMINAL
         DEPENDS config-clang-x86-Debug)
 
+    add_custom_target (winobjc-x86-Debug
+        COMMENT "WinObjC"
+        COMMAND ninja all
+        WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
+        USES_TERMINAL
+        DEPENDS config-winobjc-x86-Debug)
+
     add_custom_target (prep-ipaSim-x86-Debug
         COMMENT "Prepare ipaSim"
-        DEPENDS config-ipaSim-x86-Debug clang-x86-Release)
+        DEPENDS config-ipaSim-x86-Debug config-winobjc-x86-Debug
+            clang-x86-Release)
 
-else (SUPERBUILD)
+elseif (BUILD_WINOBJC)
 
-    project (ipaSim LANGUAGES C CXX ASM)
-    
+    project (winobjc)
+
+    # TODO: Share this with the following `if` branch.
     list (APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/scripts")
     include (CommonVariables)
-    
+
+    # TODO: Add and depend on target `prep`.
+
+    add_subdirectory (deps)
+
+else (BUILD_WINOBJC)
+
+    project (ipaSim LANGUAGES C CXX ASM)
+
+    list (APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/scripts")
+    include (CommonVariables)
+
     # Now, the compiler was tested, so we can change it to our
     # possibly-not-yet-existing patched Clang. See #2.
     set (ORIG_CLANG_EXE "${CLANG_EXE}")

@@ -3,7 +3,7 @@ include (CommonVariables)
 
 file (MAKE_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}")
 execute_process (
-    COMMAND cmake -G Ninja
+    COMMAND "${CMAKE_COMMAND}" -G Ninja
         -DLLVM_TARGETS_TO_BUILD=X86;ARM
         "-DLLVM_EXTERNAL_CLANG_SOURCE_DIR=${SOURCE_DIR}/deps/clang"
         "-DLLVM_EXTERNAL_LLD_SOURCE_DIR=${SOURCE_DIR}/deps/lld"

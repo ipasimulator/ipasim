@@ -3,7 +3,7 @@ include (CommonVariables)
 
 file (MAKE_DIRECTORY "${IPASIM_CMAKE_DIR}")
 execute_process (
-    COMMAND cmake -G Ninja
+    COMMAND "${CMAKE_COMMAND}" -G Ninja
         -DSUPERBUILD=Off
         "-DCMAKE_C_COMPILER=${CLANG_EXE}"
         -DCMAKE_C_COMPILER_ID=Clang
