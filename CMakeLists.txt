@@ -110,5 +110,6 @@ else (SUPERBUILD)
     set (DYLD_INITIALIZER "${SOURCE_DIR}/src/dyld/dyld_initializer.cpp")
 
     add_subdirectory (src)
+    add_subdirectory (deps/WinObjC/Frameworks)
 
 endif (SUPERBUILD)
