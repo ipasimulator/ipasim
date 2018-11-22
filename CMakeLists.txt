@@ -1,5 +1,7 @@
 cmake_minimum_required (VERSION 3.11)
 
+# TODO: When calling ninja, hide message "no work to do".
+
 option (SUPERBUILD "Configure Clang and then the project itself." ON)
 
 if (SUPERBUILD)
@@ -60,6 +62,9 @@ if (SUPERBUILD)
 
 else (SUPERBUILD)
 
+    option (USE_ORIG_CLANG "Use the original instead of our patched Clang. For \
+testing purposes only." OFF)
+
     project (ipaSim LANGUAGES C CXX ASM)
 
     list (APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/scripts")
@@ -69,8 +74,13 @@ else (SUPERBUILD)
     # possibly-not-yet-existing patched Clang. See #2.
     set (ORIG_CLANG_EXE "${CLANG_EXE}")
     set (ORIG_LLD_LINK_EXE "${LLD_LINK_EXE}")
-    set (CLANG_EXE "${CLANG_CMAKE_DIR}/bin/clang.exe")
-    set (LLD_LINK_EXE "${CLANG_CMAKE_DIR}/bin/lld-link.exe")
+    if (USE_ORIG_CLANG)
+        set (CLANG_EXE "${ORIG_CLANG_EXE}")
+        set (LLD_LINK_EXE "${ORIG_LLD_LINK_EXE}")
+    else (USE_ORIG_CLANG)
+        set (CLANG_EXE "${CLANG_CMAKE_DIR}/bin/clang.exe")
+        set (LLD_LINK_EXE "${CLANG_CMAKE_DIR}/bin/lld-link.exe")
+    endif (USE_ORIG_CLANG)
     set (CMAKE_C_COMPILER "${CLANG_EXE}")
     set (CMAKE_CXX_COMPILER "${CLANG_EXE}")
     # Note that this is probably not actually used, but we keep it here for
@@ -99,6 +109,18 @@ else (SUPERBUILD)
         COMMAND ninja prep-ipaSim-x86-Debug # TODO: Don't hardcode this.
         WORKING_DIRECTORY "${BINARY_DIR}"
         USES_TERMINAL)
+
+    add_custom_target (config-winobjc-x86-Debug
+        COMMENT "Configure WinObjC"
+        COMMAND ninja config-winobjc-x86-Debug
+        WORKING_DIRECTORY "${BINARY_DIR}"
+        USES_TERMINAL)
+    add_custom_target (winobjc-Logging
+        COMMENT "WinObjC: Logging"
+        COMMAND ninja Logging
+        WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
+        USES_TERMINAL
+        DEPENDS config-winobjc-x86-Debug)
 
     # See https://medium.com/@alasher/colored-c-compiler-output-with-ninja-clang-gcc-10bfe7f2b949.
     option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output." ON)
