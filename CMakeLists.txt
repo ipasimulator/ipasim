@@ -121,6 +121,12 @@ testing purposes only." OFF)
         WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
         USES_TERMINAL
         DEPENDS config-winobjc-x86-Debug)
+    add_custom_target (winobjc-Starboard
+        COMMENT "WinObjC: Starboard (CL)"
+        COMMAND ninja Starboard
+        WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
+        USES_TERMINAL
+        DEPENDS config-winobjc-x86-Debug)
 
     # See https://medium.com/@alasher/colored-c-compiler-output-with-ninja-clang-gcc-10bfe7f2b949.
     option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output." ON)
