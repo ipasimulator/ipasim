@@ -131,6 +131,8 @@ testing purposes only." OFF)
     # Common file used by many libraries.
     set (DYLD_INITIALIZER "${SOURCE_DIR}/src/dyld/dyld_initializer.cpp")
 
+    set (CL_COMPILER OFF)
+
     add_subdirectory (src)
     add_subdirectory (deps/WinObjC/Frameworks)
 
