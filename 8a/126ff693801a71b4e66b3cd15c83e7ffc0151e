@@ -1,0 +1,7 @@
+[ver:1,total:2700]
+log.txt:1230,1543269600:180,1543273200:1050,d
+CMakeLists.txt:1170,1542981600:180,1543161600:180,1543269600:480,1543273200:330,m
+src/HeadersAnalyzer/ClangHelper.cpp:150,1543165200:150,r
+scripts/winobjc-x86-Debug.cmake:60,1543269600:60,r
+.git/COMMIT_EDITMSG:60,1543273200:60,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:30,1543165200:30,r
