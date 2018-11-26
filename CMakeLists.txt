@@ -115,6 +115,12 @@ testing purposes only." OFF)
         COMMAND ninja config-winobjc-x86-Debug
         WORKING_DIRECTORY "${BINARY_DIR}"
         USES_TERMINAL)
+    add_custom_target (winobjc-WOCStdLib
+        COMMENT "WinObjC: WOCStdLib"
+        COMMAND ninja WOCStdLib
+        WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
+        USES_TERMINAL
+        DEPENDS config-winobjc-x86-Debug)
     add_custom_target (winobjc-Logging
         COMMENT "WinObjC: Logging"
         COMMAND ninja Logging
