@@ -115,19 +115,23 @@ testing purposes only." OFF)
         COMMAND ninja config-winobjc-x86-Debug
         WORKING_DIRECTORY "${BINARY_DIR}"
         USES_TERMINAL)
-    add_custom_target (winobjc-WOCStdLib
+    # TODO: Create these somehow automatically.
+    add_custom_command (
+        OUTPUT "${WINOBJC_CMAKE_DIR}/tools/WOCStdLib/WOCStdLib.lib"
         COMMENT "WinObjC: WOCStdLib"
         COMMAND ninja WOCStdLib
         WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
         USES_TERMINAL
         DEPENDS config-winobjc-x86-Debug)
-    add_custom_target (winobjc-Logging
+    add_custom_command (
+        OUTPUT "${WINOBJC_CMAKE_DIR}/tools/Logging/Logging.lib"
         COMMENT "WinObjC: Logging"
         COMMAND ninja Logging
         WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
         USES_TERMINAL
         DEPENDS config-winobjc-x86-Debug)
-    add_custom_target (winobjc-Starboard
+    add_custom_command (
+        OUTPUT "${WINOBJC_CMAKE_DIR}/Frameworks/Starboard/Starboard.lib"
         COMMENT "WinObjC: Starboard (CL)"
         COMMAND ninja Starboard
         WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
