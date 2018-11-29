@@ -109,6 +109,7 @@ testing purposes only." OFF)
     update_commands (CXX)
 
     add_custom_target (prep
+        BYPRODUCTS "${BUILT_CLANG_EXE}" "${BUILT_LLD_LINK_EXE}"
         COMMENT "Superbuild"
         COMMAND ninja prep-ipaSim-x86-Debug # TODO: Don't hardcode this.
         WORKING_DIRECTORY "${BINARY_DIR}"
