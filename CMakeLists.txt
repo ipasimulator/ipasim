@@ -97,9 +97,14 @@ testing purposes only." OFF)
     # instead of `CMAKE_CXX_COMPILER` for linking.
     macro (update_commands lang)
         set ("CMAKE_${lang}_LINK_EXECUTABLE"
-            "<CMAKE_CXX_COMPILER> -fuse-ld=lld-link <FLAGS> <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> -Wl,/implib:<TARGET_IMPLIB> <LINK_LIBRARIES>")
+            "<CMAKE_CXX_COMPILER> -fuse-ld=lld-link <FLAGS> \
+<CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> \
+-Wl,/implib:<TARGET_IMPLIB> <LINK_LIBRARIES>")
         set ("CMAKE_${lang}_CREATE_SHARED_LIBRARY"
-            "<CMAKE_CXX_COMPILER> -fuse-ld=lld-link <CMAKE_SHARED_LIBRARY_CXX_FLAGS> <LANGUAGE_COMPILE_FLAGS> <LINK_FLAGS> <CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS> <SONAME_FLAG><TARGET_SONAME> -o <TARGET> -Wl,/implib:<TARGET_IMPLIB> <OBJECTS> <LINK_LIBRARIES>")
+            "<CMAKE_CXX_COMPILER> -fuse-ld=lld-link \
+<CMAKE_SHARED_LIBRARY_CXX_FLAGS> <LANGUAGE_COMPILE_FLAGS> <LINK_FLAGS> \
+<CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS> <SONAME_FLAG><TARGET_SONAME> \
+-o <TARGET> -Wl,/implib:<TARGET_IMPLIB> <OBJECTS> <LINK_LIBRARIES>")
     endmacro ()
     update_commands (C)
     update_commands (CXX)
@@ -129,12 +134,14 @@ testing purposes only." OFF)
             IMPORTED_LOCATION "${WINOBJC_CMAKE_DIR}/bin/${name}.dll"
             IMPORTED_IMPLIB "${WINOBJC_CMAKE_DIR}/bin/${name}.lib")
     endfunction (add_woc_lib)
-    # TODO: Create these somehow automatically.
+    # TODO: Create these somehow automatically. See
+    # https://cmake.org/pipermail/cmake/2010-September/039388.html
     add_woc_lib (WOCStdLib)
     add_woc_lib (Logging)
     add_woc_lib (Starboard)
 
-    # See https://medium.com/@alasher/colored-c-compiler-output-with-ninja-clang-gcc-10bfe7f2b949.
+    # See
+    # https://medium.com/@alasher/colored-c-compiler-output-with-ninja-clang-gcc-10bfe7f2b949.
     option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output." ON)
     if (FORCE_COLORED_OUTPUT)
         add_compile_options (-fcolor-diagnostics -fansi-escape-codes)
