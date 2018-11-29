@@ -116,13 +116,19 @@ testing purposes only." OFF)
         WORKING_DIRECTORY "${BINARY_DIR}"
         USES_TERMINAL)
     # TODO: Create these somehow automatically.
-    add_custom_target (WOCStdLib
-        BYPRODUCTS "${WINOBJC_CMAKE_DIR}/bin/WOCStdLib.lib"
+    add_custom_target (WOCStdLib-build
+        BYPRODUCTS "${WINOBJC_CMAKE_DIR}/bin/WOCStdLib.dll"
+            "${WINOBJC_CMAKE_DIR}/bin/WOCStdLib.lib"
         COMMENT "WinObjC: WOCStdLib"
         COMMAND ninja WOCStdLib
         WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
         USES_TERMINAL
         DEPENDS config-winobjc-x86-Debug)
+    add_library (WOCStdLib SHARED IMPORTED)
+    set_target_properties (WOCStdLib PROPERTIES
+        IMPORTED_LOCATION "${WINOBJC_CMAKE_DIR}/bin/WOCStdLib.dll"
+        IMPORTED_IMPLIB "${WINOBJC_CMAKE_DIR}/bin/WOCStdLib.lib")
+    add_dependencies (WOCStdLib WOCStdLib-build)
     # add_custom_command (
     #     OUTPUT "${WINOBJC_CMAKE_DIR}/bin/Logging.lib"
     #     COMMENT "WinObjC: Logging"
