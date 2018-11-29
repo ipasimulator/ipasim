@@ -117,21 +117,21 @@ testing purposes only." OFF)
         USES_TERMINAL)
     # TODO: Create these somehow automatically.
     add_custom_command (
-        OUTPUT "${WINOBJC_CMAKE_DIR}/tools/WOCStdLib/WOCStdLib.lib"
+        OUTPUT "${WINOBJC_CMAKE_DIR}/bin/WOCStdLib.lib"
         COMMENT "WinObjC: WOCStdLib"
         COMMAND ninja WOCStdLib
         WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
         USES_TERMINAL
         DEPENDS config-winobjc-x86-Debug)
     add_custom_command (
-        OUTPUT "${WINOBJC_CMAKE_DIR}/tools/Logging/Logging.lib"
+        OUTPUT "${WINOBJC_CMAKE_DIR}/bin/Logging.lib"
         COMMENT "WinObjC: Logging"
         COMMAND ninja Logging
         WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
         USES_TERMINAL
         DEPENDS config-winobjc-x86-Debug)
     add_custom_command (
-        OUTPUT "${WINOBJC_CMAKE_DIR}/Frameworks/Starboard/Starboard.lib"
+        OUTPUT "${WINOBJC_CMAKE_DIR}/bin/Starboard.lib"
         COMMENT "WinObjC: Starboard (CL)"
         COMMAND ninja Starboard
         WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
