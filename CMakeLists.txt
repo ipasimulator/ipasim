@@ -116,27 +116,27 @@ testing purposes only." OFF)
         WORKING_DIRECTORY "${BINARY_DIR}"
         USES_TERMINAL)
     # TODO: Create these somehow automatically.
-    add_custom_command (
-        OUTPUT "${WINOBJC_CMAKE_DIR}/bin/WOCStdLib.lib"
+    add_custom_target (WOCStdLib
+        BYPRODUCTS "${WINOBJC_CMAKE_DIR}/bin/WOCStdLib.lib"
         COMMENT "WinObjC: WOCStdLib"
         COMMAND ninja WOCStdLib
         WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
         USES_TERMINAL
         DEPENDS config-winobjc-x86-Debug)
-    add_custom_command (
-        OUTPUT "${WINOBJC_CMAKE_DIR}/bin/Logging.lib"
-        COMMENT "WinObjC: Logging"
-        COMMAND ninja Logging
-        WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
-        USES_TERMINAL
-        DEPENDS config-winobjc-x86-Debug)
-    add_custom_command (
-        OUTPUT "${WINOBJC_CMAKE_DIR}/bin/Starboard.lib"
-        COMMENT "WinObjC: Starboard (CL)"
-        COMMAND ninja Starboard
-        WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
-        USES_TERMINAL
-        DEPENDS config-winobjc-x86-Debug)
+    # add_custom_command (
+    #     OUTPUT "${WINOBJC_CMAKE_DIR}/bin/Logging.lib"
+    #     COMMENT "WinObjC: Logging"
+    #     COMMAND ninja Logging
+    #     WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
+    #     USES_TERMINAL
+    #     DEPENDS config-winobjc-x86-Debug)
+    # add_custom_command (
+    #     OUTPUT "${WINOBJC_CMAKE_DIR}/bin/Starboard.lib"
+    #     COMMENT "WinObjC: Starboard (CL)"
+    #     COMMAND ninja Starboard
+    #     WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
+    #     USES_TERMINAL
+    #     DEPENDS config-winobjc-x86-Debug)
 
     # See https://medium.com/@alasher/colored-c-compiler-output-with-ninja-clang-gcc-10bfe7f2b949.
     option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output." ON)
