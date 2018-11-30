@@ -100,7 +100,7 @@ target_sources (objc PUBLIC ${CONV_OBJS})
 # Common configuration for normal sources (target `objc`) and `.s` files (target
 # `objc-asm`).
 macro (config_target target)
-    add_dependencies ("${target}" prep)
+    add_prep_dep ("${target}")
 
     target_compile_definitions ("${target}"
         PRIVATE

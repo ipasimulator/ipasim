@@ -7,4 +7,4 @@ set (SOURCE_FILES
 
 add_library (RTObjCInterop SHARED ${SOURCE_FILES})
 
-add_dependencies (RTObjCInterop prep)
+add_prep_dep (RTObjCInterop)

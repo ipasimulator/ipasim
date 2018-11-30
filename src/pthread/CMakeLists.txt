@@ -26,6 +26,8 @@ list (TRANSFORM ORIG_SOURCE_FILES PREPEND "${SOURCE_DIR}/deps/pthreads.2/")
 
 add_library (pthread SHARED ${ORIG_SOURCE_FILES} stubs.c)
 
+add_prep_dep (pthread)
+
 target_compile_definitions (pthread
     PRIVATE
         PTW32_BUILD
@@ -37,5 +39,3 @@ target_include_directories (pthread
     PUBLIC
         "${SOURCE_DIR}/deps/pthreads.2/"
         "${SOURCE_DIR}/src/pthread/")
-
-add_dependencies (pthread prep)

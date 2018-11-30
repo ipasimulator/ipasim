@@ -1,5 +1,5 @@
 add_executable (link main.cpp)
 
-target_link_libraries (link shlwapi)
+add_prep_dep (link)
 
-add_dependencies (link prep)
+target_link_libraries (link shlwapi)
