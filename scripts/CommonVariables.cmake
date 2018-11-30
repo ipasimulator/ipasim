@@ -16,6 +16,21 @@ set (WINOBJC_CMAKE_DIR "${BINARY_DIR}/winobjc-x86-Debug")
 set (CLANG_EXE "${LLVM_BIN_DIR}/clang.exe")
 set (LLD_LINK_EXE "${LLVM_BIN_DIR}/lld-link.exe")
 
+# These are constants and shouldn't be changed (unlike the previous two).
+set (ORIG_CLANG_EXE "${CLANG_EXE}")
+set (ORIG_LLD_LINK_EXE "${LLD_LINK_EXE}")
+set (BUILT_CLANG_EXE "${CLANG_CMAKE_DIR}/bin/clang.exe")
+set (BUILT_LLD_LINK_EXE "${CLANG_CMAKE_DIR}/bin/lld-link.exe")
+
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+function (add_prep_target cmd)
+    add_custom_target (prep
+        BYPRODUCTS "${BUILT_CLANG_EXE}" "${BUILT_LLD_LINK_EXE}"
+        COMMENT "Superbuild"
+        COMMAND ninja ${cmd}
+        WORKING_DIRECTORY "${BINARY_DIR}"
+        USES_TERMINAL)
+endfunction (add_prep_target)

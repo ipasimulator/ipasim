@@ -72,10 +72,6 @@ testing purposes only." OFF)
 
     # Now, the compiler was tested, so we can change it to our
     # possibly-not-yet-existing patched Clang. See #2.
-    set (ORIG_CLANG_EXE "${CLANG_EXE}")
-    set (ORIG_LLD_LINK_EXE "${LLD_LINK_EXE}")
-    set (BUILT_CLANG_EXE "${CLANG_CMAKE_DIR}/bin/clang.exe")
-    set (BUILT_LLD_LINK_EXE "${CLANG_CMAKE_DIR}/bin/lld-link.exe")
     if (NOT USE_ORIG_CLANG)
         set (CLANG_EXE "${BUILT_CLANG_EXE}")
         set (LLD_LINK_EXE "${BUILT_LLD_LINK_EXE}")
@@ -108,12 +104,7 @@ testing purposes only." OFF)
     update_commands (C)
     update_commands (CXX)
 
-    add_custom_target (prep
-        BYPRODUCTS "${BUILT_CLANG_EXE}" "${BUILT_LLD_LINK_EXE}"
-        COMMENT "Superbuild"
-        COMMAND ninja prep-ipaSim-x86-Debug # TODO: Don't hardcode this.
-        WORKING_DIRECTORY "${BINARY_DIR}"
-        USES_TERMINAL)
+    add_prep_target (prep-ipaSim-x86-Debug) # TODO: Don't hardcode this.
 
     add_custom_target (config-winobjc-x86-Debug
         COMMENT "Configure WinObjC"
