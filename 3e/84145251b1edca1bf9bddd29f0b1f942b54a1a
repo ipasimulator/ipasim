@@ -1,3 +1,8 @@
 [ver:1,total:60]
 scripts/CommonVariables.cmake:30,1543590000:30,m
 .git/COMMIT_EDITMSG:30,1543590000:30,r
+
+[ver:1,total:600]
+scripts/CommonVariables.cmake:300,1543586400:90,1543590000:210,m
+CMakeLists.txt:260,1543586400:150,1543590000:110,m
+.git/COMMIT_EDITMSG:40,1543590000:40,r
