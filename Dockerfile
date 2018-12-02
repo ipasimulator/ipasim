@@ -37,6 +37,12 @@ RUN powershell -c "C:/temp/vs_buildtools.exe --quiet --wait --norestart --nocach
 # Install Python. It's needed to build LLVM and Clang.
 RUN powershell -c "choco install python --version 3.7.0 -y"
 
+# Install NuGet.
+RUN powershell -c "choco install nuget.commandline --version 4.9.1 -y"
+
+# Install C++/WinRT.
+RUN powershell -c "nuget install cppwinrt -Version 2017.10.13.1 -OutputDirectory C:/packages"
+
 # Start developer command prompt.
 ENTRYPOINT C:/BuildTools/Common7/Tools/VsDevCmd.bat -arch=x86 -host_arch=x86 &&
 
