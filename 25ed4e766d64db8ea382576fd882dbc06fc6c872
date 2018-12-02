@@ -1,0 +1,5 @@
+[ver:1,total:1560]
+Dockerfile:720,1543752000:720,m
+scripts/winobjc-x86-Debug.cmake:360,1543752000:360,r
+docs/english.md:240,1543752000:240,r
+CMakeLists.txt:240,1543748400:180,1543752000:60,r
