@@ -64,4 +64,10 @@ set (WINOBJC_INCLUDE_DIRS
     # These just rose from the need, but weren't even in `.tlog` files like the
     # ones above. That's probably because they were copied to somewhere else
     # (like NuGet package) and included from there.
-    "${SOURCE_DIR}/deps/WinObjC/tools/include")
+    "${SOURCE_DIR}/deps/WinObjC/tools/include"
+    "${SOURCE_DIR}/deps/WinObjC/tools/include/WOCStdLib")
+
+# Common Clang options for WinObjC projects.
+set (WINOBJC_CLANG_OPTIONS
+    # These come from `Islandwood.props`.
+    -fblocks)
