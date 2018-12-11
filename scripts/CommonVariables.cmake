@@ -81,3 +81,6 @@ set (WINOBJC_DEFS
     # TODO: Don't define this, rather use older SDK (e.g., the one we used when
     # we successfully built WinObjC using MSBuild, i.e., 10.0.14393.0).
     DISABLE_WINRT_DEPRECATION)
+
+# Shortcuts for CL compiler options.
+set (COMPILE_AS_WINRT /ZW) # MSBuild's `<CompileAsWinRT>true</CompileAsWinRT>`
