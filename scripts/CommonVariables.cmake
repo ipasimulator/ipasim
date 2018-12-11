@@ -47,3 +47,21 @@ function (add_prep_dep target)
     set_source_files_properties (${srcs}
         PROPERTIES OBJECT_DEPENDS "${BUILT_CLANG_EXE};${BUILT_LLD_LINK_EXE}")
 endfunction (add_prep_dep)
+
+# Common include directories for WinObjC projects.
+# TODO: Track them to source MSBuild files.
+# TODO: Use them in every WinObjC project.
+# TODO: Aren't some of those headers copied from somewhere else? (This should
+# get revealed on a clean build, of course.)
+set (WINOBJC_INCLUDE_DIRS
+    # These come from `.tlog` files (MSBuild logs).
+    "${SOURCE_DIR}/deps/WinObjC/include"
+    "${SOURCE_DIR}/deps/WinObjC/include/xplat"
+    "${SOURCE_DIR}/deps/WinObjC/deps/prebuilt/include"
+    "${SOURCE_DIR}/deps/WinObjC/tools/deps/prebuilt/include"
+    "${SOURCE_DIR}/deps/WinObjC/deps/prebuilt/include/icu"
+    "${SOURCE_DIR}/deps/WinObjC/include/Platform/Universal Windows"
+    # These just rose from the need, but weren't even in `.tlog` files like the
+    # ones above. That's probably because they were copied to somewhere else
+    # (like NuGet package) and included from there.
+    "${SOURCE_DIR}/deps/WinObjC/tools/include")
