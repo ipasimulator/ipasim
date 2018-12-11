@@ -70,4 +70,14 @@ set (WINOBJC_INCLUDE_DIRS
 # Common Clang options for WinObjC projects.
 set (WINOBJC_CLANG_OPTIONS
     # These come from `Islandwood.props`.
-    -fblocks)
+    -fblocks
+    # Probably from `Islandwood.targets`.
+    -includeWOCStdlib.h)
+
+# Common compiler definitions for WinObjC projects.
+set (WINOBJC_DEFS
+    # Without this, there is an error in header `Windows.UI.Notifications.h`
+    # (and others) where macro `DEPRECATEDENUMERATOR` is used.
+    # TODO: Don't define this, rather use older SDK (e.g., the one we used when
+    # we successfully built WinObjC using MSBuild, i.e., 10.0.14393.0).
+    DISABLE_WINRT_DEPRECATION)
