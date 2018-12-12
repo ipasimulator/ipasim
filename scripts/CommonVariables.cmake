@@ -65,12 +65,14 @@ set (WINOBJC_INCLUDE_DIRS
     # ones above. That's probably because they were copied to somewhere else
     # (like NuGet package) and included from there.
     "${SOURCE_DIR}/deps/WinObjC/tools/include"
+    "${SOURCE_DIR}/deps/WinObjC/tools/include/xplat"
     "${SOURCE_DIR}/deps/WinObjC/tools/include/WOCStdLib")
 
 # Common Clang options for WinObjC projects.
 set (WINOBJC_CLANG_OPTIONS
     # These come from `Islandwood.props`.
     -fblocks
+    -fobjc-runtime=ios-11
     # Probably from `Islandwood.targets`.
     -includeWOCStdlib.h)
 
