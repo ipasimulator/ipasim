@@ -76,6 +76,8 @@ set (WINOBJC_CLANG_OPTIONS
 
 # Common compiler definitions for WinObjC projects.
 set (WINOBJC_DEFS
+    # From `Islandwood.props`.
+    WINAPI_FAMILY=WINAPI_FAMILY_APP
     # Without this, there is an error in header `Windows.UI.Notifications.h`
     # (and others) where macro `DEPRECATEDENUMERATOR` is used.
     # TODO: Don't define this, rather use older SDK (e.g., the one we used when
@@ -84,3 +86,8 @@ set (WINOBJC_DEFS
 
 # Shortcuts for CL compiler options.
 set (COMPILE_AS_WINRT /ZW) # MSBuild's `<CompileAsWinRT>true</CompileAsWinRT>`
+
+# Common linking options for WinObjC projects.
+set (WINOBJC_LIBS
+    # From `Islandwood.props`
+    WindowsApp.lib) # Because it is specified as Windows Store app, probably.
