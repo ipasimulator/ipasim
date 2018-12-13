@@ -132,9 +132,7 @@ testing purposes only." OFF)
     add_woc_lib (Starboard)
     # See `tools/Logging/CMakeLists.txt`.
     target_include_directories (woc-Logging INTERFACE
-        "${SOURCE_DIR}/deps/WinObjC/tools/Logging/include"
-        "${SOURCE_DIR}/deps/WinObjC/tools/Logging/include/wil"
-        "${SOURCE_DIR}/deps/WinObjC/tools/include/WOCStdLib")
+        "${SOURCE_DIR}/deps/WinObjC/tools/Logging/include")
 
     # See
     # https://medium.com/@alasher/colored-c-compiler-output-with-ninja-clang-gcc-10bfe7f2b949.
