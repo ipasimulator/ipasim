@@ -74,7 +74,9 @@ set (WINOBJC_CLANG_OPTIONS
     -fblocks
     -fobjc-runtime=ios-11
     # Probably from `Islandwood.targets`.
-    -includeWOCStdlib.h)
+    -includeWOCStdlib.h
+    # From `sdk-build.props`.
+    -Wno-nullability-completeness)
 
 # Common compiler definitions for WinObjC projects.
 set (WINOBJC_DEFS
