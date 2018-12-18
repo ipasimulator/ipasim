@@ -80,6 +80,7 @@ set (WINOBJC_CLANG_OPTIONS
 
 # Common compiler definitions for WinObjC projects.
 set (WINOBJC_DEFS
+    OBJC_PORT
     # From `Islandwood.props`.
     WINAPI_FAMILY=WINAPI_FAMILY_APP
     # Without this, there is an error in header `Windows.UI.Notifications.h`
