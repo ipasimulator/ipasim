@@ -95,35 +95,33 @@ add_custom_command (
         -P "${CMAKE_SOURCE_DIR}/src/objc/ConvAsmObj.cmake"
     USES_TERMINAL
     DEPENDS "${CMAKE_SOURCE_DIR}/src/objc/ConvAsmObj.cmake" objc-asm)
-target_sources (objc PUBLIC ${CONV_OBJS})
+target_sources (objc PRIVATE ${CONV_OBJS})
 
 # Common configuration for normal sources (target `objc`) and `.s` files (target
 # `objc-asm`).
 macro (config_target target)
     add_prep_dep ("${target}")
 
-    target_compile_definitions ("${target}"
-        PRIVATE
-            BUILDING_OBJC=1
-            NOMINMAX
-        PUBLIC
-            OBJC_PORT
-            __OBJC2__=1)
+    target_compile_definitions ("${target}" PRIVATE
+        BUILDING_OBJC=1
+        NOMINMAX
+        OBJC_PORT
+        __OBJC2__=1)
 
     target_compile_options ("${target}" PRIVATE
         -fblocks
         -fobjc-runtime=macosx-10.13.0)
 
-    target_include_directories ("${target}" PUBLIC
+    target_include_directories ("${target}" PRIVATE
         "${SOURCE_DIR}/src/objc/include"
         "${SOURCE_DIR}/deps/apple-headers"
         "${SOURCE_DIR}/deps/libclosure")
 
-    target_link_libraries ("${target}" pthread dyld)
+    target_link_libraries ("${target}" PRIVATE pthread dyld)
 endmacro (config_target)
 config_target (objc)
 config_target (objc-asm)
 
 # Specify module definition file `libobjc.def`.
-set_property (TARGET objc APPEND PROPERTY
-    LINK_FLAGS "-Wl,/def:${CMAKE_CURRENT_SOURCE_DIR}/libobjc.def")
+target_link_libraries (objc PRIVATE
+    "-Wl,/def:${CMAKE_CURRENT_SOURCE_DIR}/libobjc.def")
