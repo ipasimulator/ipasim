@@ -134,6 +134,16 @@ testing purposes only." OFF)
     target_include_directories (woc-Logging INTERFACE
         "${SOURCE_DIR}/deps/WinObjC/tools/Logging/include")
 
+    # Library `libdispatch.dll`.
+    # TODO: Don't hardcode the architecture, maybe even build it from sources
+    # (they are in `deps/WinObjC/deps/3rdparty/libdispatch`).
+    add_library (dispatch SHARED IMPORTED)
+    set_target_properties (dispatch PROPERTIES
+        IMPORTED_LOCATION "${SOURCE_DIR}/deps/WinObjC/tools/deps/prebuilt/\
+Universal Windows/x86/libdispatch.dll"
+        IMPORTED_IMPLIB "${SOURCE_DIR}/deps/WinObjC/tools/deps/prebuilt/\
+Universal Windows/x86/libdispatch.lib")
+
     # See
     # https://medium.com/@alasher/colored-c-compiler-output-with-ninja-clang-gcc-10bfe7f2b949.
     option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output." ON)
