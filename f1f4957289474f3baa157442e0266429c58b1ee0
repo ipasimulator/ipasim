@@ -1,0 +1,6 @@
+[ver:1,total:960]
+build/output.txt:290,1545134400:290,r
+CMakeLists.txt:260,1545134400:260,m
+build/CoreFoundation.rsp:210,1545134400:210,r
+scripts/CommonVariables.cmake:180,1545134400:180,r
+.git/COMMIT_EDITMSG:20,1545134400:20,r
