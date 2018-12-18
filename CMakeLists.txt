@@ -145,6 +145,20 @@ Universal Windows/x86/libdispatch.dll"
         IMPORTED_IMPLIB "${SOURCE_DIR}/deps/WinObjC/tools/deps/prebuilt/\
 Universal Windows/x86/libdispatch.lib")
 
+    # Library ICU. See <http://site.icu-project.org/>.
+    # TODO: Use CMake function `FindICU` or something like that instead.
+    function (add_icu_lib name)
+        add_library ("icu${name}" SHARED IMPORTED)
+        set_target_properties ("icu${name}" PROPERTIES
+            IMPORTED_LOCATION "${SOURCE_DIR}/deps/WinObjC/deps/prebuilt/\
+Universal Windows/x86/icu${name}57.dll"
+            IMPORTED_IMPLIB "${SOURCE_DIR}/deps/WinObjC/deps/prebuilt/\
+Universal Windows/x86/icu${name}.lib")
+    endfunction (add_icu_lib)
+    add_icu_lib (dt)
+    add_icu_lib (in)
+    add_icu_lib (uc)
+
     # See
     # https://medium.com/@alasher/colored-c-compiler-output-with-ninja-clang-gcc-10bfe7f2b949.
     option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output." ON)
