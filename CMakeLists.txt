@@ -130,6 +130,7 @@ testing purposes only." OFF)
     add_woc_lib (WOCStdLib)
     add_woc_lib (Logging)
     add_woc_lib (Starboard)
+    add_woc_lib (WinObjCRT)
     # See `tools/Logging/CMakeLists.txt`.
     target_include_directories (woc-Logging INTERFACE
         "${SOURCE_DIR}/deps/WinObjC/tools/Logging/include")
