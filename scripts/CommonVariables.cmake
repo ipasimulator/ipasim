@@ -83,6 +83,10 @@ set (WINOBJC_DEFS
     OBJC_PORT
     # From `Islandwood.props`.
     WINAPI_FAMILY=WINAPI_FAMILY_APP
+    _WINSOCK_DEPRECATED_NO_WARNINGS
+    _HAS_EXCEPTIONS=0
+    WINOBJC
+    __WRL_NO_DEFAULT_LIB__
     # Without this, there is an error in header `Windows.UI.Notifications.h`
     # (and others) where macro `DEPRECATEDENUMERATOR` is used.
     # TODO: Don't define this, rather use older SDK (e.g., the one we used when
