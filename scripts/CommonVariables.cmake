@@ -91,7 +91,10 @@ set (WINOBJC_DEFS
     # (and others) where macro `DEPRECATEDENUMERATOR` is used.
     # TODO: Don't define this, rather use older SDK (e.g., the one we used when
     # we successfully built WinObjC using MSBuild, i.e., 10.0.14393.0).
-    DISABLE_WINRT_DEPRECATION)
+    DISABLE_WINRT_DEPRECATION
+    # From `ClangCompile.xml`.
+    # TODO: Change dynamically depending on `CMAKE_BUILD_TYPE`.
+    _DEBUG _MT _DLL)
 
 # Shortcuts for CL compiler options.
 set (COMPILE_AS_WINRT /ZW) # MSBuild's `<CompileAsWinRT>true</CompileAsWinRT>`
