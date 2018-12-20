@@ -1,0 +1,5 @@
+[ver:1,total:1020]
+CMakeLists.txt:554,1545264000:395,1545267600:159,m
+scripts/CommonVariables.cmake:377,1545264000:335,1545267600:42,m
+scripts/winobjc-x86-Debug.cmake:77,1545264000:50,1545267600:27,m
+.git/COMMIT_EDITMSG:12,1545267600:12,r
