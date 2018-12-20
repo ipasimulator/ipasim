@@ -94,7 +94,9 @@ set (WINOBJC_DEFS
     DISABLE_WINRT_DEPRECATION
     # From `ClangCompile.xml`.
     # TODO: Change dynamically depending on `CMAKE_BUILD_TYPE`.
-    _DEBUG _MT _DLL)
+    _DEBUG _MT _DLL
+    # Unicode
+    UNICODE _UNICODE)
 
 # Shortcuts for CL compiler options.
 set (COMPILE_AS_WINRT /ZW) # MSBuild's `<CompileAsWinRT>true</CompileAsWinRT>`
