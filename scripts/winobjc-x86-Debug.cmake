@@ -1,3 +1,5 @@
+set (CL_COMPILER ON)
+
 list (APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/scripts")
 include (CommonVariables)
 

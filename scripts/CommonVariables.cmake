@@ -1,9 +1,10 @@
 set (LLVM_BIN_DIR "C:/Program Files/LLVM/bin")
 
 # See https://gitlab.kitware.com/cmake/cmake/issues/16259#note_158150.
-# TODO: Don't set this when configuring WinObjC.
-set (ENV{CFLAGS} -m32)
-set (ENV{CXXFLAGS} -m32)
+if (NOT CL_COMPILER)
+    set (ENV{CFLAGS} -m32)
+    set (ENV{CXXFLAGS} -m32)
+endif (NOT CL_COMPILER)
 
 set (CLANG_CMAKE_DIR "${BINARY_DIR}/clang-x86-Release")
 set (DEBUG_CLANG_CMAKE_DIR "${BINARY_DIR}/clang-x86-Debug")
@@ -104,7 +105,7 @@ set (COMPILE_AS_WINRT /ZW) # MSBuild's `<CompileAsWinRT>true</CompileAsWinRT>`
 # Common linking options for WinObjC projects.
 set (WINOBJC_LIBS
     # From `sdk-build.props`.
-    /force:multiple)
+    -force:multiple)
 if (NOT CL_COMPILER)
     list (TRANSFORM WINOBJC_LIBS PREPEND -Wl,)
 endif (NOT CL_COMPILER)

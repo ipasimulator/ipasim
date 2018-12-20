@@ -4,6 +4,8 @@ cmake_minimum_required (VERSION 3.12.2)
 
 option (SUPERBUILD "Configure Clang and then the project itself." ON)
 
+set (CL_COMPILER OFF)
+
 if (SUPERBUILD)
 
     project (ipaSim-superbuild LANGUAGES NONE)
@@ -22,6 +24,7 @@ if (SUPERBUILD)
                 "-DBINARY_DIR=${CMAKE_BINARY_DIR}"
                 -P "${CMAKE_SOURCE_DIR}/scripts/${name}.cmake"
             USES_TERMINAL
+            # TODO: This should also depend on CommonVariables.cmake, right?
             DEPENDS "${CMAKE_SOURCE_DIR}/scripts/${name}.cmake")
         add_custom_target ("config-${name}"
             DEPENDS "${cmakeDir}/CMakeCache.txt")
@@ -168,8 +171,6 @@ Universal Windows/x86/icu${name}.lib")
 
     # Common file used by many libraries.
     set (DYLD_INITIALIZER "${SOURCE_DIR}/src/dyld/dyld_initializer.cpp")
-
-    set (CL_COMPILER OFF)
 
     add_subdirectory (src)
     add_subdirectory (deps/WinObjC/Frameworks)
