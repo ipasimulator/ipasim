@@ -103,5 +103,11 @@ set (COMPILE_AS_WINRT /ZW) # MSBuild's `<CompileAsWinRT>true</CompileAsWinRT>`
 
 # Common linking options for WinObjC projects.
 set (WINOBJC_LIBS
+    # From `sdk-build.props`.
+    /force:multiple)
+if (NOT CL_COMPILER)
+    list (TRANSFORM WINOBJC_LIBS PREPEND -Wl,)
+endif (NOT CL_COMPILER)
+list (APPEND WINOBJC_LIBS
     # From `Islandwood.props`
     WindowsApp.lib) # Because it is specified as Windows Store app, probably.
