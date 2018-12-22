@@ -1,0 +1,7 @@
+[ver:1,total:2400]
+Dockerfile:1240,1545332400:360,1545494400:880,m
+scripts/CommonVariables.cmake:530,1545267600:510,1545494400:20,r
+docs/english.md:280,1545494400:280,r
+deps/pthreads.2/pthread.h:180,1545310800:180,r
+CMakeLists.txt:150,1545267600:150,r
+.git/COMMIT_EDITMSG:20,1545494400:20,r
