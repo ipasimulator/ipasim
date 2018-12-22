@@ -77,7 +77,9 @@ set (WINOBJC_CLANG_OPTIONS
     # Probably from `Islandwood.targets`.
     -includeWOCStdlib.h
     # From `sdk-build.props`.
-    -Wno-nullability-completeness)
+    # TODO: Add `-Werror`?
+    -Wno-c++17-extensions -Wno-nullability-completeness
+    -Wno-c++17-compat-mangling -Wno-microsoft --system-header-prefix=winrt/)
 
 # Common compiler definitions for WinObjC projects.
 set (WINOBJC_DEFS
