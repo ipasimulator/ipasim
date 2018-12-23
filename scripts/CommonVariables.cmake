@@ -38,15 +38,18 @@ endfunction (add_prep_target)
 
 # HACK: Make `target` depend on clang.exe and lld-link.exe.
 function (add_prep_dep target)
-    add_dependencies ("${target}" prep)
-    get_target_property (srcs "${target}" SOURCES)
-    target_sources ("${target}" PUBLIC
-        "${BUILT_CLANG_EXE}"
-        "${BUILT_LLD_LINK_EXE}")
-    set_source_files_properties ("${BUILT_CLANG_EXE}" "${BUILT_LLD_LINK_EXE}"
-        PROPERTIES HEADER_FILE_ONLY ON GENERATED ON)
-    set_source_files_properties (${srcs}
-        PROPERTIES OBJECT_DEPENDS "${BUILT_CLANG_EXE};${BUILT_LLD_LINK_EXE}")
+    # We don't need to build our Clang if we don't use it, though.
+    if (NOT USE_ORIG_CLANG)
+        add_dependencies ("${target}" prep)
+        get_target_property (srcs "${target}" SOURCES)
+        target_sources ("${target}" PUBLIC
+            "${BUILT_CLANG_EXE}"
+            "${BUILT_LLD_LINK_EXE}")
+        set_source_files_properties ("${BUILT_CLANG_EXE}" "${BUILT_LLD_LINK_EXE}"
+            PROPERTIES HEADER_FILE_ONLY ON GENERATED ON)
+        set_source_files_properties (${srcs}
+            PROPERTIES OBJECT_DEPENDS "${BUILT_CLANG_EXE};${BUILT_LLD_LINK_EXE}")
+    endif (NOT USE_ORIG_CLANG)
 endfunction (add_prep_dep)
 
 # Common include directories for WinObjC projects.
