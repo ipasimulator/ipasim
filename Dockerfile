@@ -44,7 +44,9 @@ ADD https://download.visualstudio.microsoft.com/download/pr/a46d2db7-bd7b-43ee-b
 RUN C:/temp/install_vs.cmd C:/temp/vs_buildtools.exe --quiet --wait --norestart --nocache \
     --installPath C:/BuildTools \
     --channelUri C:/temp/visualstudio.chman --installChannelUri C:/temp/visualstudio.chman \
-    --add "Microsoft.VisualStudio.Workload.VCTools;includeRecommended;includeOptional"
+    --addProductLang en-us \
+    --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
+    --add Microsoft.VisualStudio.Component.Windows10SDK.15063.UWP.Native
 
 # Install Python. It's needed to build LLVM and Clang.
 RUN powershell -c "choco install python --version 3.7.0 -y"
