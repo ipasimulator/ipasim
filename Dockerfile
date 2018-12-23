@@ -24,7 +24,17 @@ RUN powershell -c " \
 # Install LLVM + Clang.
 RUN powershell -c "choco install llvm --version 7.0.0 -y"
 
-# Install Node.js LTS
+# Install Python. It's needed to build LLVM and Clang.
+RUN powershell -c "choco install python --version 3.7.0 -y"
+
+# Install NuGet.
+RUN powershell -c "choco install nuget.commandline --version 4.9.1 -y"
+
+# Install C++/WinRT.
+# TODO: Use the one from Windows SDK when we use some newer version of the SDK.
+RUN powershell -c "nuget install cppwinrt -Version 2017.4.6.1 -OutputDirectory C:/packages"
+
+# Install Node.js LTS.
 ADD https://nodejs.org/dist/v8.11.3/node-v8.11.3-x64.msi C:/temp/node-install.msi
 RUN start /wait msiexec.exe /i C:/temp/node-install.msi /l*vx "C:/temp/MSI-node-install.log" /qn ADDLOCAL=ALL
 
@@ -37,26 +47,22 @@ RUN start /wait msiexec.exe /i C:/temp/node-install.msi /l*vx "C:/temp/MSI-node-
 # docs.microsoft.com/en-us/visualstudio/install/
 # build-tools-container?view=vs-2017> or <https://github.com/Microsoft/
 # vs-dockerfiles/tree/5f5c58248a97e881273bebe94fdaaca640d75002/native-desktop>.
+# TODO: Maybe execute the following in a new container based on image from
+# previous steps which would also have a volume in C:/vscache and use that for,
+# as its name suggests, cache of the Visual Studio Installer, so that it doesn't
+# have to download everything over and over again.
 COPY scripts/install_vs.cmd C:/temp/
 ADD https://download.microsoft.com/download/8/3/4/834E83F6-C377-4DCE-A757-69A418B6C6DF/Collect.exe C:/temp/collect.exe
 ADD https://download.visualstudio.microsoft.com/download/pr/7ce359b9-c96f-43bd-aa85-386a3e6af941/40e7e21dabde5db7c06f04e6710cad28/visualstudio.15.release.chman C:/temp/visualstudio.chman
 ADD https://download.visualstudio.microsoft.com/download/pr/a46d2db7-bd7b-43ee-bd7b-12624297e4ec/11b9c9bd44ec2b475f6da3d1802b3d00/vs_buildtools.exe C:/temp/vs_buildtools.exe
 RUN C:/temp/install_vs.cmd C:/temp/vs_buildtools.exe --quiet --wait --norestart --nocache \
-    --installPath C:/BuildTools \
+    --path install="C:/BuildTools" \
     --channelUri C:/temp/visualstudio.chman --installChannelUri C:/temp/visualstudio.chman \
-    --addProductLang en-us \
+    --lang en-US \
+    --add Microsoft.VisualStudio.Component.VC.CoreBuildTools \
+    --add Microsoft.VisualStudio.Component.VC.Redist.14.Latest \
     --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
     --add Microsoft.VisualStudio.Component.Windows10SDK.15063.UWP.Native
-
-# Install Python. It's needed to build LLVM and Clang.
-RUN powershell -c "choco install python --version 3.7.0 -y"
-
-# Install NuGet.
-RUN powershell -c "choco install nuget.commandline --version 4.9.1 -y"
-
-# Install C++/WinRT.
-# TODO: Use the one from Windows SDK when we use some newer version of the SDK.
-RUN powershell -c "nuget install cppwinrt -Version 2017.4.6.1 -OutputDirectory C:/packages"
 
 # Start developer command prompt.
 ENTRYPOINT C:/BuildTools/Common7/Tools/VsDevCmd.bat -arch=x86 -host_arch=x86 &&
