@@ -1,0 +1,5 @@
+[ver:1,total:600]
+Dockerfile:300,1545588000:300,m
+scripts/install_vs.cmd:180,1545588000:180,r
+.git/COMMIT_EDITMSG:60,1545588000:60,r
+docker-compose.yml:60,1545588000:60,r
