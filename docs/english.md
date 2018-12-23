@@ -4,7 +4,7 @@ This is not in any way a complete documentation, it's just a draft containing so
 
 ## Building
 
-Install and run Docker for Windows (tested with version `18.06.1-ce-win73`), enable Windows containers and run `docker-compose up`.
+Install and run Docker for Windows (tested with version `18.06.1-ce-win73`), enable Windows containers, [increase maximum container disk size](https://docs.microsoft.com/en-us/visualstudio/install/build-tools-container?view=vs-2017#step-4-expand-maximum-container-disk-size) and run `docker-compose up`.
 If you change `Dockerfile`, you'll need to run `docker-compose up --build` to rebuild the Docker image.
 To run some other commands instead of `build.ps1`, run `docker-compose run --rm ipasimulator powershell`.
 To re-build, delete the folder `cmake` (`rm -r cmake` from PowerShell).

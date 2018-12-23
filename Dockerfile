@@ -1,9 +1,11 @@
-# We use `microsoft/windowsservercore:ltsc2016` instead of
+# We use image based on `microsoft/windowsservercore:ltsc2016` instead of
 # `microsoft/windowsservercore:1803` because of this issue:
-# https://github.com/moby/moby/issues/37283.
-FROM microsoft/windowsservercore@sha256:9081c52809e4a7e66b6746137a6172eff36c30d52a30ee8f185829f6a867235c
+# https://github.com/moby/moby/issues/37283. The image we use is
+# `microsoft/dotnet-framework:3.5-sdk-windowsservercore-ltsc2016`.
+FROM microsoft/dotnet-framework@sha256:5637aa0d24af7d5d3c1726f1c280bbedf39cc8927364e5c3012d14b71c2ffce4
 LABEL Name=ipasimulator Version=0.0.1
 
+SHELL ["cmd", "/S", "/C"]
 WORKDIR "c:/project"
 
 # Install Chocolatey.
@@ -22,17 +24,27 @@ RUN powershell -c " \
 # Install LLVM + Clang.
 RUN powershell -c "choco install llvm --version 7.0.0 -y"
 
+# Install Node.js LTS
+ADD https://nodejs.org/dist/v8.11.3/node-v8.11.3-x64.msi C:/temp/node-install.msi
+RUN start /wait msiexec.exe /i C:/temp/node-install.msi /l*vx "C:/temp/MSI-node-install.log" /qn ADDLOCAL=ALL
+
 # Install Visual Studio Build Tools.
 # TODO: Don't do this, use LLVM-only toolchain instead when possible.
-# For a list of components, see
-# https://docs.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2017.
-ADD https://download.visualstudio.microsoft.com/download/pr/aa60dff5-bcbb-411c-8265-824e52a9d72f/9fa06a9b8d1721c72a87d5ae895e067f/visualstudio.15.release.chman C:/temp/visualstudio.chman
-ADD https://download.visualstudio.microsoft.com/download/pr/d80c9e2f-b6f4-47cc-bc8b-1bb40ec4c92d/7189a68796aed20aabb13985c49d530b/vs_buildtools.exe C:/temp/vs_buildtools.exe
-RUN powershell -c "C:/temp/vs_buildtools.exe --quiet --wait --norestart --nocache \
+# For a list of components, see <https://docs.microsoft.com/en-us/visualstudio/
+# install/workload-component-id-vs-build-tools?view=vs-2017>. For more
+# information, see <https://blogs.msdn.microsoft.com/heaths/2018/06/14/
+# no-container-image-for-build-tools-for-visual-studio-2017/> or <https://
+# docs.microsoft.com/en-us/visualstudio/install/
+# build-tools-container?view=vs-2017>.
+COPY scripts/install_vs.cmd C:/temp/
+# TODO: Use more specific URLs here.
+ADD https://aka.ms/vscollect.exe C:/temp/collect.exe
+ADD https://aka.ms/vs/15/release/channel C:/temp/visualstudio.chman
+ADD https://aka.ms/vs/15/release/vs_buildtools.exe C:/temp/vs_buildtools.exe
+RUN C:/temp/install_vs.cmd C:/temp/vs_buildtools.exe --quiet --wait --norestart --nocache \
     --installPath C:/BuildTools \
     --channelUri C:/temp/visualstudio.chman --installChannelUri C:/temp/visualstudio.chman \
-    --add \"Microsoft.VisualStudio.Workload.VCTools;includeOptional\" \
-    --add Microsoft.VisualCpp.DIA.SDK"
+    --add "Microsoft.VisualStudio.Workload.VCTools;includeRecommended;includeOptional"
 
 # Install Python. It's needed to build LLVM and Clang.
 RUN powershell -c "choco install python --version 3.7.0 -y"
