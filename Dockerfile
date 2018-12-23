@@ -35,12 +35,12 @@ RUN start /wait msiexec.exe /i C:/temp/node-install.msi /l*vx "C:/temp/MSI-node-
 # information, see <https://blogs.msdn.microsoft.com/heaths/2018/06/14/
 # no-container-image-for-build-tools-for-visual-studio-2017/> or <https://
 # docs.microsoft.com/en-us/visualstudio/install/
-# build-tools-container?view=vs-2017>.
+# build-tools-container?view=vs-2017> or <https://github.com/Microsoft/
+# vs-dockerfiles/tree/5f5c58248a97e881273bebe94fdaaca640d75002/native-desktop>.
 COPY scripts/install_vs.cmd C:/temp/
-# TODO: Use more specific URLs here.
-ADD https://aka.ms/vscollect.exe C:/temp/collect.exe
-ADD https://aka.ms/vs/15/release/channel C:/temp/visualstudio.chman
-ADD https://aka.ms/vs/15/release/vs_buildtools.exe C:/temp/vs_buildtools.exe
+ADD https://download.microsoft.com/download/8/3/4/834E83F6-C377-4DCE-A757-69A418B6C6DF/Collect.exe C:/temp/collect.exe
+ADD https://download.visualstudio.microsoft.com/download/pr/7ce359b9-c96f-43bd-aa85-386a3e6af941/40e7e21dabde5db7c06f04e6710cad28/visualstudio.15.release.chman C:/temp/visualstudio.chman
+ADD https://download.visualstudio.microsoft.com/download/pr/a46d2db7-bd7b-43ee-bd7b-12624297e4ec/11b9c9bd44ec2b475f6da3d1802b3d00/vs_buildtools.exe C:/temp/vs_buildtools.exe
 RUN C:/temp/install_vs.cmd C:/temp/vs_buildtools.exe --quiet --wait --norestart --nocache \
     --installPath C:/BuildTools \
     --channelUri C:/temp/visualstudio.chman --installChannelUri C:/temp/visualstudio.chman \
