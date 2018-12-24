@@ -1,0 +1,8 @@
+[ver:1,total:1920]
+Dockerfile:1070,1545645600:180,1545649200:890,m
+docker-compose.yml:280,1545649200:280,r
+.dockerignore:250,1545649200:250,r
+scripts/build.ps1:180,1545645600:120,1545649200:60,r
+vscache/.gitignore:80,1545649200:80,d
+IPASimulator.sln:30,1545649200:30,r
+.git/COMMIT_EDITMSG:30,1545649200:30,r
