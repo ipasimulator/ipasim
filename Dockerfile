@@ -61,6 +61,7 @@ RUN C:/temp/install_vs.cmd C:/temp/vs_buildtools.exe --quiet --wait --norestart 
     --add Microsoft.VisualStudio.Component.VC.CoreBuildTools \
     --add Microsoft.VisualStudio.Component.VC.Redist.14.Latest \
     --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
+    --add Microsoft.VisualStudio.Component.VC.ATLMFC \
     --add Microsoft.VisualStudio.Component.Windows10SDK.15063.UWP.Native
 
 # Start developer command prompt.
