@@ -3,11 +3,11 @@
 version: "2.4"
 
 services:
-  ipasimulator:
-    image: ipasimulator
+  ipasim:
+    image: janjones/ipasim
     build: .
     volumes:
       - type: bind
         source: .
-        target: c:/project
+        target: c:/ipaSim/src
     mem_limit: 16G

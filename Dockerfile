@@ -6,7 +6,7 @@ FROM microsoft/dotnet-framework@sha256:5637aa0d24af7d5d3c1726f1c280bbedf39cc8927
 LABEL Name=ipasimulator Version=0.0.1
 
 SHELL ["cmd", "/S", "/C"]
-WORKDIR "c:/project"
+WORKDIR c:/ipaSim/src
 
 # Install Chocolatey.
 RUN powershell -c " \
@@ -58,7 +58,6 @@ ADD https://download.visualstudio.microsoft.com/download/pr/a46d2db7-bd7b-43ee-b
 RUN C:/temp/install_vs.cmd C:/temp/vs_buildtools.exe --quiet --wait --norestart --nocache \
     --path install="C:/BuildTools" \
     --channelUri C:/temp/visualstudio.chman --installChannelUri C:/temp/visualstudio.chman \
-    --lang en-US \
     --add Microsoft.VisualStudio.Component.VC.CoreBuildTools \
     --add Microsoft.VisualStudio.Component.VC.Redist.14.Latest \
     --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \

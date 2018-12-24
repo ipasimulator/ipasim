@@ -6,10 +6,10 @@ This is not in any way a complete documentation, it's just a draft containing so
 
 Install and run Docker for Windows (tested with version `18.06.1-ce-win73`), enable Windows containers, [increase maximum container disk size](https://docs.microsoft.com/en-us/visualstudio/install/build-tools-container?view=vs-2017#step-4-expand-maximum-container-disk-size) and run `docker-compose up`.
 If you change `Dockerfile`, you'll need to run `docker-compose up --build` to rebuild the Docker image.
-To run some other commands instead of `build.ps1`, run `docker-compose run --rm ipasimulator powershell`.
+To run some other commands instead of `build.ps1`, run `docker-compose run --rm ipasim powershell`.
 To re-build, delete the folder `cmake` (`rm -r cmake` from PowerShell).
 To build manually, just execute the script `build.ps1` (`.\scripts\build.ps1` from PowerShell inside the container).
-To run commands in a container repeatedly, first run `docker-compose run --name ipasim ipasimulator powershell` (i.e., without option `--rm`) and then (after exiting the container) run `docker start -ai ipasim`.
+To run commands in a container repeatedly, first run `docker-compose run --name ipasim ipasim powershell` (i.e., without option `--rm`) and then (after exiting the container) run `docker start -ai ipasim`.
 
 > If there is an error starting the container that reads
 >

@@ -1,4 +1,4 @@
 ## See #3.
 
-if (Test-Path C:/project/cmake) { rm -r C:/project/cmake }
-cp -r -Container C:/build C:/project/cmake
+if (Test-Path C:/ipaSim/src/cmake) { rm -r C:/ipaSim/src/cmake }
+cp -r -Container C:/ipaSim/build C:/ipaSim/src/cmake
