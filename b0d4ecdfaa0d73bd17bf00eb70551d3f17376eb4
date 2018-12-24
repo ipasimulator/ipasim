@@ -1,0 +1,17 @@
+[ver:1,total:2100]
+Dockerfile:582,1545642000:360,1545645600:222,m
+CMakeLists.txt:372,1545606000:240,1545642000:132,r
+docker-compose.yml:302,1545642000:210,1545645600:92,m
+cmake/clang-x86-Release/.ninja_log:300,1545606000:300,r
+docs/issues/1.md:150,1545642000:150,r
+build/ninja-output.txt:120,1545606000:120,r
+docs/english.md:82,1545645600:82,m
+scripts/restore.ps1:48,1545642000:8,1545645600:40,m
+scripts/build.ps1:42,1545642000:30,1545645600:12,m
+scripts/backup.ps1:42,1545642000:30,1545645600:12,m
+.git/COMMIT_EDITMSG:20,1545645600:20,r
+scripts/winobjc-x86-Debug.cmake:8,1545642000:8,r
+scripts/clang-x86-Debug.cmake:8,1545642000:8,r
+scripts/CommonVariables.cmake:8,1545642000:8,r
+scripts/clang-x86-Release.cmake:8,1545642000:8,r
+scripts/ipaSim-x86-Debug.cmake:8,1545642000:8,r
