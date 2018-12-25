@@ -1,0 +1,13 @@
+[ver:1,total:3960]
+test.ps1:1395,1545757200:180,1545760800:1215,r
+sample.mm:1150,1545760800:470,1545764400:680,r
+docs/issues/6.md:536,1545764400:536,m
+sample.mm.e:225,1545760800:225,r
+scripts/CommonVariables.cmake:180,1545757200:180,r
+docker-compose.yml:180,1545757200:180,r
+build/include/lldb/Host/windows/windows.h:140,1545760800:140,r
+.gitattributes:60,1545757200:60,r
+docs/issues/5.md:44,1545764400:44,r
+sample.cpp:20,1545760800:20,r
+NSThread.mm.E:15,1545760800:15,r
+.gitignore:15,1545760800:15,r
