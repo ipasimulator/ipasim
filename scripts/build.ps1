@@ -6,3 +6,6 @@
 mkdir -Force "C:/ipaSim/build" >$null
 pushd "C:/ipaSim/build"
 cmake -G Ninja "C:/ipaSim/src"
+
+# Build everything.
+ninja ipaSim-x86-Debug

@@ -63,6 +63,12 @@ if (SUPERBUILD)
         DEPENDS config-ipaSim-x86-Debug config-winobjc-x86-Debug
             clang-x86-Release)
 
+    add_custom_target (ipaSim-x86-Debug
+        COMMENT "ipaSim"
+        COMMAND ninja all
+        WORKING_DIRECTORY "${IPASIM_CMAKE_DIR}"
+        USES_TERMINAL)
+
 else (SUPERBUILD)
 
     option (USE_ORIG_CLANG "Use the original instead of our patched Clang. For \
