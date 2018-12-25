@@ -67,10 +67,22 @@ set (WINOBJC_INCLUDE_DIRS
     "${SOURCE_DIR}/deps/WinObjC/include/Platform/Universal Windows"
     # These just rose from the need, but weren't even in `.tlog` files like the
     # ones above. That's probably because they were copied to somewhere else
-    # (like NuGet package) and included from there.
+    # (like NuGet package) and included from there. See also
+    # `WinObjC.Language.Packaging.targets`, where it seems like all files from
+    # `tools/include` and `tools/include_next` are copied somewhere (and
+    # probably later included from there).
     "${SOURCE_DIR}/deps/WinObjC/tools/include"
     "${SOURCE_DIR}/deps/WinObjC/tools/include/xplat"
     "${SOURCE_DIR}/deps/WinObjC/tools/include/WOCStdLib")
+
+# See comments at `WINOBJC_INCLUDE_DIRS`.
+set (WOCFX_INCLUDE_DIRS
+    ${WINOBJC_INCLUDE_DIRS}
+    # TODO: Alternatively (as opposed to introducing `WOCFX_INCLUDE_DIRS`), add
+    # this one only if Clang is used.
+    "${SOURCE_DIR}/deps/WinObjC/tools/include_next/WOCStdLib"
+    # From  NuGet package `cppwinrt`.
+    C:/packages/cppwinrt.2017.4.6.1/build/native/include)
 
 # Common Clang options for WinObjC projects.
 set (WINOBJC_CLANG_OPTIONS
