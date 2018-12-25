@@ -1,6 +1,0 @@
-box: docker
-build:
-  steps:
-    - script:
-        name: docker-build
-        code: docker-compose up --build
