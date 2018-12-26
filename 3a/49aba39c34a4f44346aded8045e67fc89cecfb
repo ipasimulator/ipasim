@@ -1,0 +1,7 @@
+[ver:1,total:900]
+docker-compose.yml:300,1545814800:180,1545818400:120,r
+docs/issues/7.md:180,1545818400:180,m
+CMakeLists.txt:180,1545782400:180,r
+.gitattributes:150,1545778800:150,r
+.git/COMMIT_EDITMSG:60,1545818400:60,r
+scripts/build.ps1:30,1545778800:30,r
