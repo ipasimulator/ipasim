@@ -15,6 +15,18 @@ git push new-origin develop
 
 See also [some info about forking LFS](https://help.github.com/enterprise/2.13/admin/guides/installation/migrating-to-a-different-large-file-storage-server/), although it was not actually used after all.
 
+## Forks of submodules
+
+Because of [issue #7](issues/#7.md), we recursively forked all submodules. What
+follows are their original URLs where they were forked from. Of course, these
+can be also found in Git history of `.gitmodules` files.
+
+- `deps/3rdparty/openssl`: <https://github.com/microsoft/openssl>
+- `deps/3rdparty/zlib`: <https://github.com/madler/zlib>
+- `deps/3rdparty/libobjc2`: <https://github.com/Microsoft/libobjc2>
+- `tools/vsimporter/third-party/PlistCpp`: <https://github.com/Microsoft/PlistCpp.git>
+- `tools/vsimporter/third-party/sole`: <https://github.com/r-lyeh/sole.git>
+
 ## Building from source
 
 To be able to work with it, we need to be able to build it from source first.

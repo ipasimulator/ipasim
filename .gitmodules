@@ -2,48 +2,39 @@
 	path = deps/objc4
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/objc4
 	branch = port
-	shallow = true
 [submodule "deps/apple-headers"]
 	path = deps/apple-headers
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/apple-headers
-	shallow = true
+    branch = objc_port
 [submodule "deps/libclosure"]
 	path = deps/libclosure
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/libclosure
 	branch = objc_port
-	shallow = true
 [submodule "deps/WinObjC"]
 	path = deps/WinObjC
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/WinObjC
 	branch = port
-	shallow = true
 [submodule "deps/llvm"]
 	path = deps/llvm
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/llvm
 	branch = port
-	shallow = true
 [submodule "deps/clang"]
 	path = deps/clang
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/clang
 	branch = port
-	shallow = true
 [submodule "deps/lld"]
 	path = deps/lld
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/lld
 	branch = port
-	shallow = true
 [submodule "deps/LIEF"]
 	path = deps/LIEF
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/LIEF
 	branch = port
-	shallow = true
 [submodule "deps/tapi"]
 	path = deps/tapi
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/tapi
 	branch = port
-	shallow = true
 [submodule "deps/lldb"]
 	path = deps/lldb
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/lldb
 	branch = port
-	shallow = true

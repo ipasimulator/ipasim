@@ -13,6 +13,11 @@ call push_one.cmd ..\deps\llvm
 call push_one.cmd ..\deps\objc4
 call push_one.cmd ..\deps\tapi
 call push_one.cmd ..\deps\WinObjC
+call push_one.cmd ..\deps\WinObjC\deps\3rdparty\openssl
+call push_one.cmd ..\deps\WinObjC\deps\3rdparty\zlib
+call push_one.cmd ..\deps\WinObjC\deps\3rdparty\libobjc2
+call push_one.cmd ..\deps\WinObjC\tools\vsimporter\third-party\PlistCpp
+call push_one.cmd ..\deps\WinObjC\tools\vsimporter\third-party\sole
 call push_one.cmd ..
 
 echo.
