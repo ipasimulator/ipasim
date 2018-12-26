@@ -1,0 +1,4 @@
+[ver:1,total:1440]
+scripts/CommonVariables.cmake:940,1545861600:600,1545865200:340,r
+scripts/install_docker.ps1:470,1545865200:470,r
+scripts/install_agent.ps1:30,1545865200:30,r
