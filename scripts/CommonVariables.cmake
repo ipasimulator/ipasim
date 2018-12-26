@@ -75,14 +75,17 @@ set (WINOBJC_INCLUDE_DIRS
     "${SOURCE_DIR}/deps/WinObjC/tools/include/xplat"
     "${SOURCE_DIR}/deps/WinObjC/tools/include/WOCStdLib")
 
-# See comments at `WINOBJC_INCLUDE_DIRS`.
 set (WOCFX_INCLUDE_DIRS
     ${WINOBJC_INCLUDE_DIRS}
-    # TODO: Alternatively (as opposed to introducing `WOCFX_INCLUDE_DIRS`), add
-    # this one only if Clang is used.
-    "${SOURCE_DIR}/deps/WinObjC/tools/include_next/WOCStdLib"
-    # From  NuGet package `cppwinrt`.
-    C:/packages/cppwinrt.2017.4.6.1/build/native/include)
+    # All frameworks have this one in their `*Lib.vcxproj`.
+    "${SOURCE_DIR}/deps/WinObjC/Frameworks/include")
+if (NOT CL_COMPILER)
+    list (APPEND WOCFX_INCLUDE_DIRS
+        # See comments at `WINOBJC_INCLUDE_DIRS`.
+        "${SOURCE_DIR}/deps/WinObjC/tools/include_next/WOCStdLib"
+        # From  NuGet package `cppwinrt`.
+        C:/packages/cppwinrt.2017.4.6.1/build/native/include)
+endif (NOT CL_COMPILER)
 
 # Common Clang options for WinObjC projects.
 set (WINOBJC_CLANG_OPTIONS
@@ -134,3 +137,12 @@ list (APPEND WINOBJC_LIBS
     # For `--dependent-lib=msvcrtd` + <https://docs.microsoft.com/en-us/cpp/
     # c-runtime-library/crt-library-features?view=vs-2017>.
     ucrtd vcruntimed msvcrtd msvcprtd)
+set (WOCFX_LIBS
+    ${WINOBJC_LIBS}
+    woc-Logging
+    # From `sdk-build.props`.
+    Foundation
+    Starboard
+    CoreFoundation
+    CFNetwork
+    MobileCoreServices)
