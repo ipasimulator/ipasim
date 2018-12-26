@@ -119,8 +119,10 @@ set (WINOBJC_DEFS
     # Unicode
     UNICODE _UNICODE)
 
-# Shortcuts for CL compiler options.
-set (COMPILE_AS_WINRT /ZW) # MSBuild's `<CompileAsWinRT>true</CompileAsWinRT>`
+# Shortcuts for compiler options (commented with their respective MSBuild
+# equivalents).
+set (COMPILE_AS_WINRT /ZW) # `<CompileAsWinRT>true</CompileAsWinRT>`
+set (OBJC_ARC -fobjc-arc) # `<ObjectiveCARC>true</ObjectiveCARC>`
 
 # Common linking options for WinObjC projects.
 set (WINOBJC_LIBS
