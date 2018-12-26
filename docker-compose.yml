@@ -11,3 +11,10 @@ services:
         source: .
         target: c:/ipaSim/src
     mem_limit: 16G
+    networks:
+      - default
+
+networks:
+  default:
+    external:
+      name: nat
