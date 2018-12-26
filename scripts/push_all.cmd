@@ -18,6 +18,9 @@ call push_one.cmd ..\deps\WinObjC\deps\3rdparty\zlib
 call push_one.cmd ..\deps\WinObjC\deps\3rdparty\libobjc2
 call push_one.cmd ..\deps\WinObjC\tools\vsimporter\third-party\PlistCpp
 call push_one.cmd ..\deps\WinObjC\tools\vsimporter\third-party\sole
+call push_one.cmd ..\deps\WinObjC\tools\vsimporter\third-party\PlistCpp\third-party\pugixml
+call push_one.cmd ..\deps\WinObjC\tools\vsimporter\third-party\PlistCpp\third-party\unittest-cpp
+call push_one.cmd ..\deps\WinObjC\tools\vsimporter\third-party\PlistCpp\third-party\NSPlist
 call push_one.cmd ..
 
 echo.

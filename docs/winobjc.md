@@ -26,6 +26,9 @@ can be also found in Git history of `.gitmodules` files.
 - `deps/3rdparty/libobjc2`: <https://github.com/Microsoft/libobjc2>
 - `tools/vsimporter/third-party/PlistCpp`: <https://github.com/Microsoft/PlistCpp.git>
 - `tools/vsimporter/third-party/sole`: <https://github.com/r-lyeh/sole.git>
+- `tools/vsimporter/third-party/PlistCpp/third-party/pugixml`: <https://github.com/zeux/pugixml.git>
+- `tools/vsimporter/third-party/PlistCpp/third-party/unittest-cpp`: <https://github.com/unittest-cpp/unittest-cpp.git>
+- `tools/vsimporter/third-party/PlistCpp/third-party/NSPlist`: <https://github.com/Microsoft/NSPlist.git>
 
 ## Building from source
 
