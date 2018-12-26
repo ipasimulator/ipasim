@@ -29,6 +29,7 @@ can be also found in Git history of `.gitmodules` files.
 - `tools/vsimporter/third-party/PlistCpp/third-party/pugixml`: <https://github.com/zeux/pugixml.git>
 - `tools/vsimporter/third-party/PlistCpp/third-party/unittest-cpp`: <https://github.com/unittest-cpp/unittest-cpp.git>
 - `tools/vsimporter/third-party/PlistCpp/third-party/NSPlist`: <https://github.com/Microsoft/NSPlist.git>
+- `tools/vsimporter/third-party/PlistCpp/third-party/unittest-cpp/docs`: <https://github.com/unittest-cpp/unittest-cpp.wiki.git>
 
 ## Building from source
 
