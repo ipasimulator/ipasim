@@ -128,4 +128,9 @@ if (NOT CL_COMPILER)
 endif (NOT CL_COMPILER)
 list (APPEND WINOBJC_LIBS
     # From `Islandwood.props`
-    WindowsApp.lib) # Because it is specified as Windows Store app, probably.
+    WindowsApp.lib # Because it is specified as Windows Store app, probably.
+    # From `ClangCompile.xml`.
+    oldnames # For `--dependent-lib=oldnames`.
+    # For `--dependent-lib=msvcrtd` + <https://docs.microsoft.com/en-us/cpp/
+    # c-runtime-library/crt-library-features?view=vs-2017>.
+    ucrtd vcruntimed msvcrtd msvcprtd)
