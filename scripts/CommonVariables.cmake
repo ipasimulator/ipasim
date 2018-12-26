@@ -143,6 +143,7 @@ set (WOCFX_LIBS
     ${WINOBJC_LIBS}
     woc-Logging
     objc
+    dispatch
     # From `sdk-build.props`.
     Foundation
     Starboard
