@@ -67,7 +67,8 @@ if (SUPERBUILD)
         COMMENT "ipaSim"
         COMMAND ninja all
         WORKING_DIRECTORY "${IPASIM_CMAKE_DIR}"
-        USES_TERMINAL)
+        USES_TERMINAL
+        DEPENDS config-ipaSim-x86-Debug)
 
 else (SUPERBUILD)
 
