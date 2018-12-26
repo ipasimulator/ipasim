@@ -180,6 +180,11 @@ Universal Windows/x86/${name}.lib")
 
     add_prebuilt_lib (libxml2)
 
+    add_library (cassowary STATIC IMPORTED)
+    set_target_properties (cassowary PROPERTIES
+        IMPORTED_LOCATION "${SOURCE_DIR}/deps/WinObjC/deps/prebuilt/\
+Universal Windows/x86/cassowary-0.60-Debug.lib")
+
     # See
     # https://medium.com/@alasher/colored-c-compiler-output-with-ninja-clang-gcc-10bfe7f2b949.
     option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output." ON)
