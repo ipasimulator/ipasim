@@ -1,0 +1,9 @@
+[ver:1,total:720]
+samples/export-class/CMakeLists.txt:327,1545948000:220,1545951600:107,m
+samples/export-class/main.mm:188,1545948000:10,1545951600:178,r
+src/CMakeLists.txt:60,1545948000:60,r
+samples/export-class/testclass.mm:48,1545948000:30,1545951600:18,r
+samples/export-class/README.md:40,1545948000:20,1545951600:20,r
+samples/CMakeLists.txt:29,1545948000:10,1545951600:19,m
+CMakeLists.txt:18,1545948000:10,1545951600:8,m
+src/dyld/CMakeLists.txt:10,1545951600:10,r
