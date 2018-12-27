@@ -150,3 +150,9 @@ set (WOCFX_LIBS
     CoreFoundation
     CFNetwork
     MobileCoreServices)
+
+function (add_objcuwp_libs)
+    # For `ObjCUWP*.lib`s specified in header files inside
+    # `deps/WinObjC/include/Platform/Universal Windows/UWP`.
+    link_directories ("../../deps/prebuilt/Universal Windows/x86")
+endfunction (add_objcuwp_libs)
