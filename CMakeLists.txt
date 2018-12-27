@@ -185,8 +185,22 @@ Universal Windows/x86/${name}.lib")
         IMPORTED_LOCATION "${SOURCE_DIR}/deps/WinObjC/deps/prebuilt/\
 Universal Windows/x86/cassowary-0.60-Debug.lib")
 
+    # NuGet package ANGLE.WindowsStore.
+    set (ANGLE_DIR "C:/packages/ANGLE.WindowsStore.2.1.13")
+    add_library (EGL SHARED IMPORTED)
+    set_target_properties (EGL PROPERTIES
+        IMPORTED_LOCATION "${ANGLE_DIR}/bin/UAP/Win32/libEGL.dll"
+        IMPORTED_IMPLIB "${ANGLE_DIR}/bin/UAP/Win32/libEGL.lib")
+    target_include_directories (EGL INTERFACE "${ANGLE_DIR}/Include")
+    add_library (GLESv2 SHARED IMPORTED)
+    set_target_properties (GLESv2 PROPERTIES
+        IMPORTED_LOCATION "${ANGLE_DIR}/bin/UAP/Win32/libGLESv2.dll"
+        IMPORTED_IMPLIB "${ANGLE_DIR}/bin/UAP/Win32/libGLESv2.lib")
+    target_include_directories (GLESv2 INTERFACE "${ANGLE_DIR}/Include")
+
     # See
     # https://medium.com/@alasher/colored-c-compiler-output-with-ninja-clang-gcc-10bfe7f2b949.
+    # TODO: Do this for CL.exe, too.
     option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output." ON)
     if (FORCE_COLORED_OUTPUT)
         add_compile_options (-fcolor-diagnostics -fansi-escape-codes)
