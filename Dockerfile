@@ -64,6 +64,9 @@ RUN C:/temp/install_vs.cmd C:/temp/vs_buildtools.exe --quiet --wait --norestart 
     --add Microsoft.VisualStudio.Component.VC.ATLMFC \
     --add Microsoft.VisualStudio.Component.Windows10SDK.15063.UWP.Native
 
+# Install ANGLE.WindowsStore. It's needed by project OpenGLES in WinObjC.
+RUN powershell -c "nuget install ANGLE.WindowsStore -Version 2.1.13 -OutputDirectory C:/packages"
+
 # Start developer command prompt.
 ENTRYPOINT C:/BuildTools/Common7/Tools/VsDevCmd.bat -arch=x86 -host_arch=x86 &&
 
