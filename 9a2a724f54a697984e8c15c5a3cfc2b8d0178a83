@@ -1,0 +1,5 @@
+[ver:1,total:2040]
+src/HeadersAnalyzer/CMakeLists.txt:1440,1545987600:1030,1545991200:410,m
+scripts/CommonVariables.cmake:295,1545987600:275,1545991200:20,r
+docs/git.md:180,1545955200:180,r
+CMakeLists.txt:125,1545987600:15,1545991200:110,r
