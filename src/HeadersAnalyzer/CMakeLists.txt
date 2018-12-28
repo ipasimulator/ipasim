@@ -163,7 +163,12 @@ target_include_directories (tapi PRIVATE
     ../../deps/tapi/include
     "${CMAKE_CURRENT_BINARY_DIR}/include") # Headers generated with tblgens.
 
-target_link_libraries (tapi PRIVATE ${CLANG_LIBS} ${LLVM_LIBS})
+target_link_libraries (tapi PRIVATE ${CLANG_LIBS} ${LLVM_LIBS}
+    # TODO: We should use original Clang + `lld-link`, this is just a simpler
+    # workaround for #12.
+    -fuse-ld=link
+    # `link.exe` complains otherwise.
+    -Wl,/nodefaultlib:libcmt)
 
 ## Tablegenning
 set (INC1
