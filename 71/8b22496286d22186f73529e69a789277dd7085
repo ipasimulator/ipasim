@@ -1,0 +1,9 @@
+[ver:1,total:375]
+scripts/CommonVariables.cmake:160,1545991200:160,m
+docs/winobjc.md:75,1545991200:75,r
+CMakeLists.txt:35,1545991200:35,r
+docs/llvm.md:30,1545991200:30,r
+docs/english.md:30,1545991200:30,r
+src/HeadersAnalyzer/HeadersAnalyzer.vcxproj:15,1545991200:15,r
+src/HeadersAnalyzer/README.md:15,1545991200:15,r
+docs/cmake.md:15,1545991200:15,r
