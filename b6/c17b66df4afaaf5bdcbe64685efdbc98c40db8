@@ -1,0 +1,7 @@
+[ver:1,total:2700]
+src/HeadersAnalyzer/CMakeLists.txt:1507,1546009200:985,1546012800:522,m
+src/HeadersAnalyzer/HeadersAnalyzer.vcxproj:585,1546009200:375,1546012800:210,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:314,1546012800:314,m
+docs/issues/12.md:224,1546009200:180,1546012800:44,m
+CMakeLists.txt:50,1546009200:20,1546012800:30,r
+scripts/CommonVariables.cmake:20,1546012800:20,r
