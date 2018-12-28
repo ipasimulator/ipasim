@@ -35,29 +35,56 @@ target_compile_definitions (tapi PRIVATE TAPI_PORT PATH_MAX=_MAX_PATH)
 
 target_include_directories (tapi PRIVATE
     ../../deps/tapi/include
-    "${BINARY_DIR}/include" # Headers generated with tblgens.
+    "${CMAKE_CURRENT_BINARY_DIR}/include" # Headers generated with tblgens.
     # TODO: Add these with `target_link_libraries`.
     ../../deps/llvm/include
     "${CLANG_CMAKE_DIR}/include"
     ../../deps/clang/include
     "${CLANG_CMAKE_DIR}/tools/clang/include")
 
-# TODO: Only actually invoke the commands when necessary.
-add_custom_target (tapi-tblgen
-    # TODO: Wrong kind of dependency.
-    # DEPENDS "${SOURCE_DIR}/deps/tapi/include/tapi/Driver/DiagnosticTAPIKinds.inc"
-    # TODO: Add tblgen as a dependency.
-    COMMAND "${CMAKE_COMMAND}" -E make_directory
-        "${BINARY_DIR}/include/tapi/Driver"
-    COMMAND "${CLANG_CMAKE_DIR}/bin/clang-tblgen.exe"
-        "-o=${BINARY_DIR}/include/tapi/Driver/DiagnosticTAPIKinds.inc"
+#
+# Tablegenning
+#
+set (INC1
+    "${CMAKE_CURRENT_BINARY_DIR}/include/tapi/Driver/DiagnosticTAPIKinds.inc")
+set (INC2 "${CMAKE_CURRENT_BINARY_DIR}/include/tapi/Driver/TAPIOptions.inc")
+
+# Let `.cpp` files depend on generated `.inc` files.
+get_target_property (srcs tapi SOURCES)
+set_source_files_properties (${srcs}
+    PROPERTIES OBJECT_DEPENDS "${INC1};${INC2}")
+
+# Let CMake know how to generate `.inc` files.
+add_custom_command (
+    OUTPUT include/tapi/Driver/DiagnosticTAPIKinds.inc
+    COMMAND "${CLANG_CMAKE_DIR}/bin/clang-tblgen.exe" "-o=${INC1}"
         -gen-clang-diags-defs
         "${SOURCE_DIR}/deps/tapi/include/tapi/Driver/DiagnosticTAPIKinds.td"
-    COMMAND "${CLANG_CMAKE_DIR}/bin/llvm-tblgen.exe"
-        "-o=${BINARY_DIR}/include/tapi/Driver/TAPIOptions.inc"
+    DEPENDS "${CLANG_CMAKE_DIR}/bin/clang-tblgen.exe"
+        "${SOURCE_DIR}/deps/tapi/include/tapi/Driver/DiagnosticTAPIKinds.td")
+# TODO: This also depends on some headers (in `deps/llvm/include`)...
+add_custom_command (
+    OUTPUT include/tapi/Driver/TAPIOptions.inc
+    COMMAND "${CLANG_CMAKE_DIR}/bin/llvm-tblgen.exe" "-o=${INC2}"
         "-I=${SOURCE_DIR}/deps/llvm/include" -gen-opt-parser-defs
         "${SOURCE_DIR}/deps/tapi/include/tapi/Driver/TAPIOptions.td"
-    USES_TERMINAL
-)
+    DEPENDS "${CLANG_CMAKE_DIR}/bin/llvm-tblgen.exe"
+        "${SOURCE_DIR}/deps/tapi/include/tapi/Driver/TAPIOptions.td")
 
-add_dependencies (tapi tapi-tblgen)
+# Let CMake know how to generate tblgens.
+add_custom_target (config-clang-x86-Release
+    COMMAND ninja config-clang-x86-Release
+    WORKING_DIRECTORY "${BINARY_DIR}"
+    USES_TERMINAL)
+add_custom_command (
+    OUTPUT "${CLANG_CMAKE_DIR}/bin/clang-tblgen.exe"
+    COMMAND ninja clang-tblgen
+    WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
+    USES_TERMINAL
+    DEPENDS config-clang-x86-Release)
+add_custom_command (
+    OUTPUT "${CLANG_CMAKE_DIR}/bin/llvm-tblgen.exe"
+    COMMAND ninja llvm-tblgen
+    WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
+    USES_TERMINAL
+    DEPENDS config-clang-x86-Release)
