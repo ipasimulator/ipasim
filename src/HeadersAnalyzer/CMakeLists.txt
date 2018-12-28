@@ -10,15 +10,13 @@ function (add_clang_lib name)
         IMPORTED_LOCATION "${DEBUG_CLANG_CMAKE_DIR}/lib/${name}.lib")
     add_dependencies ("${name}" "gen-${name}")
     target_compile_definitions ("${name}" INTERFACE _DEBUG _MT _DLL)
-    target_include_directories ("${name}" INTERFACE
-        ../../deps/llvm/include
-        "${DEBUG_CLANG_CMAKE_DIR}/include"
-        ../../deps/clang/include
-        "${DEBUG_CLANG_CMAKE_DIR}/tools/clang/include")
     target_link_libraries ("${name}" INTERFACE
         ucrtd vcruntimed msvcrtd msvcprtd)
 
     # Let CMake know how to generate `${name}.lib`.
+    # TODO: This probably won't rebuild the `.lib` if sources change, will it?
+    # We maybe could also build everything by a single `ninja` command if that
+    # would help...
     add_custom_command (
         OUTPUT "${DEBUG_CLANG_CMAKE_DIR}/lib/${name}.lib"
         COMMAND ninja "${name}"
@@ -28,6 +26,98 @@ function (add_clang_lib name)
     add_custom_target ("gen-${name}"
         DEPENDS "${DEBUG_CLANG_CMAKE_DIR}/lib/${name}.lib")
 endfunction (add_clang_lib)
+
+set (LLDB_LIBS
+    lldbBase
+    lldbBreakpoint
+    lldbCommands
+    lldbCore
+    lldbDataFormatters
+    lldbExpression
+    lldbHost
+    lldbInitialization
+    lldbInterpreter
+    lldbPluginABIMacOSX_arm
+    lldbPluginABIMacOSX_arm64
+    lldbPluginABIMacOSX_i386
+    lldbPluginABISysV_arm
+    lldbPluginABISysV_arm64
+    lldbPluginABISysV_hexagon
+    lldbPluginABISysV_i386
+    lldbPluginABISysV_mips
+    lldbPluginABISysV_mips64
+    lldbPluginABISysV_ppc
+    lldbPluginABISysV_ppc64
+    lldbPluginABISysV_s390x
+    lldbPluginABISysV_x86_64
+    lldbPluginAppleObjCRuntime
+    lldbPluginArchitectureArm
+    lldbPluginArchitecturePPC64
+    lldbPluginCPlusPlusLanguage
+    lldbPluginCXXItaniumABI
+    lldbPluginDisassemblerLLVM
+    lldbPluginDynamicLoaderHexagonDYLD
+    lldbPluginDynamicLoaderMacOSXDYLD
+    lldbPluginDynamicLoaderPosixDYLD
+    lldbPluginDynamicLoaderStatic
+    lldbPluginDynamicLoaderWindowsDYLD
+    lldbPluginExpressionParserClang
+    lldbPluginExpressionParserGo
+    lldbPluginGoLanguage
+    lldbPluginInstructionARM
+    lldbPluginInstructionARM64
+    lldbPluginInstructionMIPS
+    lldbPluginInstructionMIPS64
+    lldbPluginInstructionPPC64
+    lldbPluginInstrumentationRuntimeASan
+    lldbPluginInstrumentationRuntimeMainThreadChecker
+    lldbPluginInstrumentationRuntimeTSan
+    lldbPluginInstrumentationRuntimeUBSan
+    lldbPluginJavaLanguage
+    lldbPluginJITLoaderGDB
+    lldbPluginLanguageRuntimeGo
+    lldbPluginLanguageRuntimeJava
+    lldbPluginMemoryHistoryASan
+    lldbPluginObjCLanguage
+    lldbPluginObjCPlusPlusLanguage
+    lldbPluginObjectContainerBSDArchive
+    lldbPluginObjectContainerMachOArchive
+    lldbPluginObjectFileELF
+    lldbPluginObjectFileJIT
+    lldbPluginObjectFileMachO
+    lldbPluginObjectFilePECOFF
+    lldbPluginOCamlLanguage
+    lldbPluginOSGo
+    lldbPluginOSPython
+    lldbPluginPlatformAndroid
+    lldbPluginPlatformFreeBSD
+    lldbPluginPlatformGDB
+    lldbPluginPlatformKalimba
+    lldbPluginPlatformLinux
+    lldbPluginPlatformMacOSX
+    lldbPluginPlatformNetBSD
+    lldbPluginPlatformOpenBSD
+    lldbPluginPlatformPOSIX
+    lldbPluginPlatformWindows
+    lldbPluginProcessElfCore
+    lldbPluginProcessGDBRemote
+    lldbPluginProcessMinidump
+    lldbPluginProcessUtility
+    lldbPluginProcessWindowsCommon
+    lldbPluginRenderScriptRuntime
+    lldbPluginScriptInterpreterNone
+    lldbPluginScriptInterpreterPython
+    lldbPluginStructuredDataDarwinLog
+    lldbPluginSymbolFileDWARF
+    lldbPluginSymbolFilePDB
+    lldbPluginSymbolFileSymtab
+    lldbPluginSymbolVendorELF
+    lldbPluginSystemRuntimeMacOSX
+    lldbPluginUnwindAssemblyInstEmulation
+    lldbPluginUnwindAssemblyX86
+    lldbSymbol
+    lldbTarget
+    lldbUtility)
 
 set (CLANG_LIBS
     clangAnalysis
@@ -119,8 +209,23 @@ set (LLVM_LIBS
     LLVMX86Utils
     LLVMXRay)
 
-foreach (lib ${CLANG_LIBS} ${LLVM_LIBS})
+foreach (lib ${LLDB_LIBS})
     add_clang_lib ("${lib}")
+    target_include_directories ("${lib}" INTERFACE
+        "${DEBUG_CLANG_CMAKE_DIR}/tools/lldb/include"
+        ../../deps/lldb/include)
+endforeach (lib)
+foreach (lib ${CLANG_LIBS})
+    add_clang_lib ("${lib}")
+    target_include_directories ("${lib}" INTERFACE
+        "${DEBUG_CLANG_CMAKE_DIR}/tools/clang/include"
+        ../../deps/clang/include)
+endforeach (lib)
+foreach (lib ${LLVM_LIBS})
+    add_clang_lib ("${lib}")
+    target_include_directories ("${lib}" INTERFACE
+        "${DEBUG_CLANG_CMAKE_DIR}/include"
+        ../../deps/llvm/include)
 endforeach (lib)
 
 # Library TAPI. See `docs/tapi.md`.
@@ -155,13 +260,13 @@ set (TAPI_SOURCES
     ../../deps/tapi/lib/Driver/SnapshotFileSystem.cpp)
 
 add_library (tapi SHARED ${TAPI_SOURCES})
-add_prep_dep (tapi)
+add_prep_dep (tapi) # TODO: Use original Clang for CodeGen. See also #12.
 
 target_compile_definitions (tapi PRIVATE TAPI_PORT PATH_MAX=_MAX_PATH)
 
-target_include_directories (tapi PRIVATE
-    ../../deps/tapi/include
-    "${CMAKE_CURRENT_BINARY_DIR}/include") # Headers generated with tblgens.
+target_include_directories (tapi PUBLIC
+    "${CMAKE_CURRENT_BINARY_DIR}/include" # Headers generated with tblgens.
+    ../../deps/tapi/include)
 
 target_link_libraries (tapi PRIVATE ${CLANG_LIBS} ${LLVM_LIBS}
     # TODO: We should use original Clang + `lld-link`, this is just a simpler
@@ -214,3 +319,32 @@ add_custom_command (
     WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
     USES_TERMINAL
     DEPENDS config-clang-x86-Release)
+
+# HeadersAnalyzer
+set (SOURCE_FILES
+    ClangHelper.cpp
+    Common.cpp
+    ErrorReporting.cpp
+    HAContext.cpp
+    HeadersAnalyzer.cpp
+    LLDBHelper.cpp
+    LLVMHelper.cpp
+    TapiHelper.cpp)
+
+add_executable (HeadersAnalyzer ${SOURCE_FILES})
+add_prep_dep (HeadersAnalyzer) # TODO: Use original Clang for CodeGen.
+
+target_compile_options (HeadersAnalyzer PRIVATE -std=c++17)
+
+target_include_directories (HeadersAnalyzer PRIVATE
+    # Private Clang headers
+    ../../deps/clang/lib
+    # Private LLDB headers
+    ../../deps/lldb/source)
+
+target_link_libraries (HeadersAnalyzer PRIVATE
+    ${LLDB_LIBS} ${CLANG_LIBS} ${LLVM_LIBS} tapi
+    # See #12.
+    -fuse-ld=link
+    # `link.exe` complains otherwise.
+    -Wl,/nodefaultlib:libcmt)

@@ -177,7 +177,9 @@ public:
         }
 
         // Analyze functions.
-        auto Analyzer = [&](auto &&Func, bool IgnoreDuplicates = false) {
+        auto Analyzer = [&, DLL = DLL, GroupIdx = GroupIdx,
+                         DLLIdx = DLLIdx](auto &&Func, bool IgnoreDuplicates =
+                                                           false) mutable {
           string Name(LLDBHelper::mangleName(Func));
           uint32_t RVA = Func.getRelativeVirtualAddress();
 
