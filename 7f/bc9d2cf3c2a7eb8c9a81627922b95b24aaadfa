@@ -1,0 +1,11 @@
+[ver:1,total:3705]
+src/HeadersAnalyzer/CMakeLists.txt:3056,1545991200:1080,1545994800:1616,1545998400:360,m
+src/HeadersAnalyzer/HeadersAnalyzer.vcxproj:174,1545991200:30,1545994800:144,r
+docs/tapi.md:120,1545994800:120,r
+scripts/install_agent.ps1:120,1545991200:60,1546002000:60,r
+docs/llvm.md:90,1545994800:90,r
+scripts/CommonVariables.cmake:75,1545991200:15,1545994800:60,r
+cmake/clang-x86-Debug/include/llvm/Config/abi-breaking.h:30,1545994800:30,r
+cmake/clang-x86-Release/include/llvm/Config/abi-breaking.h:20,1545994800:20,r
+src/HeadersAnalyzer/build_tapi.cmd:10,1545994800:10,r
+src/HeadersAnalyzer/README.md:10,1545994800:10,r
