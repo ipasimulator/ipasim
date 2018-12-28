@@ -1,0 +1,4 @@
+[ver:1,total:420]
+scripts/install_agent.ps1:270,1545991200:270,m
+scripts/install_docker.ps1:120,1545991200:120,d
+src/HeadersAnalyzer/HeadersAnalyzer.vcxproj:30,1545991200:30,r
