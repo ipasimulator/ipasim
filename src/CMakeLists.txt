@@ -1,4 +1,5 @@
 add_subdirectory (dyld)
+add_subdirectory (HeadersAnalyzer)
 add_subdirectory (link)
 add_subdirectory (objc)
 add_subdirectory (pthread)
