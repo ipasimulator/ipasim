@@ -1,0 +1,15 @@
+[ver:1,total:3060]
+src/HeadersAnalyzer/CMakeLists.txt:1494,1545951600:386,1545955200:1108,m
+src/HeadersAnalyzer/HeadersAnalyzer.vcxproj:337,1545951600:227,1545955200:110,r
+CMakeLists.txt:180,1545955200:180,r
+samples/CMakeLists.txt:180,1545951600:180,r
+src/HeadersAnalyzer/build_tapi.cmd:178,1545951600:27,1545955200:151,r
+src/CMakeLists.txt:175,1545951600:160,1545955200:15,m
+src/HeadersAnalyzer/tblgen_one.cmd:131,1545951600:15,1545955200:116,r
+src/HeadersAnalyzer/iOSHeaders.mm:90,1545951600:90,r
+src/HeadersAnalyzer/README.md:90,1545951600:90,r
+docs/winobjc.md:60,1545951600:60,r
+scripts/CommonVariables.cmake:50,1545955200:50,r
+docs/tapi.md:50,1545951600:40,1545955200:10,r
+src/HeadersAnalyzer/analyze_ios_headers.cfg:30,1545951600:30,r
+samples/HelloUIWrapper/Package.appxmanifest:15,1545951600:15,r
