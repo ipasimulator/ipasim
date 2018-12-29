@@ -207,23 +207,58 @@ set (LLVM_LIBS
     LLVMX86Utils
     LLVMXRay)
 
+## These targets generate LLVM headers. Note that these are only tablegenned
+## headers. Other generated headers, like `config.h`, are generated at configure
+## time.
+add_custom_target (clang-tablegen-targets
+    COMMENT "Clang tablegen targets"
+    COMMAND ninja clang-tablegen-targets
+    WORKING_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}"
+    DEPENDS config-clang-x86-Debug
+    USES_TERMINAL)
+set (LLVM_TABLEGEN_TARGETS
+    intrinsics_gen
+    AttributeCompatFuncTableGen
+    COFFOptionsTableGen
+    CvtResTableGen
+    DllOptionsTableGen
+    DriverOptionsTableGen
+    ELFOptionsTableGen
+    LibOptionsTableGen
+    MinGWOptionsTableGen
+    MtTableGen
+    ObjcopyTableGen
+    OptsTestTableGen
+    RcTableGen
+    WasmOptionsTableGen
+    X86CommonTableGen)
+add_custom_target (llvm-tablegen-targets
+    COMMENT "LLVM tablegen targets"
+    COMMAND ninja ${LLVM_TABLEGEN_TARGETS}
+    WORKING_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}"
+    DEPENDS config-clang-x86-Debug
+    USES_TERMINAL)
+
 foreach (lib ${LLDB_LIBS})
     add_clang_lib ("${lib}")
     target_include_directories ("${lib}" INTERFACE
         "${DEBUG_CLANG_CMAKE_DIR}/tools/lldb/include"
         ../../deps/lldb/include)
+    # LLDB doesn't have any tablegenned headers.
 endforeach (lib)
 foreach (lib ${CLANG_LIBS})
     add_clang_lib ("${lib}")
     target_include_directories ("${lib}" INTERFACE
         "${DEBUG_CLANG_CMAKE_DIR}/tools/clang/include"
         ../../deps/clang/include)
+    add_dependencies ("${lib}" clang-tablegen-targets)
 endforeach (lib)
 foreach (lib ${LLVM_LIBS})
     add_clang_lib ("${lib}")
     target_include_directories ("${lib}" INTERFACE
         "${DEBUG_CLANG_CMAKE_DIR}/include"
         ../../deps/llvm/include)
+    add_dependencies ("${lib}" llvm-tablegen-targets)
 endforeach (lib)
 
 # Library TAPI. See `docs/tapi.md`.
