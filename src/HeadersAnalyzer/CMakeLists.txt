@@ -1,5 +1,6 @@
 # LLVM libraries
 add_custom_target (config-clang-x86-Debug
+    COMMENT "Configure LLVM libs"
     COMMAND ninja config-clang-x86-Debug
     WORKING_DIRECTORY "${BINARY_DIR}"
     USES_TERMINAL)
@@ -8,23 +9,19 @@ function (add_clang_lib name)
     add_library ("${name}" STATIC IMPORTED)
     set_target_properties ("${name}" PROPERTIES
         IMPORTED_LOCATION "${DEBUG_CLANG_CMAKE_DIR}/lib/${name}.lib")
-    add_dependencies ("${name}" "gen-${name}")
     target_compile_definitions ("${name}" INTERFACE _DEBUG _MT _DLL)
     target_link_libraries ("${name}" INTERFACE
         ucrtd vcruntimed msvcrtd msvcprtd)
 
     # Let CMake know how to generate `${name}.lib`.
-    # TODO: This probably won't rebuild the `.lib` if sources change, will it?
-    # We maybe could also build everything by a single `ninja` command if that
-    # would help...
-    add_custom_command (
-        OUTPUT "${DEBUG_CLANG_CMAKE_DIR}/lib/${name}.lib"
+    # TODO: Build everything by a single `ninja` command.
+    add_custom_target ("gen-${name}"
+        COMMENT "Generate ${name}.lib"
+        BYPRODUCTS "${DEBUG_CLANG_CMAKE_DIR}/lib/${name}.lib"
         COMMAND ninja "${name}"
         WORKING_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}"
         DEPENDS config-clang-x86-Debug
         USES_TERMINAL)
-    add_custom_target ("gen-${name}"
-        DEPENDS "${DEBUG_CLANG_CMAKE_DIR}/lib/${name}.lib")
 endfunction (add_clang_lib)
 
 set (LLDB_LIBS
@@ -302,17 +299,20 @@ add_custom_command (
 
 ### Let CMake know how to generate tblgens.
 add_custom_target (config-clang-x86-Release
+    COMMENT "Configure LLVM tablegens"
     COMMAND ninja config-clang-x86-Release
     WORKING_DIRECTORY "${BINARY_DIR}"
     USES_TERMINAL)
-add_custom_command (
-    OUTPUT "${CLANG_CMAKE_DIR}/bin/clang-tblgen.exe"
+add_custom_target (gen-clang-tblgen
+    COMMENT "Generate Clang tablegen"
+    BYPRODUCTS "${CLANG_CMAKE_DIR}/bin/clang-tblgen.exe"
     COMMAND ninja clang-tblgen
     WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
     USES_TERMINAL
     DEPENDS config-clang-x86-Release)
-add_custom_command (
-    OUTPUT "${CLANG_CMAKE_DIR}/bin/llvm-tblgen.exe"
+add_custom_target (gen-llvm-tblgen
+    COMMENT "Generate LLVM tablegen"
+    BYPRODUCTS "${CLANG_CMAKE_DIR}/bin/llvm-tblgen.exe"
     COMMAND ninja llvm-tblgen
     WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
     USES_TERMINAL
