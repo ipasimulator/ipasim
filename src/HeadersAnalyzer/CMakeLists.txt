@@ -4,25 +4,33 @@ add_custom_target (config-clang-x86-Debug
     COMMAND ninja config-clang-x86-Debug
     WORKING_DIRECTORY "${BINARY_DIR}"
     USES_TERMINAL)
-function (add_clang_lib name)
-    # Add imported library `${name}.lib`.
-    add_library ("${name}" STATIC IMPORTED)
-    set_target_properties ("${name}" PROPERTIES
-        IMPORTED_LOCATION "${DEBUG_CLANG_CMAKE_DIR}/lib/${name}.lib")
-    target_compile_definitions ("${name}" INTERFACE _DEBUG _MT _DLL)
-    target_link_libraries ("${name}" INTERFACE
-        ucrtd vcruntimed msvcrtd msvcprtd)
+function (add_clang_libs title names include_dirs tablegen_targets)
+    foreach (name ${names})
+        # Add imported library `${name}.lib`.
+        add_library ("${name}" STATIC IMPORTED)
+        set_target_properties ("${name}" PROPERTIES
+            IMPORTED_LOCATION "${DEBUG_CLANG_CMAKE_DIR}/lib/${name}.lib")
+        target_compile_definitions ("${name}" INTERFACE _DEBUG _MT _DLL)
+        target_link_libraries ("${name}" INTERFACE
+            ucrtd vcruntimed msvcrtd msvcprtd)
+        target_include_directories ("${name}" INTERFACE ${include_dirs})
+        if (tablegen_targets)
+            add_dependencies ("${name}" ${tablegen_targets})
+        endif (tablegen_targets)
+    endforeach (name)
 
-    # Let CMake know how to generate `${name}.lib`.
-    # TODO: Build everything by a single `ninja` command.
-    add_custom_target ("gen-${name}"
-        COMMENT "Generate ${name}.lib"
-        BYPRODUCTS "${DEBUG_CLANG_CMAKE_DIR}/lib/${name}.lib"
-        COMMAND ninja "${name}"
+    # Let CMake know how to generate those `.lib`s.
+    set (libs ${names})
+    list (TRANSFORM libs PREPEND "${DEBUG_CLANG_CMAKE_DIR}/lib/")
+    list (TRANSFORM libs APPEND .lib)
+    add_custom_target ("gen-${title}"
+        COMMENT "Generate ${title} libs"
+        BYPRODUCTS ${libs}
+        COMMAND ninja ${names}
         WORKING_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}"
         DEPENDS config-clang-x86-Debug
         USES_TERMINAL)
-endfunction (add_clang_lib)
+endfunction (add_clang_libs)
 
 set (LLDB_LIBS
     liblldb
@@ -239,27 +247,21 @@ add_custom_target (llvm-tablegen-targets
     DEPENDS config-clang-x86-Debug
     USES_TERMINAL)
 
-foreach (lib ${LLDB_LIBS})
-    add_clang_lib ("${lib}")
-    target_include_directories ("${lib}" INTERFACE
-        "${DEBUG_CLANG_CMAKE_DIR}/tools/lldb/include"
-        ../../deps/lldb/include)
-    # LLDB doesn't have any tablegenned headers.
-endforeach (lib)
-foreach (lib ${CLANG_LIBS})
-    add_clang_lib ("${lib}")
-    target_include_directories ("${lib}" INTERFACE
-        "${DEBUG_CLANG_CMAKE_DIR}/tools/clang/include"
-        ../../deps/clang/include)
-    add_dependencies ("${lib}" clang-tablegen-targets)
-endforeach (lib)
-foreach (lib ${LLVM_LIBS})
-    add_clang_lib ("${lib}")
-    target_include_directories ("${lib}" INTERFACE
-        "${DEBUG_CLANG_CMAKE_DIR}/include"
-        ../../deps/llvm/include)
-    add_dependencies ("${lib}" llvm-tablegen-targets)
-endforeach (lib)
+set (LLDB_INCLUDE_DIRS
+    "${DEBUG_CLANG_CMAKE_DIR}/tools/lldb/include"
+    ../../deps/lldb/include)
+set (CLANG_INCLUDE_DIRS
+    "${DEBUG_CLANG_CMAKE_DIR}/tools/clang/include"
+    ../../deps/clang/include)
+set (LLVM_INCLUDE_DIRS
+    "${DEBUG_CLANG_CMAKE_DIR}/include"
+    ../../deps/llvm/include)
+
+add_clang_libs (LLDB "${LLDB_LIBS}" "${LLDB_INCLUDE_DIRS}" "")
+add_clang_libs (Clang "${CLANG_LIBS}" "${CLANG_INCLUDE_DIRS}"
+    clang-tablegen-targets)
+add_clang_libs (LLVM "${LLVM_LIBS}" "${LLVM_INCLUDE_DIRS}"
+    llvm-tablegen-targets)
 
 # Library TAPI. See `docs/tapi.md`.
 set (TAPI_SOURCES
