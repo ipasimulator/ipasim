@@ -1,4 +1,4 @@
-# LLVM libraries.
+# LLVM libraries
 add_custom_target (config-clang-x86-Debug
     COMMAND ninja config-clang-x86-Debug
     WORKING_DIRECTORY "${BINARY_DIR}"
@@ -28,6 +28,7 @@ function (add_clang_lib name)
 endfunction (add_clang_lib)
 
 set (LLDB_LIBS
+    liblldb
     lldbBase
     lldbBreakpoint
     lldbCommands
@@ -259,7 +260,9 @@ set (TAPI_SOURCES
     ../../deps/tapi/lib/Driver/Snapshot.cpp
     ../../deps/tapi/lib/Driver/SnapshotFileSystem.cpp)
 
-add_library (tapi SHARED ${TAPI_SOURCES})
+# Making `tapi` `SHARED` doesn't work due to unresolved symbols in
+# `HeadersAnalyzer.exe`.
+add_library (tapi STATIC ${TAPI_SOURCES})
 add_prep_dep (tapi) # TODO: Use original Clang for CodeGen. See also #12.
 
 target_compile_definitions (tapi PRIVATE TAPI_PORT PATH_MAX=_MAX_PATH)
@@ -268,12 +271,7 @@ target_include_directories (tapi PUBLIC
     "${CMAKE_CURRENT_BINARY_DIR}/include" # Headers generated with tblgens.
     ../../deps/tapi/include)
 
-target_link_libraries (tapi PRIVATE ${CLANG_LIBS} ${LLVM_LIBS}
-    # TODO: We should use original Clang + `lld-link`, this is just a simpler
-    # workaround for #12.
-    -fuse-ld=link
-    # `link.exe` complains otherwise.
-    -Wl,/nodefaultlib:libcmt)
+target_link_libraries (tapi PRIVATE ${CLANG_LIBS} ${LLVM_LIBS})
 
 ## Tablegenning
 set (INC1
@@ -320,6 +318,12 @@ add_custom_command (
     USES_TERMINAL
     DEPENDS config-clang-x86-Release)
 
+# DIA SDK
+add_library (dia SHARED IMPORTED)
+set_target_properties (dia PROPERTIES
+    IMPORTED_LOCATION "C:/BuildTools/DIA SDK/bin/msdia140.dll"
+    IMPORTED_IMPLIB "C:/BuildTools/DIA SDK/lib/diaguids.lib")
+
 # HeadersAnalyzer
 set (SOURCE_FILES
     ClangHelper.cpp
@@ -343,8 +347,9 @@ target_include_directories (HeadersAnalyzer PRIVATE
     ../../deps/lldb/source)
 
 target_link_libraries (HeadersAnalyzer PRIVATE
-    ${LLDB_LIBS} ${CLANG_LIBS} ${LLVM_LIBS} tapi
-    # See #12.
+    ${LLDB_LIBS} ${CLANG_LIBS} ${LLVM_LIBS} tapi dia ws2_32.lib mincore.lib
+    # TODO: We should use original Clang + `lld-link`, this is just a simpler
+    # workaround for #12.
     -fuse-ld=link
     # `link.exe` complains otherwise.
     -Wl,/nodefaultlib:libcmt)
