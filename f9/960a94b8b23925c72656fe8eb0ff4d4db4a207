@@ -1,0 +1,5 @@
+[ver:1,total:780]
+src/HeadersAnalyzer/CMakeLists.txt:460,1546084800:460,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:200,1546012800:180,1546084800:20,r
+src/HeadersAnalyzer/HeadersAnalyzer.vcxproj:100,1546084800:100,r
+CMakeLists.txt:20,1546084800:20,r
