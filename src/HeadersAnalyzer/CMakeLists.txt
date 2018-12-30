@@ -5,6 +5,11 @@ add_custom_target (config-clang-x86-Debug
     WORKING_DIRECTORY "${BINARY_DIR}"
     USES_TERMINAL)
 function (add_clang_libs title names include_dirs tablegen_targets)
+    # Create include directories as some of them might be filled with generated
+    # headers at build time, but CMake would complain at configure time that
+    # those directories don't exist.
+    file (MAKE_DIRECTORY ${include_dirs})
+
     foreach (name ${names})
         # Add imported library `${name}.lib`.
         add_library ("${name}" STATIC IMPORTED)
@@ -249,13 +254,13 @@ add_custom_target (llvm-tablegen-targets
 
 set (LLDB_INCLUDE_DIRS
     "${DEBUG_CLANG_CMAKE_DIR}/tools/lldb/include"
-    ../../deps/lldb/include)
+    "${SOURCE_DIR}/deps/lldb/include")
 set (CLANG_INCLUDE_DIRS
     "${DEBUG_CLANG_CMAKE_DIR}/tools/clang/include"
-    ../../deps/clang/include)
+    "${SOURCE_DIR}/deps/clang/include")
 set (LLVM_INCLUDE_DIRS
     "${DEBUG_CLANG_CMAKE_DIR}/include"
-    ../../deps/llvm/include)
+    "${SOURCE_DIR}/deps/llvm/include")
 
 add_clang_libs (LLDB "${LLDB_LIBS}" "${LLDB_INCLUDE_DIRS}" "")
 add_clang_libs (Clang "${CLANG_LIBS}" "${CLANG_INCLUDE_DIRS}"
