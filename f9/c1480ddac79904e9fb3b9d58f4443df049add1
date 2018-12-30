@@ -1,0 +1,13 @@
+[ver:1,total:4440]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:2619,1546099200:750,1546102800:720,1546106400:420,1546110000:180,1546113600:180,1546117200:9,1546171200:360,r
+src/HeadersAnalyzer/CMakeLists.txt:1275,1546099200:340,1546106400:180,1546117200:15,1546171200:740,m
+samples/export-class/main.mm:187,1546117200:187,r
+scripts/push_all.cmd:120,1546171200:120,r
+src/HeadersAnalyzer/LLVMHelper.cpp:75,1546099200:75,r
+Dockerfile:60,1546117200:60,r
+samples/export-class/CMakeLists.txt:27,1546117200:7,1546171200:20,r
+src/HeadersAnalyzer/HAContext.hpp:20,1546099200:20,r
+scripts/build.ps1:20,1546171200:20,r
+src/dyld/dyld.cpp:15,1546117200:15,r
+src/HeadersAnalyzer/LLVMHelper.hpp:15,1546099200:15,r
+samples/CMakeLists.txt:7,1546117200:7,r
