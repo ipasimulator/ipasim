@@ -1,6 +1,6 @@
 # IPA Simulator
 
-This is not in any way a complete documentation, it's just a draft containing some ideas that I could forgot until the final documentation is written.
+This is not in any way a complete documentation, it's just a draft containing some ideas that I could forget until the final documentation is written.
 
 ## Building
 
