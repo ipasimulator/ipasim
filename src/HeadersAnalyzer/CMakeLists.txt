@@ -380,7 +380,7 @@ set (SOURCE_FILES
 add_executable (HeadersAnalyzer ${SOURCE_FILES})
 add_prep_dep (HeadersAnalyzer) # TODO: Use original Clang for CodeGen.
 
-target_compile_options (HeadersAnalyzer PRIVATE -std=c++17)
+target_compile_options (HeadersAnalyzer PRIVATE -std=c++17 -gcodeview)
 
 target_include_directories (HeadersAnalyzer PRIVATE
     # Private Clang headers
@@ -395,3 +395,10 @@ target_link_libraries (HeadersAnalyzer PRIVATE
     -fuse-ld=link
     # `link.exe` complains otherwise.
     -Wl,/nodefaultlib:libcmt)
+
+add_custom_target (CodeGen
+    COMMENT "Code-genning"
+    COMMAND "${IPASIM_CMAKE_DIR}/bin/HeadersAnalyzer.exe"
+    WORKING_DIRECTORY "${SOURCE_DIR}"
+    DEPENDS HeadersAnalyzer
+    USES_TERMINAL)
