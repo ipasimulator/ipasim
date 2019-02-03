@@ -1,0 +1,11 @@
+[ver:1,total:3660]
+scripts/CopyWocHeaders.cmake:1187,1549188000:1187,m
+docs/issues/13.md:890,1549184400:736,1549188000:154,m
+scripts/CommonVariables.cmake:491,1549188000:491,m
+CMakeLists.txt:468,1549188000:468,m
+samples/export-class/CMakeLists.txt:180,1549184400:180,r
+src/HeadersAnalyzer/CMakeLists.txt:180,1549184400:180,r
+scripts/clang-x86-Debug.cmake:160,1549188000:160,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:60,1549184400:60,r
+docs/issues/12.md:37,1549184400:37,r
+docs/issues/11.md:7,1549184400:7,r
