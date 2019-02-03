@@ -1,0 +1,7 @@
+[ver:1,total:1380]
+CMakeLists.txt:815,1549188000:180,1549198800:135,1549209600:420,1549213200:80,r
+scripts/CommonVariables.cmake:445,1549198800:15,1549213200:430,m
+src/HeadersAnalyzer/CMakeLists.txt:60,1549209600:60,r
+scripts/winobjc-x86-Debug.cmake:30,1549213200:30,r
+scripts/CopyWocHeaders.cmake:15,1549198800:15,r
+docs/issues/13.md:15,1549198800:15,r
