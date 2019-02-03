@@ -25,6 +25,7 @@ if (SUPERBUILD)
                 -P "${CMAKE_SOURCE_DIR}/scripts/${name}.cmake"
             USES_TERMINAL
             # TODO: This should also depend on CommonVariables.cmake, right?
+            # TODO: Wrong usage of `DEPENDS`.
             DEPENDS "${CMAKE_SOURCE_DIR}/scripts/${name}.cmake")
         add_custom_target ("config-${name}"
             DEPENDS "${cmakeDir}/CMakeCache.txt")

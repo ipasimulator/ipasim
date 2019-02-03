@@ -151,3 +151,60 @@ function (add_objcuwp_libs)
     # `deps/WinObjC/include/Platform/Universal Windows/UWP`.
     link_directories ("../../deps/prebuilt/Universal Windows/x86")
 endfunction (add_objcuwp_libs)
+
+# See #13.
+set (CF_PUBLIC_HEADERS
+    # From `sdk-build.props`.
+    Stream.subproj/CFStream.h
+    String.subproj/CFStringEncodingExt.h
+    Base.subproj/CoreFoundation.h
+    Base.subproj/SwiftRuntime/TargetConditionals.h
+    RunLoop.subproj/CFMessagePort.h
+    Collections.subproj/CFBinaryHeap.h
+    PlugIn.subproj/CFBundle.h
+    Locale.subproj/CFCalendar.h
+    Collections.subproj/CFBitVector.h
+    Base.subproj/CFAvailability.h
+    Collections.subproj/CFTree.h
+    NumberDate.subproj/CFTimeZone.h
+    Error.subproj/CFError.h
+    Collections.subproj/CFBag.h
+    PlugIn.subproj/CFPlugIn.h
+    Parsing.subproj/CFXMLParser.h
+    String.subproj/CFString.h
+    Collections.subproj/CFSet.h
+    Base.subproj/CFUUID.h
+    NumberDate.subproj/CFDate.h
+    Collections.subproj/CFDictionary.h
+    Base.subproj/CFByteOrder.h
+    AppServices.subproj/CFUserNotification.h
+    Base.subproj/CFBase.h
+    Preferences.subproj/CFPreferences.h
+    Locale.subproj/CFLocale.h
+    RunLoop.subproj/CFSocket.h
+    Parsing.subproj/CFPropertyList.h
+    Collections.subproj/CFArray.h
+    RunLoop.subproj/CFRunLoop.h
+    URL.subproj/CFURLAccess.h
+    Locale.subproj/CFDateFormatter.h
+    RunLoop.subproj/CFMachPort.h
+    PlugIn.subproj/CFPlugInCOM.h
+    Base.subproj/CFUtilities.h
+    Parsing.subproj/CFXMLNode.h
+    URL.subproj/CFURLComponents.h
+    URL.subproj/CFURL.h
+    Locale.subproj/CFNumberFormatter.h
+    String.subproj/CFCharacterSet.h
+    NumberDate.subproj/CFNumber.h
+    Collections.subproj/CFData.h
+    String.subproj/CFAttributedString.h
+    Base.subproj/module.modulemap)
+set (CF_PRIVATE_HEADERS
+    # From `sdk-build.props`.
+    Base.subproj/ForFoundationOnly.h
+    Base.subproj/CFBridgeUtilities.h
+    Base.subproj/CFPriv.h
+    Base.subproj/CFRuntime.h
+    PlugIn.subproj/CFBundlePriv.h
+    Stream.subproj/CFStreamPriv.h
+    String.subproj/CFRegularExpression.h)
