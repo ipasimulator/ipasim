@@ -89,11 +89,11 @@ public:
     reportStatus("discovering DLLs");
 
     // Our Objective-C runtime.
-    HAC.DLLGroups.push_back({"./src/objc/Debug/", {DLLEntry("libobjc.A.dll")}});
+    HAC.DLLGroups.push_back(
+        {"../build/ipasim-x86-Debug/bin/", {DLLEntry("libobjc.dll")}});
 
     // WinObjC DLLs (i.e., Windows versions of Apple's frameworks).
-    HAC.DLLGroups.push_back(
-        {"./deps/WinObjC/build/Win32/Debug/Universal Windows/"});
+    HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/"});
     DLLGroup &WinObjCGroup = HAC.DLLGroups[HAC.DLLGroups.size() - 1];
     if constexpr (Sample)
       WinObjCGroup.DLLs.push_back(DLLEntry("Foundation.dll"));
