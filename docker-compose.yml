@@ -13,6 +13,8 @@ services:
     mem_limit: 16G
     networks:
       - default
+    environment:
+      - BUILD_TABLEGENS_ONLY=${BUILD_TABLEGENS_ONLY}
 
 networks:
   default:
