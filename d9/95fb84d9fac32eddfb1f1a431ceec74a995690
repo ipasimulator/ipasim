@@ -1,0 +1,7 @@
+[ver:1,total:1020]
+docs/issues/14.md:560,1549389600:500,1549468800:60,m
+scripts/CommonVariables.cmake:240,1549216800:240,r
+Dockerfile:150,1549389600:150,r
+docker-compose.yml:30,1549389600:30,r
+scripts/build.ps1:20,1549389600:20,r
+docs/issues/13.md:20,1549389600:20,r
