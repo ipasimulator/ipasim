@@ -14,3 +14,4 @@ if ($env:BUILD_TABLEGENS_ONLY -eq "1") {
     # Build everything.
     ninja ipaSim-x86-Debug
 }
+exit $LASTEXITCODE
