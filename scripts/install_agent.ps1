@@ -18,3 +18,5 @@ Invoke-WebRequest "https://github.com/docker/compose/releases/download/1.23.2/do
 
 # TODO: Make `VSTSAgent` service depend on `docker` (by `sc config VSTSAgent... depend=docker`).
 # Then, manually (or maybe automate this, too) change Docker and VSTS Agent services to run Automatically, for Local System account and to restart on failures.
+
+# TODO: Install Git LFS.
