@@ -1,0 +1,5 @@
+[ver:1,total:1280]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:510,1549645200:510,r
+src/HeadersAnalyzer/CMakeLists.txt:500,1549648800:500,m
+src/HeadersAnalyzer/ErrorReporting.hpp:240,1549645200:180,1549648800:60,r
+src/HeadersAnalyzer/Debug/CG/exports.txt:30,1549645200:30,r
