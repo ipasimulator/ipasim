@@ -1,0 +1,7 @@
+[ver:1,total:2160]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1750,1549641600:1750,m
+src/HeadersAnalyzer/LLVMHelper.cpp:210,1549641600:210,r
+src/HeadersAnalyzer/HeadersAnalyzer.vcxproj:60,1549641600:60,r
+scripts/build.ps1:60,1549641600:60,r
+Dockerfile:50,1549641600:50,r
+src/HeadersAnalyzer/LLDBHelper.cpp:30,1549641600:30,r
