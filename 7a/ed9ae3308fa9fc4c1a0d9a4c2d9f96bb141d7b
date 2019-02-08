@@ -1,0 +1,5 @@
+[ver:1,total:540]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:320,1549645200:320,m
+src/HeadersAnalyzer/CMakeLists.txt:170,1549645200:170,r
+src/HeadersAnalyzer/ClangHelper.cpp:30,1549645200:30,r
+src/HeadersAnalyzer/ClangHelper.hpp:20,1549645200:20,r
