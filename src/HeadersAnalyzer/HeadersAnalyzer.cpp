@@ -402,7 +402,7 @@ public:
         // Create the wrapper DLL.
         ClangHelper(LLVM).linkDLL(
             (WrappersDir / DLL.Name).string(), ObjectFile,
-            path(DLLPath).replace_extension(".lib").string());
+            path(DLLPath).replace_extension(".dll.a").string());
 
         // Emit `.o` file.
         string DylibObjectFile(
