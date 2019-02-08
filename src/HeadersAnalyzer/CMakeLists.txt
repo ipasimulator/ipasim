@@ -160,6 +160,13 @@ set (CLANG_LIBS
     clangToolingRefactor)
 
 set (LLVM_LIBS
+    LLVMARMAsmParser
+    LLVMARMAsmPrinter
+    LLVMARMCodeGen
+    LLVMARMDesc
+    LLVMARMDisassembler
+    LLVMARMInfo
+    LLVMARMUtils
     LLVMAggressiveInstCombine
     LLVMAnalysis
     LLVMAsmParser
