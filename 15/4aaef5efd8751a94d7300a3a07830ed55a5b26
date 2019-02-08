@@ -1,0 +1,7 @@
+[ver:1,total:1020]
+src/HeadersAnalyzer/CMakeLists.txt:300,1549645200:300,m
+src/HeadersAnalyzer/LLVMHelper.cpp:240,1549645200:240,r
+Dockerfile:180,1549641600:180,r
+CMakeLists.txt:160,1549645200:160,r
+scripts/clang-x86-Release.cmake:80,1549645200:80,r
+scripts/clang-x86-Debug.cmake:60,1549645200:60,r
