@@ -96,7 +96,7 @@ public:
     HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/"});
     DLLGroup &WinObjCGroup = HAC.DLLGroups[HAC.DLLGroups.size() - 1];
     if constexpr (Sample)
-      WinObjCGroup.DLLs.push_back(DLLEntry("Foundation.dll"));
+      WinObjCGroup.DLLs.push_back(DLLEntry("libFoundation.dll"));
     else
       for (auto &File : directory_iterator(WinObjCGroup.Dir)) {
         path FilePath(File.path());
@@ -131,7 +131,7 @@ public:
     Clang.Args.add(IRHelper::Windows32);
     // Note that this file is not really analyzed, but it still needs to exist
     // (because it's opened) and also its extension is important (to set
-    // language options - Objective-C for `.mm`).
+    // language options - Objective-C++ for `.mm`).
     Clang.Args.add("./src/HeadersAnalyzer/iOSHeaders.mm");
     Clang.initFromInvocation();
     Clang.executeAction<InitOnlyAction>();
