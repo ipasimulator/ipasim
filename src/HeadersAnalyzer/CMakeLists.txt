@@ -403,9 +403,12 @@ target_link_libraries (HeadersAnalyzer PRIVATE
     # `link.exe` complains otherwise.
     -Wl,/nodefaultlib:libcmt)
 
-add_custom_target (CodeGen
-    COMMENT "Code-genning"
+set (CG_OUTPUTS "${SOURCE_DIR}/src/HeadersAnalyzer/Debug/CG/exports.txt")
+add_custom_command (OUTPUT ${CG_OUTPUTS}
+    COMMENT "Code-gen"
     COMMAND "${IPASIM_CMAKE_DIR}/bin/HeadersAnalyzer.exe"
     WORKING_DIRECTORY "${SOURCE_DIR}"
     DEPENDS HeadersAnalyzer
     USES_TERMINAL)
+add_custom_target (CodeGen
+    DEPENDS ${CG_OUTPUTS})
