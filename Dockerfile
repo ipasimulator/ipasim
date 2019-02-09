@@ -67,6 +67,12 @@ RUN C:/temp/install_vs.cmd C:/temp/vs_buildtools.exe --quiet --wait --norestart 
 # Install ANGLE.WindowsStore. It's needed by project OpenGLES in WinObjC.
 RUN powershell -c "nuget install ANGLE.WindowsStore -Version 2.1.13 -OutputDirectory C:/packages"
 
+# Install Remote Tools for Visual Studio 2017. They can be used for debugging.
+# See https://www.richard-banks.org/2017/02/debug-net-in-windows-container.html.
+ADD https://download.visualstudio.microsoft.com/download/pr/4757630b-d5e2-400c-b1dd-9915b00593bf/2e4ed68951cd6cebb248a862d43a6d84/vs_remotetools.exe C:/temp/vs_remotetools.exe
+RUN C:/temp/vs_remotetools.exe /install /quiet
+EXPOSE 4022 4023
+
 # Start developer command prompt.
 ENTRYPOINT C:/BuildTools/Common7/Tools/VsDevCmd.bat -arch=x86 -host_arch=x86 &&
 

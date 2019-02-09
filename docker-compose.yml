@@ -15,6 +15,9 @@ services:
       - default
     environment:
       - BUILD_TABLEGENS_ONLY=${BUILD_TABLEGENS_ONLY}
+    ports:
+      - "4022:4022"
+      - "4023:4023"
 
 networks:
   default:
