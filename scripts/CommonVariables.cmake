@@ -89,8 +89,7 @@ function (add_prep_target cmd)
         BYPRODUCTS "${BUILT_CLANG_EXE}" "${BUILT_LLD_LINK_EXE}"
         COMMENT "Superbuild"
         COMMAND ninja ${cmd}
-        WORKING_DIRECTORY "${BINARY_DIR}"
-        USES_TERMINAL)
+        WORKING_DIRECTORY "${BINARY_DIR}")
 
     # Copy header files. See #13.
     list (TRANSFORM CF_PUBLIC_HEADERS PREPEND
@@ -102,8 +101,7 @@ function (add_prep_target cmd)
             "-DBINARY_DIR=${BINARY_DIR}"
             -P "${SOURCE_DIR}/scripts/CopyWocHeaders.cmake"
         COMMENT "Copy CoreFoundation headers"
-        USES_TERMINAL
-        # TODO: Wrong usage of `DEPENDS`.
+        # TODO: Wrong usage of `DEPENDS`. And probably not just here!
         #DEPENDS "${CMAKE_SOURCE_DIR}/scripts/CopyWocHeaders.cmake"
         #    "${CMAKE_SOURCE_DIR}/scripts/CommonVariables.cmake"
     )
