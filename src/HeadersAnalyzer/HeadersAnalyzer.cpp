@@ -175,7 +175,7 @@ public:
         }
 
         // Analyze functions.
-        auto Analyzer = [&, DLL = DLL, GroupIdx = GroupIdx,
+        auto Analyzer = [&, DLL = ref(DLL), GroupIdx = GroupIdx,
                          DLLIdx = DLLIdx](auto &&Func, bool IgnoreDuplicates =
                                                            false) mutable {
           string Name(LLDBHelper::mangleName(Func));
@@ -193,14 +193,14 @@ public:
           // Update status accordingly.
           Exp->Status = ExportStatus::FoundInDLL;
           Exp->RVA = RVA;
-          DLL.Exports.push_back(Exp);
+          DLL.get().Exports.push_back(Exp);
           Exp->DLLGroup = GroupIdx;
           Exp->DLL = DLLIdx;
 
           // Save function that will serve as a reference for computing
           // addresses of Objective-C methods.
-          if (!DLL.ReferenceFunc && !Exp->ObjCMethod)
-            DLL.ReferenceFunc = Exp;
+          if (!DLL.get().ReferenceFunc && !Exp->ObjCMethod)
+            DLL.get().ReferenceFunc = Exp;
 
           auto IsStretSetter = [&]() {
             // If it's a normal messenger, it has two parameters (`id` and
