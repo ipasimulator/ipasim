@@ -1,0 +1,9 @@
+[ver:1,total:1440]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:843,1549821600:828,1549825200:15,r
+src/HeadersAnalyzer/LLVMHelper.cpp:180,1549821600:180,r
+build/include/llvm/Support/Error.h:102,1549821600:102,r
+src/HeadersAnalyzer/CMakeLists.txt:95,1549821600:80,1549825200:15,m
+src/objc/CMakeLists.txt:90,1549821600:90,m
+src/HeadersAnalyzer/LLVMHelper.hpp:60,1549821600:60,r
+scripts/CommonVariables.cmake:35,1549821600:20,1549825200:15,m
+CMakeLists.txt:35,1549821600:20,1549825200:15,m
