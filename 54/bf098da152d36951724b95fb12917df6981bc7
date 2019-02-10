@@ -1,0 +1,11 @@
+[ver:1,total:1335]
+src/HeadersAnalyzer/README.md:655,1549735200:480,1549814400:140,1549818000:20,1549821600:15,m
+src/HeadersAnalyzer/ClangHelper.cpp:180,1549818000:180,r
+src/HeadersAnalyzer/iOSHeaders.mm:150,1549735200:150,r
+docs/english.md:120,1549731600:120,r
+src/HeadersAnalyzer/HAContext.cpp:60,1549735200:60,r
+.vscode/settings.json:45,1549821600:45,r
+src/HeadersAnalyzer/Debug/CG/exports.txt:40,1549735200:40,r
+src/HeadersAnalyzer/LLVMHelper.cpp:40,1549814400:20,1549818000:20,r
+src/HeadersAnalyzer/analyze_ios_headers.cfg:30,1549735200:30,r
+docs/git.md:15,1549821600:15,r
