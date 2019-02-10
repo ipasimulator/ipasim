@@ -1,0 +1,6 @@
+[ver:1,total:60]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:12,1549821600:12,m
+.git/hooks/post-commit:12,1549821600:12,r
+.git/hooks/post-update.sample:12,1549821600:12,r
+.git/COMMIT_EDITMSG:12,1549821600:12,r
+.git/hooks/post-checkout:12,1549821600:12,r
