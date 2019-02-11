@@ -1,0 +1,15 @@
+[ver:1,total:1320]
+src/IpaSimulator/IpaSimulator.cpp:475,1549926000:475,m
+src/IpaSimulator/IpaSimApp/App.cpp:330,1549926000:330,m
+samples/HelloUIWrapper/App.xaml.cpp:195,1549926000:195,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:80,1549926000:80,m
+src/IpaSimulator/IpaSimApp/packages.config:66,1549926000:66,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:60,1549926000:60,m
+CMakeLists.txt:36,1549926000:36,r
+docs/issues/14.md:30,1549926000:30,r
+scripts/install_agent.ps1:18,1549926000:18,r
+src/IpaSimulator/MainPage.xaml.cpp:6,1549926000:6,r
+deps/objconv/README.md:6,1549926000:6,r
+src/IpaSimulator/CMakeLists.txt:6,1549926000:6,r
+scripts/build.ps1:6,1549926000:6,r
+docker-compose.yml:6,1549926000:6,r
