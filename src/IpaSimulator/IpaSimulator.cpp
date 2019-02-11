@@ -3,9 +3,7 @@
 using namespace winrt;
 using namespace Windows::Foundation::Metadata;
 
-int main() {
-  init_apartment();
-
+__declspec(dllexport) int main() {
   try {
     bool const rs4 = ApiInformation::IsApiContractPresent(
         L"Windows.Foundation.UniversalApiContract", 6);
