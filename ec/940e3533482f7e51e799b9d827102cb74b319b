@@ -1,0 +1,7 @@
+[ver:1,total:2040]
+src/IpaSimulator/IpaSimulator.cpp:1620,1549897200:180,1549900800:180,1549904400:180,1549908000:180,1549911600:180,1549915200:180,1549918800:180,1549922400:360,r
+src/IpaSimulator/CMakeLists.txt:360,1549897200:300,1549922400:60,r
+src/IpaSimulator/IpaSimApp/App.cpp:15,1549922400:15,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:15,1549922400:15,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:15,1549922400:15,m
+src/IpaSimulator/IpaSimApp/readme.txt:15,1549922400:15,d
