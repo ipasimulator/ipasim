@@ -30,13 +30,11 @@
   <ItemGroup>
     <None Include="IpaSimApp_TemporaryKey.pfx" />
     <None Include="packages.config" />
+    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libIpaSimLibrary.dll" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Assets">
       <UniqueIdentifier>{db9086fe-bacc-4437-8272-1aa6642082db}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="readme.txt" />
   </ItemGroup>
 </Project>
