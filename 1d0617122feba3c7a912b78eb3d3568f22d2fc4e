@@ -1,0 +1,10 @@
+[ver:1,total:1260]
+src/IpaSimulator/IpaSimulator.cpp:390,1549893600:240,1549897200:150,m
+src/IpaSimulator/CMakeLists.txt:270,1549897200:270,m
+src/IpaSimulator/App.xaml.cpp:180,1549893600:180,r
+samples/HelloUIWrapper/MainPage.xaml.cpp:180,1549893600:120,1549897200:60,r
+samples/HelloUIWrapper/App.xaml.cpp:90,1549893600:30,1549897200:60,r
+samples/HelloUILibrary/HelloUILibrary.cpp:60,1549893600:60,r
+samples/HelloUIWrapper/HelloUIWrapper.vcxproj:30,1549893600:30,r
+src/IpaSimulator/MainPage.xaml.cpp:30,1549893600:30,r
+samples/HelloUIWrapper/MainPage.xaml:30,1549893600:30,r
