@@ -1,0 +1,6 @@
+[ver:1,total:944]
+src/IpaSimulator/MainPage.xaml.cpp:654,1549929600:180,1549933200:360,1549962000:114,r
+CMakeLists.txt:210,1549962000:180,1549965600:30,r
+.clang-format:30,1549962000:30,r
+src/IpaSimulator/CMakeLists.txt:30,1549929600:30,r
+.gitattributes:20,1549965600:20,m
