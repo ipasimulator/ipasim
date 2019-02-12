@@ -1,0 +1,6 @@
+[ver:1,total:2700]
+src/IpaSimulator/IpaSimulator.cpp:1680,1549969200:600,1549972800:870,1549976400:210,m
+Dockerfile:435,1549972800:420,1549976400:15,m
+src/IpaSimulator/CMakeLists.txt:285,1549972800:270,1549976400:15,m
+docs/english.md:240,1549972800:240,r
+src/IpaSimulator/MainPage.xaml.cpp:60,1549969200:60,r
