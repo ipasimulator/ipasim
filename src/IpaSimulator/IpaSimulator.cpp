@@ -114,6 +114,27 @@ public:
         if (Buff.size() < VSize)
           memset(Mem + Buff.size(), 0, VSize - Buff.size());
       }
+
+      // Relocate addresses. Inspired by `ImageLoaderMachOClassic::rebase`.
+      if (Slide > 0) {
+        for (Relocation &Rel : Seg.relocations()) {
+          if (Rel.is_pc_relative() ||
+              Rel.origin() != RELOCATION_ORIGINS::ORIGIN_DYLDINFO ||
+              Rel.size() != 32)
+            error("unsupported relocation");
+
+          // Find base address for this relocation. Inspired by
+          // `ImageLoaderMachOClassic::getRelocBase`.
+          uint64_t RelBase = unsigned(LowAddr) + Slide;
+
+          uint64_t RelAddr = RelBase + Rel.address();
+          if (RelAddr > VAddr + VSize)
+            error("relocation target out of range");
+
+          uint32_t *Val = (uint32_t *)RelAddr;
+          *Val = unsigned(*Val) + Slide;
+        }
+      }
     }
   }
 
