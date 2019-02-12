@@ -30,10 +30,8 @@ public:
     // Ensure that segments are continuous (required by `relocateSegment`).
     if (hdr.has(HEADER_FLAGS::MH_SPLIT_SEGS))
       error("MH_SPLIT_SEGS not supported");
-    // We slide the binary, that's why this is required.
-    if (hdr.file_type() == FILE_TYPES::MH_EXECUTE &&
-        !hdr.has(HEADER_FLAGS::MH_PIE))
-      error("executables must be position-independent");
+    if (!canSegmentsSlide(bin))
+      error("the binary is not slideable");
 
     // TODO: Actually load the binary into memory.
   }
@@ -43,6 +41,12 @@ private:
   void error(const string &msg) {
     MessageDialog dlg(to_hstring("Error occured: " + msg));
     dlg.ShowAsync();
+  }
+  // Inspired by `ImageLoaderMachO::segmentsCanSlide`.
+  bool canSegmentsSlide(Binary &bin) {
+    auto ftype = bin.header().file_type();
+    return ftype == FILE_TYPES::MH_DYLIB || ftype == FILE_TYPES::MH_BUNDLE ||
+           (ftype == FILE_TYPES::MH_EXECUTE && bin.is_pie());
   }
 };
 
