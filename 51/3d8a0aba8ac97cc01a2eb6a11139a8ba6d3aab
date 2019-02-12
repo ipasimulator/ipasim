@@ -1,0 +1,5 @@
+[ver:1,total:1320]
+src/IpaSimulator/IpaSimulator.cpp:1060,1549965600:180,1549969200:880,m
+src/IpaSimulator/MainPage.xaml.cpp:174,1549969200:174,r
+src/IpaSimulator/IpaSimApp/App.cpp:50,1549969200:50,m
+build/include/LIEF/MachO/enums.hpp:36,1549969200:36,r
