@@ -2,13 +2,18 @@
 #include <unicorn/unicorn.h>
 #include <winrt/Windows.ApplicationModel.h>
 #include <winrt/Windows.Storage.h>
+#include <winrt/Windows.UI.Popups.h>
+#include <winrt/base.h>
 
 #include <filesystem>
 
 using namespace LIEF::MachO;
 using namespace std;
 using namespace winrt;
+// TODO: Use newer `cppwinrt` and remove this `using namespace`.
+using namespace winrt::impl; // For `to_hstring`.
 using namespace Windows::ApplicationModel;
+using namespace Windows::UI::Popups;
 
 class DynamicLoader {
 public:
@@ -34,8 +39,10 @@ public:
   }
 
 private:
+  // Reports non-fatal error to the user.
   void error(const string &msg) {
-    // TODO: Report it.
+    MessageDialog dlg(to_hstring("Error occured: " + msg));
+    dlg.ShowAsync();
   }
 };
 
@@ -48,4 +55,8 @@ extern "C" __declspec(dllexport) void start() {
   filesystem::path dir(Package::Current().InstalledLocation().Path().c_str());
   DynamicLoader dyld;
   dyld.load((dir / "ToDo").string());
+
+  // Let the user know we're done. This is here for testing purposes only.
+  MessageDialog dlg(L"Done.");
+  dlg.ShowAsync();
 }

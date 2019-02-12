@@ -73,6 +73,10 @@ ADD https://download.visualstudio.microsoft.com/download/pr/4757630b-d5e2-400c-b
 RUN C:/temp/vs_remotetools.exe /install /quiet
 EXPOSE 4022 4023
 
+# Install another (newer) version of C++/WinRT. This one is used by IpaSimulator
+# whereas the other one (see above) is used by WinObjC.
+RUN powershell -c "nuget install cppwinrt -Version 2017.10.13.1 -OutputDirectory C:/packages"
+
 # Start developer command prompt.
 ENTRYPOINT C:/BuildTools/Common7/Tools/VsDevCmd.bat -arch=x86 -host_arch=x86 &&
 
