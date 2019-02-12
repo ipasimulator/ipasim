@@ -1,0 +1,9 @@
+[ver:1,total:1860]
+src/IpaSimulator/IpaSimApp/App.cpp:525,1549983600:525,r
+src/IpaSimulator/IpaSimulator.cpp:413,1549983600:413,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:388,1549983600:388,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:249,1549983600:249,m
+src/IpaSimulator/IpaSimApp/packages.config:150,1549983600:150,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:92,1549983600:92,m
+src/IpaSimulator/IpaSimApp/.gitignore:23,1549983600:23,m
+src/IpaSimulator/IpaSimulator.vcxproj:20,1549983600:20,r
