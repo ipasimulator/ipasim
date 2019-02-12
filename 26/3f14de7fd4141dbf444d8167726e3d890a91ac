@@ -1,0 +1,4 @@
+[ver:1,total:480]
+src/IpaSimulator/IpaSimulator.cpp:350,1549980000:350,m
+src/IpaSimulator/MainPage.xaml.cpp:100,1549980000:100,r
+build/include/LIEF/MachO/type_traits.hpp:30,1549980000:30,r
