@@ -128,7 +128,7 @@ public:
           uint64_t RelBase = unsigned(LowAddr) + Slide;
 
           uint64_t RelAddr = RelBase + Rel.address();
-          if (RelAddr > VAddr + VSize)
+          if (RelAddr > VAddr + VSize || RelAddr < VAddr)
             error("relocation target out of range");
 
           uint32_t *Val = (uint32_t *)RelAddr;
