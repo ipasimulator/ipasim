@@ -6,6 +6,7 @@
 #include <winrt/base.h>
 
 #include <filesystem>
+#include <map>
 
 using namespace LIEF::MachO;
 using namespace std;
@@ -31,10 +32,16 @@ template <class T> inline T &operator^=(T &a, T b) {
   return (T &)((int &)a ^= (int)b);
 }
 
+struct LibraryInfo {
+  uint64_t LowAddr, HighAddr;
+};
+
 class DynamicLoader {
 public:
   DynamicLoader(uc_engine *UC) : UC(UC) {}
   void load(const string &Path) {
+    // TODO: Add binary to `LIs`.
+
     unique_ptr<FatBinary> Fat(Parser::parse(Path));
 
     // TODO: Select the correct binary more intelligently.
@@ -144,6 +151,21 @@ public:
         }
       }
     }
+
+    // Bind external symbols.
+    for (BindingInfo &BInfo : Bin.dyld_info().bindings()) {
+      // Check binding's kind.
+      if ((BInfo.binding_class() != BINDING_CLASS::BIND_CLASS_STANDARD &&
+           BInfo.binding_class() != BINDING_CLASS::BIND_CLASS_LAZY) ||
+          BInfo.binding_type() != BIND_TYPES::BIND_TYPE_POINTER ||
+          BInfo.addend())
+        error("unsupported binding info");
+
+      // Load referenced library.
+      DylibCommand &Lib = BInfo.library();
+      // TODO: Method `load` is not ready for this yet.
+      load(Lib.name());
+    }
   }
 
 private:
@@ -166,6 +188,7 @@ private:
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
   uc_engine *const UC;
+  map<string, LibraryInfo> LIs;
 };
 
 extern "C" __declspec(dllexport) void start() {
