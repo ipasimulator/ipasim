@@ -15,8 +15,25 @@ using namespace winrt::impl; // For `to_hstring`.
 using namespace Windows::ApplicationModel;
 using namespace Windows::UI::Popups;
 
+// Binary operators on enums. Taken from
+// <https://stackoverflow.com/a/23152590/9080566>.
+template <class T> inline T operator~(T a) { return (T) ~(int)a; }
+template <class T> inline T operator|(T a, T b) { return (T)((int)a | (int)b); }
+template <class T> inline T operator&(T a, T b) { return (T)((int)a & (int)b); }
+template <class T> inline T operator^(T a, T b) { return (T)((int)a ^ (int)b); }
+template <class T> inline T &operator|=(T &a, T b) {
+  return (T &)((int &)a |= (int)b);
+}
+template <class T> inline T &operator&=(T &a, T b) {
+  return (T &)((int &)a &= (int)b);
+}
+template <class T> inline T &operator^=(T &a, T b) {
+  return (T &)((int &)a ^= (int)b);
+}
+
 class DynamicLoader {
 public:
+  DynamicLoader(uc_engine *uc) : uc(uc) {}
   void load(const string &path) {
     unique_ptr<FatBinary> fat(Parser::parse(path));
 
@@ -35,6 +52,7 @@ public:
 
     // Compute total size of all segments. Note that in Mach-O, segments must
     // slide together (see `ImageLoaderMachO::segmentsMustSlideTogether`).
+    // Inspired by `ImageLoaderMachO::assignSegmentAddresses`.
     uint64_t lowAddr = (uint64_t)(-1);
     uint64_t highAddr = 0;
     for (SegmentCommand &seg : bin.segments()) {
@@ -59,7 +77,43 @@ public:
       error("couldn't allocate memory for segments");
     uint64_t slide = addr - lowAddr;
 
-    // TODO: Actually load the binary into memory.
+    // Load segments. Inspired by `ImageLoaderMachO::mapSegments`.
+    for (SegmentCommand &seg : bin.segments()) {
+      // Convert protection.
+      uint32_t vmprot = seg.init_protection();
+      uc_prot perms = UC_PROT_NONE;
+      if (vmprot & (uint32_t)VM_PROTECTIONS::VM_PROT_READ) {
+        perms |= UC_PROT_READ;
+      }
+      if (vmprot & (uint32_t)VM_PROTECTIONS::VM_PROT_WRITE) {
+        perms |= UC_PROT_WRITE;
+      }
+      if (vmprot & (uint32_t)VM_PROTECTIONS::VM_PROT_EXECUTE) {
+        perms |= UC_PROT_EXEC;
+      }
+
+      uint64_t vaddr = unsigned(seg.virtual_address()) + slide;
+      // Emulated virtual address is actually equal to the "real" virtual
+      // address.
+      uint8_t *mem = (uint8_t *)vaddr;
+      uint64_t vsize = seg.virtual_size();
+
+      if (perms == UC_PROT_NONE) {
+        // No protection means we don't have to copy any data, we just map it.
+        mapMemory(vaddr, vsize, perms, mem);
+      } else {
+        // TODO: Memory-map the segment instead of copying it.
+        auto &buff = seg.content();
+        // TODO: Copy to the end of the allocated space if flag `SG_HIGHVM` is
+        // present.
+        memcpy(mem, buff.data(), buff.size());
+        mapMemory(vaddr, vsize, perms, mem);
+
+        // Clear the remaining memory.
+        if (buff.size() < vsize)
+          memset(mem + buff.size(), 0, vsize - buff.size());
+      }
+    }
   }
 
 private:
@@ -74,8 +128,13 @@ private:
     return ftype == FILE_TYPES::MH_DYLIB || ftype == FILE_TYPES::MH_BUNDLE ||
            (ftype == FILE_TYPES::MH_EXECUTE && bin.is_pie());
   }
+  void mapMemory(uint64_t addr, uint64_t size, uc_prot perms, uint8_t *mem) {
+    if (uc_mem_map_ptr(uc, addr, size, perms, mem))
+      error("error while mapping memory into Unicorn Engine");
+  }
 
   static constexpr int pageSize = 4096;
+  uc_engine *const uc;
 };
 
 extern "C" __declspec(dllexport) void start() {
@@ -85,7 +144,7 @@ extern "C" __declspec(dllexport) void start() {
 
   // Load test binary `ToDo`.
   filesystem::path dir(Package::Current().InstalledLocation().Path().c_str());
-  DynamicLoader dyld;
+  DynamicLoader dyld(uc);
   dyld.load((dir / "ToDo").string());
 
   // Let the user know we're done. This is here for testing purposes only.
