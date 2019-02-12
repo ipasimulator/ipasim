@@ -120,7 +120,7 @@ public:
         for (Relocation &Rel : Seg.relocations()) {
           if (Rel.is_pc_relative() ||
               Rel.origin() != RELOCATION_ORIGINS::ORIGIN_DYLDINFO ||
-              Rel.size() != 32)
+              Rel.size() != 32 || (Rel.address() & R_SCATTERED) != 0)
             error("unsupported relocation");
 
           // Find base address for this relocation. Inspired by
@@ -156,6 +156,7 @@ private:
   }
 
   static constexpr int PageSize = 4096;
+  static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
   uc_engine *const UC;
 };
 
