@@ -40,7 +40,8 @@ public:
     for (SegmentCommand &seg : bin.segments()) {
       uint64_t segLow = seg.virtual_address();
       // Round to page size (as required by unicorn and what even dyld does).
-      uint64_t segHigh = ((segLow + seg.virtual_size()) + 4095) & (-4096);
+      uint64_t segHigh =
+          ((segLow + seg.virtual_size()) + pageSize - 1) & (-pageSize);
       if (segLow < highAddr) {
         error("overlapping segments (after rounding to pagesize)");
       }
@@ -51,6 +52,12 @@ public:
         highAddr = segHigh;
       }
     }
+
+    // Allocate space for the segments.
+    uintptr_t addr = (uintptr_t)_aligned_malloc(highAddr - lowAddr, pageSize);
+    if (!addr)
+      error("couldn't allocate memory for segments");
+    uint64_t slide = addr - lowAddr;
 
     // TODO: Actually load the binary into memory.
   }
@@ -67,6 +74,8 @@ private:
     return ftype == FILE_TYPES::MH_DYLIB || ftype == FILE_TYPES::MH_BUNDLE ||
            (ftype == FILE_TYPES::MH_EXECUTE && bin.is_pie());
   }
+
+  static constexpr int pageSize = 4096;
 };
 
 extern "C" __declspec(dllexport) void start() {
