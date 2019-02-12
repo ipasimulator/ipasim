@@ -33,6 +33,25 @@ public:
     if (!canSegmentsSlide(bin))
       error("the binary is not slideable");
 
+    // Compute total size of all segments. Note that in Mach-O, segments must
+    // slide together (see `ImageLoaderMachO::segmentsMustSlideTogether`).
+    uint64_t lowAddr = (uint64_t)(-1);
+    uint64_t highAddr = 0;
+    for (SegmentCommand &seg : bin.segments()) {
+      uint64_t segLow = seg.virtual_address();
+      // Round to page size (as required by unicorn and what even dyld does).
+      uint64_t segHigh = ((segLow + seg.virtual_size()) + 4095) & (-4096);
+      if (segLow < highAddr) {
+        error("overlapping segments (after rounding to pagesize)");
+      }
+      if (segLow < lowAddr) {
+        lowAddr = segLow;
+      }
+      if (segHigh > highAddr) {
+        highAddr = segHigh;
+      }
+    }
+
     // TODO: Actually load the binary into memory.
   }
 
