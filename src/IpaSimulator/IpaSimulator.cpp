@@ -14,6 +14,7 @@ using namespace winrt;
 // TODO: Use newer `cppwinrt` and remove this `using namespace`.
 using namespace winrt::impl; // For `to_hstring`.
 using namespace Windows::ApplicationModel;
+using namespace Windows::Storage;
 using namespace Windows::UI::Popups;
 
 // Binary operators on enums. Taken from
@@ -36,10 +37,25 @@ struct LibraryInfo {
   uint64_t LowAddr, HighAddr;
 };
 
+static bool isFileValid(const string &Path) {
+  try {
+    StorageFile File =
+        StorageFile::GetFileFromPathAsync(to_hstring(Path)).get();
+    return true;
+  } catch (...) {
+    return false;
+  }
+}
+
 class DynamicLoader {
 public:
   DynamicLoader(uc_engine *UC) : UC(UC) {}
   void load(const string &Path) {
+    if (!isFileValid(Path)) {
+      error("Invalid file: " + Path);
+      return;
+    }
+
     // TODO: Add binary to `LIs`.
 
     unique_ptr<FatBinary> Fat(Parser::parse(Path));
@@ -164,7 +180,7 @@ public:
       // Load referenced library.
       DylibCommand &Lib = BInfo.library();
       // TODO: Method `load` is not ready for this yet.
-      //load(Lib.name());
+      load(Lib.name());
     }
   }
 
