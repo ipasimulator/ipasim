@@ -23,6 +23,8 @@ set_target_properties (LIEF PROPERTIES
     IMPORTED_LOCATION "${SOURCE_DIR}/lib/LIEF/LIEF.lib")
 target_include_directories (LIEF INTERFACE
     "${SOURCE_DIR}/lib/LIEF/include")
+target_compile_options (LIEF INTERFACE
+    "-include${CMAKE_CURRENT_SOURCE_DIR}/my_iso646.h")
 target_compile_definitions (LIEF INTERFACE NOMINMAX)
 
 target_link_libraries (IpaSimLibrary PRIVATE WindowsApp.lib Unicorn LIEF)

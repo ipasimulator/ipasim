@@ -1,16 +1,3 @@
-// For LIEF to work.
-// TODO: This should be included from `iso646.h` or `ciso646` instead.
-#define and &&
-#define and_eq &=
-#define bitand &
-#define bitor |
-#define compl ~
-#define not !
-#define not_eq !=
-#define or ||
-#define or_eq |=
-#define xor ^
-#define xor_eq ^=
 #include <LIEF/MachO/BinaryParser.hpp>
 #include <unicorn/unicorn.h>
 #include <winrt/Windows.Foundation.Metadata.h>
