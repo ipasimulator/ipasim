@@ -35,10 +35,17 @@
     <None Include="..\..\..\lib\unicorn\libwinpthread-1.dll" />
     <None Include="..\..\..\lib\unicorn\unicorn.dll" />
     <None Include="..\..\..\samples\ToDo\ToDo" />
+    <!-- TODO: This doesn't work for more than one file. -->
+    <None Include="gen\**">
+      <Filter>gen</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Assets">
       <UniqueIdentifier>{db9086fe-bacc-4437-8272-1aa6642082db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gen">
+      <UniqueIdentifier>{8846a1e8-48da-42bc-a564-646872868ad2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

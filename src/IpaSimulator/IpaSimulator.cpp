@@ -164,7 +164,7 @@ public:
       // Load referenced library.
       DylibCommand &Lib = BInfo.library();
       // TODO: Method `load` is not ready for this yet.
-      load(Lib.name());
+      //load(Lib.name());
     }
   }
 

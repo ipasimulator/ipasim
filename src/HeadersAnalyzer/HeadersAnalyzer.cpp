@@ -261,8 +261,8 @@ public:
   }
   void createDirs() {
     OutputDir = createOutputDir("./src/HeadersAnalyzer/Debug/CG/");
-    WrappersDir = createOutputDir("./out/Wrappers/");
-    DylibsDir = createOutputDir("./out/Dylibs/");
+    WrappersDir = createOutputDir("./src/IpaSimulator/IpaSimApp/gen/Wrappers/");
+    DylibsDir = createOutputDir("./src/IpaSimulator/IpaSimApp/gen/Dylibs/");
   }
   void generateDLLs() {
     reportStatus("generating DLLs");

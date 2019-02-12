@@ -125,6 +125,9 @@
     <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libIpaSimLibrary.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="gen\**">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="IpaSimApp_TemporaryKey.pfx" />
     <None Include="packages.config" />
   </ItemGroup>
