@@ -47,8 +47,8 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView> {
     // TODO: Is this the right place to do it?
     HMODULE lib =
         check_pointer(LoadPackagedLibrary(L"libIpaSimLibrary.dll", 0));
-    FARPROC mainFunc = check_pointer(GetProcAddress(lib, "main"));
-    ((void (*)())mainFunc)();
+    FARPROC startFunc = check_pointer(GetProcAddress(lib, "start"));
+    ((void (*)())startFunc)();
     check_bool(FreeLibrary(lib));
   }
 
