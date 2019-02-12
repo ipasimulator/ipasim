@@ -1,0 +1,5 @@
+[ver:1,total:2774]
+src/IpaSimulator/IpaSimulator.cpp:2104,1549929600:90,1549962000:594,1549965600:1420,m
+src/IpaSimulator/IpaSimApp/App.cpp:321,1549965600:321,m
+src/IpaSimulator/MainPage.xaml.cpp:319,1549965600:319,r
+CMakeLists.txt:30,1549965600:30,r
