@@ -34,6 +34,7 @@
     <None Include="..\..\..\lib\unicorn\libgcc_s_dw2-1.dll" />
     <None Include="..\..\..\lib\unicorn\libwinpthread-1.dll" />
     <None Include="..\..\..\lib\unicorn\unicorn.dll" />
+    <None Include="..\..\..\samples\ToDo\ToDo" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Assets">

@@ -110,6 +110,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\samples\ToDo\ToDo">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="..\..\..\lib\unicorn\libgcc_s_dw2-1.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
