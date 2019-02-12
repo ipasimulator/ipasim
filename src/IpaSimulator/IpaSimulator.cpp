@@ -128,11 +128,19 @@ public:
           uint64_t RelBase = unsigned(LowAddr) + Slide;
 
           uint64_t RelAddr = RelBase + Rel.address();
+
+          // TODO: Implement what `ImageLoader::containsAddress` does.
           if (RelAddr > VAddr + VSize || RelAddr < VAddr)
             error("relocation target out of range");
 
           uint32_t *Val = (uint32_t *)RelAddr;
-          *Val = unsigned(*Val) + Slide;
+          // We actively leave NULL pointers untouched. Technically it would be
+          // correct to slide them because the PAGEZERO segment slid, too. But
+          // programs probably wouldn't be happy if their NULLs were non-zero.
+          // TODO: Solve this as the original dyld does. Maybe by always mapping
+          // PAGEZERO to address 0 or something like that.
+          if (*Val != 0)
+            *Val = unsigned(*Val) + Slide;
         }
       }
     }
