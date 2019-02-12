@@ -17,12 +17,7 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView> {
 
   IFrameworkView CreateView() { return *this; }
 
-  void Initialize(CoreApplicationView const &) {
-    HMODULE lib = check_pointer(LoadPackagedLibrary(L"libIpaSimLibrary.dll", 0));
-    FARPROC mainFunc = check_pointer(GetProcAddress(lib, "main"));
-    int result = ((int (*)())mainFunc)();
-    check_bool(FreeLibrary(lib));
-  }
+  void Initialize(CoreApplicationView const &) {}
 
   void Load(hstring const &) {}
 
@@ -47,8 +42,17 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView> {
     window.PointerMoved({this, &App::OnPointerMoved});
 
     window.PointerReleased([&](auto &&...) { m_selected = nullptr; });
+
+    // Execute the main logic which is stored inside `IpaSimLibrary`.
+    // TODO: Is this the right place to do it?
+    HMODULE lib =
+        check_pointer(LoadPackagedLibrary(L"libIpaSimLibrary.dll", 0));
+    FARPROC mainFunc = check_pointer(GetProcAddress(lib, "main"));
+    ((void (*)())mainFunc)();
+    check_bool(FreeLibrary(lib));
   }
 
+  // TODO: Remove this sample code.
   void OnPointerPressed(IInspectable const &, PointerEventArgs const &args) {
     float2 const point = args.CurrentPoint().Position();
 
