@@ -31,6 +31,9 @@
     <None Include="IpaSimApp_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libIpaSimLibrary.dll" />
+    <None Include="..\..\..\lib\unicorn\libgcc_s_dw2-1.dll" />
+    <None Include="..\..\..\lib\unicorn\libwinpthread-1.dll" />
+    <None Include="..\..\..\lib\unicorn\unicorn.dll" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Assets">

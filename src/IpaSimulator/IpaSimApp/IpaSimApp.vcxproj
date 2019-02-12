@@ -110,6 +110,15 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\lib\unicorn\libgcc_s_dw2-1.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\lib\unicorn\libwinpthread-1.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\lib\unicorn\unicorn.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libIpaSimLibrary.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
