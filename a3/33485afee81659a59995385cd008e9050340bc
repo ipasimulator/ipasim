@@ -4,3 +4,13 @@ src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:50,1549929600:50,m
 lib/unicorn/README.md:20,1549929600:20,m
 .git/COMMIT_EDITMSG:20,1549929600:20,r
 src/IpaSimulator/IpaSimApp/App.cpp:15,1549929600:15,r
+
+[ver:1,total:1260]
+src/IpaSimulator/CMakeLists.txt:429,1549926000:354,1549929600:75,m
+src/IpaSimulator/IpaSimulator.cpp:342,1549926000:327,1549929600:15,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:195,1549926000:180,1549929600:15,m
+lib/unicorn/README.md:150,1549929600:150,m
+src/IpaSimulator/IpaSimApp/App.cpp:60,1549926000:60,r
+.gitattributes:45,1549929600:45,m
+CMakeLists.txt:24,1549926000:24,r
+src/IpaSimulator/MainPage.xaml.cpp:15,1549926000:15,r
