@@ -1,0 +1,5 @@
+[ver:1,total:1560]
+src/IpaSimulator/IpaSimulator.cpp:1159,1549980000:409,1549983600:750,m
+src/IpaSimulator/MainPage.xaml.cpp:331,1549980000:121,1549983600:210,r
+build/include/LIEF/MachO/DylibCommand.hpp:60,1549983600:60,r
+build/include/LIEF/MachO/type_traits.hpp:10,1549980000:10,r
