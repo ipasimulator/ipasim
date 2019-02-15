@@ -51,14 +51,16 @@ class DynamicLoader {
 public:
   DynamicLoader(uc_engine *UC) : UC(UC) {}
   void load(const string &Path) {
-    if (!isFileValid(Path)) {
-      error("Invalid file: " + Path);
+    string FullPath(resolvePath(Path));
+
+    if (!isFileValid(FullPath)) {
+      error("Invalid file: " + FullPath);
       return;
     }
 
     // TODO: Add binary to `LIs`.
 
-    unique_ptr<FatBinary> Fat(Parser::parse(Path));
+    unique_ptr<FatBinary> Fat(Parser::parse(FullPath));
 
     // TODO: Select the correct binary more intelligently.
     Binary &Bin = Fat->at(0);
@@ -179,7 +181,6 @@ public:
 
       // Load referenced library.
       DylibCommand &Lib = BInfo.library();
-      // TODO: Method `load` is not ready for this yet.
       load(Lib.name());
     }
   }
@@ -199,6 +200,20 @@ private:
   void mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms, uint8_t *Mem) {
     if (uc_mem_map_ptr(UC, Addr, Size, Perms, Mem))
       error("error while mapping memory into Unicorn Engine");
+  }
+  string resolvePath(const string &Path) {
+    if (!Path.empty() && Path[0] == '/') {
+      // This path is something like
+      // `/System/Library/Frameworks/Foundation.framework/Foundation`.
+      filesystem::path InstallDir(
+          Package::Current().InstalledLocation().Path().c_str());
+      return (InstallDir / "gen/Dylibs" / filesystem::path(Path.substr(1)))
+          .make_preferred()
+          .string();
+    }
+
+    // TODO: Handle also `.ipa`-relative paths.
+    return Path;
   }
 
   static constexpr int PageSize = 4096;
