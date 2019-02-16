@@ -8,7 +8,6 @@
 #include <filesystem>
 #include <map>
 
-using namespace LIEF::MachO;
 using namespace std;
 using namespace winrt;
 // TODO: Use newer `cppwinrt` and remove this `using namespace`.
@@ -54,13 +53,56 @@ public:
     string FullPath(resolvePath(Path));
 
     if (!isFileValid(FullPath)) {
-      error("Invalid file: " + FullPath);
+      error("invalid file: " + FullPath);
       return;
     }
 
     // TODO: Add binary to `LIs`.
 
-    unique_ptr<FatBinary> Fat(Parser::parse(FullPath));
+    if (LIEF::MachO::is_macho(FullPath))
+      loadMachO(FullPath);
+    else if (LIEF::PE::is_pe(FullPath))
+      loadPE(FullPath);
+    else
+      error("invalid binary type: " + FullPath);
+  }
+
+private:
+  // Reports non-fatal error to the user.
+  void error(const string &Msg) {
+    MessageDialog Dlg(to_hstring("Error occurred: " + Msg));
+    Dlg.ShowAsync();
+  }
+  // Inspired by `ImageLoaderMachO::segmentsCanSlide`.
+  bool canSegmentsSlide(LIEF::MachO::Binary &Bin) {
+    using namespace LIEF::MachO;
+
+    auto FType = Bin.header().file_type();
+    return FType == FILE_TYPES::MH_DYLIB || FType == FILE_TYPES::MH_BUNDLE ||
+           (FType == FILE_TYPES::MH_EXECUTE && Bin.is_pie());
+  }
+  void mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms, uint8_t *Mem) {
+    if (uc_mem_map_ptr(UC, Addr, Size, Perms, Mem))
+      error("error while mapping memory into Unicorn Engine");
+  }
+  string resolvePath(const string &Path) {
+    if (!Path.empty() && Path[0] == '/') {
+      // This path is something like
+      // `/System/Library/Frameworks/Foundation.framework/Foundation`.
+      filesystem::path InstallDir(
+          Package::Current().InstalledLocation().Path().c_str());
+      return (InstallDir / "gen" / filesystem::path(Path.substr(1)))
+          .make_preferred()
+          .string();
+    }
+
+    // TODO: Handle also `.ipa`-relative paths.
+    return Path;
+  }
+  void loadMachO(const string &Path) {
+    using namespace LIEF::MachO;
+
+    unique_ptr<FatBinary> Fat(Parser::parse(Path));
 
     // TODO: Select the correct binary more intelligently.
     Binary &Bin = Fat->at(0);
@@ -185,39 +227,11 @@ public:
           BInfo.binding_type() != BIND_TYPES::BIND_TYPE_POINTER ||
           BInfo.addend())
         error("unsupported binding info");
+
+      // TODO: Bind it.
     }
   }
-
-private:
-  // Reports non-fatal error to the user.
-  void error(const string &Msg) {
-    MessageDialog Dlg(to_hstring("Error occurred: " + Msg));
-    Dlg.ShowAsync();
-  }
-  // Inspired by `ImageLoaderMachO::segmentsCanSlide`.
-  bool canSegmentsSlide(Binary &Bin) {
-    auto FType = Bin.header().file_type();
-    return FType == FILE_TYPES::MH_DYLIB || FType == FILE_TYPES::MH_BUNDLE ||
-           (FType == FILE_TYPES::MH_EXECUTE && Bin.is_pie());
-  }
-  void mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms, uint8_t *Mem) {
-    if (uc_mem_map_ptr(UC, Addr, Size, Perms, Mem))
-      error("error while mapping memory into Unicorn Engine");
-  }
-  string resolvePath(const string &Path) {
-    if (!Path.empty() && Path[0] == '/') {
-      // This path is something like
-      // `/System/Library/Frameworks/Foundation.framework/Foundation`.
-      filesystem::path InstallDir(
-          Package::Current().InstalledLocation().Path().c_str());
-      return (InstallDir / "gen" / filesystem::path(Path.substr(1)))
-          .make_preferred()
-          .string();
-    }
-
-    // TODO: Handle also `.ipa`-relative paths.
-    return Path;
-  }
+  void loadPE(const string &Path) { using namespace LIEF::PE; }
 
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
