@@ -170,6 +170,13 @@ public:
       }
     }
 
+    // Load referenced libraries.
+    for (DylibCommand &Lib : Bin.libraries()) {
+      if (Lib.command() == LOAD_COMMAND_TYPES::LC_ID_DYLIB)
+        continue;
+      load(Lib.name());
+    }
+
     // Bind external symbols.
     for (BindingInfo &BInfo : Bin.dyld_info().bindings()) {
       // Check binding's kind.
@@ -178,10 +185,6 @@ public:
           BInfo.binding_type() != BIND_TYPES::BIND_TYPE_POINTER ||
           BInfo.addend())
         error("unsupported binding info");
-
-      // Load referenced library.
-      DylibCommand &Lib = BInfo.library();
-      load(Lib.name());
     }
   }
 
