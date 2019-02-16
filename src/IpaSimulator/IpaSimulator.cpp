@@ -188,7 +188,7 @@ public:
 private:
   // Reports non-fatal error to the user.
   void error(const string &Msg) {
-    MessageDialog Dlg(to_hstring("Error occured: " + Msg));
+    MessageDialog Dlg(to_hstring("Error occurred: " + Msg));
     Dlg.ShowAsync();
   }
   // Inspired by `ImageLoaderMachO::segmentsCanSlide`.
