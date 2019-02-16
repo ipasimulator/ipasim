@@ -1,0 +1,8 @@
+[ver:1,total:1260]
+src/IpaSimulator/IpaSimulator.cpp:1179,1550318400:1179,m
+src/IpaSimulator/IpaSimApp/App.cpp:15,1550318400:15,r
+build/include/LIEF/MachO/enums.hpp:15,1550318400:15,r
+build/include/LIEF/MachO/type_traits.hpp:15,1550318400:15,r
+CMakeLists.txt:12,1550318400:12,r
+src/IpaSimulator/CMakeLists.txt:12,1550318400:12,r
+docs/git.md:12,1550318400:12,r
