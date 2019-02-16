@@ -210,6 +210,9 @@ Universal Windows/x86/cassowary-0.60-Debug.lib")
     # Common file used by many libraries.
     set (DYLD_INITIALIZER "${SOURCE_DIR}/src/dyld/dyld_initializer.cpp")
 
+    # Target grouping all WinObjC Frameworks. See function `woc_framework`.
+    add_custom_target (Frameworks)
+
     add_subdirectory (src)
     add_subdirectory (deps/WinObjC/Frameworks)
     add_subdirectory (samples)

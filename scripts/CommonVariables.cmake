@@ -228,3 +228,14 @@ function (add_objcuwp_libs)
     # `deps/WinObjC/include/Platform/Universal Windows/UWP`.
     link_directories ("../../deps/prebuilt/Universal Windows/x86")
 endfunction (add_objcuwp_libs)
+
+# This function is called by all WinObjC Frameworks (subdirectories in
+# `/deps/WinObjC/Frameworks/`).
+function (woc_framework name)
+    add_prep_dep ("${name}")
+    set_target_properties ("${name}" PROPERTIES
+        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Frameworks"
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Frameworks"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Frameworks")
+    add_dependencies (Frameworks "${name}")
+endfunction (woc_framework)
