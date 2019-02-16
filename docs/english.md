@@ -29,10 +29,12 @@ Currently, there aren't any other dependencies IIRC.
 > See [these Microsoft docs](https://docs.microsoft.com/en-us/visualstudio/install/build-tools-container?view=vs-2017) for useful information about that.
 
 When we have our Docker machine up and running, we can start building.
-First, run `.\scripts\build.ps1` inside `C:\project`.
-That script creates build directory `C:\build`.
+First, run `.\scripts\build.ps1` inside `C:\ipaSim\src`.
+That script creates build directory `C:\ipaSim\build`.
 Inside that directory, run `ninja config-ipaSim-x86-Debug` to prepare building of that configuration (x86 Debug).
-Then, move to `C:\build\ipaSim-x86-Debug` and continue using Ninja from there (e.g., run `ninja -t targets` to see list of possible build targets).
+Then, move to `C:\ipaSim\build\ipaSim-x86-Debug` and continue using Ninja from there (e.g., run `ninja -t targets` to see list of possible build targets).
+To enable incremental builds across Docker builds, use scripts `C:\ipaSim\src\scripts\backup.ps1` and `C:\ipaSim\src\scripts\restore.ps1`.
+See [issue #3](issues/3.md) for more details.
 
 ## Updating dependencies
 
