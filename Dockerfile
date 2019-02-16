@@ -62,7 +62,7 @@ RUN C:/temp/install_vs.cmd C:/temp/vs_buildtools.exe --quiet --wait --norestart 
     --add Microsoft.VisualStudio.Component.VC.Redist.14.Latest \
     --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
     --add Microsoft.VisualStudio.Component.VC.ATLMFC \
-    --add Microsoft.VisualStudio.Component.Windows10SDK.15063.UWP.Native
+    --add Microsoft.VisualStudio.Component.Windows10SDK.17134
 
 # Install ANGLE.WindowsStore. It's needed by project OpenGLES in WinObjC.
 RUN powershell -c "nuget install ANGLE.WindowsStore -Version 2.1.13 -OutputDirectory C:/packages"
@@ -72,10 +72,6 @@ RUN powershell -c "nuget install ANGLE.WindowsStore -Version 2.1.13 -OutputDirec
 ADD https://download.visualstudio.microsoft.com/download/pr/4757630b-d5e2-400c-b1dd-9915b00593bf/2e4ed68951cd6cebb248a862d43a6d84/vs_remotetools.exe C:/temp/vs_remotetools.exe
 RUN C:/temp/vs_remotetools.exe /install /quiet
 EXPOSE 4022 4023
-
-# Install another (newer) version of C++/WinRT. This one is used by IpaSimulator
-# whereas the other one (see above) is used by WinObjC.
-RUN powershell -c "nuget install cppwinrt -Version 2017.10.13.1 -OutputDirectory C:/packages"
 
 # Install `cppcheck`. It's needed to compile LIEF.
 RUN powershell -c "choco install cppcheck --version 1.87 -y"
