@@ -231,7 +231,13 @@ private:
       // TODO: Bind it.
     }
   }
-  void loadPE(const string &Path) { using namespace LIEF::PE; }
+  void loadPE(const string &Path) {
+    using namespace LIEF::PE;
+
+    HMODULE Lib = LoadPackagedLibrary(to_hstring(Path).c_str(), 0);
+    if (!Lib)
+      error("couldn't load DLL: " + Path);
+  }
 
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
