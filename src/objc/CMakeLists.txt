@@ -93,6 +93,7 @@ add_custom_command (
         "-DTARGET_DIR=${CMAKE_BINARY_DIR}/conv"
         "-DASM_OBJECTS=$<TARGET_OBJECTS:objc-asm>"
         -P "${CMAKE_SOURCE_DIR}/src/objc/ConvAsmObj.cmake"
+    USES_TERMINAL
     DEPENDS "${CMAKE_SOURCE_DIR}/src/objc/ConvAsmObj.cmake" objc-asm)
 target_sources (objc PRIVATE ${CONV_OBJS})
 

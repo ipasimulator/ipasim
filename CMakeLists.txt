@@ -23,6 +23,7 @@ if (SUPERBUILD)
                 "-DSOURCE_DIR=${CMAKE_SOURCE_DIR}"
                 "-DBINARY_DIR=${CMAKE_BINARY_DIR}"
                 -P "${CMAKE_SOURCE_DIR}/scripts/${name}.cmake"
+            USES_TERMINAL
             # TODO: This should also depend on CommonVariables.cmake, right?
             # TODO: Wrong usage of `DEPENDS`.
             DEPENDS "${CMAKE_SOURCE_DIR}/scripts/${name}.cmake")
@@ -40,6 +41,7 @@ if (SUPERBUILD)
         COMMENT "Tablegens"
         COMMAND ninja llvm-tblgen clang-tblgen
         WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
+        USES_TERMINAL
         DEPENDS config-clang-x86-Release)
 
     add_dependencies (config-clang-x86-Debug tblgens-x86-Release)
@@ -48,12 +50,14 @@ if (SUPERBUILD)
         COMMENT "Clang"
         COMMAND ninja clang lld
         WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
+        USES_TERMINAL
         DEPENDS config-clang-x86-Release)
 
     add_custom_target (clang-x86-Debug
         COMMENT "Clang"
         COMMAND ninja clang lld
         WORKING_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}"
+        USES_TERMINAL
         DEPENDS config-clang-x86-Debug)
 
     add_custom_target (prep-ipaSim-x86-Debug
@@ -66,12 +70,14 @@ if (SUPERBUILD)
         # TODO: Change to `IpaSimApp` when it's ready.
         COMMAND ninja IpaSimLibrary
         WORKING_DIRECTORY "${IPASIM_CMAKE_DIR}"
+        USES_TERMINAL
         DEPENDS config-ipaSim-x86-Debug)
 
     add_custom_target (lief-x86-Debug
         COMMENT "LIEF"
         COMMAND ninja LIB_LIEF_STATIC
         WORKING_DIRECTORY "${LIEF_CMAKE_DIR}"
+        USES_TERMINAL
         DEPENDS config-lief-x86-Debug)
 
 else (SUPERBUILD)
@@ -123,7 +129,8 @@ testing purposes only." OFF)
     add_custom_target (config-winobjc-x86-Debug
         COMMENT "Configure WinObjC"
         COMMAND ninja config-winobjc-x86-Debug
-        WORKING_DIRECTORY "${BINARY_DIR}")
+        WORKING_DIRECTORY "${BINARY_DIR}"
+        USES_TERMINAL)
     function (add_woc_lib name)
         add_custom_target ("woc-${name}-build"
             BYPRODUCTS "${WINOBJC_CMAKE_DIR}/bin/${name}.dll"
@@ -131,6 +138,7 @@ testing purposes only." OFF)
             COMMENT "WinObjC: ${name}"
             COMMAND ninja ${name}
             WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
+            USES_TERMINAL
             DEPENDS config-winobjc-x86-Debug)
         add_library ("woc-${name}" SHARED IMPORTED)
         set_target_properties ("woc-${name}" PROPERTIES

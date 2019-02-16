@@ -22,7 +22,8 @@ add_custom_target (lief-x86-Debug
     COMMENT "LIEF"
     COMMAND ninja lief-x86-Debug
     BYPRODUCTS "${LIEF_CMAKE_DIR}/libLIEF.a"
-    WORKING_DIRECTORY "${BINARY_DIR}")
+    WORKING_DIRECTORY "${BINARY_DIR}"
+    USES_TERMINAL)
 add_library (LIEF STATIC IMPORTED)
 set_target_properties (LIEF PROPERTIES
     IMPORTED_LOCATION "${LIEF_CMAKE_DIR}/libLIEF.a")

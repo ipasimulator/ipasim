@@ -2,7 +2,8 @@
 add_custom_target (config-clang-x86-Debug
     COMMENT "Configure LLVM libs"
     COMMAND ninja config-clang-x86-Debug
-    WORKING_DIRECTORY "${BINARY_DIR}")
+    WORKING_DIRECTORY "${BINARY_DIR}"
+    USES_TERMINAL)
 function (add_clang_libs title names include_dirs tablegen_targets)
     # Create include directories as some of them might be filled with generated
     # headers at build time, but CMake would complain at configure time that
@@ -32,6 +33,7 @@ function (add_clang_libs title names include_dirs tablegen_targets)
         BYPRODUCTS ${libs}
         COMMAND ninja ${names}
         WORKING_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}"
+        USES_TERMINAL
         DEPENDS config-clang-x86-Debug)
 endfunction (add_clang_libs)
 
@@ -232,6 +234,7 @@ add_custom_target (clang-tablegen-targets
     COMMENT "Clang tablegen targets"
     COMMAND ninja clang-tablegen-targets
     WORKING_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}"
+    USES_TERMINAL
     DEPENDS config-clang-x86-Debug)
 set (LLVM_TABLEGEN_TARGETS
     intrinsics_gen
@@ -253,6 +256,7 @@ add_custom_target (llvm-tablegen-targets
     COMMENT "LLVM tablegen targets"
     COMMAND ninja ${LLVM_TABLEGEN_TARGETS}
     WORKING_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}"
+    USES_TERMINAL
     DEPENDS config-clang-x86-Debug)
 
 set (LLDB_INCLUDE_DIRS
@@ -346,18 +350,21 @@ add_custom_command (
 add_custom_target (config-clang-x86-Release
     COMMENT "Configure LLVM tablegens"
     COMMAND ninja config-clang-x86-Release
-    WORKING_DIRECTORY "${BINARY_DIR}")
+    WORKING_DIRECTORY "${BINARY_DIR}"
+    USES_TERMINAL)
 add_custom_target (gen-clang-tblgen
     COMMENT "Generate Clang tablegen"
     BYPRODUCTS "${CLANG_CMAKE_DIR}/bin/clang-tblgen.exe"
     COMMAND ninja clang-tblgen
     WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
+    USES_TERMINAL
     DEPENDS config-clang-x86-Release)
 add_custom_target (gen-llvm-tblgen
     COMMENT "Generate LLVM tablegen"
     BYPRODUCTS "${CLANG_CMAKE_DIR}/bin/llvm-tblgen.exe"
     COMMAND ninja llvm-tblgen
     WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
+    USES_TERMINAL
     DEPENDS config-clang-x86-Release)
 
 # DIA SDK
@@ -401,6 +408,7 @@ add_custom_command (OUTPUT ${CG_OUTPUTS}
     COMMENT "Code-gen"
     COMMAND "${IPASIM_CMAKE_DIR}/bin/HeadersAnalyzer.exe"
     WORKING_DIRECTORY "${SOURCE_DIR}"
+    USES_TERMINAL
     DEPENDS HeadersAnalyzer)
 add_custom_target (CodeGen
     DEPENDS ${CG_OUTPUTS})

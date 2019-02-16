@@ -90,7 +90,8 @@ function (add_prep_target cmd)
         BYPRODUCTS "${BUILT_CLANG_EXE}" "${BUILT_LLD_LINK_EXE}"
         COMMENT "Superbuild"
         COMMAND ninja ${cmd}
-        WORKING_DIRECTORY "${BINARY_DIR}")
+        WORKING_DIRECTORY "${BINARY_DIR}"
+        USES_TERMINAL)
 
     # Copy header files. See #13.
     list (TRANSFORM CF_PUBLIC_HEADERS PREPEND
