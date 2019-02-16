@@ -236,6 +236,8 @@ function (woc_framework name)
     set_target_properties ("${name}" PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Frameworks"
         LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Frameworks"
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Frameworks")
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/Frameworks"
+        PREFIX ""
+        IMPORT_PREFIX "")
     add_dependencies (Frameworks "${name}")
 endfunction (woc_framework)
