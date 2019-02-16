@@ -1,0 +1,7 @@
+[ver:1,total:600]
+scripts/CommonVariables.cmake:210,1550336400:210,m
+CMakeLists.txt:100,1550336400:100,r
+scripts/backup.ps1:100,1550336400:100,r
+src/IpaSimulator/CMakeLists.txt:90,1550336400:90,r
+scripts/restore.ps1:60,1550336400:60,r
+src/IpaSimulator/IpaSimulator.cpp:40,1550336400:40,r
