@@ -69,8 +69,13 @@ public:
 
 private:
   // Reports non-fatal error to the user.
-  void error(const string &Msg) {
-    MessageDialog Dlg(to_hstring("Error occurred: " + Msg));
+  void error(const string &Msg, bool AppendLastError = false) {
+    hstring HS(to_hstring("Error occurred: " + Msg));
+    if (AppendLastError) {
+      hresult_error Err(HRESULT_FROM_WIN32(GetLastError()));
+      HS = HS + L"\n" + Err.message();
+    }
+    MessageDialog Dlg(HS);
     Dlg.ShowAsync();
   }
   // Inspired by `ImageLoaderMachO::segmentsCanSlide`.
@@ -236,7 +241,7 @@ private:
 
     HMODULE Lib = LoadPackagedLibrary(to_hstring(Path).c_str(), 0);
     if (!Lib)
-      error("couldn't load DLL: " + Path);
+      error("couldn't load DLL: " + Path, /* AppendLastError */ true);
   }
 
   static constexpr int PageSize = 4096;
