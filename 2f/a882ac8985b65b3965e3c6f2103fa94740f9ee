@@ -1,0 +1,8 @@
+[ver:1,total:835]
+src/IpaSimulator/CMakeLists.txt:460,1550322000:60,1550325600:180,1550332800:160,1550336400:60,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:137,1550336400:137,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:136,1550336400:136,m
+src/IpaSimulator/IpaSimulator.cpp:45,1550336400:45,r
+src/IpaSimulator/IpaSimApp/App.cpp:27,1550336400:27,r
+scripts/CommonVariables.cmake:15,1550336400:15,r
+CMakeLists.txt:15,1550336400:15,r
