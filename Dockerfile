@@ -77,6 +77,12 @@ EXPOSE 4022 4023
 # whereas the other one (see above) is used by WinObjC.
 RUN powershell -c "nuget install cppwinrt -Version 2017.10.13.1 -OutputDirectory C:/packages"
 
+# Install `cppcheck`. It's needed to compile LIEF.
+RUN powershell -c "choco install cppcheck --version 1.87 -y"
+
+# Install Git. It's needed to compile LIEF.
+RUN powershell -c "choco install git --version 2.20.1 -y"
+
 # Start developer command prompt.
 ENTRYPOINT C:/BuildTools/Common7/Tools/VsDevCmd.bat -arch=x86 -host_arch=x86 &&
 

@@ -34,6 +34,7 @@ if (SUPERBUILD)
     add_superbuild_target (clang-x86-Debug "${DEBUG_CLANG_CMAKE_DIR}")
     add_superbuild_target (ipaSim-x86-Debug "${IPASIM_CMAKE_DIR}")
     add_superbuild_target (winobjc-x86-Debug "${WINOBJC_CMAKE_DIR}")
+    add_superbuild_target (lief-x86-Debug "${LIEF_CMAKE_DIR}")
 
     add_custom_target (tblgens-x86-Release
         COMMENT "Tablegens"
@@ -65,6 +66,12 @@ if (SUPERBUILD)
         COMMAND ninja all
         WORKING_DIRECTORY "${IPASIM_CMAKE_DIR}"
         DEPENDS config-ipaSim-x86-Debug)
+
+    add_custom_target (lief-x86-Debug
+        COMMENT "LIEF"
+        COMMAND ninja LIB_LIEF_STATIC
+        WORKING_DIRECTORY "${LIEF_CMAKE_DIR}"
+        DEPENDS config-lief-x86-Debug)
 
 else (SUPERBUILD)
 
