@@ -38,6 +38,9 @@
     <None Include="gen\**">
       <Filter>bin</Filter>
     </None>
+    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\Frameworks\*.dll">
+      <Filter>bin</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Assets">
