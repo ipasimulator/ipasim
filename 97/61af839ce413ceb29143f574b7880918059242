@@ -1,0 +1,5 @@
+[ver:1,total:1080]
+src/IpaSimulator/IpaSimulator.cpp:924,1550336400:924,m
+src/IpaSimulator/MainPage.xaml.cpp:84,1550336400:84,r
+samples/HelloUIWrapper/App.xaml.cpp:60,1550336400:60,r
+CMakeLists.txt:12,1550336400:12,r
