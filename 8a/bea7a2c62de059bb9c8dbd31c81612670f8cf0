@@ -1,0 +1,11 @@
+[ver:1,total:2460]
+src/ninja-wrapper/main.cpp:1415,1550350800:1073,1550354400:342,m
+src/IpaSimulator/IpaSimulator.cpp:255,1550350800:195,1550354400:60,r
+docs/issues/15.md:194,1550354400:194,m
+src/link/main.cpp:177,1550350800:177,r
+src/link/CMakeLists.txt:170,1550350800:170,r
+src/ninja-wrapper/CMakeLists.txt:107,1550350800:35,1550354400:72,m
+CMakeLists.txt:60,1550350800:60,r
+src/CMakeLists.txt:47,1550350800:15,1550354400:32,m
+docs/git.md:20,1550354400:20,r
+src/IpaSimulator/MainPage.xaml.cpp:15,1550350800:15,r
