@@ -1,0 +1,8 @@
+[ver:1,total:360]
+docs/english.md:180,1550311200:180,m
+docs/git.md:80,1550311200:80,r
+docs/issues/3.md:30,1550311200:30,r
+scripts/restore.ps1:20,1550311200:20,r
+src/IpaSimulator/IpaSimulator.cpp:20,1550311200:20,r
+scripts/build.ps1:15,1550311200:15,r
+scripts/backup.ps1:15,1550311200:15,r
