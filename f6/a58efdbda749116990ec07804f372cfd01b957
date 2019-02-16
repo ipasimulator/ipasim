@@ -1,0 +1,7 @@
+[ver:1,total:720]
+docs/issues/15.md:248,1550354400:248,m
+CMakeLists.txt:190,1550354400:190,m
+scripts/CommonVariables.cmake:188,1550354400:188,m
+src/HeadersAnalyzer/CMakeLists.txt:57,1550354400:57,m
+src/objc/CMakeLists.txt:20,1550354400:20,m
+src/IpaSimulator/CMakeLists.txt:17,1550354400:17,m
