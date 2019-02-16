@@ -210,7 +210,7 @@ private:
       // `/System/Library/Frameworks/Foundation.framework/Foundation`.
       filesystem::path InstallDir(
           Package::Current().InstalledLocation().Path().c_str());
-      return (InstallDir / "gen/Dylibs" / filesystem::path(Path.substr(1)))
+      return (InstallDir / "gen" / filesystem::path(Path.substr(1)))
           .make_preferred()
           .string();
     }

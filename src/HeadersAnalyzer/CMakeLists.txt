@@ -404,3 +404,5 @@ add_custom_command (OUTPUT ${CG_OUTPUTS}
     DEPENDS HeadersAnalyzer)
 add_custom_target (CodeGen
     DEPENDS ${CG_OUTPUTS})
+
+# TODO: Clear the output directory `gen` before emitting binaries.

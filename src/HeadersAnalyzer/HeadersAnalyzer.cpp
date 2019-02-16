@@ -262,7 +262,7 @@ public:
   void createDirs() {
     OutputDir = createOutputDir("./src/HeadersAnalyzer/Debug/CG/");
     WrappersDir = createOutputDir("./src/IpaSimulator/IpaSimApp/gen/Wrappers/");
-    DylibsDir = createOutputDir("./src/IpaSimulator/IpaSimApp/gen/Dylibs/");
+    DylibsDir = createOutputDir("./src/IpaSimulator/IpaSimApp/gen/");
   }
   void generateDLLs() {
     reportStatus("generating DLLs");

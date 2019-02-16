@@ -37,3 +37,5 @@ target_link_libraries (LIEF INTERFACE msvcrtd)
 add_dependencies (LIEF lief-x86-Debug)
 
 target_link_libraries (IpaSimLibrary PRIVATE WindowsApp.lib Unicorn LIEF)
+
+add_dependencies (IpaSimLibrary CodeGen)
