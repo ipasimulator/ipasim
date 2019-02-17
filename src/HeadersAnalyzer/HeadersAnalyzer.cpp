@@ -263,8 +263,7 @@ public:
   }
   void createDirs() {
     OutputDir = createOutputDir("./src/HeadersAnalyzer/Debug/CG/");
-    WrappersDir = createOutputDir("./src/IpaSimulator/IpaSimApp/gen/Wrappers/");
-    DylibsDir = createOutputDir("./src/IpaSimulator/IpaSimApp/gen/");
+    GenDir = createOutputDir("./src/IpaSimulator/IpaSimApp/gen/");
   }
   void generateDLLs() {
     reportStatus("generating DLLs");
@@ -401,8 +400,8 @@ public:
 
         // Create the wrapper DLL.
         ClangHelper(LLVM).linkDLL(
-            (WrappersDir / DLL.Name).string(), ObjectFile,
-            path(DLLPath).replace_extension(".dll.a").string());
+            (GenDir / DLL.Name).replace_extension(".wrapper.dll").string(),
+            ObjectFile, path(DLLPath).replace_extension(".dll.a").string());
 
         // Emit `.o` file.
         string DylibObjectFile(
@@ -410,10 +409,12 @@ public:
         DylibIR.emitObj(DylibObjectFile);
 
         // Create the stub Dylib.
-        ClangHelper(LLVM).linkDylib((OutputDir / ("lib" + DLL.Name))
-                                        .replace_extension(".dll.dylib")
-                                        .string(),
-                                    DylibObjectFile, "/Wrappers/" + DLL.Name);
+        ClangHelper(LLVM).linkDylib(
+            (OutputDir / ("lib" + DLL.Name))
+                .replace_extension(".dll.dylib")
+                .string(),
+            DylibObjectFile,
+            path("/" + DLL.Name).replace_extension(".wrapper.dll").string());
       }
     }
   }
@@ -553,7 +554,7 @@ public:
       IR.emitObj(ObjectFile);
 
       // We add `./` to the library name to convert it to a relative path.
-      path DylibPath(DylibsDir / ("./" + Lib.Name));
+      path DylibPath(GenDir / ("./" + Lib.Name));
 
       // Initialize Clang args to create the Dylib.
       ClangHelper Clang(LLVM);
@@ -597,7 +598,7 @@ private:
   HAContext HAC;
   LLVMInitializer LLVMInit;
   LLVMHelper LLVM;
-  path OutputDir, WrappersDir, DylibsDir;
+  path OutputDir, GenDir;
 
   // Some common types.
   llvm::Type *VoidTy = llvm::Type::getVoidTy(LLVM.Ctx);
