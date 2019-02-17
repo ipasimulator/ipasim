@@ -43,6 +43,15 @@ struct App : implements<App, IFrameworkViewSource, IFrameworkView> {
 
     window.PointerReleased([&](auto &&...) { m_selected = nullptr; });
 
+    // TODO: Remove this, it's for testing purposes only.
+    if (!LoadPackagedLibrary(L"libxml2.dll", 0)) {
+      using namespace Windows::UI::Popups;
+      hresult_error Err(HRESULT_FROM_WIN32(GetLastError()));
+      MessageDialog Dlg(L"Couldn't load dependent library.\n" + Err.message());
+      Dlg.ShowAsync();
+      return;
+    }
+
     // Execute the main logic which is stored inside `IpaSimLibrary`.
     // TODO: Is this the right place to do it?
     HMODULE lib =

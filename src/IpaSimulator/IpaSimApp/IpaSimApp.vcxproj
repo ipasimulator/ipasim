@@ -131,6 +131,15 @@
     <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\Frameworks\*.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\libxml2.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icuuc57.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icudt57.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="IpaSimApp_TemporaryKey.pfx" />
     <None Include="packages.config" />
   </ItemGroup>
