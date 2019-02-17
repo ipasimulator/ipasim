@@ -10,8 +10,6 @@
 
 using namespace std;
 using namespace winrt;
-// TODO: Use newer `cppwinrt` and remove this `using namespace`.
-using namespace winrt::impl; // For `to_hstring`.
 using namespace Windows::ApplicationModel;
 using namespace Windows::Storage;
 using namespace Windows::UI::Popups;
