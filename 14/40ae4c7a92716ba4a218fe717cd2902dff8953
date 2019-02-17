@@ -1,0 +1,7 @@
+[ver:1,total:720]
+src/IpaSimulator/IpaSimulator.cpp:540,1550394000:540,r
+scripts/clang-x86-Release.cmake:97,1550397600:97,m
+scripts/clang-x86-Debug.cmake:29,1550397600:29,m
+scripts/ipaSim-x86-Debug.cmake:22,1550397600:22,r
+CMakeLists.txt:20,1550397600:20,r
+src/HeadersAnalyzer/CMakeLists.txt:12,1550397600:12,r
