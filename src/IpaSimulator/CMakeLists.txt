@@ -27,10 +27,13 @@ add_custom_target (lief-x86-Debug
 add_library (LIEF STATIC IMPORTED)
 set_target_properties (LIEF PROPERTIES
     IMPORTED_LOCATION "${LIEF_CMAKE_DIR}/libLIEF.a")
-target_include_directories (LIEF INTERFACE
+set (LIEF_INCLUDE_DIRS
     "${SOURCE_DIR}/deps/LIEF/include"
     "${SOURCE_DIR}/deps/LIEF/api/c/include"
     "${LIEF_CMAKE_DIR}/include")
+# CMake would complain if some include dirs didn't exist.
+file (MAKE_DIRECTORY ${LIEF_INCLUDE_DIRS})
+target_include_directories (LIEF INTERFACE ${LIEF_INCLUDE_DIRS})
 target_compile_options (LIEF INTERFACE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/my_iso646.h")
 target_compile_definitions (LIEF INTERFACE NOMINMAX)
