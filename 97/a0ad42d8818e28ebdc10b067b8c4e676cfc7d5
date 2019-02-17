@@ -1,0 +1,8 @@
+[ver:1,total:1540]
+src/IpaSimulator/IpaSimulator.cpp:690,1550412000:270,1550415600:180,1550419200:240,r
+src/HeadersAnalyzer/LLDBHelper.cpp:590,1550419200:150,1550422800:440,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:120,1550419200:120,r
+docs/issues/16.md:60,1550412000:60,r
+scripts/CommonVariables.cmake:40,1550412000:40,r
+src/HeadersAnalyzer/ErrorReporting.cpp:20,1550422800:20,r
+src/HeadersAnalyzer/CMakeLists.txt:20,1550412000:20,r
