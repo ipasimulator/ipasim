@@ -67,8 +67,7 @@ if (SUPERBUILD)
 
     add_custom_target (ipaSim-x86-Debug
         COMMENT "ipaSim"
-        # TODO: Change to `IpaSimApp` when it's ready.
-        COMMAND ninja IpaSimLibrary
+        COMMAND ninja IpaSimApp
         WORKING_DIRECTORY "${IPASIM_CMAKE_DIR}"
         USES_TERMINAL
         DEPENDS config-ipaSim-x86-Debug)
