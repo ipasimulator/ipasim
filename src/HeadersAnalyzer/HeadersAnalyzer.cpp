@@ -91,19 +91,21 @@ public:
     // Our Objective-C runtime and WinObjC DLLs (i.e., Windows versions of
     // Apple's frameworks).
     HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/"});
-    DLLGroup &Group = HAC.DLLGroups[HAC.DLLGroups.size() - 1];
-    Group.DLLs.push_back(DLLEntry("libobjc.dll"));
+    HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/Frameworks/"});
+    DLLGroup &BinGroup = HAC.DLLGroups[HAC.DLLGroups.size() - 2];
+    DLLGroup &FxGroup = HAC.DLLGroups[HAC.DLLGroups.size() - 1];
+    BinGroup.DLLs.push_back(DLLEntry("libobjc.dll"));
     if constexpr (Sample)
-      Group.DLLs.push_back(DLLEntry("libFoundation.dll"));
+      FxGroup.DLLs.push_back(DLLEntry("Foundation.dll"));
     else
-      for (auto &File : directory_iterator(Group.Dir)) {
+      for (auto &File : directory_iterator(FxGroup.Dir)) {
         path FilePath(File.path());
 
         // We are only interested in DLLs that have accompanying PDBs with them.
         if (FilePath.extension() == ".pdb") {
           path DLLPath(FilePath.replace_extension(".dll"));
           if (exists(DLLPath))
-            Group.DLLs.push_back(DLLEntry(DLLPath.filename().string()));
+            FxGroup.DLLs.push_back(DLLEntry(DLLPath.filename().string()));
         }
       }
   }
