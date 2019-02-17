@@ -1,0 +1,5 @@
+[ver:1,total:1745]
+src/IpaSimulator/IpaSimulator.cpp:1595,1550422800:240,1550426400:1355,m
+src/ninja-wrapper/main.cpp:60,1550426400:60,r
+.git/COMMIT_EDITMSG:60,1550426400:60,r
+src/IpaSimulator/IpaSimApp/App.cpp:30,1550426400:30,r
