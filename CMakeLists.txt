@@ -18,7 +18,7 @@ if (SUPERBUILD)
 
     function (add_superbuild_target name cmakeDir)
         add_custom_command (
-            OUTPUT "${cmakeDir}/CMakeCache.txt"
+            OUTPUT "${cmakeDir}/build.ninja"
             COMMAND "${CMAKE_COMMAND}"
                 "-DSOURCE_DIR=${CMAKE_SOURCE_DIR}"
                 "-DBINARY_DIR=${CMAKE_BINARY_DIR}"
@@ -28,7 +28,7 @@ if (SUPERBUILD)
             # TODO: Wrong usage of `DEPENDS`.
             DEPENDS "${CMAKE_SOURCE_DIR}/scripts/${name}.cmake")
         add_custom_target ("config-${name}"
-            DEPENDS "${cmakeDir}/CMakeCache.txt")
+            DEPENDS "${cmakeDir}/build.ninja")
     endfunction (add_superbuild_target)
 
     add_superbuild_target (clang-x86-Release "${CLANG_CMAKE_DIR}")
