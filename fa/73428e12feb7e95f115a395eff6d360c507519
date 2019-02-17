@@ -1,0 +1,5 @@
+[ver:1,total:980]
+src/IpaSimulator/CMakeLists.txt:635,1550412000:270,1550419200:330,1550422800:35,m
+src/IpaSimulator/IpaSimulator.cpp:270,1550422800:270,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:60,1550422800:60,r
+src/HeadersAnalyzer/LLDBHelper.cpp:15,1550422800:15,r
