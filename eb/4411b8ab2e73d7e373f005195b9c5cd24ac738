@@ -1,0 +1,13 @@
+[ver:1,total:1440]
+src/IpaSimulator/IpaSimApp/App.cpp:580,1550437200:580,m
+src/IpaSimulator/IpaSimulator.cpp:265,1550437200:265,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:121,1550437200:121,m
+src/IpaSimulator/IpaSimulator.vcxproj:105,1550437200:105,r
+CMakeLists.txt:84,1550437200:84,r
+src/IpaSimulator/Microsoft.VCToolsVersion.14.14.props:75,1550437200:75,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:70,1550437200:70,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:50,1550437200:50,r
+src/IpaSimulator/IpaSimApp/pch.h:40,1550437200:40,m
+src/HeadersAnalyzer/ClangHelper.cpp:20,1550437200:20,r
+src/IpaSimulator/Package.appxmanifest:15,1550437200:15,r
+scripts/CommonVariables.cmake:15,1550437200:15,r
