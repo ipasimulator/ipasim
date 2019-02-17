@@ -41,7 +41,10 @@ void LLDBHelper::load(const char *DLL, const char *PDB) {
   Obj = std::make_unique<ObjectFileDummy>(Module, Buffer);
   SymbolFile.reset(
       static_cast<SymbolFilePDB *>(SymbolFilePDB::CreateInstance(Obj.get())));
-  SymbolFile->CalculateAbilities(); // Initialization, actually.
+  // Initialization, actually.
+  uint32_t abilities = SymbolFile->CalculateAbilities();
+  if (abilities == 0)
+    reportFatalError(llvm::Twine("cannot load symbols for '") + DLL + "'");
   RootSymbol = SymbolFile->GetPDBSession().getGlobalScope();
 }
 
