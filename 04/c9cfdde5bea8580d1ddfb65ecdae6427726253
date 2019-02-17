@@ -1,0 +1,8 @@
+[ver:1,total:2340]
+src/IpaSimulator/IpaSimulator.cpp:1360,1550430000:570,1550433600:290,1550437200:500,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:680,1550433600:30,1550437200:650,m
+src/HeadersAnalyzer/ClangHelper.cpp:120,1550437200:120,r
+.git/COMMIT_EDITMSG:80,1550437200:80,r
+src/IpaSimulator/CMakeLists.txt:50,1550430000:30,1550433600:20,r
+src/HeadersAnalyzer/HAContext.hpp:30,1550437200:30,r
+CMakeLists.txt:20,1550433600:20,r
