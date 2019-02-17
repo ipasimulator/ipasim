@@ -86,6 +86,10 @@ private:
     }
     MessageDialog Dlg(HS);
     Dlg.ShowAsync();
+
+    // Also output the error to debugging console.
+    HS = HS + L"\n";
+    OutputDebugStringW(HS.c_str());
   }
   // Inspired by `ImageLoaderMachO::segmentsCanSlide`.
   bool canSegmentsSlide(LIEF::MachO::Binary &Bin) {
