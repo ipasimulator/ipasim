@@ -34,10 +34,21 @@ struct LibraryInfo {
   uint64_t LowAddr, HighAddr;
 };
 
-static bool isFileValid(const string &Path) {
+struct BinaryPath {
+  string Path;
+  bool Relative; // true iff `Path` is relative to install dir
+};
+
+static bool isFileValid(const BinaryPath &BP) {
+  if (BP.Relative) {
+    return Package::Current()
+               .InstalledLocation()
+               .TryGetItemAsync(to_hstring(BP.Path))
+               .get() != nullptr;
+  }
   try {
     StorageFile File =
-        StorageFile::GetFileFromPathAsync(to_hstring(Path)).get();
+        StorageFile::GetFileFromPathAsync(to_hstring(BP.Path)).get();
     return true;
   } catch (...) {
     return false;
@@ -48,21 +59,21 @@ class DynamicLoader {
 public:
   DynamicLoader(uc_engine *UC) : UC(UC) {}
   void load(const string &Path) {
-    string FullPath(resolvePath(Path));
+    BinaryPath BP(resolvePath(Path));
 
-    if (!isFileValid(FullPath)) {
-      error("invalid file: " + FullPath);
+    if (!isFileValid(BP)) {
+      error("invalid file: " + BP.Path);
       return;
     }
 
     // TODO: Add binary to `LIs`.
 
-    if (LIEF::MachO::is_macho(FullPath))
-      loadMachO(FullPath);
-    else if (LIEF::PE::is_pe(FullPath))
-      loadPE(FullPath);
+    if (LIEF::MachO::is_macho(BP.Path))
+      loadMachO(BP.Path);
+    else if (LIEF::PE::is_pe(BP.Path))
+      loadPE(BP.Path);
     else
-      error("invalid binary type: " + FullPath);
+      error("invalid binary type: " + BP.Path);
   }
 
 private:
@@ -88,19 +99,17 @@ private:
     if (uc_mem_map_ptr(UC, Addr, Size, Perms, Mem))
       error("error while mapping memory into Unicorn Engine");
   }
-  string resolvePath(const string &Path) {
+  BinaryPath resolvePath(const string &Path) {
     if (!Path.empty() && Path[0] == '/') {
       // This path is something like
       // `/System/Library/Frameworks/Foundation.framework/Foundation`.
-      filesystem::path InstallDir(
-          Package::Current().InstalledLocation().Path().c_str());
-      return (InstallDir / "gen" / filesystem::path(Path.substr(1)))
-          .make_preferred()
-          .string();
+      return BinaryPath{
+          filesystem::path("gen" + Path).make_preferred().string(),
+          /* Relative */ true};
     }
 
     // TODO: Handle also `.ipa`-relative paths.
-    return Path;
+    return BinaryPath{Path, /* Relative */ false};
   }
   void loadMachO(const string &Path) {
     using namespace LIEF::MachO;
