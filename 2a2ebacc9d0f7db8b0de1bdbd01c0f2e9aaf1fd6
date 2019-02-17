@@ -1,0 +1,5 @@
+[ver:1,total:870]
+src/IpaSimulator/IpaSimulator.cpp:360,1550354400:180,1550390400:180,r
+src/IpaSimulator/CMakeLists.txt:230,1550390400:110,1550394000:120,m
+src/HeadersAnalyzer/CMakeLists.txt:160,1550390400:130,1550394000:30,r
+src/objc/CMakeLists.txt:120,1550354400:120,r
