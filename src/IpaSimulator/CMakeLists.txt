@@ -4,7 +4,7 @@ set (SOURCE_FILES
 add_library (IpaSimLibrary SHARED ${SOURCE_FILES})
 add_prep_dep (IpaSimLibrary)
 
-target_compile_options (IpaSimLibrary PRIVATE -std=c++17 -gcodeview)
+target_compile_options (IpaSimLibrary PRIVATE -std=c++17)
 
 # Unicorn Engine
 add_library (Unicorn SHARED IMPORTED)

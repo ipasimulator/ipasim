@@ -71,8 +71,6 @@ add_library (objc SHARED
     ${SOURCE_FILES}
     "${DYLD_INITIALIZER}")
 
-target_compile_options (objc PRIVATE -gcodeview)
-
 # `runtime.c` needs to be compiled as C++ since there are errors otherwise.
 # TODO: Why?
 set_source_files_properties ("${SOURCE_DIR}/deps/libclosure/runtime.c"

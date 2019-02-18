@@ -17,5 +17,10 @@ execute_process (
         "-DBINARY_DIR=${BINARY_DIR}"
         -DCMAKE_EXPORT_COMPILE_COMMANDS=On
         -DCMAKE_BUILD_TYPE=Debug
+        # Build 32 bit binaries with debugging symbols that Visual Studio
+        # understands. See also
+        # https://gitlab.kitware.com/cmake/cmake/issues/16259#note_158150.
+        "-DCMAKE_C_FLAGS=-m32 -gcodeview"
+        "-DCMAKE_CXX_FLAGS=-m32 -gcodeview"
         "${SOURCE_DIR}"
     WORKING_DIRECTORY "${IPASIM_CMAKE_DIR}")

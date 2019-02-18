@@ -24,9 +24,9 @@ if (SUPERBUILD)
                 "-DBINARY_DIR=${CMAKE_BINARY_DIR}"
                 -P "${CMAKE_SOURCE_DIR}/scripts/${name}.cmake"
             USES_TERMINAL
-            # TODO: This should also depend on CommonVariables.cmake, right?
-            # TODO: Wrong usage of `DEPENDS`.
-            DEPENDS "${CMAKE_SOURCE_DIR}/scripts/${name}.cmake")
+            # TODO: Wrong usage of `DEPENDS`. Or is it?
+            DEPENDS "${CMAKE_SOURCE_DIR}/scripts/${name}.cmake"
+                "${CMAKE_SOURCE_DIR}/scripts/CommonVariables.cmake")
         add_custom_target ("config-${name}"
             DEPENDS "${cmakeDir}/build.ninja")
     endfunction (add_superbuild_target)

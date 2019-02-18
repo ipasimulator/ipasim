@@ -1,11 +1,5 @@
 set (LLVM_BIN_DIR "C:/Program Files/LLVM/bin")
 
-# See https://gitlab.kitware.com/cmake/cmake/issues/16259#note_158150.
-if (NOT CL_COMPILER)
-    set (ENV{CFLAGS} -m32)
-    set (ENV{CXXFLAGS} -m32)
-endif (NOT CL_COMPILER)
-
 set (CLANG_CMAKE_DIR "${BINARY_DIR}/clang-x86-Release")
 set (DEBUG_CLANG_CMAKE_DIR "${BINARY_DIR}/clang-x86-Debug")
 set (IPASIM_CMAKE_DIR "${BINARY_DIR}/ipasim-x86-Debug")
