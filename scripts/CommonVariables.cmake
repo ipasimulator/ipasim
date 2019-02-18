@@ -232,7 +232,8 @@ function (woc_framework name)
         IMPORT_PREFIX "")
     add_dependencies (Frameworks "${name}")
 
-    # Initialization compatible with our Objective-C runtime and Dyld.
+    # Initialization compatible with our Objective-C runtime and Dyld. Also see
+    # #17.
     target_sources ("${name}" PRIVATE ${DYLD_INITIALIZER})
-    target_link_libraries ("${name}" PRIVATE dyld objc)
+    target_link_libraries ("${name}" PRIVATE dyld objc pthread)
 endfunction (woc_framework)

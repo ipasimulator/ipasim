@@ -18,4 +18,6 @@ target_compile_options (RTObjCInterop PRIVATE ${WINOBJC_CLANG_OPTIONS})
 
 target_link_libraries (RTObjCInterop PRIVATE
     ${WOCFX_LIBS}
-    "-Wl,/def:${CMAKE_CURRENT_SOURCE_DIR}/export.def")
+    "-Wl,/def:${CMAKE_CURRENT_SOURCE_DIR}/export.def"
+    # See #17.
+    pthread)
