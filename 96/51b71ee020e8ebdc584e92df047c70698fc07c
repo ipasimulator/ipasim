@@ -1,0 +1,6 @@
+[ver:1,total:1500]
+docs/issues/18.md:960,1550502000:960,m
+src/dyld/dyld.cpp:330,1550491200:60,1550494800:270,r
+src/IpaSimulator/IpaSimApp/App.cpp:160,1550494800:160,r
+docs/issues/17.md:30,1550494800:30,r
+src/dyld/dyld_initializer.cpp:20,1550494800:20,r
