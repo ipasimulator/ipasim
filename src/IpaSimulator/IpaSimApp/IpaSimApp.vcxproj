@@ -140,6 +140,9 @@
     <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icudt57.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icuin57.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\Logging.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -147,6 +150,15 @@
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libpthread.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libobjc.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libdyld.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\deps\WinObjC\tools\deps\prebuilt\Universal Windows\x86\libdispatch.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="IpaSimApp_TemporaryKey.pfx" />
