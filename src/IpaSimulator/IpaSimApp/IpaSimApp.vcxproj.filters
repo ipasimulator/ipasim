@@ -47,6 +47,7 @@
     <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icuin57.dll" />
     <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\Logging.dll" />
     <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\WOCStdLib.dll" />
+    <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\WinObjCRT.dll" />
     <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libpthread.dll" />
     <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libobjc.dll" />
     <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libdyld.dll" />

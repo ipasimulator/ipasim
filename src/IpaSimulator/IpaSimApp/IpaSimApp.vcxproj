@@ -149,6 +149,9 @@
     <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\WOCStdLib.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\WinObjCRT.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libpthread.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
