@@ -1,0 +1,7 @@
+[ver:1,total:1440]
+scripts/CommonVariables.cmake:464,1550480400:230,1550484000:234,m
+src/IpaSimulator/IpaSimApp/App.cpp:300,1550480400:120,1550484000:180,r
+src/objc/CMakeLists.txt:274,1550480400:130,1550484000:144,m
+src/dyld/dyld_initializer.cpp:195,1550484000:195,r
+CMakeLists.txt:192,1550480400:180,1550484000:12,m
+src/dyld/dyld.cpp:15,1550484000:15,r
