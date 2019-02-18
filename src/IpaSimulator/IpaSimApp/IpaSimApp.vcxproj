@@ -140,6 +140,15 @@
     <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icudt57.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\Logging.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\WOCStdLib.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libpthread.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="IpaSimApp_TemporaryKey.pfx" />
     <None Include="packages.config" />
   </ItemGroup>

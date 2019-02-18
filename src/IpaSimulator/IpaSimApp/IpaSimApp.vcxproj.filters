@@ -44,6 +44,9 @@
     <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\libxml2.dll" />
     <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icuuc57.dll" />
     <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icudt57.dll" />
+    <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\Logging.dll" />
+    <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\WOCStdLib.dll" />
+    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libpthread.dll" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Assets">
