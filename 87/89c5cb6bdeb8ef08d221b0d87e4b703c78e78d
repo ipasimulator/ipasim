@@ -1,0 +1,8 @@
+[ver:1,total:1500]
+docs/cmake.md:744,1550476800:240,1550480400:504,m
+CMakeLists.txt:368,1550476800:180,1550480400:188,m
+scripts/CommonVariables.cmake:286,1550476800:60,1550480400:226,m
+scripts/ipaSim-x86-Debug.cmake:40,1550480400:40,r
+cmake/ipasim-x86-Debug/build.ninja:30,1550480400:30,r
+src/IpaSimulator/IpaSimApp/App.cpp:20,1550480400:20,r
+scripts/lief-x86-Debug.cmake:12,1550480400:12,r
