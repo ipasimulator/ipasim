@@ -32,3 +32,16 @@ Also see [this SO answer](https://stackoverflow.com/a/13089688) which references
 
 - SO: [CMake custom Link executable command, how to extract linker options?](https://stackoverflow.com/q/37368434).
 - SO: [CMake: use a custom linker](https://stackoverflow.com/a/25274328).
+
+## Tips and tricks
+
+### Dependencies
+
+`DEPENDS` of `add_custom_target` just builds files listed if there is any
+`add_custom_command` that can build them. To add target dependencies, you have
+to use `add_dependencies`.
+
+`DEPENDS` of `add_custom_command`, on the other hand, is far more advanced. It
+can specify outputs of other custom commands, other targets and also arbitrary
+files. If you specify an arbitrary file (i.e., file that is not an output of a
+custom command), the custom command is re-run every time the file is changed.

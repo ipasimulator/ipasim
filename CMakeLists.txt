@@ -13,20 +13,19 @@ if (SUPERBUILD)
     set (SOURCE_DIR "${CMAKE_SOURCE_DIR}")
     set (BINARY_DIR "${CMAKE_BINARY_DIR}")
 
-    list (APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/scripts")
+    list (APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/scripts")
     include (CommonVariables)
 
     function (add_superbuild_target name cmakeDir)
         add_custom_command (
             OUTPUT "${cmakeDir}/build.ninja"
             COMMAND "${CMAKE_COMMAND}"
-                "-DSOURCE_DIR=${CMAKE_SOURCE_DIR}"
-                "-DBINARY_DIR=${CMAKE_BINARY_DIR}"
-                -P "${CMAKE_SOURCE_DIR}/scripts/${name}.cmake"
+                "-DSOURCE_DIR=${SOURCE_DIR}"
+                "-DBINARY_DIR=${BINARY_DIR}"
+                -P "${SOURCE_DIR}/scripts/${name}.cmake"
             USES_TERMINAL
-            # TODO: Wrong usage of `DEPENDS`. Or is it?
-            DEPENDS "${CMAKE_SOURCE_DIR}/scripts/${name}.cmake"
-                "${CMAKE_SOURCE_DIR}/scripts/CommonVariables.cmake")
+            DEPENDS "${SOURCE_DIR}/scripts/${name}.cmake"
+                "${SOURCE_DIR}/scripts/CommonVariables.cmake")
         add_custom_target ("config-${name}"
             DEPENDS "${cmakeDir}/build.ninja")
     endfunction (add_superbuild_target)

@@ -97,26 +97,19 @@ function (add_prep_target cmd)
             "-DBINARY_DIR=${BINARY_DIR}"
             -P "${SOURCE_DIR}/scripts/CopyWocHeaders.cmake"
         COMMENT "Copy CoreFoundation headers"
-        # TODO: Wrong usage of `DEPENDS`. And probably not just here!
-        #DEPENDS "${CMAKE_SOURCE_DIR}/scripts/CopyWocHeaders.cmake"
-        #    "${CMAKE_SOURCE_DIR}/scripts/CommonVariables.cmake"
-    )
+        DEPENDS "${SOURCE_DIR}/scripts/CopyWocHeaders.cmake"
+            "${SOURCE_DIR}/scripts/CommonVariables.cmake")
     add_custom_target (CoreFoundationHeaders
         DEPENDS ${CF_PUBLIC_HEADERS} ${CF_PRIVATE_HEADERS})
     add_dependencies (prep CoreFoundationHeaders)
 endfunction (add_prep_target)
 
-# HACK: Make `target` depend on clang.exe and lld-link.exe.
+# HACK: Make `target` depend on `clang.exe` and `lld-link.exe`.
 function (add_prep_dep target)
-    # We don't need to build our Clang if we don't use it, though.
-    # TODO: This is wrong. `prep` target does other things than just building
-    # Clang.
-    if (NOT USE_ORIG_CLANG)
-        add_dependencies ("${target}" prep)
-        get_target_property (srcs "${target}" SOURCES)
-        set_source_files_properties (${srcs} PROPERTIES
-            OBJECT_DEPENDS "${BUILT_CLANG_EXE};${BUILT_LLD_LINK_EXE}")
-    endif (NOT USE_ORIG_CLANG)
+    add_dependencies ("${target}" prep)
+    get_target_property (srcs "${target}" SOURCES)
+    set_source_files_properties (${srcs} PROPERTIES
+        OBJECT_DEPENDS "${BUILT_CLANG_EXE};${BUILT_LLD_LINK_EXE}")
 endfunction (add_prep_dep)
 
 # Common include directories for WinObjC projects.
