@@ -211,6 +211,9 @@ set (WOCFX_LIBS
     CFNetwork
     MobileCoreServices)
 
+# Common file used by many libraries.
+set (DYLD_INITIALIZER "${SOURCE_DIR}/src/dyld/dyld_initializer.cpp")
+
 function (add_objcuwp_libs)
     # For `ObjCUWP*.lib`s specified in header files inside
     # `deps/WinObjC/include/Platform/Universal Windows/UWP`.
@@ -228,4 +231,8 @@ function (woc_framework name)
         PREFIX ""
         IMPORT_PREFIX "")
     add_dependencies (Frameworks "${name}")
+
+    # Initialization compatible with our Objective-C runtime and Dyld.
+    target_sources ("${name}" PRIVATE ${DYLD_INITIALIZER})
+    target_link_libraries ("${name}" PRIVATE dyld objc)
 endfunction (woc_framework)
