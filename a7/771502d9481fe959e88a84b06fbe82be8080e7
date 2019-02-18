@@ -1,0 +1,15 @@
+[ver:1,total:3660]
+deps/pthreads.2/pthread.h:1142,1550484000:60,1550487600:767,1550491200:315,m
+docs/issues/17.md:610,1550487600:595,1550491200:15,m
+src/pthread/CMakeLists.txt:420,1550487600:420,r
+src/IpaSimulator/IpaSimApp/App.cpp:315,1550491200:315,m
+scripts/CommonVariables.cmake:263,1550487600:248,1550491200:15,m
+src/RTObjCInterop/CMakeLists.txt:210,1550487600:30,1550491200:180,m
+src/dyld/dyld.cpp:160,1550491200:160,r
+deps/pthreads.2/pthread_mutex_lock.c:150,1550484000:90,1550491200:60,r
+src/IpaSimulator/IpaSimulator.cpp:150,1550484000:30,1550491200:120,r
+deps/pthreads.2/pthread_mutex_unlock.c:120,1550484000:120,r
+.vscode/settings.json:60,1550487600:60,r
+deps/pthreads.2/pthread_self.c:30,1550487600:30,r
+src/dyld/dyld_initializer.cpp:20,1550491200:20,r
+CMakeLists.txt:10,1550487600:10,r
