@@ -1,0 +1,5 @@
+[ver:1,total:201]
+docs/issues/21.md:157,1550570400:157,m
+docs/llvm.md:30,1550570400:30,r
+src/HeadersAnalyzer/LLDHelper.cpp:7,1550570400:7,r
+src/HeadersAnalyzer/LLDHelper.hpp:7,1550570400:7,r
