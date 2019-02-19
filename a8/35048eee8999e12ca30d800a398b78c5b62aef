@@ -1,0 +1,8 @@
+[ver:1,total:459]
+src/objc/stubs.mm:136,1550570400:136,m
+src/HeadersAnalyzer/CMakeLists.txt:100,1550570400:100,m
+src/HeadersAnalyzer/LLDHelper.hpp:78,1550570400:78,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:72,1550570400:72,m
+src/HeadersAnalyzer/ClangHelper.cpp:35,1550570400:35,m
+.git/COMMIT_EDITMSG:20,1550570400:20,r
+src/HeadersAnalyzer/LLDHelper.cpp:18,1550570400:18,m
