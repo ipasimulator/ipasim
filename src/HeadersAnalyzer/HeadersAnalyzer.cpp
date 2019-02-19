@@ -473,6 +473,17 @@ public:
           Twine LookupName(Twine(HAContext::MsgLookupPrefix) +
                            (Exp.Name.c_str() + HAContext::MsgSendLength));
 
+          // If the corresponding lookup function doesn't exist, don't call it
+          // (so that we don't have unresolved references in the resulting
+          // binary).
+          if (HAC.iOSExps.find(ExportEntry(LookupName.str())) ==
+              HAC.iOSExps.end()) {
+            reportError(Twine("lookup function not found (") + LookupName +
+                        ")");
+            IR.Builder.CreateRetVoid();
+            continue;
+          }
+
           // Declare the lookup function.
           llvm::Function *LookupFunc =
               IR.declareFunc(Exp.Stret ? LookupStretTy : LookupTy, LookupName);
