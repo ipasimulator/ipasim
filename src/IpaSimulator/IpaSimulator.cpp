@@ -293,12 +293,9 @@ private:
       }
     }
 
-    // Load referenced libraries.
-    for (DylibCommand &Lib : Bin.libraries()) {
-      if (Lib.command() == LOAD_COMMAND_TYPES::LC_ID_DYLIB)
-        continue;
+    // Load referenced libraries. See also #22.
+    for (DylibCommand &Lib : Bin.libraries())
       load(Lib.name());
-    }
 
     // Bind external symbols.
     for (BindingInfo &BInfo : Bin.dyld_info().bindings()) {
