@@ -1,0 +1,9 @@
+[ver:1,total:2880]
+src/IpaSimulator/IpaSimulator.cpp:1620,1550602800:300,1550606400:1320,m
+docs/issues/22.md:600,1550606400:600,m
+build/include/LIEF/MachO/BindingInfo.hpp:240,1550606400:240,r
+build/include/LIEF/MachO/DylibCommand.hpp:180,1550606400:180,r
+build/include/LIEF/MachO/enums.hpp:180,1550606400:180,r
+build/include/LIEF/MachO/Structures.hpp:20,1550606400:20,r
+build/include/LIEF/MachO/Binary.hpp:20,1550606400:20,r
+docs/issues/21.md:20,1550606400:20,r
