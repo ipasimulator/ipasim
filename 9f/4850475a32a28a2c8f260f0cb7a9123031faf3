@@ -1,0 +1,8 @@
+[ver:1,total:3790]
+src/IpaSimulator/IpaSimulator.cpp:3027,1550592000:300,1550595600:240,1550599200:1927,1550602800:560,m
+.vscode/settings.json:235,1550599200:215,1550602800:20,r
+src/HeadersAnalyzer/LLDHelper.cpp:200,1550595600:180,1550599200:20,r
+src/IpaSimulator/MainPage.xaml.cpp:194,1550599200:194,r
+build/include/LIEF/MachO/Symbol.hpp:60,1550602800:60,r
+build/include/LIEF/MachO/Binary.hpp:44,1550599200:44,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:30,1550592000:30,r
