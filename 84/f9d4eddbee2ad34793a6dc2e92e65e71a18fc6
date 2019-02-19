@@ -1,0 +1,7 @@
+[ver:1,total:1020]
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:440,1550584800:440,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:270,1550584800:270,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:210,1550584800:210,r
+src/IpaSimulator/IpaSimulator.cpp:50,1550584800:50,r
+scripts/backup.ps1:30,1550584800:30,r
+src/HeadersAnalyzer/LLDHelper.cpp:20,1550584800:20,r
