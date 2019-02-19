@@ -1,4 +1,5 @@
 #include <LIEF/LIEF.hpp>
+#include <Windows.h>
 #include <unicorn/unicorn.h>
 #include <winrt/Windows.ApplicationModel.h>
 #include <winrt/Windows.Storage.h>
@@ -30,8 +31,37 @@ template <class T> inline T &operator^=(T &a, T b) {
   return (T &)((int &)a ^= (int)b);
 }
 
-struct LibraryInfo {
-  uint64_t LowAddr, HighAddr;
+class LoadedLibrary {
+public:
+  virtual ~LoadedLibrary() = default;
+  virtual uint64_t findSymbol(const string &Name) = 0;
+};
+
+class LoadedDylib : public LoadedLibrary {
+public:
+  LIEF::MachO::Binary &Bin;
+
+  LoadedDylib(unique_ptr<LIEF::MachO::FatBinary> &&Fat)
+      : Fat(move(Fat)), Bin(Fat->at(0)) {}
+  uint64_t findSymbol(const string &Name) override {
+    if (!Bin.has_symbol(Name))
+      return 0;
+    return Bin.get_symbol(Name).value(); // TODO: Rebase!!
+  }
+
+private:
+  unique_ptr<LIEF::MachO::FatBinary> Fat;
+};
+
+class LoadedDll : public LoadedLibrary {
+public:
+  LoadedDll(HMODULE Ptr) : Ptr(Ptr) {}
+  uint64_t findSymbol(const string &Name) override {
+    return (uint64_t)GetProcAddress(Ptr, Name.c_str());
+  }
+
+private:
+  HMODULE Ptr;
 };
 
 struct BinaryPath {
@@ -58,22 +88,27 @@ static bool isFileValid(const BinaryPath &BP) {
 class DynamicLoader {
 public:
   DynamicLoader(uc_engine *UC) : UC(UC) {}
-  void load(const string &Path) {
+  LoadedLibrary *load(const string &Path) {
     BinaryPath BP(resolvePath(Path));
 
+    auto I = LIs.find(BP.Path);
+    if (I != LIs.end())
+      return I->second.get();
+
+    // Check that file exists.
     if (!isFileValid(BP)) {
       error("invalid file: " + BP.Path);
-      return;
+      return nullptr;
     }
 
-    // TODO: Add binary to `LIs`.
-
     if (LIEF::MachO::is_macho(BP.Path))
-      loadMachO(BP.Path);
+      return loadMachO(BP.Path);
     else if (LIEF::PE::is_pe(BP.Path))
-      loadPE(BP.Path);
+      return loadPE(BP.Path);
     else
       error("invalid binary type: " + BP.Path);
+
+    return nullptr;
   }
 
 private:
@@ -115,13 +150,16 @@ private:
     // TODO: Handle also `.ipa`-relative paths.
     return BinaryPath{Path, /* Relative */ false};
   }
-  void loadMachO(const string &Path) {
+  LoadedLibrary *loadMachO(const string &Path) {
     using namespace LIEF::MachO;
 
-    unique_ptr<FatBinary> Fat(Parser::parse(Path));
+    auto LL = make_unique<LoadedDylib>(Parser::parse(Path));
+    LoadedLibrary *LLP = LL.get();
 
     // TODO: Select the correct binary more intelligently.
-    Binary &Bin = Fat->at(0);
+    Binary &Bin = LL->Bin;
+
+    LIs[Path] = move(LL);
 
     // Check header.
     Header &Hdr = Bin.header();
@@ -243,22 +281,37 @@ private:
           BInfo.binding_type() != BIND_TYPES::BIND_TYPE_POINTER ||
           BInfo.addend())
         error("unsupported binding info");
+      if (!BInfo.has_library())
+        error("flat-namespace symbols are not supported yet");
 
       // TODO: Bind it.
+      string LibName(BInfo.library().name());
+      string SymName(BInfo.symbol().name());
+      LoadedLibrary *Lib = load(LibName);
     }
+
+    return LLP;
   }
-  void loadPE(const string &Path) {
+  LoadedLibrary *loadPE(const string &Path) {
     using namespace LIEF::PE;
 
     HMODULE Lib = LoadPackagedLibrary(to_hstring(Path).c_str(), 0);
-    if (!Lib)
+    if (!Lib) {
       error("couldn't load DLL: " + Path, /* AppendLastError */ true);
+      return nullptr;
+    }
+
+    // TODO: Add library to LIs *before* `LoadPackagedLibrary` is called!
+    auto LL = make_unique<LoadedDll>(Lib);
+    LoadedLibrary *LLP = LL.get();
+    LIs[Path] = move(LL);
+    return LLP;
   }
 
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
   uc_engine *const UC;
-  map<string, LibraryInfo> LIs;
+  map<string, unique_ptr<LoadedLibrary>> LIs;
 };
 
 extern "C" __declspec(dllexport) void start() {
