@@ -65,9 +65,6 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup>
-    <CustomBuildBeforeTargets>Build</CustomBuildBeforeTargets>
-  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -92,13 +89,12 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
-    <CustomBuildStep>
+    <PreBuildEvent>
       <Command>robocopy ..\..\..\..\build\ipasim-x86-Debug\gen\ $(ProjectDir)gen\ * /MIR /NP /NFL /NDL
 rem See &lt;https://weblogs.sqlteam.com/robv/2010/02/17/61106/&gt;.
 set /A errlev="%ERRORLEVEL% &amp; 24"
 exit /B %errlev%</Command>
-      <Outputs>$(ProjectDir)gen\**</Outputs>
-    </CustomBuildStep>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
