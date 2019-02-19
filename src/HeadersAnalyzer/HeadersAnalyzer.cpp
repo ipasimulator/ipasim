@@ -272,8 +272,8 @@ public:
     }
   }
   void createDirs() {
-    OutputDir = createOutputDir("./src/HeadersAnalyzer/Debug/CG/");
-    GenDir = createOutputDir("./src/IpaSimulator/IpaSimApp/gen/");
+    OutputDir = createOutputDir("../build/ipasim-x86-Debug/cg/");
+    GenDir = createOutputDir("../build/ipasim-x86-Debug/gen/");
   }
   void generateDLLs() {
     reportStatus("generating DLLs");
