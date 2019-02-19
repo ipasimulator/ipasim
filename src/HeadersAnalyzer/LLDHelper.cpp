@@ -2,15 +2,19 @@
 
 #include "LLDHelper.hpp"
 
+#include "ErrorReporting.hpp"
+
 #include <lld/Common/Driver.h>
 
 #include <llvm/ADT/ArrayRef.h>
 #include <llvm/Support/InitLLVM.h>
 
+#include <string>
 #include <vector>
 
 using namespace lld;
 using namespace llvm;
+using namespace std;
 
 LLDHelper::LLDHelper(LLVMHelper &LLVM) : Args(LLVM.Saver) {
   // First argument is expected to be an executable name.
@@ -51,6 +55,11 @@ void LLDHelper::executeArgs() {
   // TODO: Make this work.
   // InitLLVM X(Argc, Argv);
 
-  std::vector<const char *> ArgsVec(Argv, Argv + Argc);
-  mach_o::link(ArgsVec);
+  vector<const char *> ArgsVec(Argv, Argv + Argc);
+  if (!mach_o::link(ArgsVec)) {
+    string CmdLine;
+    for (const char *Arg : ArgsVec)
+      CmdLine = CmdLine + " " + Arg;
+    reportError(Twine("failed to execute:") + CmdLine);
+  }
 }
