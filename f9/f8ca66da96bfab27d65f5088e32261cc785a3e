@@ -1,0 +1,5 @@
+[ver:1,total:1020]
+src/IpaSimulator/IpaSimulator.cpp:787,1550602800:787,m
+src/IpaSimulator/MainPage.xaml.cpp:197,1550602800:197,r
+build/include/LIEF/MachO/Structures.hpp:24,1550602800:24,r
+build/include/LIEF/MachO/Binary.hpp:12,1550602800:12,r
