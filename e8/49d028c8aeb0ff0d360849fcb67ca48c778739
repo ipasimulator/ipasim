@@ -1,0 +1,7 @@
+[ver:1,total:1680]
+src/HeadersAnalyzer/LLDHelper.cpp:1246,1550577600:156,1550581200:970,1550584800:120,m
+docs/cmake.md:180,1550577600:180,r
+build/clang-x64-Release/include/llvm/ADT/Twine.h:170,1550577600:60,1550581200:110,r
+docs/debug.md:30,1550577600:30,r
+src/HeadersAnalyzer/ClangHelper.cpp:30,1550577600:30,r
+src/HeadersAnalyzer/ErrorReporting.cpp:24,1550577600:24,r
