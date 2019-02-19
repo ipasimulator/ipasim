@@ -2,6 +2,8 @@
 
 #include "..\..\deps\objc4\runtime\objc-private.h"
 
+OBJC_EXPORT void dyld_stub_binder() { assert(false); }
+
 // The original is in libobjc2/arc.mm.
 OBJC_EXPORT void objc_delete_weak_refs(id obj) {}
 
@@ -329,7 +331,7 @@ static struct objc_class _NSConcreteMallocBlockMeta;
 static struct objc_class _NSBlock;
 static struct objc_class _NSBlockMeta;
 
-static void createNSBlockSubclass(Class superclass, Class newClass, 
+static void createNSBlockSubclass(Class superclass, Class newClass,
 		Class metaClass, const char *name)
 {
 	// We don't actually use the code from `libobjc2/NSBlocks.mm` here,

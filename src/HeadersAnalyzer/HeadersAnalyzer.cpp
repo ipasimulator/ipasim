@@ -5,6 +5,7 @@
 #include "Config.hpp"
 #include "HAContext.hpp"
 #include "LLDBHelper.hpp"
+#include "LLDHelper.hpp"
 #include "LLVMHelper.hpp"
 #include "TapiHelper.hpp"
 
@@ -67,6 +68,10 @@ public:
           "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libobjc.A.tbd");
       TH.HandleFile("./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/"
                     "Frameworks/Foundation.framework/Foundation.tbd");
+      // This one needs to be loaded, so that symbol `dyld_stub_binder` gets
+      // discovered.
+      TH.HandleFile(
+          "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libSystem.B.tbd");
     } else {
       vector<string> Dirs{
           "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
@@ -116,6 +121,11 @@ public:
 
     for (const llvm::Function &Func : *LLVM.getModule())
       analyzeAppleFunction(Func);
+
+    // `dyld_stub_binder` may not be in headers, but we still want it.
+    llvm::FunctionType *VoidToVoidTy =
+        llvm::FunctionType::get(VoidTy, /* isVarArg */ false);
+    analyzeAppleFunction("dyld_stub_binder", VoidToVoidTy);
 
     reportUnimplementedFunctions();
   }
@@ -409,7 +419,7 @@ public:
         DylibIR.emitObj(DylibObjectFile);
 
         // Create the stub Dylib.
-        ClangHelper(LLVM).linkDylib(
+        LLDHelper(LLVM).linkDylib(
             (OutputDir / ("lib" + DLL.Name))
                 .replace_extension(".dll.dylib")
                 .string(),
@@ -617,6 +627,9 @@ private:
     // We use mangled names to uniquely identify functions.
     string Name(LLVM.mangleName(Func));
 
+    analyzeAppleFunction(Name, Func.getFunctionType());
+  }
+  void analyzeAppleFunction(const string &Name, llvm::FunctionType *Type) {
     // Find the corresponding export info from TBD files.
     ExportPtr Exp;
     if (!HAC.isInteresting(Name, Exp))
@@ -638,7 +651,7 @@ private:
     }
 
     // Save the function's signature.
-    Exp->Type = Func.getFunctionType();
+    Exp->Type = Type;
   }
   void compileAppleHeaders() {
     ClangHelper Clang(LLVM);

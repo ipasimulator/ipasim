@@ -37,6 +37,18 @@ function (add_clang_libs title names include_dirs tablegen_targets)
         DEPENDS config-clang-x86-Debug)
 endfunction (add_clang_libs)
 
+set (LLD_LIBS
+    lldCOFF
+    lldCommon
+    lldCore
+    lldDriver
+    lldELF
+    lldMachO
+    lldMinGW
+    lldReaderWriter
+    lldWasm
+    lldYAML)
+
 set (LLDB_LIBS
     liblldb
     lldbBase
@@ -259,6 +271,9 @@ add_custom_target (llvm-tablegen-targets
     USES_TERMINAL
     DEPENDS config-clang-x86-Debug)
 
+set (LLD_INCLUDE_DIRS
+    "${DEBUG_CLANG_CMAKE_DIR}/tools/lld/include"
+    "${SOURCE_DIR}/deps/lld/include")
 set (LLDB_INCLUDE_DIRS
     "${DEBUG_CLANG_CMAKE_DIR}/tools/lldb/include"
     "${SOURCE_DIR}/deps/lldb/include")
@@ -269,6 +284,7 @@ set (LLVM_INCLUDE_DIRS
     "${DEBUG_CLANG_CMAKE_DIR}/include"
     "${SOURCE_DIR}/deps/llvm/include")
 
+add_clang_libs (LLD "${LLD_LIBS}" "${LLD_INCLUDE_DIRS}" "")
 add_clang_libs (LLDB "${LLDB_LIBS}" "${LLDB_INCLUDE_DIRS}" "")
 add_clang_libs (Clang "${CLANG_LIBS}" "${CLANG_INCLUDE_DIRS}"
     clang-tablegen-targets)
@@ -381,6 +397,7 @@ set (SOURCE_FILES
     HAContext.cpp
     HeadersAnalyzer.cpp
     LLDBHelper.cpp
+    LLDHelper.cpp
     LLVMHelper.cpp
     TapiHelper.cpp)
 
@@ -396,7 +413,8 @@ target_include_directories (HeadersAnalyzer PRIVATE
     ../../deps/lldb/source)
 
 target_link_libraries (HeadersAnalyzer PRIVATE
-    ${LLDB_LIBS} ${CLANG_LIBS} ${LLVM_LIBS} tapi dia ws2_32.lib mincore.lib
+    ${LLD_LIBS} ${LLDB_LIBS} ${CLANG_LIBS} ${LLVM_LIBS} tapi dia ws2_32.lib
+    mincore.lib
     # TODO: We should use original Clang + `lld-link`, this is just a simpler
     # workaround for #12.
     -fuse-ld=link

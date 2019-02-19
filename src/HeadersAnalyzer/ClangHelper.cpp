@@ -57,11 +57,9 @@ void ClangHelper::addDylibArgs(StringRef Output, StringRef ObjectFile,
   Args.add("-o");
   Args.add(Output.data());
   Args.add(ObjectFile.data());
-  // Don't emit error that symbol `dyld_stub_binder` is undefined.
-  Args.add("-undefined");
-  Args.add("warning");
-  // But to do that, we cannot use two-level namespace.
-  Args.add("-flat_namespace");
+  // For symbol `dyld_stub_binder`.
+  // TODO: It doesn't work.
+  // Args.add("-lobjc");
   // See [no-lsystem].
   Args.add("-no_lsystem");
   // Let's call this as the original DLL (in the Mach-O header), so
