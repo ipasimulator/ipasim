@@ -1,0 +1,6 @@
+[ver:1,total:1680]
+src/HeadersAnalyzer/LLDHelper.cpp:1165,1550570400:295,1550574000:870,m
+src/HeadersAnalyzer/LLDHelper.hpp:240,1550570400:240,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:165,1550570400:165,r
+src/HeadersAnalyzer/iOSHeaders.mm:80,1550570400:80,r
+build/clang-x64-Release/include/llvm/Support/InitLLVM.h:30,1550574000:30,r
