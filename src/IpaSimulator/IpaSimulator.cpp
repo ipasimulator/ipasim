@@ -55,13 +55,11 @@ private:
 
 class LoadedDll : public LoadedLibrary {
 public:
-  LoadedDll(HMODULE Ptr) : Ptr(Ptr) {}
+  HMODULE Ptr;
+
   uint64_t findSymbol(const string &Name) override {
     return (uint64_t)GetProcAddress(Ptr, Name.c_str());
   }
-
-private:
-  HMODULE Ptr;
 };
 
 struct BinaryPath {
@@ -295,16 +293,19 @@ private:
   LoadedLibrary *loadPE(const string &Path) {
     using namespace LIEF::PE;
 
+    // Mark the library as found.
+    auto LL = make_unique<LoadedDll>();
+    LoadedDll *LLP = LL.get();
+    LIs[Path] = move(LL);
+
     HMODULE Lib = LoadPackagedLibrary(to_hstring(Path).c_str(), 0);
     if (!Lib) {
       error("couldn't load DLL: " + Path, /* AppendLastError */ true);
+      LIs.erase(Path);
       return nullptr;
     }
 
-    // TODO: Add library to LIs *before* `LoadPackagedLibrary` is called!
-    auto LL = make_unique<LoadedDll>(Lib);
-    LoadedLibrary *LLP = LL.get();
-    LIs[Path] = move(LL);
+    LLP->Ptr = Lib;
     return LLP;
   }
 
