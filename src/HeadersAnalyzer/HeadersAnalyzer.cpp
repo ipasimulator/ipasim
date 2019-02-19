@@ -68,10 +68,6 @@ public:
           "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libobjc.A.tbd");
       TH.HandleFile("./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/"
                     "Frameworks/Foundation.framework/Foundation.tbd");
-      // This one needs to be loaded, so that symbol `dyld_stub_binder` gets
-      // discovered.
-      TH.HandleFile(
-          "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libSystem.B.tbd");
     } else {
       vector<string> Dirs{
           "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
@@ -121,11 +117,6 @@ public:
 
     for (const llvm::Function &Func : *LLVM.getModule())
       analyzeAppleFunction(Func);
-
-    // `dyld_stub_binder` may not be in headers, but we still want it.
-    llvm::FunctionType *VoidToVoidTy =
-        llvm::FunctionType::get(VoidTy, /* isVarArg */ false);
-    analyzeAppleFunction("dyld_stub_binder", VoidToVoidTy);
 
     reportUnimplementedFunctions();
   }
