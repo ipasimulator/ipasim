@@ -48,7 +48,8 @@ void LLDHelper::executeArgs() {
   int Argc = ArgsRef.size();
   auto Argv = const_cast<const char **>(ArgsRef.data());
 
-  InitLLVM X(Argc, Argv);
+  // TODO: Make this work.
+  // InitLLVM X(Argc, Argv);
 
   std::vector<const char *> ArgsVec(Argv, Argv + Argc);
   mach_o::link(ArgsVec);
