@@ -48,6 +48,8 @@ void ClangHelper::linkDLL(StringRef Output, StringRef ObjectFile,
 
   executeArgs();
 }
+// TODO: Not currently used (but it's referenced from a comment at
+// `LLDHelper::addDylibArgs`).
 void ClangHelper::addDylibArgs(StringRef Output, StringRef ObjectFile,
                                StringRef InstallName) {
   Args.add("-target");
@@ -57,9 +59,6 @@ void ClangHelper::addDylibArgs(StringRef Output, StringRef ObjectFile,
   Args.add("-o");
   Args.add(Output.data());
   Args.add(ObjectFile.data());
-  // For symbol `dyld_stub_binder`.
-  // TODO: It doesn't work.
-  // Args.add("-lobjc");
   // See [no-lsystem].
   Args.add("-no_lsystem");
   // Let's call this as the original DLL (in the Mach-O header), so

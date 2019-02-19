@@ -566,29 +566,28 @@ public:
       // We add `./` to the library name to convert it to a relative path.
       path DylibPath(GenDir / ("./" + Lib.Name));
 
-      // Initialize Clang args to create the Dylib.
-      ClangHelper Clang(LLVM);
-      Clang.addDylibArgs(DylibPath.string(), ObjectFile, Lib.Name);
-      Clang.Args.add("-L");
-      Clang.Args.add(OutputDir.string().c_str());
+      // Initialize LLD args to create the Dylib.
+      LLDHelper LLD(LLVM);
+      LLD.addDylibArgs(DylibPath.string(), ObjectFile, Lib.Name);
+      LLD.Args.add(("-L" + OutputDir.string()).c_str());
 
       // Add DLLs to link.
       set<DLLPtr> DLLs;
       for (const ExportEntry &Exp : deref(Lib.Exports))
         if (Exp.Status == ExportStatus::FoundInDLL &&
             DLLs.insert(Exp.DLL).second) {
-          Clang.Args.add("-l");
-          Clang.Args.add(path(HAC.DLLGroups[Exp.DLLGroup].DLLs[Exp.DLL].Name)
-                             .replace_extension(".dll")
-                             .string()
-                             .c_str());
+          LLD.Args.add(
+              ("-l" + path(HAC.DLLGroups[Exp.DLLGroup].DLLs[Exp.DLL].Name)
+                          .replace_extension(".dll")
+                          .string())
+                  .c_str());
         }
 
       // Create output directory.
       createOutputDir(DylibPath.parent_path().string().c_str());
 
       // Link the Dylib.
-      Clang.executeArgs();
+      LLD.executeArgs();
     }
 
     if constexpr (SumUnimplementedFunctions & LibType::DLL)
