@@ -306,15 +306,32 @@ private:
       if ((BInfo.binding_class() != BINDING_CLASS::BIND_CLASS_STANDARD &&
            BInfo.binding_class() != BINDING_CLASS::BIND_CLASS_LAZY) ||
           BInfo.binding_type() != BIND_TYPES::BIND_TYPE_POINTER ||
-          BInfo.addend())
+          BInfo.addend()) {
         error("unsupported binding info");
-      if (!BInfo.has_library())
+        continue;
+      }
+      if (!BInfo.has_library()) {
         error("flat-namespace symbols are not supported yet");
+        continue;
+      }
+
+      // Find symbol's library.
+      string LibName(BInfo.library().name());
+      LoadedLibrary *Lib = load(LibName);
+      if (!Lib) {
+        error("symbol's library couldn't be loaded");
+        continue;
+      }
+
+      // Find symbol's address.
+      string SymName(BInfo.symbol().name());
+      uint64_t SymAddr = Lib->findSymbol(SymName);
+      if (!SymAddr) {
+        error("external symbol couldn't be resolved");
+        continue;
+      }
 
       // TODO: Bind it.
-      string LibName(BInfo.library().name());
-      string SymName(BInfo.symbol().name());
-      LoadedLibrary *Lib = load(LibName);
     }
 
     return LLP;
