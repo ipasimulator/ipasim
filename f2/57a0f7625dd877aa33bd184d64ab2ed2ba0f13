@@ -1,0 +1,6 @@
+[ver:1,total:240]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:137,1550584800:137,m
+src/HeadersAnalyzer/LLDHelper.cpp:77,1550584800:77,r
+src/HeadersAnalyzer/LLDHelper.hpp:10,1550584800:10,r
+src/HeadersAnalyzer/CMakeLists.txt:8,1550584800:8,r
+src/HeadersAnalyzer/ClangHelper.cpp:8,1550584800:8,r
