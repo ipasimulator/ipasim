@@ -1,5 +1,6 @@
 #include <LIEF/LIEF.hpp>
 #include <Windows.h>
+#include <psapi.h> // for `GetModuleInformation`
 #include <unicorn/unicorn.h>
 #include <winrt/Windows.ApplicationModel.h>
 #include <winrt/Windows.Storage.h>
@@ -31,9 +32,34 @@ template <class T> inline T &operator^=(T &a, T b) {
   return (T &)((int &)a ^= (int)b);
 }
 
+static const uint8_t *bytes(const void *Ptr) {
+  return reinterpret_cast<const uint8_t *>(Ptr);
+}
+static size_t getDylibSize(const void *Ptr) {
+  using namespace LIEF::MachO;
+
+  // Compute lib size by summing `vmsize`s of all `LC_SEGMENT` commands.
+  size_t Size = 0;
+  auto Header = reinterpret_cast<const mach_header *>(Ptr);
+  auto Cmd = reinterpret_cast<const load_command *>(Header + 1);
+  for (size_t I = 0; I != Header->ncmds; ++I) {
+    if (Cmd->cmd == (uint32_t)LOAD_COMMAND_TYPES::LC_SEGMENT) {
+      auto Seg = reinterpret_cast<const segment_command_32 *>(Cmd);
+      Size += Seg->vmsize;
+    }
+
+    // Move to the next `load_command`.
+    Cmd = reinterpret_cast<const load_command *>(bytes(Cmd) + Cmd->cmdsize);
+  }
+  return Size;
+}
+
 class LoadedLibrary {
 public:
   virtual ~LoadedLibrary() = default;
+
+  uint64_t StartAddress, Size;
+
   virtual uint64_t findSymbol(const string &Name) = 0;
 };
 
@@ -46,7 +72,7 @@ public:
   uint64_t findSymbol(const string &Name) override {
     if (!Bin.has_symbol(Name))
       return 0;
-    return Bin.get_symbol(Name).value(); // TODO: Rebase!!
+    return StartAddress + Bin.get_symbol(Name).value();
   }
 
 private:
@@ -152,7 +178,7 @@ private:
     using namespace LIEF::MachO;
 
     auto LL = make_unique<LoadedDylib>(Parser::parse(Path));
-    LoadedLibrary *LLP = LL.get();
+    LoadedDylib *LLP = LL.get();
 
     // TODO: Select the correct binary more intelligently.
     Binary &Bin = LL->Bin;
@@ -192,10 +218,13 @@ private:
     }
 
     // Allocate space for the segments.
-    uintptr_t Addr = (uintptr_t)_aligned_malloc(HighAddr - LowAddr, PageSize);
+    uint64_t Size = HighAddr - LowAddr;
+    uintptr_t Addr = (uintptr_t)_aligned_malloc(Size, PageSize);
     if (!Addr)
       error("couldn't allocate memory for segments");
     uint64_t Slide = Addr - LowAddr;
+    LLP->StartAddress = Slide;
+    LLP->Size = Size;
 
     // Load segments. Inspired by `ImageLoaderMachO::mapSegments`.
     for (SegmentCommand &Seg : Bin.segments()) {
@@ -298,14 +327,32 @@ private:
     LoadedDll *LLP = LL.get();
     LIs[Path] = move(LL);
 
+    // Load it into memory.
     HMODULE Lib = LoadPackagedLibrary(to_hstring(Path).c_str(), 0);
     if (!Lib) {
       error("couldn't load DLL: " + Path, /* AppendLastError */ true);
       LIs.erase(Path);
       return nullptr;
     }
-
     LLP->Ptr = Lib;
+
+    // Find out where it lies in memory.
+    if (uint64_t Hdr = LLP->findSymbol("_mh_dylib_header")) {
+      // Map libraries that act as `.dylib`s without their PE headers.
+      LLP->StartAddress = Hdr;
+      LLP->Size = getDylibSize(reinterpret_cast<const void *>(Hdr));
+    } else {
+      // Map other libraries in their entirety.
+      MODULEINFO Info;
+      if (!GetModuleInformation(GetCurrentProcess(), Lib, &Info,
+                                sizeof(Info))) {
+        error("couldn't load module information", /* AppendLastError */ true);
+        return nullptr;
+      }
+      LLP->StartAddress = (uint64_t)Info.lpBaseOfDll;
+      LLP->Size = Info.SizeOfImage;
+    }
+
     return LLP;
   }
 
