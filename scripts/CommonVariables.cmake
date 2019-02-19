@@ -87,6 +87,9 @@ function (add_prep_target cmd)
         WORKING_DIRECTORY "${BINARY_DIR}"
         USES_TERMINAL)
 
+    option (DEPEND_ON_COMPILER "Rebuild everything whenever one of `clang.exe` \
+or `lld-link.exe` is rebuilt." ON)
+
     # Copy header files. See #13.
     list (TRANSFORM CF_PUBLIC_HEADERS PREPEND
         "${SOURCE_DIR}/deps/WinObjC/include/CoreFoundation/")
@@ -107,9 +110,11 @@ endfunction (add_prep_target)
 # HACK: Make `target` depend on `clang.exe` and `lld-link.exe`.
 function (add_prep_dep target)
     add_dependencies ("${target}" prep)
-    get_target_property (srcs "${target}" SOURCES)
-    set_source_files_properties (${srcs} PROPERTIES
-        OBJECT_DEPENDS "${BUILT_CLANG_EXE};${BUILT_LLD_LINK_EXE}")
+    if (DEPEND_ON_COMPILER)
+        get_target_property (srcs "${target}" SOURCES)
+        set_source_files_properties (${srcs} PROPERTIES
+            OBJECT_DEPENDS "${BUILT_CLANG_EXE};${BUILT_LLD_LINK_EXE}")
+    endif (DEPEND_ON_COMPILER)
 endfunction (add_prep_dep)
 
 # Common include directories for WinObjC projects.
