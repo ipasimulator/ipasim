@@ -1,0 +1,7 @@
+[ver:1,total:4350]
+src/dyld/dyld_initializer.cpp:3810,1550685600:630,1550689200:1920,1550692800:1260,m
+src/IpaSimulator/IpaSimApp/Package.appxmanifest:180,1550689200:180,r
+src/dyld/dyld.cpp:150,1550692800:150,r
+src/objc/CMakeLists.txt:90,1550692800:90,r
+src/IpaSimulator/IpaSimulator.cpp:60,1550692800:60,r
+docs/git.md:60,1550692800:60,r
