@@ -1,0 +1,9 @@
+[ver:1,total:2808]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:2320,1550653200:558,1550656800:1762,m
+src/HeadersAnalyzer/HAContext.cpp:184,1550656800:184,m
+build/include/llvm/IR/Module.h:85,1550656800:85,r
+src/HeadersAnalyzer/HAContext.hpp:84,1550656800:84,m
+build/include/llvm/ADT/StringMap.h:57,1550656800:57,r
+src/IpaSimulator/IpaSimulator.cpp:30,1550656800:30,r
+build/include/llvm/IR/ValueSymbolTable.h:28,1550656800:28,r
+src/IpaSimulator/MainPage.xaml.cpp:20,1550656800:20,r
