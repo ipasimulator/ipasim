@@ -1,0 +1,14 @@
+[ver:1,total:1630]
+samples/HelloUIWrapper/App.xaml.cpp:540,1550678400:420,1550682000:120,r
+src/IpaSimulator/IpaSimulator.cpp:350,1550678400:350,r
+docs/issues/19.md:180,1550682000:180,r
+samples/HelloUIWrapper/Package.appxmanifest:160,1550674800:160,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:120,1550678400:120,r
+docs/winobjc.md:96,1550671200:60,1550678400:30,1550682000:6,r
+samples/HelloUILibrary/HelloUILibrary.cpp:60,1550678400:60,r
+Debug/HelloUIWrapper/AppX/AppxManifest.xml:50,1550678400:50,r
+src/IpaSimulator/Debug/IpaSimApp/AppX/AppxManifest.xml:20,1550678400:20,r
+docs/issues/22.md:15,1550682000:15,r
+docs/issues/21.md:13,1550682000:13,r
+docs/issues/20.md:13,1550682000:13,r
+docs/issues/23.md:13,1550682000:13,r
