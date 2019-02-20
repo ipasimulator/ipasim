@@ -1,0 +1,7 @@
+[ver:1,total:1020]
+.vscode/settings.json:270,1550667600:270,r
+build/include/llvm/ADT/StringMap.h:210,1550667600:210,r
+src/HeadersAnalyzer/LLDHelper.cpp:210,1550664000:180,1550667600:30,r
+build/clang-x64-Release/include/llvm/ADT/StringRef.h:150,1550667600:150,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:150,1550667600:150,r
+build/include/llvm/ADT/StringSet.h:30,1550667600:30,r
