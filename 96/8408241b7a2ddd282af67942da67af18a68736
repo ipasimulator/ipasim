@@ -1,0 +1,7 @@
+[ver:1,total:835]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:405,1550703600:405,m
+src/HeadersAnalyzer/Config.hpp:160,1550667600:60,1550692800:20,1550703600:80,m
+src/IpaSimulator/IpaSimulator.cpp:120,1550703600:120,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:75,1550703600:75,r
+.vscode/settings.json:55,1550692800:15,1550696400:20,1550703600:20,r
+src/IpaSimulator/IpaSimulator.vcxproj:20,1550703600:20,r
