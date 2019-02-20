@@ -710,8 +710,7 @@ int main() {
     return 1;
   }
 
-  // TODO: Also generate map from DLL RVAs to Dylib RVAs and map from Dylibs to
-  // DLL symbols they should re-export.
+  // TODO: Also generate map from DLL RVAs to Dylib RVAs.
 
   return 0;
 }

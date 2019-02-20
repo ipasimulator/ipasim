@@ -425,6 +425,8 @@ target_link_libraries (HeadersAnalyzer PRIVATE
     # `link.exe` complains otherwise.
     -Wl,/nodefaultlib:libcmt)
 
+# TODO: Add real outputs and inputs.
+# TODO: Pass path to binary folder as an argument to `HeadersAnalyzer.exe`.
 set (CG_OUTPUTS "${SOURCE_DIR}/src/HeadersAnalyzer/Debug/CG/exports.txt")
 add_custom_command (OUTPUT ${CG_OUTPUTS}
     COMMENT "Code-gen"
