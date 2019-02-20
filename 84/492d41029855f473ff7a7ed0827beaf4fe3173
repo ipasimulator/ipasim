@@ -1,0 +1,7 @@
+[ver:1,total:420]
+src/IpaSimulator/IpaSimulator.cpp:180,1550671200:180,r
+src/RTObjCInterop/CMakeLists.txt:114,1550671200:114,m
+scripts/CommonVariables.cmake:54,1550671200:54,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:30,1550671200:30,r
+docs/git.md:30,1550671200:30,r
+src/CMakeLists.txt:12,1550671200:12,r
