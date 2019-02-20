@@ -52,6 +52,8 @@
     <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libobjc.dll" />
     <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libdyld.dll" />
     <None Include="..\..\..\deps\WinObjC\tools\deps\prebuilt\Universal Windows\x86\libdispatch.dll" />
+    <None Include="..\..\..\deps\WinObjC\Frameworks\UIKit.Xaml\prebuilt\UIKit.Xaml.dll" />
+    <None Include="..\..\..\deps\WinObjC\Frameworks\Social.Xaml\prebuilt\Social.Xaml.dll" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Assets">
