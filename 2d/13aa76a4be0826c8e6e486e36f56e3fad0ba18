@@ -1,0 +1,7 @@
+[ver:1,total:1032]
+src/HeadersAnalyzer/CMakeLists.txt:600,1550653200:270,1550656800:330,m
+build/include/llvm/IR/Module.h:177,1550653200:177,r
+src/HeadersAnalyzer/TapiHelper.hpp:120,1550653200:120,r
+src/HeadersAnalyzer/LLVMHelper.hpp:60,1550653200:60,r
+build/include/llvm/IR/GlobalVariable.h:60,1550653200:60,r
+src/HeadersAnalyzer/HAContext.hpp:15,1550653200:15,r
