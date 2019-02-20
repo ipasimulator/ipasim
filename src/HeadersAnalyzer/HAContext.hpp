@@ -102,6 +102,7 @@ struct Dylib {
 
   std::string Name;
   mutable std::vector<ExportPtr> Exports;
+  mutable std::set<std::pair<GroupPtr, DLLPtr>> ReExports; // See #23.
 
   bool operator<(const Dylib &Other) const { return Name < Other.Name; }
 };

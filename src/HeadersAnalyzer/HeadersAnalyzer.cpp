@@ -463,9 +463,9 @@ public:
           continue;
         }
 
-        // Ignore data for now.
+        // Re-export data symbols. See #23.
         if (!Exp.Type) {
-          reportError(Twine("data symbol ignored (") + Exp.Name + ")");
+          Lib.ReExports.insert({Exp.DLLGroup, Exp.DLL});
           continue;
         }
 
@@ -607,6 +607,15 @@ public:
 
       // Link the Dylib.
       LLD.executeArgs();
+
+      // TODO: Handle re-exports.
+      for (auto &ReExport : Lib.ReExports) {
+        DLLGroup &Group = HAC.DLLGroups[ReExport.first];
+        DLLEntry &DLL = Group.DLLs[ReExport.second];
+
+        reportError(Twine("ignored re-export '") + DLL.Name + "' from '" +
+                    Lib.Name + "'");
+      }
     }
 
     if constexpr (SumUnimplementedFunctions & LibType::DLL)
