@@ -12,6 +12,7 @@ public:
   uint64_t StartAddress, Size;
 
   virtual uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) = 0;
+  virtual bool hasUnderscorePrefix() = 0;
 };
 
 class LoadedDylib : public LoadedLibrary {
@@ -21,6 +22,7 @@ public:
   LoadedDylib(std::unique_ptr<LIEF::MachO::FatBinary> &&Fat)
       : Fat(move(Fat)), Bin(Fat->at(0)) {}
   uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) override;
+  bool hasUnderscorePrefix() override { return true; }
 
 private:
   std::unique_ptr<LIEF::MachO::FatBinary> Fat;
@@ -31,6 +33,7 @@ public:
   HMODULE Ptr;
 
   uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) override;
+  bool hasUnderscorePrefix() override { return false; }
 };
 
 struct BinaryPath {

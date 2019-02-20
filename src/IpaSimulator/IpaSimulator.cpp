@@ -61,7 +61,16 @@ uint64_t LoadedDylib::findSymbol(DynamicLoader &DL, const string &Name) {
     for (DylibCommand &Lib : Bin.libraries()) {
       if (Lib.command() == LOAD_COMMAND_TYPES::LC_REEXPORT_DYLIB) {
         LoadedLibrary *LL = DL.load(Lib.name());
-        if (uint64_t SymAddr = LL->findSymbol(DL, Name))
+
+        // If the target library is DLL, it doesn't have underscore prefixes, so
+        // we need to remove it.
+        uint64_t SymAddr;
+        if (!LL->hasUnderscorePrefix() && Name[0] == '_')
+          SymAddr = LL->findSymbol(DL, Name.substr(1));
+        else
+          SymAddr = LL->findSymbol(DL, Name);
+
+        if (SymAddr)
           return SymAddr;
       }
     }
