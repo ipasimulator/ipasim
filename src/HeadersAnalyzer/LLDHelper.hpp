@@ -13,6 +13,7 @@ public:
 
   void addDylibArgs(llvm::StringRef Output, llvm::StringRef ObjectFile,
                     llvm::StringRef InstallName);
+  void reexportLibrary(llvm::StringRef Name);
   void linkDylib(llvm::StringRef Output, llvm::StringRef ObjectFile,
                  llvm::StringRef InstallName);
   void executeArgs();

@@ -41,6 +41,11 @@ void LLDHelper::addDylibArgs(StringRef Output, StringRef ObjectFile,
   // load command.  Setting sdk version to match provided min version`.
   Args.add("-no_version_load_command");
 }
+void LLDHelper::reexportLibrary(llvm::StringRef Name) {
+  // See #23.
+  Args.add("-reexport_library");
+  Args.add(Name.data());
+}
 void LLDHelper::linkDylib(StringRef Output, StringRef ObjectFile,
                           StringRef InstallName) {
   addDylibArgs(Output, ObjectFile, InstallName);

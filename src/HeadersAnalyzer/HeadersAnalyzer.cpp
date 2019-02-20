@@ -602,20 +602,18 @@ public:
                   .c_str());
         }
 
+      // Add re-exports.
+      for (auto &ReExport : Lib.ReExports) {
+        DLLGroup &Group = HAC.DLLGroups[ReExport.first];
+        DLLEntry &DLL = Group.DLLs[ReExport.second];
+        LLD.reexportLibrary(DLL.Name);
+      }
+
       // Create output directory.
       createOutputDir(DylibPath.parent_path().string().c_str());
 
       // Link the Dylib.
       LLD.executeArgs();
-
-      // TODO: Handle re-exports.
-      for (auto &ReExport : Lib.ReExports) {
-        DLLGroup &Group = HAC.DLLGroups[ReExport.first];
-        DLLEntry &DLL = Group.DLLs[ReExport.second];
-
-        reportError(Twine("ignored re-export '") + DLL.Name + "' from '" +
-                    Lib.Name + "'");
-      }
     }
 
     if constexpr (SumUnimplementedFunctions & LibType::DLL)
