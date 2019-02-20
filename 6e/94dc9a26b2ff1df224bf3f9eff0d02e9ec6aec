@@ -1,0 +1,6 @@
+[ver:1,total:1080]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:375,1550660400:375,r
+src/HeadersAnalyzer/LLDHelper.cpp:210,1550664000:210,r
+docs/issues/23.md:180,1550664000:180,m
+src/HeadersAnalyzer/test.yaml:180,1550660400:30,1550664000:150,d
+src/HeadersAnalyzer/LLDHelper.hpp:135,1550660400:135,r
