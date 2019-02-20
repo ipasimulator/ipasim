@@ -12,9 +12,11 @@
 class TBDHandler {
 public:
   TBDHandler(HAContext &HAC);
-  void HandleFile(const std::string &Path);
+  void handleFile(const std::string &Path);
 
 private:
+  void addExport(DylibPtr Dylib, std::string &&Name);
+
   HAContext &HAC;
   tapi::internal::FileManager FM;
   tapi::internal::InterfaceFileManager IFM;

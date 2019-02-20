@@ -14,7 +14,7 @@ using namespace tapi::internal;
 TBDHandler::TBDHandler(HAContext &HAC)
     : HAC(HAC), FM(FileSystemOptions()), IFM(FM) {}
 
-void TBDHandler::HandleFile(const string &Path) {
+void TBDHandler::handleFile(const string &Path) {
   bool HasTBDExtension = filesystem::path(Path).extension() == ".tbd";
 
   // Check file.
@@ -58,7 +58,7 @@ void TBDHandler::HandleFile(const string &Path) {
     string Name;
     switch (Sym->getKind()) {
     case SymbolKind::ObjectiveCClass: {
-      // Get original name with leading underscore that was dropped - see
+      // HACK: Get original name with leading underscore that was dropped - see
       // `TextStub_v2.cpp`, line 301, commit `a92576e0`.
       llvm::StringRef OriginalName(Sym->getName().data() - 1,
                                    Sym->getName().size() + 1);
@@ -66,6 +66,11 @@ void TBDHandler::HandleFile(const string &Path) {
       // Save class.
       auto Class = HAC.iOSClasses.insert(OriginalName.str()).first;
       Class->Dylibs.push_back(Lib);
+
+      // Also let it appear as if special Objective-C symbols are exported even
+      // though they might not actually be listed in the TBD file.
+      addExport(Lib, "_OBJC_CLASS_$" + OriginalName.str());
+      addExport(Lib, "_OBJC_METACLASS_$" + OriginalName.str());
       continue;
     }
     case SymbolKind::ObjectiveCInstanceVariable:
@@ -82,10 +87,14 @@ void TBDHandler::HandleFile(const string &Path) {
     }
 
     // Save export.
-    ExportPtr Exp = HAC.iOSExps.find(Name);
-    if (Exp != HAC.iOSExps.end())
-      Lib->Exports.push_back(Exp);
-    else
-      Lib->Exports.push_back(HAC.addExport(move(Name)));
+    addExport(Lib, move(Name));
   }
+}
+
+void TBDHandler::addExport(DylibPtr Lib, string &&Name) {
+  ExportPtr Exp = HAC.iOSExps.find(Name);
+  if (Exp != HAC.iOSExps.end())
+    Lib->Exports.push_back(Exp);
+  else
+    Lib->Exports.push_back(HAC.addExport(move(Name)));
 }

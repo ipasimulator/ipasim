@@ -64,9 +64,9 @@ public:
 
     TBDHandler TH(HAC);
     if constexpr (Sample) {
-      TH.HandleFile(
+      TH.handleFile(
           "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libobjc.A.tbd");
-      TH.HandleFile("./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/"
+      TH.handleFile("./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/"
                     "Frameworks/Foundation.framework/Foundation.tbd");
     } else {
       vector<string> Dirs{
@@ -74,14 +74,14 @@ public:
           "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/TextInput/"};
       for (const string &Dir : Dirs)
         for (auto &File : directory_iterator(Dir))
-          TH.HandleFile(File.path().string());
+          TH.handleFile(File.path().string());
       // Discover `.tbd` files inside frameworks.
       string FrameworksDir =
           "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/";
       for (auto &File : directory_iterator(FrameworksDir))
         if (File.status().type() == file_type::directory &&
             !File.path().extension().compare(".framework"))
-          TH.HandleFile(
+          TH.handleFile(
               (File.path() / File.path().filename().replace_extension(".tbd"))
                   .string());
     }
