@@ -1,0 +1,13 @@
+[ver:1,total:4895]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:2184,1550610000:1662,1550613600:480,1550653200:42,m
+src/HeadersAnalyzer/HAContext.cpp:831,1550610000:734,1550613600:97,r
+src/HeadersAnalyzer/TapiHelper.cpp:628,1550610000:374,1550613600:227,1550653200:27,m
+src/IpaSimulator/IpaSimulator.cpp:612,1550606400:150,1550610000:462,r
+src/HeadersAnalyzer/Config.hpp:235,1550592000:195,1550602800:20,1550610000:20,r
+src/HeadersAnalyzer/HAContext.hpp:124,1550610000:114,1550613600:10,r
+src/HeadersAnalyzer/TapiHelper.hpp:103,1550610000:12,1550613600:52,1550653200:39,m
+src/HeadersAnalyzer/LLDHelper.cpp:90,1550610000:90,r
+.vscode/settings.json:32,1550613600:20,1550653200:12,r
+docs/issues/22.md:30,1550606400:30,r
+src/HeadersAnalyzer/LLVMHelper.cpp:19,1550610000:12,1550613600:7,r
+src/HeadersAnalyzer/LLVMHelper.hpp:7,1550613600:7,r
