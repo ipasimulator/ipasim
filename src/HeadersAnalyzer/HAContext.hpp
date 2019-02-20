@@ -84,7 +84,7 @@ struct ExportEntry {
   std::string Name;
   mutable ExportStatus Status;
   mutable uint32_t RVA;
-  mutable llvm::FunctionType *Type;
+  mutable llvm::FunctionType *Type; // `nullptr` means this is not a function
   mutable bool ObjCMethod : 1;
   mutable bool Messenger : 1;
   mutable bool Stret : 1;

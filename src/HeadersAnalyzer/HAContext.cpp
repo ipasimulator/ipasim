@@ -81,9 +81,5 @@ bool HAContext::isInterestingForWindows(const string &Name, ExportPtr &Exp,
       reportError(Twine("found duplicate DLL export (") + Name + ")");
     return false;
   }
-  if (Exp->Status != ExportStatus::Found) {
-    warnUninteresting<LibType::DLL>(Name);
-    return false;
-  }
   return true;
 }

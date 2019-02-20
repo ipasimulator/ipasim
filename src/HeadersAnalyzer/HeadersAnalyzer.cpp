@@ -34,6 +34,7 @@
 #include <llvm/IR/IntrinsicInst.h>
 #include <llvm/IR/Mangler.h>
 #include <llvm/IR/Module.h>
+#include <llvm/IR/ValueSymbolTable.h>
 #include <llvm/Object/COFF.h>
 #include <llvm/Object/ObjectFile.h>
 #include <llvm/Target/TargetMachine.h>
@@ -118,7 +119,12 @@ public:
     for (const llvm::Function &Func : *LLVM.getModule())
       analyzeAppleFunction(Func);
 
-    reportUnimplementedFunctions();
+    // Now we simply consider all symbols found in TBDs and not in headers to be
+    // data symbols.
+    // TODO: We should actually search for definitions of those data symbols in
+    // `Module`, as well, to be sure they're really data and not functions. But
+    // be aware that class symbols (e.g., `_OBJC_CLASS_$_NSObject`) are probably
+    // not gonna be listed explicitly in `Module`'s tables.
   }
   void loadDLLs() {
     reportStatus("loading DLLs");
@@ -192,6 +198,7 @@ public:
           ExportPtr Exp;
           if (!HAC.isInterestingForWindows(Name, Exp, RVA, IgnoreDuplicates))
             return;
+          bool DataSymbol = Exp->Status == ExportStatus::NotFound;
 
           // Update status accordingly.
           Exp->Status = ExportStatus::FoundInDLL;
@@ -199,6 +206,10 @@ public:
           DLL.get().Exports.push_back(Exp);
           Exp->DLLGroup = GroupIdx;
           Exp->DLL = DLLIdx;
+
+          // If this is not a function, we can skip the rest of analysis.
+          if (DataSymbol)
+            return;
 
           // Save function that will serve as a reference for computing
           // addresses of Objective-C methods.
@@ -296,8 +307,8 @@ public:
                  "Unexpected status of `ExportEntry`.");
 
           // Don't generate wrappers for Objective-C messengers. We handle those
-          // specially.
-          if (Exp.Messenger)
+          // specially. Also don't generate wrappers for data.
+          if (!Exp.Type || Exp.Messenger)
             continue;
 
           // TODO: Handle variadic functions specially.
@@ -449,6 +460,12 @@ public:
           if constexpr (SumUnimplementedFunctions & LibType::DLL)
             if (Exp.Status == ExportStatus::Found)
               ++Unimplemented;
+          continue;
+        }
+
+        // Ignore data for now.
+        if (!Exp.Type) {
+          reportError(Twine("data symbol ignored (") + Exp.Name + ")");
           continue;
         }
 
@@ -668,24 +685,6 @@ private:
 
     // Compile to LLVM IR.
     Clang.executeCodeGenAction<EmitLLVMOnlyAction>();
-  }
-  void reportUnimplementedFunctions() {
-    if constexpr (ErrorUnimplementedFunctions & LibType::Dylib)
-      for (const ExportEntry &Exp : HAC.iOSExps)
-        if (Exp.Status == ExportStatus::NotFound)
-          reportError(
-              "function found in TBD files wasn't found in any Apple header (" +
-              Exp.Name + ")");
-    if constexpr (SumUnimplementedFunctions & LibType::Dylib) {
-      size_t Count = 0;
-      for (const ExportEntry &Exp : HAC.iOSExps)
-        if (Exp.Status == ExportStatus::NotFound)
-          ++Count;
-      if (Count)
-        reportError(
-            "functions found in TBD files weren't found in any Apple header (" +
-            to_string(Count) + ")");
-    }
   }
 };
 
