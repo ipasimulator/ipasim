@@ -90,16 +90,23 @@ public:
   void discoverDLLs() {
     reportStatus("discovering DLLs");
 
-    // Our Objective-C runtime and WinObjC DLLs (i.e., Windows versions of
-    // Apple's frameworks).
+    // Note that groups must be added just once and together because references
+    // to them are invalidated after that.
     HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/"});
     HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/Frameworks/"});
-    DLLGroup &BinGroup = HAC.DLLGroups[HAC.DLLGroups.size() - 2];
-    DLLGroup &FxGroup = HAC.DLLGroups[HAC.DLLGroups.size() - 1];
+    if constexpr (!Sample)
+      HAC.DLLGroups.push_back(
+          {"./deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/"});
+
+    // Our Objective-C runtime
+    DLLGroup &BinGroup = HAC.DLLGroups[0];
+
+    // WinObjC DLLs (i.e., Windows versions of Apple's frameworks)
+    DLLGroup &FxGroup = HAC.DLLGroups[1];
     BinGroup.DLLs.push_back(DLLEntry("libobjc.dll"));
     if constexpr (Sample)
       FxGroup.DLLs.push_back(DLLEntry("Foundation.dll"));
-    else
+    else {
       for (auto &File : directory_iterator(FxGroup.Dir)) {
         path FilePath(File.path());
 
@@ -110,6 +117,11 @@ public:
             FxGroup.DLLs.push_back(DLLEntry(DLLPath.filename().string()));
         }
       }
+
+      // Prebuilt `libdispatch.dll`
+      DLLGroup &PrebuiltToolsGroup = HAC.DLLGroups[2];
+      PrebuiltToolsGroup.DLLs.push_back(DLLEntry("libdispatch.dll"));
+    }
   }
   void parseAppleHeaders() {
     reportStatus("parsing Apple headers");
