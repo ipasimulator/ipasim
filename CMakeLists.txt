@@ -163,7 +163,7 @@ testing purposes only." OFF)
         IMPORTED_LOCATION "${SOURCE_DIR}/deps/WinObjC/tools/deps/prebuilt/\
 Universal Windows/x86/libdispatch.dll"
         IMPORTED_IMPLIB "${SOURCE_DIR}/deps/WinObjC/tools/deps/prebuilt/\
-Universal Windows/x86/libdispatch.lib")
+Universal Windows/x86/libdispatch.dll.a")
 
     function (add_prebuilt_lib_core name dllname)
         add_library ("${name}" SHARED IMPORTED)
