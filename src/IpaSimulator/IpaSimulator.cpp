@@ -53,13 +53,24 @@ static size_t getDylibSize(const void *Ptr) {
   return Size;
 }
 
-uint64_t LoadedDylib::findSymbol(const string &Name) {
-  if (!Bin.has_symbol(Name))
+uint64_t LoadedDylib::findSymbol(DynamicLoader &DL, const string &Name) {
+  using namespace LIEF::MachO;
+
+  if (!Bin.has_symbol(Name)) {
+    // Try also re-exported libraries.
+    for (DylibCommand &Lib : Bin.libraries()) {
+      if (Lib.command() == LOAD_COMMAND_TYPES::LC_REEXPORT_DYLIB) {
+        LoadedLibrary *LL = DL.load(Lib.name());
+        if (uint64_t SymAddr = LL->findSymbol(DL, Name))
+          return SymAddr;
+      }
+    }
     return 0;
+  }
   return StartAddress + Bin.get_symbol(Name).value();
 }
 
-uint64_t LoadedDll::findSymbol(const string &Name) {
+uint64_t LoadedDll::findSymbol(DynamicLoader &DL, const string &Name) {
   return (uint64_t)GetProcAddress(Ptr, Name.c_str());
 }
 
@@ -288,7 +299,7 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
 
     // Find symbol's address.
     string SymName(BInfo.symbol().name());
-    uint64_t SymAddr = Lib->findSymbol(SymName);
+    uint64_t SymAddr = Lib->findSymbol(*this, SymName);
     if (!SymAddr) {
       error("external symbol couldn't be resolved");
       continue;
@@ -317,7 +328,7 @@ LoadedLibrary *DynamicLoader::loadPE(const string &Path) {
   LLP->Ptr = Lib;
 
   // Find out where it lies in memory.
-  if (uint64_t Hdr = LLP->findSymbol("_mh_dylib_header")) {
+  if (uint64_t Hdr = LLP->findSymbol(*this, "_mh_dylib_header")) {
     // Map libraries that act as `.dylib`s without their PE headers.
     LLP->StartAddress = Hdr;
     LLP->Size = getDylibSize(reinterpret_cast<const void *>(Hdr));

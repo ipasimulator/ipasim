@@ -3,13 +3,15 @@
 #include <string>
 #include <unicorn/unicorn.h>
 
+class DynamicLoader;
+
 class LoadedLibrary {
 public:
   virtual ~LoadedLibrary() = default;
 
   uint64_t StartAddress, Size;
 
-  virtual uint64_t findSymbol(const std::string &Name) = 0;
+  virtual uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) = 0;
 };
 
 class LoadedDylib : public LoadedLibrary {
@@ -18,7 +20,7 @@ public:
 
   LoadedDylib(std::unique_ptr<LIEF::MachO::FatBinary> &&Fat)
       : Fat(move(Fat)), Bin(Fat->at(0)) {}
-  uint64_t findSymbol(const std::string &Name) override;
+  uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) override;
 
 private:
   std::unique_ptr<LIEF::MachO::FatBinary> Fat;
@@ -28,7 +30,7 @@ class LoadedDll : public LoadedLibrary {
 public:
   HMODULE Ptr;
 
-  uint64_t findSymbol(const std::string &Name) override;
+  uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) override;
 };
 
 struct BinaryPath {
