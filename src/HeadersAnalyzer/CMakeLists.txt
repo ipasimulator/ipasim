@@ -1,42 +1,4 @@
-# LLVM libraries
-add_custom_target (config-clang-x86-Debug
-    COMMENT "Configure LLVM libs"
-    COMMAND ninja config-clang-x86-Debug
-    WORKING_DIRECTORY "${BINARY_DIR}"
-    USES_TERMINAL)
-function (add_clang_libs title names include_dirs tablegen_targets)
-    # Create include directories as some of them might be filled with generated
-    # headers at build time, but CMake would complain at configure time that
-    # those directories don't exist.
-    file (MAKE_DIRECTORY ${include_dirs})
-
-    foreach (name ${names})
-        # Add imported library `${name}.lib`.
-        add_library ("${name}" STATIC IMPORTED)
-        set_target_properties ("${name}" PROPERTIES
-            IMPORTED_LOCATION "${DEBUG_CLANG_CMAKE_DIR}/lib/${name}.lib")
-        target_compile_definitions ("${name}" INTERFACE _DEBUG _MT _DLL)
-        target_link_libraries ("${name}" INTERFACE
-            ucrtd vcruntimed msvcrtd msvcprtd)
-        target_include_directories ("${name}" INTERFACE ${include_dirs})
-        if (tablegen_targets)
-            add_dependencies ("${name}" ${tablegen_targets})
-        endif (tablegen_targets)
-    endforeach (name)
-
-    # Let CMake know how to generate those `.lib`s.
-    set (libs ${names})
-    list (TRANSFORM libs PREPEND "${DEBUG_CLANG_CMAKE_DIR}/lib/")
-    list (TRANSFORM libs APPEND .lib)
-    add_custom_target ("gen-${title}"
-        COMMENT "Generate ${title} libs"
-        BYPRODUCTS ${libs}
-        COMMAND ninja ${names}
-        WORKING_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}"
-        USES_TERMINAL
-        DEPENDS config-clang-x86-Debug)
-endfunction (add_clang_libs)
-
+# Clang libraries
 set (LLD_LIBS
     lldCOFF
     lldCommon
@@ -239,6 +201,24 @@ set (LLVM_LIBS
     LLVMX86Utils
     LLVMXRay)
 
+set (ALL_CLANG_LIBS ${LLD_LIBS} ${LLDB_LIBS} ${CLANG_LIBS} ${LLVM_LIBS})
+
+set (LLD_INCLUDE_DIRS
+    "${DEBUG_CLANG_CMAKE_DIR}/tools/lld/include"
+    "${SOURCE_DIR}/deps/lld/include")
+set (LLDB_INCLUDE_DIRS
+    "${DEBUG_CLANG_CMAKE_DIR}/tools/lldb/include"
+    "${SOURCE_DIR}/deps/lldb/include")
+set (CLANG_INCLUDE_DIRS
+    "${DEBUG_CLANG_CMAKE_DIR}/tools/clang/include"
+    "${SOURCE_DIR}/deps/clang/include")
+set (LLVM_INCLUDE_DIRS
+    "${DEBUG_CLANG_CMAKE_DIR}/include"
+    "${SOURCE_DIR}/deps/llvm/include")
+
+set (ALL_CLANG_INCLUDE_DIRS ${LLD_INCLUDE_DIRS} ${LLDB_INCLUDE_DIRS}
+    ${CLANG_INCLUDE_DIRS} ${LLVM_INCLUDE_DIRS})
+
 ## These targets generate LLVM headers. Note that these are only tablegenned
 ## headers. Other generated headers, like `config.h`, are generated at configure
 ## time.
@@ -271,18 +251,26 @@ add_custom_target (llvm-tablegen-targets
     USES_TERMINAL
     DEPENDS config-clang-x86-Debug)
 
-set (LLD_INCLUDE_DIRS
-    "${DEBUG_CLANG_CMAKE_DIR}/tools/lld/include"
-    "${SOURCE_DIR}/deps/lld/include")
-set (LLDB_INCLUDE_DIRS
-    "${DEBUG_CLANG_CMAKE_DIR}/tools/lldb/include"
-    "${SOURCE_DIR}/deps/lldb/include")
-set (CLANG_INCLUDE_DIRS
-    "${DEBUG_CLANG_CMAKE_DIR}/tools/clang/include"
-    "${SOURCE_DIR}/deps/clang/include")
-set (LLVM_INCLUDE_DIRS
-    "${DEBUG_CLANG_CMAKE_DIR}/include"
-    "${SOURCE_DIR}/deps/llvm/include")
+# Create include directories as some of them might be filled with generated
+# headers at build time, but CMake would complain at configure time that those
+# directories don't exist.
+file (MAKE_DIRECTORY ${ALL_CLANG_INCLUDE_DIRS})
+
+function (add_clang_libs title names include_dirs tablegen_targets)
+    foreach (name ${names})
+        # Add imported library `${name}.lib`.
+        add_library ("${name}" STATIC IMPORTED)
+        set_target_properties ("${name}" PROPERTIES
+            IMPORTED_LOCATION "${DEBUG_CLANG_CMAKE_DIR}/lib/${name}.lib")
+        target_compile_definitions ("${name}" INTERFACE _DEBUG _MT _DLL)
+        target_link_libraries ("${name}" INTERFACE
+            ucrtd vcruntimed msvcrtd msvcprtd)
+        target_include_directories ("${name}" INTERFACE ${include_dirs})
+        if (tablegen_targets)
+            add_dependencies ("${name}" ${tablegen_targets})
+        endif (tablegen_targets)
+    endforeach (name)
+endfunction (add_clang_libs)
 
 add_clang_libs (LLD "${LLD_LIBS}" "${LLD_INCLUDE_DIRS}" "")
 add_clang_libs (LLDB "${LLDB_LIBS}" "${LLDB_INCLUDE_DIRS}" "")
@@ -290,6 +278,23 @@ add_clang_libs (Clang "${CLANG_LIBS}" "${CLANG_INCLUDE_DIRS}"
     clang-tablegen-targets)
 add_clang_libs (LLVM "${LLVM_LIBS}" "${LLVM_INCLUDE_DIRS}"
     llvm-tablegen-targets)
+
+# Let CMake know how to generate those `.lib`s.
+set (libs ${ALL_CLANG_LIBS})
+list (TRANSFORM libs PREPEND "${DEBUG_CLANG_CMAKE_DIR}/lib/")
+list (TRANSFORM libs APPEND .lib)
+add_custom_target (config-clang-x86-Debug
+    COMMENT "Configure Clang libs"
+    COMMAND ninja config-clang-x86-Debug
+    WORKING_DIRECTORY "${BINARY_DIR}"
+    USES_TERMINAL)
+add_custom_target (ClangLibs
+    COMMENT "Generate Clang libs"
+    BYPRODUCTS ${libs}
+    COMMAND ninja ${ALL_CLANG_LIBS}
+    WORKING_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}"
+    USES_TERMINAL
+    DEPENDS config-clang-x86-Debug)
 
 # Library TAPI. See `docs/tapi.md`.
 set (TAPI_SOURCES
@@ -413,8 +418,7 @@ target_include_directories (HeadersAnalyzer PRIVATE
     ../../deps/lldb/source)
 
 target_link_libraries (HeadersAnalyzer PRIVATE
-    ${LLD_LIBS} ${LLDB_LIBS} ${CLANG_LIBS} ${LLVM_LIBS} tapi dia ws2_32.lib
-    mincore.lib
+    ${ALL_CLANG_LIBS} tapi dia ws2_32.lib mincore.lib
     # TODO: We should use original Clang + `lld-link`, this is just a simpler
     # workaround for #12.
     -fuse-ld=link
