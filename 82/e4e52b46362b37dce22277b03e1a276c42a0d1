@@ -1,0 +1,6 @@
+[ver:1,total:660]
+CMakeLists.txt:240,1550703600:240,m
+scripts/CommonVariables.cmake:150,1550703600:150,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:150,1550703600:150,r
+src/IpaSimulator/IpaSimulator.cpp:90,1550703600:90,r
+src/HeadersAnalyzer/analyze_ios_headers.cfg:30,1550703600:30,r
