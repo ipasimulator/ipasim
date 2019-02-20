@@ -172,7 +172,7 @@ private:
     }
 
     // TODO: Handle also `.ipa`-relative paths.
-    return BinaryPath{Path, /* Relative */ false};
+    return BinaryPath{Path, filesystem::path(Path).is_relative()};
   }
   LoadedLibrary *loadMachO(const string &Path) {
     using namespace LIEF::MachO;
