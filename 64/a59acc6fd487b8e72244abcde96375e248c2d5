@@ -1,0 +1,5 @@
+[ver:1,total:660]
+src/IpaSimulator/IpaSimApp/App.cpp:330,1550671200:330,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:225,1550671200:225,m
+src/RTObjCInterop/CMakeLists.txt:60,1550671200:60,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:45,1550671200:45,m
