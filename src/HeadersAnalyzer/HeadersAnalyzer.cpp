@@ -64,12 +64,10 @@ public:
     reportStatus("discovering TBDs");
 
     TBDHandler TH(HAC);
-    if constexpr (Sample) {
-      TH.handleFile(
-          "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libobjc.A.tbd");
+    if constexpr (Sample)
       TH.handleFile(
           "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libSystem.B.tbd");
-    } else {
+    else {
       vector<string> Dirs{
           "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
           "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/TextInput/"};
@@ -92,19 +90,21 @@ public:
 
     // Note that groups must be added just once and together because references
     // to them are invalidated after that.
-    HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/"});
     if constexpr (!Sample) {
+      HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/"});
       HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/Frameworks/"});
+      HAC.DLLGroups.push_back(
+          {"./deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/"});
     }
-    HAC.DLLGroups.push_back(
-        {"./deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/"});
-
-    // Our Objective-C runtime
-    HAC.DLLGroups[0].DLLs.push_back(DLLEntry("libobjc.dll"));
+    HAC.DLLGroups.push_back({"./lib/crt/"});
+    size_t I = 0;
 
     if constexpr (!Sample) {
+      // Our Objective-C runtime
+      HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("libobjc.dll"));
+
       // WinObjC DLLs (i.e., Windows versions of Apple's frameworks)
-      DLLGroup &FxGroup = HAC.DLLGroups[1];
+      DLLGroup &FxGroup = HAC.DLLGroups[I++];
       for (auto &File : directory_iterator(FxGroup.Dir)) {
         path FilePath(File.path());
 
@@ -115,11 +115,13 @@ public:
             FxGroup.DLLs.push_back(DLLEntry(DLLPath.filename().string()));
         }
       }
+
+      // Prebuilt `libdispatch.dll`
+      HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("libdispatch.dll"));
     }
 
-    // Prebuilt `libdispatch.dll`
-    HAC.DLLGroups[HAC.DLLGroups.size() - 1].DLLs.push_back(
-        DLLEntry("libdispatch.dll"));
+    // C runtime
+    HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("ucrtbased.dll"));
   }
   void parseAppleHeaders() {
     reportStatus("parsing Apple headers");
