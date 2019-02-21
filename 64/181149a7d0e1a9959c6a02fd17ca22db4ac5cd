@@ -1,0 +1,7 @@
+[ver:1,total:2520]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:2145,1550703600:750,1550707200:660,1550736000:735,m
+CMakeLists.txt:180,1550703600:180,r
+src/HeadersAnalyzer/LLDHelper.cpp:90,1550736000:90,r
+src/HeadersAnalyzer/Config.hpp:45,1550703600:30,1550736000:15,m
+src/IpaSimulator/IpaSimulator.cpp:30,1550703600:30,r
+docs/llvm.md:30,1550703600:30,r
