@@ -1,0 +1,9 @@
+[ver:1,total:2040]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1034,1550739600:1034,m
+lib/crt/README.md:380,1550739600:380,m
+src/IpaSimulator/IpaSimulator.cpp:380,1550739600:380,r
+src/HeadersAnalyzer/Config.hpp:132,1550739600:72,1550743200:60,r
+src/HeadersAnalyzer/LLDHelper.cpp:30,1550739600:30,r
+cmake/ipasim-x86-Debug/cg/exports.txt:30,1550739600:30,r
+src/IpaSimulator/MainPage.xaml.cpp:30,1550739600:30,r
+.gitattributes:24,1550739600:24,m
