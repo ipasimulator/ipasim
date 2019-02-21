@@ -67,8 +67,8 @@ public:
     if constexpr (Sample) {
       TH.handleFile(
           "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libobjc.A.tbd");
-      TH.handleFile("./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/"
-                    "Frameworks/Foundation.framework/Foundation.tbd");
+      TH.handleFile(
+          "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libSystem.B.tbd");
     } else {
       vector<string> Dirs{
           "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
@@ -93,20 +93,18 @@ public:
     // Note that groups must be added just once and together because references
     // to them are invalidated after that.
     HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/"});
-    HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/Frameworks/"});
-    if constexpr (!Sample)
-      HAC.DLLGroups.push_back(
-          {"./deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/"});
+    if constexpr (!Sample) {
+      HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/Frameworks/"});
+    }
+    HAC.DLLGroups.push_back(
+        {"./deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/"});
 
     // Our Objective-C runtime
-    DLLGroup &BinGroup = HAC.DLLGroups[0];
+    HAC.DLLGroups[0].DLLs.push_back(DLLEntry("libobjc.dll"));
 
-    // WinObjC DLLs (i.e., Windows versions of Apple's frameworks)
-    DLLGroup &FxGroup = HAC.DLLGroups[1];
-    BinGroup.DLLs.push_back(DLLEntry("libobjc.dll"));
-    if constexpr (Sample)
-      FxGroup.DLLs.push_back(DLLEntry("Foundation.dll"));
-    else {
+    if constexpr (!Sample) {
+      // WinObjC DLLs (i.e., Windows versions of Apple's frameworks)
+      DLLGroup &FxGroup = HAC.DLLGroups[1];
       for (auto &File : directory_iterator(FxGroup.Dir)) {
         path FilePath(File.path());
 
@@ -117,11 +115,11 @@ public:
             FxGroup.DLLs.push_back(DLLEntry(DLLPath.filename().string()));
         }
       }
-
-      // Prebuilt `libdispatch.dll`
-      DLLGroup &PrebuiltToolsGroup = HAC.DLLGroups[2];
-      PrebuiltToolsGroup.DLLs.push_back(DLLEntry("libdispatch.dll"));
     }
+
+    // Prebuilt `libdispatch.dll`
+    HAC.DLLGroups[HAC.DLLGroups.size() - 1].DLLs.push_back(
+        DLLEntry("libdispatch.dll"));
   }
   void parseAppleHeaders() {
     reportStatus("parsing Apple headers");
@@ -603,16 +601,18 @@ public:
       LLD.Args.add(("-L" + OutputDir.string()).c_str());
 
       // Add DLLs to link.
-      set<DLLPtr> DLLs;
-      for (const ExportEntry &Exp : deref(Lib.Exports))
-        if (Exp.Status == ExportStatus::FoundInDLL &&
-            DLLs.insert(Exp.DLL).second) {
-          LLD.Args.add(
-              ("-l" + path(HAC.DLLGroups[Exp.DLLGroup].DLLs[Exp.DLL].Name)
-                          .replace_extension(".dll")
-                          .string())
-                  .c_str());
-        }
+      {
+        set<DLLPtr> DLLs;
+        for (const ExportEntry &Exp : deref(Lib.Exports))
+          if (Exp.Status == ExportStatus::FoundInDLL &&
+              DLLs.insert(Exp.DLL).second) {
+            LLD.Args.add(
+                ("-l" + path(HAC.DLLGroups[Exp.DLLGroup].DLLs[Exp.DLL].Name)
+                            .replace_extension(".dll")
+                            .string())
+                    .c_str());
+          }
+      }
 
       // Add re-exports.
       for (auto &ReExport : Lib.ReExports) {
