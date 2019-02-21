@@ -1,0 +1,4 @@
+[ver:1,total:675]
+src/HeadersAnalyzer/ClangHelper.cpp:555,1550764800:555,m
+src/HeadersAnalyzer/Config.hpp:60,1550743200:30,1550764800:30,r
+lib/crt/README.md:60,1550764800:60,r
