@@ -86,7 +86,8 @@ void ClangHelper::executeArgs() {
     return;
   }
   SmallVector<pair<int, const Command *>, 4> FailingCommands;
-  if (TheDriver.ExecuteCompilation(*C, FailingCommands)) {
+  if (TheDriver.ExecuteCompilation(*C, FailingCommands) ||
+      !FailingCommands.empty()) {
     string CmdLine;
     for (const char *Arg : ArgsRef)
       CmdLine = CmdLine + " " + Arg;
