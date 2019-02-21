@@ -87,7 +87,10 @@ void ClangHelper::executeArgs() {
   }
   SmallVector<pair<int, const Command *>, 4> FailingCommands;
   if (TheDriver.ExecuteCompilation(*C, FailingCommands)) {
-    reportError("failed to execute compilation");
+    string CmdLine;
+    for (const char *Arg : ArgsRef)
+      CmdLine = CmdLine + " " + Arg;
+    reportError(Twine("failed to execute:") + CmdLine);
     return;
   }
 }
