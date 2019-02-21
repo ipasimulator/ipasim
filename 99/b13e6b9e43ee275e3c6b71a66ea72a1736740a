@@ -1,0 +1,5 @@
+[ver:1,total:1620]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:795,1550743200:150,1550754000:300,1550757600:60,1550764800:285,r
+src/IpaSimulator/IpaSimulator.cpp:405,1550743200:30,1550746800:180,1550750400:180,1550764800:15,r
+src/HeadersAnalyzer/ClangHelper.cpp:400,1550743200:60,1550764800:340,m
+src/HeadersAnalyzer/LLVMHelper.hpp:20,1550764800:20,r
