@@ -602,10 +602,10 @@ public:
 
       // Add DLLs to link.
       {
-        set<DLLPtr> DLLs;
+        set<pair<GroupPtr, DLLPtr>> DLLs;
         for (const ExportEntry &Exp : deref(Lib.Exports))
           if (Exp.Status == ExportStatus::FoundInDLL &&
-              DLLs.insert(Exp.DLL).second) {
+              DLLs.insert({Exp.DLLGroup, Exp.DLL}).second) {
             LLD.Args.add(
                 ("-l" + path(HAC.DLLGroups[Exp.DLLGroup].DLLs[Exp.DLL].Name)
                             .replace_extension(".dll")
