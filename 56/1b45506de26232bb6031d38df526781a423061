@@ -1,0 +1,4 @@
+[ver:1,total:210]
+lib/crt/.gitignore:120,1550743200:120,r
+src/HeadersAnalyzer/ClangHelper.cpp:50,1550743200:50,m
+src/HeadersAnalyzer/LLDHelper.cpp:40,1550743200:40,r
