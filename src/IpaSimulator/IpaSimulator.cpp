@@ -60,11 +60,11 @@ static void callUC(uc_err Err) {
 }
 
 bool LoadedLibrary::isInRange(uint64_t Addr) {
-  return Addr > StartAddress + Size || Addr < StartAddress;
+  return StartAddress <= Addr && Addr < StartAddress + Size;
 }
 void LoadedLibrary::checkInRange(uint64_t Addr) {
   // TODO: Do more flexible error reporting here.
-  if (isInRange(Addr))
+  if (!isInRange(Addr))
     throw "address out of range";
 }
 
