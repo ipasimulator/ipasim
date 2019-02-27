@@ -1,0 +1,5 @@
+[ver:1,total:1020]
+src/IpaSimulator/IpaSimulator.cpp:439,1551261600:439,m
+src/IpaSimulator/IpaSimulator.hpp:378,1551261600:378,r
+src/IpaSimulator/MainPage.xaml.cpp:187,1551261600:187,r
+src/dyld/dyld_initializer.cpp:16,1551261600:16,r
