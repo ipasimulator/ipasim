@@ -48,18 +48,6 @@ void LLDBHelper::load(const char *DLL, const char *PDB) {
   RootSymbol = SymbolFile->GetPDBSession().getGlobalScope();
 }
 
-template <typename SymbolTy> string LLDBHelper::mangleName(SymbolTy &Func) {
-  // Get function's name, mangled if possible.
-  string Name(Func.getUndecoratedName());
-  if (Name.empty()) {
-    Name = Func.getName();
-    assert(!Name.empty() && "A function has no name.");
-  }
-  return move(Name);
-}
-template string LLDBHelper::mangleName(PDBSymbolFunc &);
-template string LLDBHelper::mangleName(PDBSymbolPublicSymbol &);
-
 llvm::Type *TypeComparer::getLLVMType(const PDBSymbol &Symbol) {
   using namespace clang;
 
@@ -80,7 +68,7 @@ bool TypeComparer::areEquivalent(llvm::FunctionType *Func,
     reportError(
         llvm::Twine(
             "cannot compare signatures of a function and non-typed symbol `") +
-        LLDBHelper::mangleName(SymbolFunc) + "'");
+        SymbolFunc.getName() + "'");
     return true;
   }
   return FunctionComparer::compareTypes(Module, Func, Func2) == 0;

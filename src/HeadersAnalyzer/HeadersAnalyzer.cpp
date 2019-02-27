@@ -199,7 +199,7 @@ public:
         auto Analyzer = [&, DLL = ref(DLL), GroupIdx = GroupIdx,
                          DLLIdx = DLLIdx](auto &&Func, bool IgnoreDuplicates =
                                                            false) mutable {
-          string Name(LLDBHelper::mangleName(Func));
+          string Name(Func.getName());
           uint32_t RVA = Func.getRelativeVirtualAddress();
 
           // We are only interested in exported symbols or Objective-C methods.
@@ -715,7 +715,7 @@ private:
     // Compile to LLVM IR.
     Clang.executeCodeGenAction<EmitLLVMOnlyAction>();
   }
-  void createAlias(const ExportEntry &Exp, const llvm::Function *Func) {
+  void createAlias(const ExportEntry &Exp, llvm::Function *Func) {
     llvm::StringRef RVAStr = LLVM.Saver.save(to_string(Exp.RVA));
     llvm::GlobalAlias::create(Twine("\01$__ipaSim_wraps_") + RVAStr, Func);
   }

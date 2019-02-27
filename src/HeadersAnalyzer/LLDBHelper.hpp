@@ -65,7 +65,6 @@ public:
   LLDBHelper();
 
   void load(const char *DLL, const char *PDB);
-  template <typename SymbolTy> static std::string mangleName(SymbolTy &Func);
   lldb_private::SymbolFile *getSymbolFile() { return SymbolFile.get(); }
 
 private:
