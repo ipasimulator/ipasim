@@ -1,0 +1,9 @@
+[ver:1,total:1940]
+src/IpaSimulator/IpaSimulator.cpp:1605,1551301200:1605,m
+src/HeadersAnalyzer/ClangHelper.cpp:180,1551301200:180,r
+src/HeadersAnalyzer/Config.hpp:35,1551290400:20,1551301200:15,r
+cmake/ipasim-x86-Debug/cg/libobjc.cpp:30,1551301200:30,r
+src/IpaSimulator/CMakeLists.txt:30,1551301200:30,m
+src/HeadersAnalyzer/include/WrapperIndex.hpp:30,1551301200:30,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:15,1551301200:15,r
+.vscode/settings.json:15,1551301200:15,r
