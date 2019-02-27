@@ -47,11 +47,12 @@ class DynamicLoader {
 public:
   DynamicLoader(uc_engine *UC) : UC(UC) {}
   LoadedLibrary *load(const std::string &Path);
+  void execute(LoadedLibrary *Lib);
 
 private:
   void error(const std::string &Msg, bool AppendLastError = false);
   bool canSegmentsSlide(LIEF::MachO::Binary &Bin);
-  void mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms, uint8_t *Mem);
+  void mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms, void *Mem);
   BinaryPath resolvePath(const std::string &Path);
   LoadedLibrary *loadMachO(const std::string &Path);
   LoadedLibrary *loadPE(const std::string &Path);

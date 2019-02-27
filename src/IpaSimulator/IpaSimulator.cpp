@@ -160,7 +160,7 @@ bool DynamicLoader::canSegmentsSlide(LIEF::MachO::Binary &Bin) {
          (FType == FILE_TYPES::MH_EXECUTE && Bin.is_pie());
 }
 void DynamicLoader::mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms,
-                              uint8_t *Mem) {
+                              void *Mem) {
   callUC(uc_mem_map_ptr(UC, Addr, Size, Perms, Mem));
 }
 BinaryPath DynamicLoader::resolvePath(const string &Path) {
@@ -240,10 +240,10 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
       Perms |= UC_PROT_EXEC;
     }
 
-    uint64_t VAddr = unsigned(Seg.virtual_address()) + Slide;
+    uint64_t VAddr = Seg.virtual_address() + Slide;
     // Emulated virtual address is actually equal to the "real" virtual
     // address.
-    uint8_t *Mem = (uint8_t *)VAddr;
+    uint8_t *Mem = reinterpret_cast<uint8_t *>(VAddr);
     uint64_t VSize = Seg.virtual_size();
 
     if (Perms == UC_PROT_NONE) {
@@ -272,7 +272,7 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
 
         // Find base address for this relocation. Inspired by
         // `ImageLoaderMachOClassic::getRelocBase`.
-        uint64_t RelBase = unsigned(LowAddr) + Slide;
+        uint64_t RelBase = LowAddr + Slide;
 
         uint64_t RelAddr = RelBase + Rel.address();
 
@@ -287,7 +287,7 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
         // TODO: Solve this as the original dyld does. Maybe by always mapping
         // PAGEZERO to address 0 or something like that.
         if (*Val != 0)
-          *Val = unsigned(*Val) + Slide;
+          *Val = *Val + Slide;
       }
     }
   }
@@ -371,10 +371,26 @@ LoadedLibrary *DynamicLoader::loadPE(const string &Path) {
   // Load the library into Unicorn engine.
   uint64_t StartAddr = alignToPageSize(LLP->StartAddress);
   uint64_t Size = roundToPageSize(LLP->Size);
-  callUC(uc_mem_map_ptr(UC, StartAddr, Size, UC_PROT_READ | UC_PROT_WRITE,
-                        reinterpret_cast<void *>(StartAddr)));
+  mapMemory(StartAddr, Size, UC_PROT_READ | UC_PROT_WRITE,
+            reinterpret_cast<void *>(StartAddr));
 
   return LLP;
+}
+void DynamicLoader::execute(LoadedLibrary *Lib) {
+  auto *Dylib = dynamic_cast<LoadedDylib *>(Lib);
+  if (!Dylib) {
+    error("we can only execute Dylibs right now");
+    return;
+  }
+
+  // Initialize the stack.
+  size_t StackSize = 8 * 1024 * 1024; // 8 MiB
+  void *StackPtr = _aligned_malloc(StackSize, PageSize);
+  uint64_t StackAddr = reinterpret_cast<uint64_t>(StackPtr);
+  mapMemory(StackAddr, StackSize, UC_PROT_READ | UC_PROT_WRITE, StackPtr);
+  // Reserve 12 bytes for 3 null arguments to the main procedure.
+  uint32_t StackTop = StackAddr + StackSize - 12;
+  callUC(uc_reg_write(UC, UC_ARM_REG_SP, &StackTop));
 }
 
 extern "C" __declspec(dllexport) void start() {
@@ -385,7 +401,10 @@ extern "C" __declspec(dllexport) void start() {
   // Load test binary `ToDo`.
   filesystem::path Dir(Package::Current().InstalledLocation().Path().c_str());
   DynamicLoader Dyld(UC);
-  Dyld.load((Dir / "ToDo").string());
+  LoadedLibrary *App = Dyld.load((Dir / "ToDo").string());
+
+  // Execute it.
+  Dyld.execute(App);
 
   // Let the user know we're done. This is here for testing purposes only.
   MessageDialog Dlg(L"Done.");
