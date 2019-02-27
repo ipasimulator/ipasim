@@ -114,6 +114,13 @@ static bool isFileValid(const BinaryPath &BP) {
   }
 }
 
+static bool startsWith(const std::string &S, const std::string &Prefix) {
+  return !S.compare(0, Prefix.length(), Prefix);
+}
+static bool endsWith(const std::string &S, const std::string &Suffix) {
+  return !S.compare(S.length() - Suffix.length(), Suffix.length(), Suffix);
+}
+
 LoadedLibrary *DynamicLoader::load(const string &Path) {
   BinaryPath BP(resolvePath(Path));
 
@@ -136,6 +143,10 @@ LoadedLibrary *DynamicLoader::load(const string &Path) {
     error("invalid binary type: " + BP.Path);
     return nullptr;
   }
+
+  // Recognize wrapper DLLs.
+  L->IsWrapperDLL = BP.Relative && startsWith(BP.Path, "gen\\") &&
+                    endsWith(BP.Path, ".wrapper.dll");
 
   return L;
 }
@@ -435,7 +446,12 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   // Check that the target address is in some loaded library.
   AddrInfo AI(inspect(Addr));
   if (!AI.Lib) {
-    error("fetch prot. mem.");
+    error("unmapped address fetched");
+    return false;
+  }
+
+  if (!AI.Lib->IsWrapperDLL) {
+    error("non-wrapper DLL called");
     return false;
   }
 

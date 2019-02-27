@@ -7,9 +7,11 @@ class DynamicLoader;
 
 class LoadedLibrary {
 public:
+  LoadedLibrary() : StartAddress(0), Size(0), IsWrapperDLL(false) {}
   virtual ~LoadedLibrary() = default;
 
   uint64_t StartAddress, Size;
+  bool IsWrapperDLL;
 
   // TODO: Check that the found symbol is inside range [StartAddress, +Size].
   virtual uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) = 0;
