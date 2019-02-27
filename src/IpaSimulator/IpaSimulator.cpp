@@ -438,19 +438,6 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   OutputDebugStringA(" at 0x");
   uint64_t RVA = Addr - AI.Lib->StartAddress;
   OutputDebugStringA(to_hex_string(RVA).c_str());
-  uint32_t Val;
-  callUC(uc_mem_read(UC, Addr, &Val, 4));
-  OutputDebugStringA(" containing value 0x");
-  OutputDebugStringA(to_hex_string(Val).c_str());
-  AddrInfo AI2(inspect(Val));
-  if (AI2.Lib) {
-    OutputDebugStringA(" (0x");
-    uint64_t RelVal = Val - AI2.Lib->StartAddress;
-    OutputDebugStringA(to_hex_string(RelVal).c_str());
-    OutputDebugStringA(" from ");
-    OutputDebugStringA(AI2.LibPath->c_str());
-    OutputDebugStringA(")");
-  }
   OutputDebugStringA(".\n");
   return false;
 }
