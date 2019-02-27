@@ -6,6 +6,10 @@ add_prep_dep (IpaSimLibrary)
 
 target_compile_options (IpaSimLibrary PRIVATE -std=c++17)
 
+target_include_directories (IpaSimLibrary PRIVATE
+    # For `WrapperIndex.hpp`
+    "${SOURCE_DIR}/src/HeadersAnalyzer/include")
+
 # Unicorn Engine
 add_library (Unicorn SHARED IMPORTED)
 set_target_properties (Unicorn PROPERTIES

@@ -1,5 +1,7 @@
 #include "IpaSimulator.hpp"
 
+#include "WrapperIndex.hpp"
+
 #include <psapi.h> // for `GetModuleInformation`
 #include <winrt/Windows.ApplicationModel.h>
 #include <winrt/Windows.Storage.h>
@@ -452,7 +454,8 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
 
   // If the target is not a wrapper DLL, we must find and call the corresponding
   // wrapper instead.
-  if (!AI.Lib->IsWrapperDLL) {
+  bool Wrapper = AI.Lib->IsWrapperDLL;
+  if (!Wrapper) {
     filesystem::path WrapperPath(filesystem::path("gen") /
                                  filesystem::path(*AI.LibPath)
                                      .filename()
@@ -461,9 +464,26 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
     if (!WrapperLib)
       return false;
 
+    // Load `WrapperIndex`.
+    uint64_t IdxAddr = WrapperLib->findSymbol(*this, "?Idx@@3UWrapperIndex@@A");
+    auto *Idx = reinterpret_cast<WrapperIndex *>(IdxAddr);
+
     // TODO: Add real base address instead of hardcoded 0x1000.
     uint64_t RVA = Addr - AI.Lib->StartAddress + 0x1000;
-    Addr = WrapperLib->findSymbol(*this, "$__ipaSim_wrapper_" + to_string(RVA));
+
+    // Find Dylib with the corresponding wrapper.
+    auto Entry = Idx->Map.find(RVA);
+    if (Entry == Idx->Map.end()) {
+      error("cannot find RVA in WrapperIndex");
+      return false;
+    }
+    const string &Dylib = Idx->Dylibs[Entry->second];
+    LoadedLibrary *WrapperDylib = load(Dylib);
+    if (!WrapperDylib)
+      return false;
+
+    // Find the correct wrapper using its alias.
+    Addr = WrapperDylib->findSymbol(*this, "$__ipaSim_wraps_" + to_string(RVA));
     if (!Addr) {
       error("cannot find wrapper for 0x" + to_hex_string(RVA) + " in " +
             *AI.LibPath);
@@ -481,7 +501,17 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   OutputDebugStringA(" at 0x");
   uint64_t RVA = Addr - AI.Lib->StartAddress;
   OutputDebugStringA(to_hex_string(RVA).c_str());
+  if (!Wrapper)
+    OutputDebugStringA(" (not a wrapper)");
   OutputDebugStringA(".\n");
+
+  // If the target is not a wrapper, we simply jump to it, no need to translate
+  // anything.
+  if (!Wrapper) {
+    uint32_t R15 = Addr;
+    callUC(uc_reg_write(UC, UC_ARM_REG_R15, &R15)); // R15 is PC
+    return true;
+  }
 
   // Read register R0 containing address of our structure with function
   // arguments and return value.
