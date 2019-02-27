@@ -93,8 +93,7 @@ void TBDHandler::handleFile(const string &Path) {
 
 void TBDHandler::addExport(DylibPtr Lib, string &&Name) {
   ExportPtr Exp = HAC.iOSExps.find(Name);
-  if (Exp != HAC.iOSExps.end())
-    Lib->Exports.push_back(Exp);
-  else
-    Lib->Exports.push_back(HAC.addExport(move(Name)));
+  if (Exp == HAC.iOSExps.end())
+    Exp = HAC.addExport(move(Name));
+  Lib->Exports.push_back(Exp);
 }

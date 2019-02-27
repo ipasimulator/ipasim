@@ -41,6 +41,7 @@
 #include <llvm/Transforms/Utils/FunctionComparator.h>
 
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <vector>
 
@@ -84,6 +85,13 @@ public:
               (File.path() / File.path().filename().replace_extension(".tbd"))
                   .string());
     }
+
+    // Fill `ExportEntry.Dylib` fields. This must not be done earlier since
+    // `DylibPtr`s need to be stable.
+    for (auto [LibPtr, Lib] : withPtrs(HAC.iOSLibs))
+      for (const ExportPtr &Exp : Lib.Exports)
+        if (!Exp->Dylib)
+          Exp->Dylib = LibPtr;
   }
   void discoverDLLs() {
     reportStatus("discovering DLLs");
@@ -417,6 +425,45 @@ public:
           IR.Builder.CreateRetVoid();
         }
 
+        // Generate `WrapperIndex`.
+        string IndexFile(
+            (OutputDir / DLL.Name).replace_extension(".cpp").string());
+        {
+          ofstream OS;
+          OS.open(IndexFile, ios_base::out | ios_base::trunc);
+          if (!OS) {
+            reportError(llvm::Twine("cannot create index file for ") +
+                        DLL.Name);
+            continue;
+          }
+
+          ifstream IS;
+          IS.open("./src/HeadersAnalyzer/WrapperIndex.cpp");
+          if (!IS) {
+            reportError("cannot open WrapperIndex.cpp");
+            continue;
+          }
+
+          OS << IS.rdbuf();
+
+          // Add libraries.
+          std::map<DylibPtr, size_t> Dylibs;
+          size_t Counter = 0;
+          for (const ExportEntry &Exp : deref(DLL.Exports))
+            if (Exp.Dylib && Dylibs.find(Exp.Dylib) == Dylibs.end()) {
+              Dylibs[Exp.Dylib] = Counter++;
+              OS << "ADD_LIBRARY(\"" << Exp.Dylib->Name << "\");\n";
+            }
+
+          // Fill the index.
+          for (const ExportEntry &Exp : deref(DLL.Exports))
+            if (Exp.Dylib)
+              OS << "MAP(" << Exp.RVA << ", " << Dylibs[Exp.Dylib] << ");\n";
+
+          OS << "END\n";
+          OS.flush();
+        }
+
         // Emit `.obj` file.
         string ObjectFile(
             (OutputDir / DLL.Name).replace_extension(".obj").string());
@@ -428,6 +475,10 @@ public:
           // See #24.
           if (DLL.Name == "ucrtbased.dll")
             Clang.Args.add("./lib/crt/stubs.obj");
+
+          Clang.Args.add("-I./src/HeadersAnalyzer/include");
+          Clang.Args.add(IndexFile.c_str());
+
           Clang.linkDLL(
               (GenDir / DLL.Name).replace_extension(".wrapper.dll").string(),
               ObjectFile, path(DLLPath).replace_extension(".dll.a").string());

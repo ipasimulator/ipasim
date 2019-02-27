@@ -8,6 +8,6 @@ struct WrapperIndex {
   WrapperIndex();
 
   std::vector<std::string> Dylibs;
-  // original DLL RVAs -> wrapper Dylib index and RVA
-  std::map<uint32_t, std::pair<uint32_t, uint32_t>> Map;
+  // original DLL RVA -> wrapper Dylib index
+  std::map<uint32_t, uint32_t> Map;
 };

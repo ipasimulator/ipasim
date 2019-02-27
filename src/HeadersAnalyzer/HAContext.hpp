@@ -90,6 +90,7 @@ struct ExportEntry {
   mutable bool Stret : 1;
   mutable GroupPtr DLLGroup;
   mutable DLLPtr DLL;
+  mutable DylibPtr Dylib; // first Dylib that implements this function
 
   bool operator<(const ExportEntry &Other) const { return Name < Other.Name; }
   bool isTrivial() const {
