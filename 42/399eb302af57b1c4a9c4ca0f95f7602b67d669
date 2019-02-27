@@ -1,0 +1,10 @@
+[ver:1,total:1260]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:510,1551294000:510,m
+src/HeadersAnalyzer/LLDBHelper.cpp:375,1551294000:375,m
+src/HeadersAnalyzer/HAContext.cpp:150,1551294000:150,r
+src/HeadersAnalyzer/LLDBHelper.hpp:80,1551294000:80,m
+src/HeadersAnalyzer/LLVMHelper.cpp:50,1551294000:50,r
+cmake/ipasim-x86-Debug/cg/exports.txt:35,1551294000:35,r
+docs/debug.md:20,1551294000:20,r
+docs/cmake.md:20,1551294000:20,r
+src/IpaSimulator/IpaSimulator.cpp:20,1551294000:20,r
