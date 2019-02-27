@@ -500,6 +500,7 @@ public:
           // Declare the messenger.
           llvm::Function *MessengerFunc =
               IR.declareFunc(VoidToVoidTy, Exp.Name);
+          createAlias(Exp, MessengerFunc);
 
           // And define it, too.
           FunctionGuard MessengerGuard(IR, MessengerFunc);
@@ -540,6 +541,7 @@ public:
         // Declarations.
         llvm::Function *Func = IR.declareFunc(Exp);
         llvm::Function *Wrapper = IR.declareFunc(Exp, /* Wrapper */ true);
+        createAlias(Exp, Func);
 
         FunctionGuard FuncGuard(IR, Func);
 
@@ -713,6 +715,10 @@ private:
     // Compile to LLVM IR.
     Clang.executeCodeGenAction<EmitLLVMOnlyAction>();
   }
+  void createAlias(const ExportEntry &Exp, const llvm::Function *Func) {
+    llvm::StringRef RVAStr = LLVM.Saver.save(to_string(Exp.RVA));
+    llvm::GlobalAlias::create(Twine("\01$__ipaSim_wraps_") + RVAStr, Func);
+  }
 };
 
 int main() {
@@ -729,8 +735,6 @@ int main() {
   } catch (const FatalError &) {
     return 1;
   }
-
-  // TODO: Also generate map from DLL RVAs to Dylib RVAs.
 
   return 0;
 }
