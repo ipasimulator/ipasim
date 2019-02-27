@@ -11,8 +11,10 @@ public:
 
   uint64_t StartAddress, Size;
 
+  // TODO: Check that the found symbol is inside range [StartAddress, +Size].
   virtual uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) = 0;
   virtual bool hasUnderscorePrefix() = 0;
+  void checkInRange(uint64_t Addr);
 };
 
 class LoadedDylib : public LoadedLibrary {

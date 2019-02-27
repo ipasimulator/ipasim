@@ -53,6 +53,12 @@ static size_t getDylibSize(const void *Ptr) {
   return Size;
 }
 
+void LoadedLibrary::checkInRange(uint64_t Addr) {
+  // TODO: Do more flexible error reporting here.
+  if (Addr > StartAddress + Size || Addr < StartAddress)
+    throw "address out of range";
+}
+
 uint64_t LoadedDylib::findSymbol(DynamicLoader &DL, const string &Name) {
   using namespace LIEF::MachO;
 
@@ -314,7 +320,10 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
       continue;
     }
 
-    // TODO: Bind it.
+    // Bind it.
+    uint64_t TargetAddr = BInfo.address() + Slide;
+    LLP->checkInRange(TargetAddr);
+    *reinterpret_cast<uint32_t *>(TargetAddr) = SymAddr;
   }
 
   return LLP;
