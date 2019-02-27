@@ -392,6 +392,13 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   uint32_t StackTop = StackAddr + StackSize - 12;
   callUC(uc_reg_write(UC, UC_ARM_REG_SP, &StackTop));
 
+  // Install hooks. Hook `catchFetchProtMem` handles calls across platform
+  // boundaries (iOS -> Windows). It works thanks to mapping Windows DLLs as
+  // non-executable.
+  uc_hook Hook;
+  callUC(uc_hook_add(UC, &Hook, UC_HOOK_MEM_FETCH_PROT,
+                     reinterpret_cast<void *>(catchFetchProtMem), this, 1, 0));
+
   // TODO: Do this also for all non-wrapper Dylibs (i.e., Dylibs that come with
   // the `.ipa` file).
   // TODO: Call also other (user) C++ initializers.
@@ -405,6 +412,17 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   // Start execution.
   callUC(
       uc_emu_start(UC, Dylib->Bin.entrypoint() + Dylib->StartAddress, 0, 0, 0));
+}
+bool DynamicLoader::catchFetchProtMem(uc_engine *UC, uc_mem_type Type,
+                                      uint64_t Addr, int Size, int64_t Value,
+                                      void *Data) {
+  return reinterpret_cast<DynamicLoader *>(Data)->handleFetchProtMem(
+      Type, Addr, Size, Value);
+}
+bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
+                                       int Size, int64_t Value) {
+  error("protected memory fetched");
+  return false;
 }
 
 extern "C" __declspec(dllexport) void start() {

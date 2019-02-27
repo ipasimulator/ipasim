@@ -70,6 +70,10 @@ private:
     auto *Ptr = reinterpret_cast<void (*)(Args...)>(Addr);
     Ptr(std::forward<Args>(Params)...);
   }
+  static bool catchFetchProtMem(uc_engine *UC, uc_mem_type Type, uint64_t Addr,
+                                int Size, int64_t Value, void *Data);
+  bool handleFetchProtMem(uc_mem_type Type, uint64_t Addr, int Size,
+                          int64_t Value);
 
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
