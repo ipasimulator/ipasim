@@ -15,5 +15,6 @@ dumpbin /exports ucrtbased.dll > exports.txt
 echo LIBRARY UCRTBASED > ucrtbased.def
 echo EXPORTS >> ucrtbased.def
 for /f "skip=19 tokens=4" %A in (exports.txt) do @echo %A >> ucrtbased.def
+echo ldexpl >> ucrtbased.def ; See #24.
 lib /def:ucrtbased.def /out:ucrtbased.dll.a /machine:x86
 ```
