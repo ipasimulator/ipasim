@@ -1,0 +1,11 @@
+[ver:1,total:2130]
+lib/crt/README.md:532,1551254400:532,m
+src/IpaSimulator/IpaSimulator.cpp:450,1551254400:390,1551258000:60,r
+lib/crt/ucrtbased.def:330,1551254400:330,r
+lib/crt/stubs.cpp:285,1551254400:285,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:160,1551254400:160,m
+docs/issues/24.md:157,1551254400:157,m
+.gitattributes:129,1551254400:129,m
+src/HeadersAnalyzer/ClangHelper.cpp:65,1551254400:65,r
+src/HeadersAnalyzer/LLDHelper.cpp:15,1551254400:15,r
+lib/crt/.gitignore:7,1551254400:7,m
