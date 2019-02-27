@@ -391,6 +391,21 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   // Reserve 12 bytes for 3 null arguments to the main procedure.
   uint32_t StackTop = StackAddr + StackSize - 12;
   callUC(uc_reg_write(UC, UC_ARM_REG_SP, &StackTop));
+
+  // TODO: Do this also for all non-wrapper Dylibs (i.e., Dylibs that come with
+  // the `.ipa` file).
+  // TODO: Call also other (user) C++ initializers.
+  // Initialize the binary with our Objective-C runtime. This simulates what
+  // `dyld_initializer.cpp` does.
+  uint64_t Hdr = Dylib->findSymbol(*this, "__mh_execute_header");
+  LoadedLibrary *Dyld = load("libdyld.dll");
+  auto *DyldInitialize = reinterpret_cast<void (*)(void *)>(
+      Dyld->findSymbol(*this, "_dyld_initialize"));
+  DyldInitialize(reinterpret_cast<void *>(Hdr));
+  LoadedLibrary *LibObjC = load("libobjc.dll");
+  auto *ObjCInit = reinterpret_cast<void (*)(void)>(
+      LibObjC->findSymbol(*this, "_objc_init"));
+  ObjCInit();
 }
 
 extern "C" __declspec(dllexport) void start() {
