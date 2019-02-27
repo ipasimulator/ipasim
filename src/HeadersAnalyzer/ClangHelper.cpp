@@ -45,9 +45,9 @@ void ClangHelper::linkDLL(StringRef Output, StringRef ObjectFile,
   Args.add(Output.data());
   Args.add(ObjectFile.data());
   Args.add(ImportLib.data());
-  // We just create wrappers, we don't really need C runtime. Also, it causes
-  // problems when creating wrappers for the C runtime itself.
+  // See #25.
   Args.add("-nostdlib");
+  Args.add("-Wl,-defaultlib:msvcrtd");
 
   executeArgs();
 }
