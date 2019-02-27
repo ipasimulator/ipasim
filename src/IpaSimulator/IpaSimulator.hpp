@@ -14,6 +14,7 @@ public:
   // TODO: Check that the found symbol is inside range [StartAddress, +Size].
   virtual uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) = 0;
   virtual bool hasUnderscorePrefix() = 0;
+  bool isInRange(uint64_t Addr);
   void checkInRange(uint64_t Addr);
 };
 
@@ -41,6 +42,11 @@ public:
 struct BinaryPath {
   std::string Path;
   bool Relative; // true iff `Path` is relative to install dir
+};
+
+struct AddrInfo {
+  LoadedLibrary *Lib;
+  std::string SymbolName;
 };
 
 class DynamicLoader {
@@ -77,6 +83,8 @@ private:
   static void catchCode(uc_engine *UC, uint64_t Addr, uint32_t Size,
                         void *Data);
   void handleCode(uint64_t Addr, uint32_t Size);
+  LoadedLibrary *lookup(uint64_t Addr);
+  AddrInfo inspect(uint64_t Addr);
 
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.

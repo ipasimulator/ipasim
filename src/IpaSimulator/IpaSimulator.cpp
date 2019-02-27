@@ -59,9 +59,12 @@ static void callUC(uc_err Err) {
     throw "unicorn error";
 }
 
+bool LoadedLibrary::isInRange(uint64_t Addr) {
+  return Addr > StartAddress + Size || Addr < StartAddress;
+}
 void LoadedLibrary::checkInRange(uint64_t Addr) {
   // TODO: Do more flexible error reporting here.
-  if (Addr > StartAddress + Size || Addr < StartAddress)
+  if (isInRange(Addr))
     throw "address out of range";
 }
 
@@ -433,6 +436,20 @@ void DynamicLoader::catchCode(uc_engine *UC, uint64_t Addr, uint32_t Size,
 }
 void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
   OutputDebugStringA("executing...\n");
+}
+LoadedLibrary *DynamicLoader::lookup(uint64_t Addr) {
+  for (auto &LI : LIs) {
+    LoadedLibrary *LL = LI.second.get();
+    if (LL->isInRange(Addr))
+      return LL;
+  }
+  return nullptr;
+}
+AddrInfo DynamicLoader::inspect(uint64_t Addr) {
+  LoadedLibrary *LL = lookup(Addr);
+  // TODO: Find symbol name and also use this function to implement
+  // `src/objc/dladdr.mm`.
+  return {LL, string()};
 }
 
 extern "C" __declspec(dllexport) void start() {
