@@ -53,6 +53,12 @@ static size_t getDylibSize(const void *Ptr) {
   return Size;
 }
 
+static void callUC(uc_err Err) {
+  // TODO: Do more flexible error reporting here.
+  if (Err)
+    throw "unicorn error";
+}
+
 void LoadedLibrary::checkInRange(uint64_t Addr) {
   // TODO: Do more flexible error reporting here.
   if (Addr > StartAddress + Size || Addr < StartAddress)
@@ -128,8 +134,6 @@ LoadedLibrary *DynamicLoader::load(const string &Path) {
     return nullptr;
   }
 
-  // TODO: Load the library into Unicorn engine.
-
   return L;
 }
 
@@ -157,8 +161,7 @@ bool DynamicLoader::canSegmentsSlide(LIEF::MachO::Binary &Bin) {
 }
 void DynamicLoader::mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms,
                               uint8_t *Mem) {
-  if (uc_mem_map_ptr(UC, Addr, Size, Perms, Mem))
-    error("error while mapping memory into Unicorn Engine");
+  callUC(uc_mem_map_ptr(UC, Addr, Size, Perms, Mem));
 }
 BinaryPath DynamicLoader::resolvePath(const string &Path) {
   if (!Path.empty() && Path[0] == '/') {
@@ -365,13 +368,19 @@ LoadedLibrary *DynamicLoader::loadPE(const string &Path) {
     LLP->Size = Info.SizeOfImage;
   }
 
+  // Load the library into Unicorn engine.
+  uint64_t StartAddr = alignToPageSize(LLP->StartAddress);
+  uint64_t Size = roundToPageSize(LLP->Size);
+  callUC(uc_mem_map_ptr(UC, StartAddr, Size, UC_PROT_READ | UC_PROT_WRITE,
+                        reinterpret_cast<void *>(StartAddr)));
+
   return LLP;
 }
 
 extern "C" __declspec(dllexport) void start() {
   // Initialize Unicorn Engine.
   uc_engine *UC;
-  uc_open(UC_ARCH_ARM, UC_MODE_ARM, &UC); // TODO: Handle errors.
+  callUC(uc_open(UC_ARCH_ARM, UC_MODE_ARM, &UC));
 
   // Load test binary `ToDo`.
   filesystem::path Dir(Package::Current().InstalledLocation().Path().c_str());
