@@ -398,6 +398,9 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   uc_hook Hook;
   callUC(uc_hook_add(UC, &Hook, UC_HOOK_MEM_FETCH_PROT,
                      reinterpret_cast<void *>(catchFetchProtMem), this, 1, 0));
+  // Hook `catchCode` logs execution for debugging purposes.
+  callUC(uc_hook_add(UC, &Hook, UC_HOOK_CODE,
+                     reinterpret_cast<void *>(catchCode), this, 1, 0));
 
   // TODO: Do this also for all non-wrapper Dylibs (i.e., Dylibs that come with
   // the `.ipa` file).
@@ -423,6 +426,13 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
                                        int Size, int64_t Value) {
   error("protected memory fetched");
   return false;
+}
+void DynamicLoader::catchCode(uc_engine *UC, uint64_t Addr, uint32_t Size,
+                              void *Data) {
+  reinterpret_cast<DynamicLoader *>(Data)->handleCode(Addr, Size);
+}
+void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
+  OutputDebugStringA("executing...\n");
 }
 
 extern "C" __declspec(dllexport) void start() {

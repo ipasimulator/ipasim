@@ -74,6 +74,9 @@ private:
                                 int Size, int64_t Value, void *Data);
   bool handleFetchProtMem(uc_mem_type Type, uint64_t Addr, int Size,
                           int64_t Value);
+  static void catchCode(uc_engine *UC, uint64_t Addr, uint32_t Size,
+                        void *Data);
+  void handleCode(uint64_t Addr, uint32_t Size);
 
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
