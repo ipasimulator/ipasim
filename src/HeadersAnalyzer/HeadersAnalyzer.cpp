@@ -423,9 +423,15 @@ public:
         IR.emitObj(ObjectFile);
 
         // Create the wrapper DLL.
-        ClangHelper(LLVM).linkDLL(
-            (GenDir / DLL.Name).replace_extension(".wrapper.dll").string(),
-            ObjectFile, path(DLLPath).replace_extension(".dll.a").string());
+        {
+          ClangHelper Clang(LLVM);
+          // See #24.
+          if (DLL.Name == "ucrtbased.dll")
+            Clang.Args.add("./lib/crt/stubs.obj");
+          Clang.linkDLL(
+              (GenDir / DLL.Name).replace_extension(".wrapper.dll").string(),
+              ObjectFile, path(DLLPath).replace_extension(".dll.a").string());
+        }
 
         // Emit `.o` file.
         string DylibObjectFile(
