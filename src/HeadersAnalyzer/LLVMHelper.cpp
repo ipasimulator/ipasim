@@ -78,10 +78,8 @@ const char *const IRHelper::Windows32 = "i386-pc-windows-msvc";
 const char *const IRHelper::Apple = "armv7s-apple-ios10";
 
 Function *IRHelper::declareFunc(const ExportEntry &Exp, bool Wrapper) {
-  // This is needed to keep `to_string(Exp->RVA)` alive.
-  string WrapperRVA;
-  if (Wrapper)
-    WrapperRVA = to_string(Exp.RVA);
+  // This is needed to keep `to_string(Exp.RVA)` alive.
+  StringRef WrapperRVA(LLVM.Saver.save(to_string(Exp.RVA)));
 
   auto Name =
       Wrapper ? Twine("$__ipaSim_wrapper_") + WrapperRVA : Twine(Exp.Name);
