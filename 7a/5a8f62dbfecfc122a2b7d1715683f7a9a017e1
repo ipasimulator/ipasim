@@ -1,0 +1,6 @@
+[ver:1,total:1410]
+src/IpaSimulator/IpaSimulator.cpp:984,1551258000:984,m
+src/IpaSimulator/IpaSimulator.hpp:176,1551258000:176,m
+src/IpaSimulator/MainPage.xaml.cpp:118,1551258000:118,r
+src/HeadersAnalyzer/Config.hpp:87,1551254400:30,1551258000:57,m
+lib/crt/.gitignore:45,1551258000:45,r
