@@ -432,14 +432,36 @@ template <typename T> static string to_hex_string(T Value) {
 }
 bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
                                        int Size, int64_t Value) {
+  // Check that the target address is in some loaded library.
   AddrInfo AI(inspect(Addr));
+  if (!AI.Lib) {
+    error("fetch prot. mem.");
+    return false;
+  }
+
+  // Log details.
   OutputDebugStringA("Info: fetch prot. mem. in ");
   OutputDebugStringA(AI.LibPath->c_str());
   OutputDebugStringA(" at 0x");
   uint64_t RVA = Addr - AI.Lib->StartAddress;
   OutputDebugStringA(to_hex_string(RVA).c_str());
   OutputDebugStringA(".\n");
-  return false;
+
+  // Read register R0 containing address of our structure with function
+  // arguments and return value.
+  uint32_t R0;
+  callUC(uc_reg_read(UC, UC_ARM_REG_R0, &R0));
+
+  // Call the target function.
+  auto *Func = reinterpret_cast<void (*)(uint32_t)>(Addr);
+  Func(R0);
+
+  // Move R14 (LR) to R15 (PC) to return.
+  uint32_t R14;
+  callUC(uc_reg_read(UC, UC_ARM_REG_R14, &R14));
+  callUC(uc_reg_write(UC, UC_ARM_REG_R15, &R14));
+
+  return true;
 }
 void DynamicLoader::catchCode(uc_engine *UC, uint64_t Addr, uint32_t Size,
                               void *Data) {
