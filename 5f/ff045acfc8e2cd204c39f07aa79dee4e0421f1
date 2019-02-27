@@ -1,0 +1,5 @@
+[ver:1,total:480]
+src/IpaSimulator/IpaSimulator.cpp:331,1551261600:331,m
+src/IpaSimulator/MainPage.xaml.cpp:104,1551261600:104,r
+src/IpaSimulator/IpaSimulator.hpp:28,1551261600:28,r
+lib/UnicornPort/uc.c:17,1551261600:17,r
