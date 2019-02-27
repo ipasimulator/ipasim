@@ -444,15 +444,35 @@ template <typename T> static string to_hex_string(T Value) {
 bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
                                        int Size, int64_t Value) {
   // Check that the target address is in some loaded library.
-  AddrInfo AI(inspect(Addr));
+  AddrInfo AI(lookup(Addr));
   if (!AI.Lib) {
     error("unmapped address fetched");
     return false;
   }
 
+  // If the target is not a wrapper DLL, we must find and call the corresponding
+  // wrapper instead.
   if (!AI.Lib->IsWrapperDLL) {
-    error("non-wrapper DLL called");
-    return false;
+    filesystem::path WrapperPath(filesystem::path("gen") /
+                                 filesystem::path(*AI.LibPath)
+                                     .filename()
+                                     .replace_extension(".wrapper.dll"));
+    LoadedLibrary *WrapperLib = load(WrapperPath.string());
+    if (!WrapperLib)
+      return false;
+
+    // TODO: Add real base address instead of hardcoded 0x1000.
+    uint64_t RVA = Addr - AI.Lib->StartAddress + 0x1000;
+    Addr = WrapperLib->findSymbol(*this, "$__ipaSim_wrapper_" + to_string(RVA));
+    if (!Addr) {
+      error("cannot find wrapper for 0x" + to_hex_string(RVA) + " in " +
+            *AI.LibPath);
+      return false;
+    }
+
+    AI = lookup(Addr);
+    assert(AI.Lib &&
+           "Symbol found in library wasn't found there in reverse lookup.");
   }
 
   // Log details.
