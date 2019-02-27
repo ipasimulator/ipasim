@@ -398,14 +398,8 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   // Initialize the binary with our Objective-C runtime. This simulates what
   // `dyld_initializer.cpp` does.
   uint64_t Hdr = Dylib->findSymbol(*this, "__mh_execute_header");
-  LoadedLibrary *Dyld = load("libdyld.dll");
-  auto *DyldInitialize = reinterpret_cast<void (*)(void *)>(
-      Dyld->findSymbol(*this, "_dyld_initialize"));
-  DyldInitialize(reinterpret_cast<void *>(Hdr));
-  LoadedLibrary *LibObjC = load("libobjc.dll");
-  auto *ObjCInit = reinterpret_cast<void (*)(void)>(
-      LibObjC->findSymbol(*this, "_objc_init"));
-  ObjCInit();
+  call("libdyld.dll", "_dyld_initialize", reinterpret_cast<void *>(Hdr));
+  call("libobjc.dll", "_objc_init");
 }
 
 extern "C" __declspec(dllexport) void start() {

@@ -62,6 +62,14 @@ private:
   static constexpr uint64_t roundToPageSize(uint64_t Addr) {
     return alignToPageSize(Addr + PageSize - 1);
   }
+  template <typename... Args>
+  void call(const std::string &Lib, const std::string &Func,
+            Args &&... Params) {
+    LoadedLibrary *L = load(Lib);
+    uint64_t Addr = L->findSymbol(*this, Func);
+    auto *Ptr = reinterpret_cast<void (*)(Args...)>(Addr);
+    Ptr(std::forward<Args>(Params)...);
+  }
 
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
