@@ -434,23 +434,31 @@ void DynamicLoader::catchCode(uc_engine *UC, uint64_t Addr, uint32_t Size,
                               void *Data) {
   reinterpret_cast<DynamicLoader *>(Data)->handleCode(Addr, Size);
 }
-void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
-  OutputDebugStringA("executing...\n");
+template <typename T> static string to_hex_string(T Value) {
+  std::stringstream SS;
+  SS << std::hex << Value;
+  return SS.str();
 }
-LoadedLibrary *DynamicLoader::lookup(uint64_t Addr) {
+void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
+  AddrInfo AI(inspect(Addr));
+  OutputDebugStringA("Info: executing ");
+  OutputDebugStringA(AI.LibPath->c_str());
+  OutputDebugStringA(" at 0x");
+  uint64_t RVA = Addr - AI.Lib->StartAddress;
+  OutputDebugStringA(to_hex_string(RVA).c_str());
+  OutputDebugStringA(".\n");
+}
+AddrInfo DynamicLoader::lookup(uint64_t Addr) {
   for (auto &LI : LIs) {
     LoadedLibrary *LL = LI.second.get();
     if (LL->isInRange(Addr))
-      return LL;
+      return {&LI.first, LL, string()};
   }
-  return nullptr;
+  return {nullptr, nullptr, string()};
 }
-AddrInfo DynamicLoader::inspect(uint64_t Addr) {
-  LoadedLibrary *LL = lookup(Addr);
-  // TODO: Find symbol name and also use this function to implement
-  // `src/objc/dladdr.mm`.
-  return {LL, string()};
-}
+// TODO: Find symbol name and also use this function to implement
+// `src/objc/dladdr.mm`.
+AddrInfo DynamicLoader::inspect(uint64_t Addr) { return lookup(Addr); }
 
 extern "C" __declspec(dllexport) void start() {
   // Initialize Unicorn Engine.

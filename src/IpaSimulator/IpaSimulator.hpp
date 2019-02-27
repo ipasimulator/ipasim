@@ -45,6 +45,7 @@ struct BinaryPath {
 };
 
 struct AddrInfo {
+  const std::string *LibPath;
   LoadedLibrary *Lib;
   std::string SymbolName;
 };
@@ -83,7 +84,9 @@ private:
   static void catchCode(uc_engine *UC, uint64_t Addr, uint32_t Size,
                         void *Data);
   void handleCode(uint64_t Addr, uint32_t Size);
-  LoadedLibrary *lookup(uint64_t Addr);
+  // Finds only library, no symbol information is inspected. To do that, call
+  // `inspect`.
+  AddrInfo lookup(uint64_t Addr);
   AddrInfo inspect(uint64_t Addr);
 
   static constexpr int PageSize = 4096;
