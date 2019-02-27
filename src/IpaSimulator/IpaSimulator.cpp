@@ -425,19 +425,38 @@ bool DynamicLoader::catchFetchProtMem(uc_engine *UC, uc_mem_type Type,
   return reinterpret_cast<DynamicLoader *>(Data)->handleFetchProtMem(
       Type, Addr, Size, Value);
 }
+template <typename T> static string to_hex_string(T Value) {
+  std::stringstream SS;
+  SS << std::hex << Value;
+  return SS.str();
+}
 bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
                                        int Size, int64_t Value) {
-  error("protected memory fetched");
+  AddrInfo AI(inspect(Addr));
+  OutputDebugStringA("Info: fetch prot. mem. in ");
+  OutputDebugStringA(AI.LibPath->c_str());
+  OutputDebugStringA(" at 0x");
+  uint64_t RVA = Addr - AI.Lib->StartAddress;
+  OutputDebugStringA(to_hex_string(RVA).c_str());
+  uint32_t Val;
+  callUC(uc_mem_read(UC, Addr, &Val, 4));
+  OutputDebugStringA(" containing value 0x");
+  OutputDebugStringA(to_hex_string(Val).c_str());
+  AddrInfo AI2(inspect(Val));
+  if (AI2.Lib) {
+    OutputDebugStringA(" (0x");
+    uint64_t RelVal = Val - AI2.Lib->StartAddress;
+    OutputDebugStringA(to_hex_string(RelVal).c_str());
+    OutputDebugStringA(" from ");
+    OutputDebugStringA(AI2.LibPath->c_str());
+    OutputDebugStringA(")");
+  }
+  OutputDebugStringA(".\n");
   return false;
 }
 void DynamicLoader::catchCode(uc_engine *UC, uint64_t Addr, uint32_t Size,
                               void *Data) {
   reinterpret_cast<DynamicLoader *>(Data)->handleCode(Addr, Size);
-}
-template <typename T> static string to_hex_string(T Value) {
-  std::stringstream SS;
-  SS << std::hex << Value;
-  return SS.str();
 }
 void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
   AddrInfo AI(inspect(Addr));
