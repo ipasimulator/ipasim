@@ -1,0 +1,7 @@
+[ver:1,total:1643]
+src/IpaSimulator/IpaSimulator.cpp:750,1551283200:360,1551286800:210,1551290400:180,r
+src/HeadersAnalyzer/WrapperIndex.cpp:656,1551286800:444,1551290400:212,m
+src/HeadersAnalyzer/WrapperIndex.hpp:186,1551286800:147,1551290400:39,m
+src/dyld/dyld_initializer.cpp:20,1551290400:20,r
+.vscode/settings.json:16,1551286800:9,1551290400:7,r
+src/HeadersAnalyzer/HAContext.hpp:15,1551286800:15,r
