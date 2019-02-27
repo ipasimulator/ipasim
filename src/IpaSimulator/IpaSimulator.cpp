@@ -395,11 +395,16 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   // TODO: Do this also for all non-wrapper Dylibs (i.e., Dylibs that come with
   // the `.ipa` file).
   // TODO: Call also other (user) C++ initializers.
+  // TODO: Catch callbacks into the emulated code.
   // Initialize the binary with our Objective-C runtime. This simulates what
   // `dyld_initializer.cpp` does.
   uint64_t Hdr = Dylib->findSymbol(*this, "__mh_execute_header");
   call("libdyld.dll", "_dyld_initialize", reinterpret_cast<void *>(Hdr));
   call("libobjc.dll", "_objc_init");
+
+  // Start execution.
+  callUC(
+      uc_emu_start(UC, Dylib->Bin.entrypoint() + Dylib->StartAddress, 0, 0, 0));
 }
 
 extern "C" __declspec(dllexport) void start() {
@@ -414,6 +419,9 @@ extern "C" __declspec(dllexport) void start() {
 
   // Execute it.
   Dyld.execute(App);
+
+  // Clean up Unicorn Engine.
+  callUC(uc_close(UC));
 
   // Let the user know we're done. This is here for testing purposes only.
   MessageDialog Dlg(L"Done.");
