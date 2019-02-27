@@ -118,14 +118,19 @@ LoadedLibrary *DynamicLoader::load(const string &Path) {
     return nullptr;
   }
 
+  LoadedLibrary *L;
   if (LIEF::MachO::is_macho(BP.Path))
-    return loadMachO(BP.Path);
+    L = loadMachO(BP.Path);
   else if (LIEF::PE::is_pe(BP.Path))
-    return loadPE(BP.Path);
-  else
+    L = loadPE(BP.Path);
+  else {
     error("invalid binary type: " + BP.Path);
+    return nullptr;
+  }
 
-  return nullptr;
+  // TODO: Load the library into Unicorn engine.
+
+  return L;
 }
 
 // Reports non-fatal error to the user.
@@ -195,8 +200,7 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
   for (SegmentCommand &Seg : Bin.segments()) {
     uint64_t SegLow = Seg.virtual_address();
     // Round to page size (as required by unicorn and what even dyld does).
-    uint64_t SegHigh =
-        ((SegLow + Seg.virtual_size()) + PageSize - 1) & (-PageSize);
+    uint64_t SegHigh = roundToPageSize(SegLow + Seg.virtual_size());
     if ((SegLow < HighAddr && SegLow >= LowAddr) ||
         (SegHigh > LowAddr && SegHigh <= HighAddr)) {
       error("overlapping segments (after rounding to pagesize)");

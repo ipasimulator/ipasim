@@ -55,6 +55,12 @@ private:
   BinaryPath resolvePath(const std::string &Path);
   LoadedLibrary *loadMachO(const std::string &Path);
   LoadedLibrary *loadPE(const std::string &Path);
+  static constexpr uint64_t alignToPageSize(uint64_t Addr) {
+    return Addr & (-PageSize);
+  }
+  static constexpr uint64_t roundToPageSize(uint64_t Addr) {
+    return alignToPageSize(Addr + PageSize - 1);
+  }
 
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
