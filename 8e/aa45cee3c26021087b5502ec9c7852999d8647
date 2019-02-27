@@ -1,0 +1,8 @@
+[ver:1,total:2231]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1307,1551276000:1307,r
+src/HeadersAnalyzer/LLVMHelper.cpp:339,1551276000:339,m
+src/HeadersAnalyzer/HAContext.cpp:330,1551276000:330,r
+src/HeadersAnalyzer/ClangHelper.cpp:135,1551276000:135,r
+.vscode/settings.json:72,1551272400:30,1551276000:42,r
+src/HeadersAnalyzer/LLVMHelper.hpp:36,1551276000:36,r
+src/HeadersAnalyzer/HAContext.hpp:12,1551276000:12,r
