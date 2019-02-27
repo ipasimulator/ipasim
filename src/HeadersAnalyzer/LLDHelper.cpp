@@ -18,7 +18,8 @@ using namespace std;
 
 LLDHelper::LLDHelper(LLVMHelper &LLVM) : Args(LLVM.Saver) {
   // First argument is expected to be an executable name.
-  Args.add("ld64.lld.exe");
+  // TODO: See #26.
+  Args.add("../build/clang-x86-Release/bin/ld64.lld.exe");
 }
 
 // Inspired by what `ClangHelper::linkDylib` invokes.
