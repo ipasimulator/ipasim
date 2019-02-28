@@ -212,6 +212,17 @@ public:
           string Name(Func.getName());
           uint32_t RVA = Func.getRelativeVirtualAddress();
 
+          // If undecorated name has underscore at the beginning, use that
+          // instead.
+          // TODO: This eliminates exporting some functions (e.g., `fdopen` from
+          // `ucrtbased`). But if we didn't do that, linking would fail due to
+          // unresolved symbols (because of different underscore prefixes). On
+          // the other hand, we probably want those functions to be exported.
+          string UN(Func.getUndecoratedName());
+          if (!UN.empty() && Name != UN && UN[0] == '_' &&
+              !UN.compare(1, Name.length(), Name))
+            Name = move(UN);
+
           // We are only interested in exported symbols or Objective-C methods.
           if (!HAC.isClassMethod(Name) && Exports.find(RVA) == Exports.end())
             return;
