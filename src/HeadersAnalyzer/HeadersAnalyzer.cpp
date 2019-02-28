@@ -88,6 +88,8 @@ public:
 
     // Fill `ExportEntry.Dylib` fields. This must not be done earlier since
     // `DylibPtr`s need to be stable.
+    // TODO: Maybe don't do this and have only Objective-C methods inside
+    // `WrapperIndex`.
     for (auto [LibPtr, Lib] : withPtrs(HAC.iOSLibs))
       for (const ExportPtr &Exp : Lib.Exports)
         if (!Exp->Dylib)

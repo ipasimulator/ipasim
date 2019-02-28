@@ -58,6 +58,8 @@ bool HAContext::isInteresting(const string &Name, ExportPtr &Exp) {
     if (Class != iOSClasses.end()) {
       Exp = iOSExps.insert(ExportEntry(Name)).first;
       Exp->ObjCMethod = true;
+      if (!Class->Dylibs.empty())
+        Exp->Dylib = Class->Dylibs.front();
       std::for_each(Class->Dylibs.begin(), Class->Dylibs.end(),
                     [&Exp](auto &Dylib) { Dylib->Exports.push_back(Exp); });
     } else {
