@@ -67,7 +67,7 @@ public:
     TBDHandler TH(HAC);
     if constexpr (Sample)
       TH.handleFile(
-          "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libSystem.B.tbd");
+          "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libobjc.A.tbd");
     else {
       vector<string> Dirs{
           "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
@@ -100,19 +100,19 @@ public:
 
     // Note that groups must be added just once and together because references
     // to them are invalidated after that.
+    HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/"});
     if constexpr (!Sample) {
-      HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/"});
       HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/Frameworks/"});
       HAC.DLLGroups.push_back(
           {"./deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/"});
+      HAC.DLLGroups.push_back({"./lib/crt/"});
     }
-    HAC.DLLGroups.push_back({"./lib/crt/"});
     size_t I = 0;
 
-    if constexpr (!Sample) {
-      // Our Objective-C runtime
-      HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("libobjc.dll"));
+    // Our Objective-C runtime
+    HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("libobjc.dll"));
 
+    if constexpr (!Sample) {
       // WinObjC DLLs (i.e., Windows versions of Apple's frameworks)
       DLLGroup &FxGroup = HAC.DLLGroups[I++];
       for (auto &File : directory_iterator(FxGroup.Dir)) {
@@ -128,10 +128,10 @@ public:
 
       // Prebuilt `libdispatch.dll`
       HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("libdispatch.dll"));
-    }
 
-    // C runtime
-    HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("ucrtbased.dll"));
+      // C runtime
+      HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("ucrtbased.dll"));
+    }
   }
   void parseAppleHeaders() {
     reportStatus("parsing Apple headers");
