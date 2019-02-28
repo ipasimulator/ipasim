@@ -1,0 +1,6 @@
+[ver:1,total:960]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:770,1551376800:360,1551380400:410,m
+src/HeadersAnalyzer/iOSHeaders.mm:110,1551376800:60,1551380400:50,m
+src/HeadersAnalyzer/Config.hpp:30,1551380400:30,m
+src/HeadersAnalyzer/HAContext.hpp:30,1551380400:30,r
+src/IpaSimulator/IpaSimulator.cpp:20,1551380400:20,r
