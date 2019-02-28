@@ -277,7 +277,7 @@ public:
           if (!Exp->Name.compare(0, HAContext::MsgLookupLength,
                                  HAContext::MsgLookupPrefix)) {
             IsStretSetter();
-            Exp->Type = Exp->Stret ? LookupStretTy : LookupTy;
+            Exp->Type = LookupTy;
 
             // Don't verify their types.
             return;
@@ -547,17 +547,17 @@ public:
         // Handle Objective-C messengers specially.
         if (Exp.Messenger) {
           // Now here comes the trick. We actually declare the `msgSend`
-          // function as `void *, void * -> void`, then call `msgLookup` as
-          // `void *, void * -> void(*)(void *, void *)` inside of it and
-          // tail-call the result. Since that's pretty simple, the generated
-          // machine code shouldn't touch any registers that might contain other
-          // arguments. But that's not guaranteed right now.
+          // function to have four parameters. `msgLookup` is declared to return
+          // a four-parameter function. We then call `msgLookup` inside of
+          // `msgSend` and tail-call the result. Thanks to that four parameters,
+          // no parameter registers are changed when jumping to the result of
+          // `msgLookup`. And thanks to that tail call, even returning should
+          // work correctly.
           // TODO: Ideally, we would like to use `PreserveMost` CC (see commit
           // `eeae6dc2`), but it's only for `x86_64` right now.
 
           // Declare the messenger.
-          llvm::Function *MessengerFunc =
-              IR.declareFunc(Exp.Stret ? SendStretTy : SendTy, Exp.Name);
+          llvm::Function *MessengerFunc = IR.declareFunc(SendTy, Exp.Name);
           createAlias(Exp, MessengerFunc);
 
           // And define it, too.
@@ -579,8 +579,7 @@ public:
           }
 
           // Declare the lookup function.
-          llvm::Function *LookupFunc =
-              IR.declareFunc(Exp.Stret ? LookupStretTy : LookupTy, LookupName);
+          llvm::Function *LookupFunc = IR.declareFunc(LookupTy, LookupName);
 
           // Collect arguments.
           vector<llvm::Value *> Args;
@@ -721,13 +720,10 @@ private:
   llvm::Type *VoidTy = llvm::Type::getVoidTy(LLVM.Ctx);
   llvm::Type *VoidPtrTy = llvm::Type::getInt8PtrTy(LLVM.Ctx);
   llvm::FunctionType *SendTy = llvm::FunctionType::get(
-      VoidTy, {VoidPtrTy, VoidPtrTy}, /* isVarArg */ false);
-  llvm::FunctionType *SendStretTy = llvm::FunctionType::get(
-      VoidTy, {VoidPtrTy, VoidPtrTy, VoidPtrTy}, /* isVarArg */ false);
+      VoidTy, {VoidPtrTy, VoidPtrTy, VoidPtrTy, VoidPtrTy},
+      /* isVarArg */ false);
   llvm::FunctionType *LookupTy = llvm::FunctionType::get(
-      SendTy->getPointerTo(), {VoidPtrTy, VoidPtrTy}, /* isVarArg */ false);
-  llvm::FunctionType *LookupStretTy = llvm::FunctionType::get(
-      SendStretTy->getPointerTo(), {VoidPtrTy, VoidPtrTy, VoidPtrTy},
+      SendTy->getPointerTo(), {VoidPtrTy, VoidPtrTy, VoidPtrTy, VoidPtrTy},
       /* isVarArg */ false);
 
   void analyzeAppleFunction(const llvm::Function &Func) {
