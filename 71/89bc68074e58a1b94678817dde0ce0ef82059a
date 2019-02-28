@@ -1,0 +1,6 @@
+[ver:1,total:540]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:260,1551337200:260,m
+lib/crt/ucrtbased.def:120,1551337200:120,r
+src/HeadersAnalyzer/Config.hpp:80,1551337200:80,m
+lib/crt/README.md:60,1551337200:60,r
+lib/crt/exports.txt:20,1551337200:20,r
