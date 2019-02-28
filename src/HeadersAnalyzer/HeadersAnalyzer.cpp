@@ -67,7 +67,7 @@ public:
     TBDHandler TH(HAC);
     if constexpr (Sample)
       TH.handleFile("./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/"
-                    "Frameworks/Accounts.framework/Accounts.tbd");
+                    "Frameworks/AudioUnit.framework/AudioUnit.tbd");
     else {
       vector<string> Dirs{
           "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
@@ -110,7 +110,7 @@ public:
     size_t I = 0;
 
     if constexpr (Sample)
-      HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("Accounts.dll"));
+      HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("AudioUnit.dll"));
     else {
       // WinObjC DLLs (i.e., Windows versions of Apple's frameworks)
       DLLGroup &FxGroup = HAC.DLLGroups[I++];

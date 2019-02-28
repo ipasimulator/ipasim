@@ -10,15 +10,15 @@
 #include <objc-abi.h>
 #include <objc-internal.h>
 #include <Accelerate/Accelerate.h>
-#endif
 #include <Accounts/Accounts.h>
-#if !defined(IPASIM_CG_SAMPLE)
 #include <AddressBook/AddressBook.h>
 #include <AddressBookUI/AddressBookUI.h>
 #include <AdSupport/AdSupport.h>
 #include <AssetsLibrary/AssetsLibrary.h>
 #include <AudioToolbox/AudioToolbox.h>
+#endif
 #include <AudioUnit/AudioUnit.h>
+#if !defined(IPASIM_CG_SAMPLE)
 #include <AVFoundation/AVFoundation.h>
 #include <AVKit/AVKit.h>
 #include <CFNetwork/CFNetwork.h>
