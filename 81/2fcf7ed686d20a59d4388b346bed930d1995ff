@@ -1,0 +1,7 @@
+[ver:1,total:1440]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1115,1551369600:730,1551373200:385,m
+src/HeadersAnalyzer/LLDBHelper.cpp:160,1551369600:160,r
+cmake/ipasim-x86-Debug/cg/0.o.ll:90,1551369600:90,r
+src/HeadersAnalyzer/iOSHeaders.mm:38,1551369600:20,1551373200:18,m
+src/HeadersAnalyzer/LLVMHelper.cpp:20,1551369600:20,r
+src/HeadersAnalyzer/Config.hpp:17,1551373200:17,m
