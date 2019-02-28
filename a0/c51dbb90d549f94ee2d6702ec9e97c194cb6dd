@@ -1,0 +1,8 @@
+[ver:1,total:2520]
+src/IpaSimulator/IpaSimulator.cpp:1050,1551373200:810,1551376800:240,r
+src/HeadersAnalyzer/iOSHeaders.mm:940,1551373200:910,1551376800:30,m
+src/HeadersAnalyzer/analyze_ios_headers.cfg:270,1551373200:240,1551376800:30,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:180,1551373200:120,1551376800:60,r
+src/HeadersAnalyzer/ClangHelper.cpp:30,1551373200:30,r
+cmake/ipasim-x86-Debug/cg/exports.txt:30,1551373200:30,d
+src/HeadersAnalyzer/Config.hpp:20,1551373200:20,r
