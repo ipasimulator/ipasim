@@ -515,13 +515,6 @@ public:
   void generateDylibs() {
     reportStatus("generating Dylibs");
 
-    // Some common types.
-    llvm::FunctionType *VoidToVoidTy =
-        llvm::FunctionType::get(VoidTy, /* isVarArg */ false);
-    llvm::FunctionType *SimpleLookupTy = llvm::FunctionType::get(
-        VoidToVoidTy->getPointerTo(), /* isVarArg */ false);
-    llvm::Type *SimpleLookupPtrTy = SimpleLookupTy->getPointerTo();
-
     size_t Unimplemented = 0;
     for (auto [LibIdx, Lib] : withIndices(HAC.iOSLibs)) {
       string LibNo = to_string(LibIdx);
@@ -554,16 +547,17 @@ public:
         // Handle Objective-C messengers specially.
         if (Exp.Messenger) {
           // Now here comes the trick. We actually declare the `msgSend`
-          // function as `void -> void`, then call `msgLookup` as `void ->
-          // void(*)(void)` inside of it and tail-call the result. That way, the
-          // generated machine instructions shouldn't touch any registers (other
-          // than the one for return address), so it should work correctly.
+          // function as `void *, void * -> void`, then call `msgLookup` as
+          // `void *, void * -> void(*)(void *, void *)` inside of it and
+          // tail-call the result. Since that's pretty simple, the generated
+          // machine code shouldn't touch any registers that might contain other
+          // arguments. But that's not guaranteed right now.
           // TODO: Ideally, we would like to use `PreserveMost` CC (see commit
           // `eeae6dc2`), but it's only for `x86_64` right now.
 
           // Declare the messenger.
           llvm::Function *MessengerFunc =
-              IR.declareFunc(VoidToVoidTy, Exp.Name);
+              IR.declareFunc(Exp.Stret ? SendStretTy : SendTy, Exp.Name);
           createAlias(Exp, MessengerFunc);
 
           // And define it, too.
@@ -588,14 +582,16 @@ public:
           llvm::Function *LookupFunc =
               IR.declareFunc(Exp.Stret ? LookupStretTy : LookupTy, LookupName);
 
-          // And bitcast it to `void -> void(*)(void)`.
-          llvm::Value *FP =
-              IR.Builder.CreateBitCast(LookupFunc, SimpleLookupPtrTy, "fp");
+          // Collect arguments.
+          vector<llvm::Value *> Args;
+          Args.reserve(MessengerFunc->arg_size());
+          for (llvm::Argument &Arg : MessengerFunc->args())
+            Args.push_back(&Arg);
 
           // Call the lookup function and jump to its result.
-          llvm::Value *IMP =
-              IR.Builder.CreateCall(SimpleLookupTy, FP, {}, "imp");
-          llvm::CallInst *Call = IR.Builder.CreateCall(VoidToVoidTy, IMP, {});
+          llvm::Value *IMP = IR.Builder.CreateCall(LookupFunc, Args, "imp");
+          llvm::CallInst *Call = IR.Builder.CreateCall(
+              MessengerFunc->getFunctionType(), IMP, Args);
           Call->setTailCallKind(llvm::CallInst::TCK_MustTail);
           IR.Builder.CreateRetVoid();
 

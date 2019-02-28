@@ -14,10 +14,10 @@ constexpr bool operator&(LibType Value, LibType Flag) {
 constexpr LibType WarnUninterestingFunctions = LibType::None;
 constexpr LibType ErrorUnimplementedFunctions = LibType::None;
 constexpr LibType SumUnimplementedFunctions = LibType::Both;
-constexpr bool OutputLLVMIR = false;
+constexpr bool OutputLLVMIR = true;
 constexpr bool VerboseClang = false;
 constexpr bool IgnoreErrors = false;
-constexpr bool Sample = false;
+constexpr bool Sample = true;
 // TODO: Fix `TypeComparer` and then turn this on.
 constexpr bool CompareTypes = false;
 
