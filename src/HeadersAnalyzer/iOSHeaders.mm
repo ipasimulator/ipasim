@@ -2,6 +2,7 @@
 // See <objc/objc-api.h>.
 #define OBJC_OLD_DISPATCH_PROTOTYPES 0
 
+#if !defined(IPASIM_CG_SAMPLE)
 #include <objc/NSObject.h>
 #include <objc/message.h>
 #include <objc/objc.h>
@@ -9,7 +10,9 @@
 #include <objc-abi.h>
 #include <objc-internal.h>
 #include <Accelerate/Accelerate.h>
+#endif
 #include <Accounts/Accounts.h>
+#if !defined(IPASIM_CG_SAMPLE)
 #include <AddressBook/AddressBook.h>
 #include <AddressBookUI/AddressBookUI.h>
 #include <AdSupport/AdSupport.h>
@@ -76,3 +79,4 @@
 #include <Twitter/Twitter.h>
 #include <UIKit/UIKit.h>
 #include <WebKit/WebKit.h>
+#endif
