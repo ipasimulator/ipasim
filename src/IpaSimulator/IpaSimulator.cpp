@@ -555,8 +555,14 @@ void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
   OutputDebugStringA(" at 0x");
   uint64_t RVA = Addr - AI.Lib->StartAddress;
   OutputDebugStringA(to_hex_string(RVA).c_str());
-  OutputDebugStringA(" [R12 = 0x");
+  OutputDebugStringA(" [R0 = 0x");
   uint32_t Reg;
+  callUC(uc_reg_read(UC, UC_ARM_REG_R0, &Reg));
+  OutputDebugStringA(to_hex_string(Reg).c_str());
+  OutputDebugStringA(", R1 = 0x");
+  callUC(uc_reg_read(UC, UC_ARM_REG_R1, &Reg));
+  OutputDebugStringA(to_hex_string(Reg).c_str());
+  OutputDebugStringA(", R12 = 0x");
   callUC(uc_reg_read(UC, UC_ARM_REG_R12, &Reg));
   OutputDebugStringA(to_hex_string(Reg).c_str());
   OutputDebugStringA("].\n");
