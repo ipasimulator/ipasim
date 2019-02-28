@@ -1,0 +1,7 @@
+[ver:1,total:2112]
+src/IpaSimulator/IpaSimulator.cpp:1275,1551340800:795,1551344400:480,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:310,1551340800:280,1551344400:30,r
+src/HeadersAnalyzer/Config.hpp:275,1551340800:275,m
+.vscode/settings.json:222,1551337200:180,1551340800:42,r
+lib/unicorn/include/unicorn/unicorn.h:15,1551344400:15,r
+lib/unicorn/README.md:15,1551344400:15,r
