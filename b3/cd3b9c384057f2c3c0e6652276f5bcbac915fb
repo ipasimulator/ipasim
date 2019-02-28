@@ -1,0 +1,11 @@
+[ver:1,total:1608]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:863,1551337200:60,1551340800:803,m
+lib/crt/README.md:240,1551340800:240,r
+lib/crt/stubs.cpp:150,1551340800:150,m
+src/HeadersAnalyzer/ClangHelper.cpp:150,1551340800:150,r
+lib/crt/ucrtbased.def:70,1551340800:70,r
+lib/crt/exports.txt:60,1551340800:60,r
+src/HeadersAnalyzer/Common.hpp:37,1551340800:37,r
+cmake/ipasim-x86-Debug/cg/exports.txt:20,1551340800:20,r
+src/IpaSimulator/IpaSimulator.cpp:10,1551340800:10,r
+src/HeadersAnalyzer/Common.cpp:8,1551340800:8,r
