@@ -1,0 +1,10 @@
+[ver:1,total:4260]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:2900,1551366000:1320,1551369600:1580,m
+.vscode/c_cpp_properties.json:420,1551366000:120,1551369600:300,d
+src/HeadersAnalyzer/Config.hpp:230,1551366000:90,1551369600:140,m
+compile_commands.json:220,1551366000:220,d
+cmake/ipasim-x86-Debug/cg/0.o.ll:140,1551369600:140,r
+src/HeadersAnalyzer/iOSHeaders.mm:120,1551369600:120,m
+src/IpaSimulator/IpaSimulator.cpp:120,1551366000:120,r
+src/HeadersAnalyzer/README.md:60,1551366000:60,r
+docs/issues/27.md:50,1551366000:50,d
