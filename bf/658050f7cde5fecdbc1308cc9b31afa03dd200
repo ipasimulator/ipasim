@@ -1,0 +1,8 @@
+[ver:1,total:720]
+src/HeadersAnalyzer/HAContext.cpp:230,1551337200:230,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:150,1551337200:150,m
+src/HeadersAnalyzer/ClangHelper.cpp:150,1551301200:150,r
+src/HeadersAnalyzer/HAContext.hpp:80,1551337200:80,r
+cmake/ipasim-x86-Debug/cg/libobjc.cpp:50,1551337200:50,r
+src/HeadersAnalyzer/Common.hpp:30,1551337200:30,r
+src/IpaSimulator/IpaSimulator.cpp:30,1551301200:30,r
