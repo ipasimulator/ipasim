@@ -535,6 +535,21 @@ void DynamicLoader::catchCode(uc_engine *UC, uint64_t Addr, uint32_t Size,
 }
 void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
   AddrInfo AI(inspect(Addr));
+  if (!AI.Lib) {
+    error("unmapped address executed");
+    return;
+  }
+
+  // There is a bug that sometimes protected memory accesses are not caught by
+  // Unicorn Engine.
+  // TODO: Fix that bug, maybe.
+  // See also <https://github.com/unicorn-engine/unicorn/issues/888>.
+  if (!dynamic_cast<LoadedDylib *>(load(*AI.LibPath))) {
+    // TODO: Stop execution if this returns false.
+    handleFetchProtMem(UC_MEM_FETCH_PROT, Addr, Size, 0);
+    return;
+  }
+
   OutputDebugStringA("Info: executing ");
   OutputDebugStringA(AI.LibPath->c_str());
   OutputDebugStringA(" at 0x");
