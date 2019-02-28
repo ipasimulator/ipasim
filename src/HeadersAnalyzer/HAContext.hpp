@@ -60,7 +60,7 @@ struct DLLEntry {
 
   std::string Name;
   std::vector<ExportPtr> Exports;
-  ExportPtr ReferenceFunc;
+  ExportPtr ReferenceSymbol;
 };
 
 struct DLLGroup {

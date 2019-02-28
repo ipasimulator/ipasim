@@ -242,14 +242,14 @@ public:
           Exp->DLLGroup = GroupIdx;
           Exp->DLL = DLLIdx;
 
+          // Save symbol that will serve as a reference for computing addresses
+          // of Objective-C methods.
+          if (!DLL.get().ReferenceSymbol && !Exp->ObjCMethod)
+            DLL.get().ReferenceSymbol = Exp;
+
           // If this is not a function, we can skip the rest of analysis.
           if (DataSymbol)
             return;
-
-          // Save function that will serve as a reference for computing
-          // addresses of Objective-C methods.
-          if (!DLL.get().ReferenceFunc && !Exp->ObjCMethod)
-            DLL.get().ReferenceFunc = Exp;
 
           auto IsStretSetter = [&]() {
             // If it's a normal messenger, it has two parameters (`id` and
@@ -331,10 +331,10 @@ public:
           assert(IR.isBigEndian() == DylibIR.isBigEndian() &&
                  "Inconsistency in endianness.");
 
-        // Declare reference function.
-        // TODO: What if there are no non-Objective-C functions?
-        llvm::Function *RefFunc =
-            !DLL.ReferenceFunc ? nullptr : IR.declareFunc(*DLL.ReferenceFunc);
+        // Declare reference symbol.
+        llvm::GlobalValue *RefSymbol =
+            !DLL.ReferenceSymbol ? nullptr : IR.declare(*DLL.ReferenceSymbol);
+        RefSymbol->setDLLStorageClass(llvm::GlobalValue::DLLImportStorageClass);
 
         // Generate function wrappers.
         for (const ExportEntry &Exp : deref(DLL.Exports)) {
@@ -404,19 +404,19 @@ public:
           if (Exp.ObjCMethod) {
             // Objective-C methods are not exported, so we call them by
             // computing their address using their RVA.
-            if (!DLL.ReferenceFunc) {
+            if (!DLL.ReferenceSymbol) {
               reportError("no reference function, cannot emit Objective-C "
                           "method DLL wrappers (" +
                           DLL.Name + ")");
               continue;
             }
 
-            // Add RVA to the reference function's address.
-            llvm::Value *Addr =
-                llvm::ConstantInt::getSigned(llvm::Type::getInt32Ty(LLVM.Ctx),
-                                             Exp.RVA - DLL.ReferenceFunc->RVA);
-            llvm::Value *RefPtr = IR.Builder.CreateBitCast(
-                RefFunc, llvm::Type::getInt8PtrTy(LLVM.Ctx));
+            // Add RVA to the reference symbol's address.
+            llvm::Value *Addr = llvm::ConstantInt::getSigned(
+                llvm::Type::getInt32Ty(LLVM.Ctx),
+                Exp.RVA - DLL.ReferenceSymbol->RVA);
+            llvm::Value *RefPtr =
+                IR.Builder.CreateBitCast(RefSymbol, VoidPtrTy);
             llvm::Value *ComputedPtr = IR.Builder.CreateInBoundsGEP(
                 llvm::Type::getInt8Ty(LLVM.Ctx), RefPtr, Addr);
             llvm::Value *FP = IR.Builder.CreateBitCast(

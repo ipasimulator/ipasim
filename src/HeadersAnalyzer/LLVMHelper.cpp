@@ -64,18 +64,28 @@ IRHelper::IRHelper(LLVMHelper &LLVM, StringRef Name, StringRef Path,
   Module.setTargetTriple(Triple);
   Module.setDataLayout(TM->createDataLayout());
 
+  VoidPtrTy = Type::getInt8PtrTy(LLVM.Ctx);
+
   // DLL function wrappers have mostly type `(void *) -> void`.
   Type *VoidTy = Type::getVoidTy(LLVM.Ctx);
-  WrapperTy = FunctionType::get(VoidTy, {Type::getInt8PtrTy(LLVM.Ctx)},
-                                /* isVarArg */ false);
+  WrapperTy = FunctionType::get(VoidTy, {VoidPtrTy}, /* isVarArg */ false);
 
-  // Although, wrappers for trivial functions (`void -> void`) have also trivial
+  // However, wrappers for trivial functions (`void -> void`) have also trivial
   // signature `void -> void`.
   TrivialWrapperTy = FunctionType::get(VoidTy, /* isVarArg */ false);
 }
 
 const char *const IRHelper::Windows32 = "i386-pc-windows-msvc";
 const char *const IRHelper::Apple = "armv7s-apple-ios10";
+
+GlobalValue *IRHelper::declare(const ExportEntry &Exp) {
+  if (Exp.Type)
+    return declareFunc(Exp);
+
+  Twine RawName(Twine('\01') + Exp.Name);
+  return static_cast<GlobalValue *>(
+      Module.getOrInsertGlobal(LLVM.Saver.save(RawName), VoidPtrTy));
+}
 
 Function *IRHelper::declareFunc(const ExportEntry &Exp, bool Wrapper) {
   // This is needed to keep `to_string(Exp.RVA)` alive.

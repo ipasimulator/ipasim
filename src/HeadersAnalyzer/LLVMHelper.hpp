@@ -73,6 +73,7 @@ public:
     return Module.getDataLayout().isLittleEndian();
   }
   bool isBigEndian() const { return Module.getDataLayout().isBigEndian(); }
+  llvm::GlobalValue *declare(const ExportEntry &Exp);
   llvm::Function *declareFunc(const ExportEntry &Exp, bool Wrapper = false);
   llvm::Function *declareFunc(llvm::FunctionType *Type,
                               const llvm::Twine &Name);
@@ -93,6 +94,7 @@ private:
   llvm::Module Module;
   std::unique_ptr<llvm::TargetMachine> TM;
   llvm::FunctionType *WrapperTy, *TrivialWrapperTy;
+  llvm::Type *VoidPtrTy;
 };
 
 class FunctionGuard {
