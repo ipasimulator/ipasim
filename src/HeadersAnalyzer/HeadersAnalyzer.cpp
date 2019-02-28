@@ -334,7 +334,9 @@ public:
         // Declare reference symbol.
         llvm::GlobalValue *RefSymbol =
             !DLL.ReferenceSymbol ? nullptr : IR.declare(*DLL.ReferenceSymbol);
-        RefSymbol->setDLLStorageClass(llvm::GlobalValue::DLLImportStorageClass);
+        if (RefSymbol)
+          RefSymbol->setDLLStorageClass(
+              llvm::GlobalValue::DLLImportStorageClass);
 
         // Generate function wrappers.
         for (const ExportEntry &Exp : deref(DLL.Exports)) {
