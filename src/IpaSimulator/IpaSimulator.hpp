@@ -86,6 +86,9 @@ private:
   static void catchCode(uc_engine *UC, uint64_t Addr, uint32_t Size,
                         void *Data);
   void handleCode(uint64_t Addr, uint32_t Size);
+  static bool catchMemWrite(uc_engine *UC, uc_mem_type Type, uint64_t Addr,
+                            int Size, int64_t Value, void *Data);
+  bool handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size, int64_t Value);
   // Finds only library, no symbol information is inspected. To do that, call
   // `inspect`.
   AddrInfo lookup(uint64_t Addr);

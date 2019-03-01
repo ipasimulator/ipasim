@@ -175,6 +175,7 @@ bool DynamicLoader::canSegmentsSlide(LIEF::MachO::Binary &Bin) {
   return FType == FILE_TYPES::MH_DYLIB || FType == FILE_TYPES::MH_BUNDLE ||
          (FType == FILE_TYPES::MH_EXECUTE && Bin.is_pie());
 }
+// TODO: What if the mappings overlap?
 void DynamicLoader::mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms,
                               void *Mem) {
   callUC(uc_mem_map_ptr(UC, Addr, Size, Perms, Mem));
@@ -417,6 +418,9 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   // Hook `catchCode` logs execution for debugging purposes.
   callUC(uc_hook_add(UC, &Hook, UC_HOOK_CODE,
                      reinterpret_cast<void *>(catchCode), this, 1, 0));
+  // Hook `catchMemWrite` logs all memory writes.
+  callUC(uc_hook_add(UC, &Hook, UC_HOOK_MEM_WRITE,
+                     reinterpret_cast<void *>(catchMemWrite), this, 1, 0));
 
   // TODO: Do this also for all non-wrapper Dylibs (i.e., Dylibs that come with
   // the `.ipa` file).
@@ -565,10 +569,40 @@ void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
   OutputDebugStringA(", R12 = 0x");
   callUC(uc_reg_read(UC, UC_ARM_REG_R12, &Reg));
   OutputDebugStringA(to_hex_string(Reg).c_str());
+  OutputDebugStringA(", R13 = 0x");
+  callUC(uc_reg_read(UC, UC_ARM_REG_R13, &Reg));
+  OutputDebugStringA(to_hex_string(Reg).c_str());
+  OutputDebugStringA(", [R13] = 0x");
+  uint32_t Word;
+  callUC(uc_mem_read(UC, Reg, &Word, 4));
+  OutputDebugStringA(to_hex_string(Word).c_str());
+  OutputDebugStringA(", [R13+4] = 0x");
+  callUC(uc_mem_read(UC, Reg + 4, &Word, 4));
+  OutputDebugStringA(to_hex_string(Word).c_str());
+  OutputDebugStringA(", [R13+8] = 0x");
+  callUC(uc_mem_read(UC, Reg + 4, &Word, 4));
+  OutputDebugStringA(to_hex_string(Word).c_str());
   OutputDebugStringA(", R14 = 0x");
   callUC(uc_reg_read(UC, UC_ARM_REG_R14, &Reg));
   OutputDebugStringA(to_hex_string(Reg).c_str());
   OutputDebugStringA("].\n");
+}
+bool DynamicLoader::catchMemWrite(uc_engine *UC, uc_mem_type Type,
+                                  uint64_t Addr, int Size, int64_t Value,
+                                  void *Data) {
+  return reinterpret_cast<DynamicLoader *>(Data)->handleMemWrite(Type, Addr,
+                                                                 Size, Value);
+}
+bool DynamicLoader::handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size,
+                                   int64_t Value) {
+  OutputDebugStringA("Info: writing [0x");
+  OutputDebugStringA(to_hex_string(Addr).c_str());
+  OutputDebugStringA("] := 0x");
+  OutputDebugStringA(to_hex_string(Value).c_str());
+  OutputDebugStringA(" (");
+  OutputDebugStringA(to_string(Size).c_str());
+  OutputDebugStringA(").\n");
+  return true;
 }
 AddrInfo DynamicLoader::lookup(uint64_t Addr) {
   for (auto &LI : LIs) {
