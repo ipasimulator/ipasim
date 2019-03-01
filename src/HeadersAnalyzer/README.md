@@ -147,7 +147,7 @@ int main(int argc, char **argv) {
 }
 
 // The DLL (i386) wrapper.
-int $__ipaSim_wrapper_main(void *args) {
+void $__ipaSim_wrapper_main(void *args) {
   union {
     struct {
       int *arg0;
