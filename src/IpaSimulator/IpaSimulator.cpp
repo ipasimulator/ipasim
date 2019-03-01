@@ -565,6 +565,9 @@ void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
   OutputDebugStringA(", R12 = 0x");
   callUC(uc_reg_read(UC, UC_ARM_REG_R12, &Reg));
   OutputDebugStringA(to_hex_string(Reg).c_str());
+  OutputDebugStringA(", R14 = 0x");
+  callUC(uc_reg_read(UC, UC_ARM_REG_R14, &Reg));
+  OutputDebugStringA(to_hex_string(Reg).c_str());
   OutputDebugStringA("].\n");
 }
 AddrInfo DynamicLoader::lookup(uint64_t Addr) {
