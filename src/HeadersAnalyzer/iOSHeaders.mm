@@ -16,9 +16,7 @@
 #include <AdSupport/AdSupport.h>
 #include <AssetsLibrary/AssetsLibrary.h>
 #include <AudioToolbox/AudioToolbox.h>
-#endif
 #include <AudioUnit/AudioUnit.h>
-#if !defined(IPASIM_CG_SAMPLE)
 #include <AVFoundation/AVFoundation.h>
 #include <AVKit/AVKit.h>
 #include <CFNetwork/CFNetwork.h>
@@ -77,6 +75,8 @@
 #include <StoreKit/StoreKit.h>
 #include <SystemConfiguration/SystemConfiguration.h>
 #include <Twitter/Twitter.h>
+#endif
 #include <UIKit/UIKit.h>
+#if !defined(IPASIM_CG_SAMPLE)
 #include <WebKit/WebKit.h>
 #endif
