@@ -1,0 +1,5 @@
+[ver:1,total:720]
+CMakeLists.txt:420,1551535200:420,m
+src/IpaSimulator/IpaSimulator.cpp:260,1551535200:260,r
+cmake/ipasim-x86-Debug/compile_commands.json:20,1551535200:20,r
+cmake/winobjc-x86-Debug/compile_commands.json:20,1551535200:20,r
