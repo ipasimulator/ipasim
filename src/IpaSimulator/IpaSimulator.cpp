@@ -652,9 +652,9 @@ extern "C" __declspec(dllexport) void start(
   // Call `UIApplicationLaunched`.
   LoadedLibrary *UIKit = Dyld.load("UIKit.dll");
   uint64_t LaunchAddr = UIKit->findSymbol(Dyld, "UIApplicationLaunched");
-  auto *LaunchFunc =
-      reinterpret_cast<void (*)(const LaunchActivatedEventArgs &)>(LaunchAddr);
-  LaunchFunc(LaunchArgs);
+  auto *LaunchFunc = reinterpret_cast<void (*)(void *)>(LaunchAddr);
+  // `get_abi` converts C++/WinRT object to its C++/CX equivalent.
+  LaunchFunc(get_abi(LaunchArgs));
 
   // Clean up Unicorn Engine.
   callUC(uc_close(UC));
