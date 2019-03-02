@@ -14,6 +14,7 @@
 using namespace std;
 using namespace winrt;
 using namespace Windows::ApplicationModel;
+using namespace Windows::ApplicationModel::Activation;
 using namespace Windows::Storage;
 using namespace Windows::UI::Popups;
 
@@ -634,7 +635,8 @@ AddrInfo DynamicLoader::lookup(uint64_t Addr) {
 // `src/objc/dladdr.mm`.
 AddrInfo DynamicLoader::inspect(uint64_t Addr) { return lookup(Addr); }
 
-extern "C" __declspec(dllexport) void start() {
+extern "C" __declspec(dllexport) void start(
+    const LaunchActivatedEventArgs &LaunchArgs) {
   // Initialize Unicorn Engine.
   uc_engine *UC;
   callUC(uc_open(UC_ARCH_ARM, UC_MODE_ARM, &UC));
@@ -646,6 +648,13 @@ extern "C" __declspec(dllexport) void start() {
 
   // Execute it.
   Dyld.execute(App);
+
+  // Call `UIApplicationLaunched`.
+  LoadedLibrary *UIKit = Dyld.load("UIKit.dll");
+  uint64_t LaunchAddr = UIKit->findSymbol(Dyld, "UIApplicationLaunched");
+  auto *LaunchFunc =
+      reinterpret_cast<void (*)(const LaunchActivatedEventArgs &)>(LaunchAddr);
+  LaunchFunc(LaunchArgs);
 
   // Clean up Unicorn Engine.
   callUC(uc_close(UC));
