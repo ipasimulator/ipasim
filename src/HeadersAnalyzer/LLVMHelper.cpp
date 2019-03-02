@@ -2,6 +2,7 @@
 
 #include "LLVMHelper.hpp"
 
+#include "ClangHelper.hpp"
 #include "Common.hpp"
 #include "Config.hpp"
 #include "ErrorReporting.hpp"
@@ -192,22 +193,22 @@ void IRHelper::verifyFunction(Function *Func) {
 // Compiles the module. Inspired by LLVM tutorial:
 // https://llvm.org/docs/tutorial/LangImpl08.html.
 void IRHelper::emitObj(StringRef Path) {
-  // Print out LLVM IR.
-  if constexpr (OutputLLVMIR) {
-    if (auto IROutput = createOutputFile(Path.str() + ".ll"))
-      Module.print(*IROutput, nullptr);
-  }
-
-  // Create output file.
-  auto Output(createOutputFile(Path));
-  if (!Output)
+  // Generate LLVM IR.
+  string IRPath(Path.str() + ".ll");
+  auto IROutput(createOutputFile(IRPath));
+  if (!IROutput)
     return;
+  Module.print(*IROutput, nullptr);
 
-  // Emit object code.
-  legacy::PassManager PM;
-  if (TM->addPassesToEmitFile(PM, *Output, TargetMachine::CGFT_ObjectFile)) {
-    reportError("cannot emit object file");
-    return;
-  }
-  PM.run(Module);
+  // Emit object file.
+  // TODO: Doing this via `PassManager` and `addPassesToEmitFile` didn't work
+  // well (for, e.g., `UIApplicationMain`).
+  ClangHelper Clang(LLVM);
+  Clang.Args.add("-target");
+  Clang.Args.add(Module.getTargetTriple().c_str());
+  Clang.Args.add("-c");
+  Clang.Args.add(IRPath.c_str());
+  Clang.Args.add("-o");
+  Clang.Args.add(Path.data());
+  Clang.executeArgs();
 }

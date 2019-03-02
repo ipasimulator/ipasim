@@ -14,7 +14,6 @@ constexpr bool operator&(LibType Value, LibType Flag) {
 constexpr LibType WarnUninterestingFunctions = LibType::None;
 constexpr LibType ErrorUnimplementedFunctions = LibType::None;
 constexpr LibType SumUnimplementedFunctions = LibType::Both;
-constexpr bool OutputLLVMIR = false;
 constexpr bool VerboseClang = false;
 constexpr bool IgnoreErrors = false;
 constexpr bool Sample = true;
