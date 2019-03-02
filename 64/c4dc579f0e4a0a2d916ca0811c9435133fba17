@@ -1,0 +1,5 @@
+[ver:1,total:2640]
+src/IpaSimulator/IpaSimulator.cpp:1380,1551531600:1000,1551535200:380,m
+src/IpaSimulator/IpaSimApp/App.cpp:1150,1551531600:210,1551535200:940,m
+samples/HelloUIWrapper/App.xaml.cpp:80,1551531600:80,r
+samples/HelloUILibrary/HelloUILibrary.cpp:30,1551531600:30,r
