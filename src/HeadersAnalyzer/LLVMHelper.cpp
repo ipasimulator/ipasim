@@ -210,5 +210,7 @@ void IRHelper::emitObj(StringRef Path) {
   Clang.Args.add(IRPath.c_str());
   Clang.Args.add("-o");
   Clang.Args.add(Path.data());
+  // TODO: Use THUMB, but make sure it's emulated correctly.
+  Clang.Args.add("-mno-thumb");
   Clang.executeArgs();
 }
