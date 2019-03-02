@@ -54,7 +54,7 @@ struct AddrInfo {
 
 class DynamicLoader {
 public:
-  DynamicLoader(uc_engine *UC) : UC(UC) {}
+  DynamicLoader(uc_engine *UC);
   LoadedLibrary *load(const std::string &Path);
   void execute(LoadedLibrary *Lib);
 
@@ -98,4 +98,5 @@ private:
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
   uc_engine *const UC;
   std::map<std::string, std::unique_ptr<LoadedLibrary>> LIs;
+  uint64_t KernelAddr;
 };

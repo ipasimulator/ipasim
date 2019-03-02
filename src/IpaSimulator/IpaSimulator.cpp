@@ -123,6 +123,13 @@ static bool endsWith(const std::string &S, const std::string &Suffix) {
   return !S.compare(S.length() - Suffix.length(), Suffix.length(), Suffix);
 }
 
+DynamicLoader::DynamicLoader(uc_engine *UC) : UC(UC) {
+  // Map "kernel" page.
+  void *KernelPtr = _aligned_malloc(PageSize, PageSize);
+  KernelAddr = reinterpret_cast<uint64_t>(KernelPtr);
+  mapMemory(KernelAddr, PageSize, UC_PROT_NONE, KernelPtr);
+}
+
 LoadedLibrary *DynamicLoader::load(const string &Path) {
   BinaryPath BP(resolvePath(Path));
 
@@ -405,7 +412,8 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   void *StackPtr = _aligned_malloc(StackSize, PageSize);
   uint64_t StackAddr = reinterpret_cast<uint64_t>(StackPtr);
   mapMemory(StackAddr, StackSize, UC_PROT_READ | UC_PROT_WRITE, StackPtr);
-  // Reserve 12 bytes for 3 null arguments to the main procedure.
+  // Reserve 12 bytes on the stack, so that our instruction logger can read
+  // them.
   uint32_t StackTop = StackAddr + StackSize - 12;
   callUC(uc_reg_write(UC, UC_ARM_REG_SP, &StackTop));
 
@@ -432,6 +440,10 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   call("libdyld.dll", "_dyld_initialize", reinterpret_cast<void *>(Hdr));
   call("libobjc.dll", "_objc_init");
 
+  // Point return address to kernel.
+  uint32_t RetAddr = KernelAddr;
+  callUC(uc_reg_write(UC, UC_ARM_REG_LR, &RetAddr));
+
   // Start execution.
   callUC(
       uc_emu_start(UC, Dylib->Bin.entrypoint() + Dylib->StartAddress, 0, 0, 0));
@@ -452,6 +464,12 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   // Check that the target address is in some loaded library.
   AddrInfo AI(lookup(Addr));
   if (!AI.Lib) {
+    // Handle return to kernel.
+    if (Addr == KernelAddr) {
+      callUC(uc_emu_stop(UC));
+      return true;
+    }
+
     error("unmapped address fetched");
     return false;
   }
@@ -512,8 +530,8 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   // If the target is not a wrapper, we simply jump to it, no need to translate
   // anything.
   if (!Wrapper) {
-    uint32_t R15 = Addr;
-    callUC(uc_reg_write(UC, UC_ARM_REG_R15, &R15)); // R15 is PC
+    uint32_t PC = Addr;
+    callUC(uc_reg_write(UC, UC_ARM_REG_PC, &PC));
     return true;
   }
 
@@ -527,9 +545,9 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   Func(R0);
 
   // Move R14 (LR) to R15 (PC) to return.
-  uint32_t R14;
-  callUC(uc_reg_read(UC, UC_ARM_REG_R14, &R14));
-  callUC(uc_reg_write(UC, UC_ARM_REG_R15, &R14));
+  uint32_t LR;
+  callUC(uc_reg_read(UC, UC_ARM_REG_LR, &LR));
+  callUC(uc_reg_write(UC, UC_ARM_REG_PC, &LR));
 
   return true;
 }
