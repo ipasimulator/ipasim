@@ -1,0 +1,8 @@
+[ver:1,total:2400]
+src/IpaSimulator/IpaSimulator.cpp:1175,1551524400:995,1551528000:180,r
+src/HeadersAnalyzer/LLVMHelper.cpp:660,1551528000:660,m
+src/HeadersAnalyzer/LLVMHelper.hpp:315,1551524400:315,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:180,1551524400:60,1551528000:120,r
+src/IpaSimulator/IpaSimApp/App.cpp:30,1551524400:30,r
+src/dyld/dyld.cpp:20,1551524400:20,r
+src/IpaSimulator/IpaSimulator.hpp:20,1551524400:20,r
