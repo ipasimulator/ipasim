@@ -27,11 +27,24 @@ private:
   llvm::sys::InitializeCOMRAII COM;
 };
 
+class TerminationGuard {
+public:
+  TerminationGuard(llvm::SmallVector<const char *, 256> &Vector)
+      : Vector(Vector) {
+    Vector.push_back(nullptr);
+  }
+  ~TerminationGuard() { Vector.pop_back(); }
+
+private:
+  llvm::SmallVector<const char *, 256> Vector;
+};
+
 class StringVector {
 public:
   StringVector(llvm::StringSaver &S) : Saver(S) {}
 
   void add(const char *S) { Vector.emplace_back(Saver.save(S).data()); }
+  TerminationGuard terminate() { return TerminationGuard(Vector); }
   void loadConfigFile(llvm::StringRef File);
   llvm::ArrayRef<const char *> get() { return Vector; }
 

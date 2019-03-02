@@ -1,16 +1,4 @@
 # Clang libraries
-set (LLD_LIBS
-    lldCOFF
-    lldCommon
-    lldCore
-    lldDriver
-    lldELF
-    lldMachO
-    lldMinGW
-    lldReaderWriter
-    lldWasm
-    lldYAML)
-
 set (LLDB_LIBS
     liblldb
     lldbBase
@@ -201,11 +189,8 @@ set (LLVM_LIBS
     LLVMX86Utils
     LLVMXRay)
 
-set (ALL_CLANG_LIBS ${LLD_LIBS} ${LLDB_LIBS} ${CLANG_LIBS} ${LLVM_LIBS})
+set (ALL_CLANG_LIBS ${LLDB_LIBS} ${CLANG_LIBS} ${LLVM_LIBS})
 
-set (LLD_INCLUDE_DIRS
-    "${DEBUG_CLANG_CMAKE_DIR}/tools/lld/include"
-    "${SOURCE_DIR}/deps/lld/include")
 set (LLDB_INCLUDE_DIRS
     "${DEBUG_CLANG_CMAKE_DIR}/tools/lldb/include"
     "${SOURCE_DIR}/deps/lldb/include")
@@ -216,8 +201,8 @@ set (LLVM_INCLUDE_DIRS
     "${DEBUG_CLANG_CMAKE_DIR}/include"
     "${SOURCE_DIR}/deps/llvm/include")
 
-set (ALL_CLANG_INCLUDE_DIRS ${LLD_INCLUDE_DIRS} ${LLDB_INCLUDE_DIRS}
-    ${CLANG_INCLUDE_DIRS} ${LLVM_INCLUDE_DIRS})
+set (ALL_CLANG_INCLUDE_DIRS ${LLDB_INCLUDE_DIRS} ${CLANG_INCLUDE_DIRS}
+    ${LLVM_INCLUDE_DIRS})
 
 ## These targets generate LLVM headers. Note that these are only tablegenned
 ## headers. Other generated headers, like `config.h`, are generated at configure
@@ -272,7 +257,6 @@ function (add_clang_libs title names include_dirs tablegen_targets)
     endforeach (name)
 endfunction (add_clang_libs)
 
-add_clang_libs (LLD "${LLD_LIBS}" "${LLD_INCLUDE_DIRS}" "")
 add_clang_libs (LLDB "${LLDB_LIBS}" "${LLDB_INCLUDE_DIRS}" "")
 add_clang_libs (Clang "${CLANG_LIBS}" "${CLANG_INCLUDE_DIRS}"
     clang-tablegen-targets)

@@ -4,15 +4,12 @@
 
 #include "ErrorReporting.hpp"
 
-#include <lld/Common/Driver.h>
-
 #include <llvm/ADT/ArrayRef.h>
-#include <llvm/Support/InitLLVM.h>
+#include <llvm/Support/Program.h>
 
 #include <string>
 #include <vector>
 
-using namespace lld;
 using namespace llvm;
 using namespace std;
 
@@ -52,19 +49,15 @@ void LLDHelper::linkDylib(StringRef Output, StringRef ObjectFile,
   addDylibArgs(Output, ObjectFile, InstallName);
   executeArgs();
 }
-// Inspired by `lld.cpp`.
 void LLDHelper::executeArgs() {
+  TerminationGuard TG(Args.terminate());
   auto ArgsRef(Args.get());
   int Argc = ArgsRef.size();
   auto Argv = const_cast<const char **>(ArgsRef.data());
 
-  // TODO: Make this work.
-  // InitLLVM X(Argc, Argv);
-
-  vector<const char *> ArgsVec(Argv, Argv + Argc);
-  if (!mach_o::link(ArgsVec)) {
+  if (llvm::sys::ExecuteAndWait(ArgsRef[0], Argv)) {
     string CmdLine;
-    for (const char *Arg : ArgsVec)
+    for (const char *Arg : ArgsRef)
       CmdLine = CmdLine + " " + Arg;
     reportError(Twine("failed to execute:") + CmdLine);
   }
