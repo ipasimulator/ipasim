@@ -1,0 +1,8 @@
+[ver:1,total:1740]
+src/IpaSimulator/IpaSimulator.cpp:1108,1551528000:420,1551531600:688,m
+src/HeadersAnalyzer/Config.hpp:207,1551528000:180,1551531600:27,m
+src/IpaSimulator/IpaSimulator.hpp:125,1551528000:60,1551531600:65,m
+src/HeadersAnalyzer/LLVMHelper.cpp:120,1551528000:120,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:90,1551528000:90,r
+lib/UnicornPort/uc.c:60,1551531600:60,r
+src/HeadersAnalyzer/iOSHeaders.mm:30,1551528000:30,r
