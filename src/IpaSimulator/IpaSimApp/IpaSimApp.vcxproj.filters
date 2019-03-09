@@ -50,10 +50,38 @@
   <ItemGroup>
     <None Include="IpaSimApp_TemporaryKey.pfx" />
     <None Include="packages.config" />
+    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libIpaSimLibrary.dll" />
+    <None Include="..\..\..\lib\unicorn\libgcc_s_dw2-1.dll" />
+    <None Include="..\..\..\lib\unicorn\libwinpthread-1.dll" />
+    <None Include="..\..\..\lib\unicorn\unicorn.dll" />
+    <None Include="..\..\..\samples\ToDo\ToDo" />
+    <None Include="gen\**">
+      <Filter>bin</Filter>
+    </None>
+    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\Frameworks\*.dll">
+      <Filter>bin</Filter>
+    </None>
+    <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\libxml2.dll" />
+    <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icuuc57.dll" />
+    <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icudt57.dll" />
+    <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icuin57.dll" />
+    <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\Logging.dll" />
+    <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\WOCStdLib.dll" />
+    <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\WinObjCRT.dll" />
+    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libpthread.dll" />
+    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libobjc.dll" />
+    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libdyld.dll" />
+    <None Include="..\..\..\deps\WinObjC\tools\deps\prebuilt\Universal Windows\x86\libdispatch.dll" />
+    <None Include="..\..\..\deps\WinObjC\Frameworks\UIKit.Xaml\prebuilt\UIKit.Xaml.dll" />
+    <None Include="..\..\..\deps\WinObjC\Frameworks\Social.Xaml\prebuilt\Social.Xaml.dll" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Assets">
       <UniqueIdentifier>{e48dc53e-40b1-40cb-970a-f89935452892}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="bin">
+      <UniqueIdentifier>{690030eb-7fdc-4292-b586-4866e630b9b2}</UniqueIdentifier>
+      <Extensions>dll;lib;exp;dylib</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
