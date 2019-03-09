@@ -1,0 +1,5 @@
+[ver:1,total:420]
+src/IpaSimulator/IpaSimApp/App.cpp:225,1552114800:225,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:130,1552114800:130,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:50,1552114800:50,m
+src/IpaSimulator/IpaSimApp/.gitignore:15,1552114800:15,m
