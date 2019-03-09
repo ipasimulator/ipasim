@@ -97,6 +97,16 @@ uint64_t LoadedDylib::findSymbol(DynamicLoader &DL, const string &Name) {
   return StartAddress + Bin.get_symbol(Name).value();
 }
 
+uint64_t LoadedDylib::getSection(const std::string &Name, uint64_t *Size) {
+  if (!Bin.has_section(Name))
+    return 0;
+
+  auto &Sect = Bin.get_section(Name);
+  if (Size)
+    *Size = Sect.size();
+  return Sect.address() + StartAddress;
+}
+
 uint64_t LoadedDll::findSymbol(DynamicLoader &DL, const string &Name) {
   return (uint64_t)GetProcAddress(Ptr, Name.c_str());
 }
@@ -667,6 +677,68 @@ extern "C" __declspec(dllexport) void start(
   Dlg.ShowAsync();
 }
 
+struct method_t {
+  const char *name;
+  const char *types;
+  void *imp;
+};
+
+struct method_list_t {
+  uint32_t entrysize;
+  uint32_t count;
+  method_t methods[0];
+};
+
+#define FAST_DATA_MASK 0xfffffffcUL
+#define RW_REALIZED (1 << 31)
+
+struct class_ro_t {
+  uint32_t flags;
+  uint32_t instanceStart;
+  uint32_t instanceSize;
+
+  const uint8_t *ivarLayout;
+
+  const char *name;
+  method_list_t *baseMethodList;
+  void *baseProtocols;
+  const void *ivars;
+
+  const uint8_t *weakIvarLayout;
+  void *baseProperties;
+};
+
+struct class_rw_t {
+  uint32_t flags;
+  uint32_t version;
+
+  const class_ro_t *ro;
+
+  /*
+  method_array_t methods;
+  property_array_t properties;
+  protocol_array_t protocols;
+
+  Class firstSubclass;
+  Class nextSiblingClass;
+
+  char *demangledName;
+  */
+};
+
+struct objc_class {
+  void *isa;
+  void *superclass;
+  void *cache;
+  void *vtable;
+  class_ro_t *info;
+
+  class_rw_t *data() {
+    return (class_rw_t *)((uintptr_t)info & FAST_DATA_MASK);
+  }
+  bool isRealized() { return data()->flags & RW_REALIZED; }
+};
+
 // If `Addr` points to emulated code, returns address of wrapper that should be
 // called instead. Otherwise, returns `Addr` unchanged.
 extern "C" __declspec(dllexport) void *ipaSim_translate(void *Addr) {
@@ -674,8 +746,29 @@ extern "C" __declspec(dllexport) void *ipaSim_translate(void *Addr) {
   DynamicLoader &Dyld = *DyldPtr;
 
   AddrInfo AI(Dyld.lookup(reinterpret_cast<uint64_t>(Addr)));
-  if (AI.Lib && dynamic_cast<LoadedDylib *>(AI.Lib)) {
+  if (auto *Dylib = dynamic_cast<LoadedDylib *>(AI.Lib)) {
     // The address points to Dylib.
+
+    // Enumerate classes in the image.
+    uint64_t SecSize;
+    uint64_t SecAddr = Dylib->getSection("__objc_classlist", &SecSize);
+    if (!SecAddr)
+      return nullptr;
+    auto *Classes = reinterpret_cast<objc_class **>(SecAddr);
+    for (size_t I = 0, Count = SecSize / sizeof(void *); I != Count; ++I) {
+      // Enumerate methods of every class.
+      objc_class *Class = Classes[I];
+      // TODO: Also iterate through (non-base) `methods` if class is realized.
+      method_list_t *Methods = Class->isRealized()
+                                   ? Class->data()->ro->baseMethodList
+                                   : Class->info->baseMethodList;
+      for (size_t J = 0; J != Methods->count; ++J) {
+        if (Methods->methods[J].imp == Addr) {
+          OutputDebugStringA("Found!!!");
+        }
+      }
+    }
+
     // TODO: Return pointer to wrapper.
     return nullptr;
   }

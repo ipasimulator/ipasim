@@ -28,6 +28,7 @@ public:
       : Fat(move(Fat)), Bin(Fat->at(0)) {}
   uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) override;
   bool hasUnderscorePrefix() override { return true; }
+  uint64_t getSection(const std::string &Name, uint64_t *Size = nullptr);
 
 private:
   std::unique_ptr<LIEF::MachO::FatBinary> Fat;
