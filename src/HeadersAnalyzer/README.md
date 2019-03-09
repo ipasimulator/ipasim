@@ -117,7 +117,6 @@ When they call our i386 wrappers, the machine code jumps to an unmapped memory.
 We catch that and simply extract a pointer to the structure (it's always in some well known location, e.g., if it's first argument, then the location is register `r0`).
 Then, we call the proper i386 wrapper with this pointer as a parameter.
 Return values are passed in the same structure.
-Wrappers for callbacks are generated similarly.
 
 The wrappers themselves are generated in LLVM IR which was chosen over C++ because it's easier to generate and the result is more robust.
 
@@ -180,6 +179,54 @@ For now, we chose the second approach since it's easier to implement.
 
 Note, though, that modifying Clang might be a problem - we should probably export those symbols by some generated numbers rather than their names, since the special Objective-C names (e.g., `+[ClassName methodName]`) cause problems with linker which thinks they are its directives.
 Maybe it's just a problem of Microsoft's linker, though, so using `lld-link` could solve the problem.
+
+#### Generating callback wrappers
+
+**TODO: This is not actually implemented yet.**
+
+Currently, we only handle callbacks that go through Objective-C runtime (i.e.,
+through some kind of `objc_msgSend` function). It's possible that those are all
+callbacks we need to handle, but we haven't checked.
+
+We generate wrappers similar to the following ones.
+
+```cpp
+// The DLL (i386) wrapper.
+int main(int argc, char **argv) {
+  union {
+    struct {
+      void (*addr)(int, char **);
+      int *arg0;
+      char ***arg1;
+    } x;
+    int retval;
+  } s;
+  s.x.addr = ipaSim_getAddr(); // API of `IpaSimLibrary`
+  s.x.arg0 = &argc;
+  s.x.arg1 = &argv;
+  $__ipaSim_cwrapper_main(&s);
+  return s.retval;
+}
+
+// The iOS (ARM) wrapper.
+void $__ipaSim_cwrapper_main(void *args) {
+  union {
+    struct {
+      void (*addr)(int, char **);
+      int *arg0;
+      char ***arg1;
+    } x;
+    int retval;
+  } *argsp = (decltype(argsp))args;
+  // Here we call the actual emulated callback function.
+  argsp->retval = argsp->addr(*argsp->x.arg0, *argsp->x.arg1);
+}
+```
+
+See also:
+
+- StackOverflow:
+  [How are the digits in ObjC method type encoding calculated?](https://stackoverflow.com/a/11527666).
 
 ### Calling functions at runtime
 
