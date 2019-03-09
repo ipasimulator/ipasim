@@ -635,6 +635,8 @@ AddrInfo DynamicLoader::lookup(uint64_t Addr) {
 // `src/objc/dladdr.mm`.
 AddrInfo DynamicLoader::inspect(uint64_t Addr) { return lookup(Addr); }
 
+static DynamicLoader *DyldPtr = nullptr;
+
 extern "C" __declspec(dllexport) void start(
     const LaunchActivatedEventArgs &LaunchArgs) {
   // Initialize Unicorn Engine.
@@ -644,6 +646,7 @@ extern "C" __declspec(dllexport) void start(
   // Load test binary `ToDo`.
   filesystem::path Dir(Package::Current().InstalledLocation().Path().c_str());
   DynamicLoader Dyld(UC);
+  DyldPtr = &Dyld;
   LoadedLibrary *App = Dyld.load((Dir / "ToDo").string());
 
   // Execute it.
@@ -662,4 +665,24 @@ extern "C" __declspec(dllexport) void start(
   // Let the user know we're done. This is here for testing purposes only.
   MessageDialog Dlg(L"Done.");
   Dlg.ShowAsync();
+}
+
+// If `Addr` points to emulated code, returns address of wrapper that should be
+// called instead. Otherwise, returns `Addr` unchanged.
+extern "C" __declspec(dllexport) void *ipaSim_translate(void *Addr) {
+  assert(DyldPtr && "DynamicLoader was expected to exist at this point");
+  DynamicLoader &Dyld = *DyldPtr;
+
+  AddrInfo AI(Dyld.lookup(reinterpret_cast<uint64_t>(Addr)));
+  if (AI.Lib && dynamic_cast<LoadedDylib *>(AI.Lib)) {
+    // The address points to Dylib.
+    // TODO: Return pointer to wrapper.
+    return nullptr;
+  }
+
+  return Addr;
+}
+extern "C" __declspec(dllexport) void ipaSim_translate4(uint32_t *Addr) {
+  Addr[1] = reinterpret_cast<uint32_t>(
+      ipaSim_translate(reinterpret_cast<void *>(Addr[1])));
 }

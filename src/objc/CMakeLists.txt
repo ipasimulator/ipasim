@@ -94,7 +94,8 @@ add_custom_command (
         "-DASM_OBJECTS=$<TARGET_OBJECTS:objc-asm>"
         -P "${CMAKE_SOURCE_DIR}/src/objc/ConvAsmObj.cmake"
     USES_TERMINAL
-    DEPENDS "${CMAKE_SOURCE_DIR}/src/objc/ConvAsmObj.cmake" objc-asm)
+    DEPENDS "${CMAKE_SOURCE_DIR}/src/objc/ConvAsmObj.cmake" objc-asm
+        "$<TARGET_OBJECTS:objc-asm>")
 target_sources (objc PRIVATE ${CONV_OBJS})
 
 # Common configuration for normal sources (target `objc`) and `.s` files (target
@@ -122,6 +123,8 @@ endmacro (config_target)
 config_target (objc)
 config_target (objc-asm)
 
-# Specify module definition file `libobjc.def`.
 target_link_libraries (objc PRIVATE
-    "-Wl,/def:${CMAKE_CURRENT_SOURCE_DIR}/libobjc.def")
+    # Specify module definition file `libobjc.def`.
+    "-Wl,/def:${CMAKE_CURRENT_SOURCE_DIR}/libobjc.def"
+    # For function `_ipaSim_translate`
+    IpaSimLibrary)
