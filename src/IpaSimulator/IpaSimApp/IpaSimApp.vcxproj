@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\Microsoft.Windows.CppWinRT.1.0.190205.2\build\native\Microsoft.Windows.CppWinRT.props" Condition="Exists('..\packages\Microsoft.Windows.CppWinRT.1.0.190205.2\build\native\Microsoft.Windows.CppWinRT.props')" />
   <PropertyGroup Label="Globals">
     <CppWinRTEnabled>true</CppWinRTEnabled>
     <MinimalCoreWin>true</MinimalCoreWin>
-    <ProjectGuid>{03f6ed66-af51-4439-95b2-63c7db61b3a6}</ProjectGuid>
+    <ProjectGuid>{12396109-267a-4788-a4a2-9791ed7c5f3f}</ProjectGuid>
     <ProjectName>IpaSimApp</ProjectName>
     <RootNamespace>IpaSimApp</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
@@ -65,6 +65,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <PackageCertificateKeyFile>IpaSimApp_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <PackageCertificateThumbprint>1132EA939A7107B303D4D40ED6CE28778FC96409</PackageCertificateThumbprint>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -74,9 +78,6 @@
       <AdditionalOptions>%(AdditionalOptions) /bigobj</AdditionalOptions>
       <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
     </ClCompile>
-    <Link>
-      <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
     <ClCompile>
@@ -88,98 +89,63 @@
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup>
-    <PreBuildEvent>
-      <Command>robocopy ..\..\..\..\build\ipasim-x86-Debug\gen\ $(ProjectDir)gen\ * /MIR /NP /NFL /NDL
-rem See &lt;https://weblogs.sqlteam.com/robv/2010/02/17/61106/&gt;.
-set /A errlev="%ERRORLEVEL% &amp; 24"
-exit /B %errlev%</Command>
-    </PreBuildEvent>
-  </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="pch.h" />
+    <ClInclude Include="App.h">
+      <DependentUpon>App.xaml</DependentUpon>
+    </ClInclude>
+    <ClInclude Include="MainPage.h">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="MainPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <None Include="IpaSimApp_TemporaryKey.pfx" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Assets\Logo.scale-100.png" />
-    <Image Include="Assets\SmallLogo.scale-100.png" />
-    <Image Include="Assets\StoreLogo.scale-100.png" />
-    <Image Include="Assets\SplashScreen.scale-100.png" />
-    <Image Include="Assets\WideLogo.scale-100.png" />
+    <Image Include="Assets\LockScreenLogo.scale-200.png" />
+    <Image Include="Assets\SplashScreen.scale-200.png" />
+    <Image Include="Assets\Square150x150Logo.scale-200.png" />
+    <Image Include="Assets\Square44x44Logo.scale-200.png" />
+    <Image Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+    <Image Include="Assets\StoreLogo.png" />
+    <Image Include="Assets\Wide310x150Logo.scale-200.png" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="App.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="App.cpp">
+      <DependentUpon>App.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="MainPage.cpp">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </ClCompile>
+    <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\samples\ToDo\ToDo">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\lib\unicorn\libgcc_s_dw2-1.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\lib\unicorn\libwinpthread-1.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\lib\unicorn\unicorn.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libIpaSimLibrary.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="gen\**">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\Frameworks\*.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\libxml2.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icuuc57.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icudt57.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icuin57.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\Logging.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\WOCStdLib.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\WinObjCRT.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libpthread.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libobjc.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libdyld.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\deps\WinObjC\tools\deps\prebuilt\Universal Windows\x86\libdispatch.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\deps\WinObjC\Frameworks\UIKit.Xaml\prebuilt\UIKit.Xaml.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\deps\WinObjC\Frameworks\Social.Xaml\prebuilt\Social.Xaml.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="IpaSimApp_TemporaryKey.pfx" />
-    <None Include="packages.config" />
+    <Midl Include="App.idl">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Midl>
+    <Midl Include="MainPage.idl">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="readme.txt">
+      <DeploymentContent>false</DeploymentContent>
+    </Text>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

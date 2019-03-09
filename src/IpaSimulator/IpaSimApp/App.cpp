@@ -1,129 +1,124 @@
+﻿//
+// App.xaml.cpp
+// Implementation of the App class.
+//
+
 #include "pch.h"
 
+#include "App.h"
+#include "MainPage.h"
+
 using namespace winrt;
-
-using namespace Windows;
-using namespace Windows::ApplicationModel::Core;
+using namespace Windows::ApplicationModel;
 using namespace Windows::ApplicationModel::Activation;
-using namespace Windows::Foundation::Numerics;
-using namespace Windows::UI;
-using namespace Windows::UI::Core;
-using namespace Windows::UI::Composition;
-using namespace Windows::UI::Popups;
+using namespace Windows::Foundation;
+using namespace Windows::UI::Xaml;
+using namespace Windows::UI::Xaml::Controls;
+using namespace Windows::UI::Xaml::Navigation;
+using namespace IpaSimApp;
+using namespace IpaSimApp::implementation;
 
-struct App : implements<App, IFrameworkViewSource, IFrameworkView> {
-  CompositionTarget m_target{nullptr};
-  VisualCollection m_visuals{nullptr};
-  Visual m_selected{nullptr};
-  float2 m_offset{};
+/// <summary>
+/// Initializes the singleton application object.  This is the first line of authored code
+/// executed, and as such is the logical equivalent of main() or WinMain().
+/// </summary>
+App::App()
+{
+    InitializeComponent();
+    Suspending({ this, &App::OnSuspending });
 
-  IFrameworkView CreateView() { return *this; }
-
-  void Initialize(CoreApplicationView const &appView) {
-    appView.Activated({this, &App::OnActivated});
-  }
-
-  void Load(hstring const &) {}
-
-  void Uninitialize() {}
-
-  void Run() {
-    CoreWindow window = CoreWindow::GetForCurrentThread();
-    window.Activate();
-
-    CoreDispatcher dispatcher = window.Dispatcher();
-    dispatcher.ProcessEvents(CoreProcessEventsOption::ProcessUntilQuit);
-  }
-
-  void SetWindow(CoreWindow const &window) {
-    Compositor compositor;
-    ContainerVisual root = compositor.CreateContainerVisual();
-    m_target = compositor.CreateTargetForCurrentView();
-    m_target.Root(root);
-    m_visuals = root.Children();
-
-    window.PointerPressed({this, &App::OnPointerPressed});
-    window.PointerMoved({this, &App::OnPointerMoved});
-
-    window.PointerReleased([&](auto &&...) { m_selected = nullptr; });
-  }
-
-  void OnActivated(CoreApplicationView const &,
-                   IActivatedEventArgs const &args) {
-    if (auto LaunchArgs = args.try_as<LaunchActivatedEventArgs>()) {
-      // Execute the main logic which is stored inside `IpaSimLibrary`.
-      // TODO: Is this the right place to do it?
-      HMODULE lib =
-          check_pointer(LoadPackagedLibrary(L"libIpaSimLibrary.dll", 0));
-      FARPROC startFunc = check_pointer(GetProcAddress(lib, "start"));
-      ((void (*)(const LaunchActivatedEventArgs &))startFunc)(LaunchArgs);
-      check_bool(FreeLibrary(lib));
-    }
-  }
-
-  // TODO: Remove this sample code.
-  void OnPointerPressed(IInspectable const &, PointerEventArgs const &args) {
-    float2 const point = args.CurrentPoint().Position();
-
-    for (Visual visual : m_visuals) {
-      float3 const offset = visual.Offset();
-      float2 const size = visual.Size();
-
-      if (point.x >= offset.x && point.x < offset.x + size.x &&
-          point.y >= offset.y && point.y < offset.y + size.y) {
-        m_selected = visual;
-        m_offset.x = offset.x - point.x;
-        m_offset.y = offset.y - point.y;
-      }
-    }
-
-    if (m_selected) {
-      m_visuals.Remove(m_selected);
-      m_visuals.InsertAtTop(m_selected);
-    } else {
-      AddVisual(point);
-    }
-  }
-
-  void OnPointerMoved(IInspectable const &, PointerEventArgs const &args) {
-    if (m_selected) {
-      float2 const point = args.CurrentPoint().Position();
-
-      m_selected.Offset({point.x + m_offset.x, point.y + m_offset.y, 0.0f});
-    }
-  }
-
-  void AddVisual(float2 const point) {
-    Compositor compositor = m_visuals.Compositor();
-    SpriteVisual visual = compositor.CreateSpriteVisual();
-
-    static Color colors[] = {{0xDC, 0x5B, 0x9B, 0xD5},
-                             {0xDC, 0xED, 0x7D, 0x31},
-                             {0xDC, 0x70, 0xAD, 0x47},
-                             {0xDC, 0xFF, 0xC0, 0x00}};
-
-    static unsigned last = 0;
-    unsigned const next = ++last % _countof(colors);
-    visual.Brush(compositor.CreateColorBrush(colors[next]));
-
-    float const BlockSize = 100.0f;
-
-    visual.Size({BlockSize, BlockSize});
-
-    visual.Offset({
-        point.x - BlockSize / 2.0f,
-        point.y - BlockSize / 2.0f,
-        0.0f,
+#if defined _DEBUG && !defined DISABLE_XAML_GENERATED_BREAK_ON_UNHANDLED_EXCEPTION
+    UnhandledException([this](IInspectable const&, UnhandledExceptionEventArgs const& e)
+    {
+        if (IsDebuggerPresent())
+        {
+            auto errorMessage = e.Message();
+            __debugbreak();
+        }
     });
+#endif
+}
 
-    m_visuals.InsertAtTop(visual);
+/// <summary>
+/// Invoked when the application is launched normally by the end user.  Other entry points
+/// will be used such as when the application is launched to open a specific file.
+/// </summary>
+/// <param name="e">Details about the launch request and process.</param>
+void App::OnLaunched(LaunchActivatedEventArgs const& e)
+{
+    Frame rootFrame{ nullptr };
+    auto content = Window::Current().Content();
+    if (content)
+    {
+        rootFrame = content.try_as<Frame>();
+    }
 
-    m_selected = visual;
-    m_offset.x = -BlockSize / 2.0f;
-    m_offset.y = -BlockSize / 2.0f;
-  }
-};
+    // Do not repeat app initialization when the Window already has content,
+    // just ensure that the window is active
+    if (rootFrame == nullptr)
+    {
+        // Create a Frame to act as the navigation context and associate it with
+        // a SuspensionManager key
+        rootFrame = Frame();
 
-int __stdcall wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
-  CoreApplication::Run(make<App>());
+        rootFrame.NavigationFailed({ this, &App::OnNavigationFailed });
+
+        if (e.PreviousExecutionState() == ApplicationExecutionState::Terminated)
+        {
+            // Restore the saved session state only when appropriate, scheduling the
+            // final launch steps after the restore is complete
+        }
+
+        if (e.PrelaunchActivated() == false)
+        {
+            if (rootFrame.Content() == nullptr)
+            {
+                // When the navigation stack isn't restored navigate to the first page,
+                // configuring the new page by passing required information as a navigation
+                // parameter
+                rootFrame.Navigate(xaml_typename<IpaSimApp::MainPage>(), box_value(e.Arguments()));
+            }
+            // Place the frame in the current Window
+            Window::Current().Content(rootFrame);
+            // Ensure the current window is active
+            Window::Current().Activate();
+        }
+    }
+    else
+    {
+        if (e.PrelaunchActivated() == false)
+        {
+            if (rootFrame.Content() == nullptr)
+            {
+                // When the navigation stack isn't restored navigate to the first page,
+                // configuring the new page by passing required information as a navigation
+                // parameter
+                rootFrame.Navigate(xaml_typename<IpaSimApp::MainPage>(), box_value(e.Arguments()));
+            }
+            // Ensure the current window is active
+            Window::Current().Activate();
+        }
+    }
+}
+
+/// <summary>
+/// Invoked when application execution is being suspended.  Application state is saved
+/// without knowing whether the application will be terminated or resumed with the contents
+/// of memory still intact.
+/// </summary>
+/// <param name="sender">The source of the suspend request.</param>
+/// <param name="e">Details about the suspend request.</param>
+void App::OnSuspending([[maybe_unused]] IInspectable const& sender, [[maybe_unused]] SuspendingEventArgs const& e)
+{
+    // Save application state and stop any background activity
+}
+
+/// <summary>
+/// Invoked when Navigation to a certain page fails
+/// </summary>
+/// <param name="sender">The Frame which failed navigation</param>
+/// <param name="e">Details about the navigation failure</param>
+void App::OnNavigationFailed(IInspectable const&, NavigationFailedEventArgs const& e)
+{
+    throw hresult_error(E_FAIL, hstring(L"Failed to load Page ") + e.SourcePageType().Name);
 }
