@@ -1,0 +1,5 @@
+[ver:1,total:4820]
+src/IpaSimulator/IpaSimulator.cpp:4565,1552158000:420,1552161600:3045,1552165200:1100,m
+src/IpaSimulator/IpaSimulator.hpp:155,1552161600:135,1552165200:20,m
+src/HeadersAnalyzer/Config.hpp:80,1552143600:50,1552147200:10,1552165200:20,r
+lib/unicorn/include/unicorn/arm.h:20,1552161600:20,r
