@@ -1,5 +1,6 @@
 #include <LIEF/LIEF.hpp>
 #include <Windows.h>
+#include <cstdarg>
 #include <string>
 #include <unicorn/unicorn.h>
 
@@ -58,10 +59,7 @@ public:
   DynamicLoader(uc_engine *UC);
   LoadedLibrary *load(const std::string &Path);
   void execute(LoadedLibrary *Lib);
-  // Finds only library, no symbol information is inspected. To do that, call
-  // `inspect`.
-  AddrInfo lookup(uint64_t Addr);
-  AddrInfo inspect(uint64_t Addr);
+  void *translate(void *Addr, va_list Args);
 
 private:
   void error(const std::string &Msg, bool AppendLastError = false);
@@ -94,6 +92,10 @@ private:
   static bool catchMemWrite(uc_engine *UC, uc_mem_type Type, uint64_t Addr,
                             int Size, int64_t Value, void *Data);
   bool handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size, int64_t Value);
+  // Finds only library, no symbol information is inspected. To do that, call
+  // `inspect`.
+  AddrInfo lookup(uint64_t Addr);
+  AddrInfo inspect(uint64_t Addr);
 
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.

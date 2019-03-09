@@ -739,13 +739,12 @@ struct objc_class {
   bool isRealized() { return data()->flags & RW_REALIZED; }
 };
 
+static void noop() {}
+
 // If `Addr` points to emulated code, returns address of wrapper that should be
 // called instead. Otherwise, returns `Addr` unchanged.
-extern "C" __declspec(dllexport) void *ipaSim_translate(void *Addr) {
-  assert(DyldPtr && "DynamicLoader was expected to exist at this point");
-  DynamicLoader &Dyld = *DyldPtr;
-
-  AddrInfo AI(Dyld.lookup(reinterpret_cast<uint64_t>(Addr)));
+void *DynamicLoader::translate(void *Addr, va_list Args) {
+  AddrInfo AI(lookup(reinterpret_cast<uint64_t>(Addr)));
   if (auto *Dylib = dynamic_cast<LoadedDylib *>(AI.Lib)) {
     // The address points to Dylib.
 
@@ -763,19 +762,82 @@ extern "C" __declspec(dllexport) void *ipaSim_translate(void *Addr) {
                                    ? Class->data()->ro->baseMethodList
                                    : Class->info->baseMethodList;
       for (size_t J = 0; J != Methods->count; ++J) {
-        if (Methods->methods[J].imp == Addr) {
-          OutputDebugStringA("Found!!!");
+        method_t &Method = Methods->methods[J];
+        if (Method.imp == Addr) {
+          // We have found metadata of the callback method. Now, for simple
+          // methods, it's actually quite simple to translate i386 -> ARM calls
+          // dynamically, so that's what we do here.
+          // TODO: Generate wrappers for callbacks, too (see README of
+          // `HeadersAnalyzer` for more details).
+
+          const char *T = Method.types;
+
+          // TODO: First, handle the return value.
+          switch (*T) {
+          case 'v': // void
+          case 'c': // char
+            break;
+          default:
+            error("unsupported return value of callback");
+            return nullptr;
+          }
+
+          // Next, process function arguments.
+          int regid = UC_ARM_REG_R0;
+          while (*(++T)) {
+            // Skip digits.
+            for (; '0' <= *T && *T <= '9'; ++T)
+              ;
+            if (!*T)
+              break;
+
+            switch (*T) {
+            case '@':   // id
+            case ':': { // SEL
+              uint32_t I32 = va_arg(Args, uint32_t);
+              if (regid > UC_ARM_REG_R3) {
+                error("callback has too much arguments");
+                return nullptr;
+              }
+              callUC(uc_reg_write(UC, regid++, &I32));
+              break;
+            }
+            default:
+              error("unsupported callback argument type");
+              return nullptr;
+            }
+          }
+
+          // TODO: Finally, call the function.
+
+          // Since we already called the function, return a no-op.
+          return reinterpret_cast<void *>(noop);
         }
       }
     }
 
-    // TODO: Return pointer to wrapper.
+    error("callback not found");
     return nullptr;
   }
 
   return Addr;
 }
-extern "C" __declspec(dllexport) void ipaSim_translate4(uint32_t *Addr) {
+
+void *ipaSim_translateImpl(void *Addr, va_list Args) {
+  assert(DyldPtr && "DynamicLoader was expected to exist at this point");
+  return DyldPtr->translate(Addr, Args);
+}
+extern "C" __declspec(dllexport) void *ipaSim_translate(void *Addr...) {
+  va_list Args;
+  va_start(Args, Addr);
+  void *Result = ipaSim_translateImpl(Addr, Args);
+  va_end(Args);
+  return Result;
+}
+extern "C" __declspec(dllexport) void ipaSim_translate4(uint32_t *Addr...) {
+  va_list Args;
+  va_start(Args, Addr);
   Addr[1] = reinterpret_cast<uint32_t>(
-      ipaSim_translate(reinterpret_cast<void *>(Addr[1])));
+      ipaSim_translateImpl(reinterpret_cast<void *>(Addr[1]), Args));
+  va_end(Args);
 }
