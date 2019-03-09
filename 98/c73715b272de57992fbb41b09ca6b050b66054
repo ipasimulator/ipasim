@@ -1,0 +1,6 @@
+[ver:1,total:1500]
+docs/issues/18.md:900,1552118400:360,1552122000:180,1552125600:360,m
+samples/HelloUIWrapper/App.xaml.cpp:280,1552118400:280,r
+src/IpaSimulator/IpaSimApp/App.cpp:180,1552118400:180,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:120,1552118400:120,r
+samples/HelloUILibrary/HelloUILibrary.cpp:20,1552118400:20,r
