@@ -1,4 +1,4 @@
-﻿//
+//
 // App.xaml.cpp
 // Implementation of the App class.
 //
@@ -44,8 +44,17 @@ App::App()
 /// will be used such as when the application is launched to open a specific file.
 /// </summary>
 /// <param name="e">Details about the launch request and process.</param>
-void App::OnLaunched(LaunchActivatedEventArgs const& e)
-{
+void App::OnLaunched(LaunchActivatedEventArgs const& e) {
+    // Execute the main logic which is stored inside `IpaSimLibrary`.
+    // TODO: Is this the right place to do it?
+    HMODULE lib = check_pointer(LoadPackagedLibrary(L"libIpaSimLibrary.dll", 0));
+    FARPROC startFunc = check_pointer(GetProcAddress(lib, "start"));
+    ((void (*)(const LaunchActivatedEventArgs &))startFunc)(e);
+    check_bool(FreeLibrary(lib));
+
+    // TODO: Don't execute the rest if we emulate.
+    return;
+
     Frame rootFrame{ nullptr };
     auto content = Window::Current().Content();
     if (content)
