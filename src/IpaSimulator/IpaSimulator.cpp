@@ -782,6 +782,10 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
             return nullptr;
           }
 
+          // First variadic argument is actually return address on top of the
+          // stack. Just skip that.
+          va_arg(Args, uint32_t);
+
           // Next, process function arguments.
           int regid = UC_ARM_REG_R0;
           while (*(++T)) {
