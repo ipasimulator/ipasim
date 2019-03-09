@@ -1,0 +1,6 @@
+[ver:1,total:5280]
+src/IpaSimulator/IpaSimulator.cpp:4650,1552125600:360,1552129200:1110,1552136400:1950,1552140000:900,1552143600:330,m
+src/objc/CMakeLists.txt:495,1552136400:480,1552143600:15,m
+src/IpaSimulator/IpaSimApp/App.cpp:60,1552125600:60,r
+src/IpaSimulator/IpaSimulator.hpp:45,1552129200:30,1552143600:15,m
+src/objc/build.cmd:30,1552136400:30,r
