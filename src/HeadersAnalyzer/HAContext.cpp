@@ -58,6 +58,9 @@ bool HAContext::isInteresting(const string &Name, ExportPtr &Exp) {
     if (Class != iOSClasses.end()) {
       Exp = iOSExps.insert(ExportEntry(Name)).first;
       Exp->ObjCMethod = true;
+      // Note that if some class is in more than one Dylib, its wrappers will be
+      // emitted to all of them, so we can use any one of them in `WrapperIndex`
+      // (`Exp->Dylib` is used when generating `WrapperIndex`).
       if (!Class->Dylibs.empty())
         Exp->Dylib = Class->Dylibs.front();
       std::for_each(Class->Dylibs.begin(), Class->Dylibs.end(),
