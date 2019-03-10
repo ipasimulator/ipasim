@@ -1,0 +1,8 @@
+[ver:1,total:840]
+samples/HelloUIWrapper/App.xaml.cpp:405,1552201200:405,r
+src/IpaSimulator/IpaSimulator.cpp:230,1552201200:230,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:95,1552201200:95,m
+samples/ToDo/Info.plist:45,1552201200:45,m
+src/IpaSimulator/IpaSimApp/App.cpp:30,1552201200:30,r
+src/IpaSimulator/IpaSimulator.vcxproj:20,1552201200:20,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:15,1552201200:15,m
