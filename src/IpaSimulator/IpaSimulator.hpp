@@ -60,6 +60,7 @@ public:
   LoadedLibrary *load(const std::string &Path);
   void execute(LoadedLibrary *Lib);
   void *translate(void *Addr, va_list Args);
+  void *getRetVal();
 
 private:
   void error(const std::string &Msg, bool AppendLastError = false);

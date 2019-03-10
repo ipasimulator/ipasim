@@ -682,6 +682,11 @@ AddrInfo DynamicLoader::lookup(uint64_t Addr) {
 // TODO: Find symbol name and also use this function to implement
 // `src/objc/dladdr.mm`.
 AddrInfo DynamicLoader::inspect(uint64_t Addr) { return lookup(Addr); }
+void *DynamicLoader::getRetVal() {
+  uint32_t Reg;
+  callUC(uc_reg_read(UC, UC_ARM_REG_R0, &Reg));
+  return reinterpret_cast<void *>(Reg);
+}
 
 struct IpaSimulator {
   IpaSimulator() : UC(initUC()), Dyld(UC) {}
@@ -785,6 +790,7 @@ struct objc_class {
 };
 
 static void noop() {}
+static void *returningWrapper() { return IpaSim.Dyld.getRetVal(); }
 
 // If `Addr` points to emulated code, returns address of wrapper that should be
 // called instead. Otherwise, returns `Addr` unchanged.
@@ -818,10 +824,15 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
 
           const char *T = Method.types;
 
-          // TODO: First, handle the return value.
+          // First, handle the return value.
+          bool Returns;
           switch (*T) {
           case 'v': // void
+            Returns = false;
+            break;
           case 'c': // char
+          case '@': // id
+            Returns = true;
             break;
           default:
             error("unsupported return value of callback");
@@ -862,6 +873,8 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
           execute(AddrVal);
 
           // Since we already called the function, return a no-op.
+          if (Returns)
+            return reinterpret_cast<void *>(returningWrapper);
           return reinterpret_cast<void *>(noop);
         }
       }
