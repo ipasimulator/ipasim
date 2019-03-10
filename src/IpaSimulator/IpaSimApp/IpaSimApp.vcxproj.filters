@@ -79,6 +79,12 @@
     <None Include="..\..\..\deps\WinObjC\Frameworks\CoreFoundation\CharacterSets\**">
       <Filter>bin</Filter>
     </None>
+    <None Include="UIKit.Xaml\**">
+      <Filter>bin</Filter>
+    </None>
+    <None Include="Social.Xaml\**">
+      <Filter>bin</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Assets">

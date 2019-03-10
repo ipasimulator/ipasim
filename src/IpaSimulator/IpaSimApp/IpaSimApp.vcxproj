@@ -92,6 +92,8 @@
   <ItemDefinitionGroup>
     <PreBuildEvent>
       <Command>robocopy ..\..\..\..\build\ipasim-x86-Debug\gen\ $(ProjectDir)gen\ * /MIR /NP /NFL /NDL
+robocopy "..\..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\UIKit.Xaml"\ $(ProjectDir)UIKit.Xaml\ * /MIR /NP /NFL /NDL
+robocopy "..\..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\Social.Xaml"\ $(ProjectDir)Social.Xaml\ * /MIR /NP /NFL /NDL
 rem See &lt;https://weblogs.sqlteam.com/robv/2010/02/17/61106/&gt;.
 set /A errlev="%ERRORLEVEL% &amp; 24"
 exit /B %errlev%</Command>
@@ -181,6 +183,12 @@ exit /B %errlev%</Command>
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="..\..\..\deps\WinObjC\Frameworks\CoreFoundation\CharacterSets\**">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="UIKit.Xaml\**">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="Social.Xaml\**">
       <DeploymentContent>true</DeploymentContent>
     </None>
   </ItemGroup>
