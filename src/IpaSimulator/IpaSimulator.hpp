@@ -92,6 +92,10 @@ private:
   static bool catchMemWrite(uc_engine *UC, uc_mem_type Type, uint64_t Addr,
                             int Size, int64_t Value, void *Data);
   bool handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size, int64_t Value);
+  static bool catchMemUnmapped(uc_engine *UC, uc_mem_type Type, uint64_t Addr,
+                               int Size, int64_t Value, void *Data);
+  bool handleMemUnmapped(uc_mem_type Type, uint64_t Addr, int Size,
+                         int64_t Value);
   // Finds only library, no symbol information is inspected. To do that, call
   // `inspect`.
   AddrInfo lookup(uint64_t Addr);

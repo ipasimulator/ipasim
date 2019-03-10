@@ -440,6 +440,11 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   // Hook `catchMemWrite` logs all memory writes.
   callUC(uc_hook_add(UC, &Hook, UC_HOOK_MEM_WRITE,
                      reinterpret_cast<void *>(catchMemWrite), this, 1, 0));
+  // Hook `catchMemUnmapped` allows through reading and writing to unmapped
+  // memory (probably heap or other external objects).
+  callUC(uc_hook_add(UC, &Hook,
+                     UC_HOOK_MEM_READ_UNMAPPED | UC_HOOK_MEM_WRITE_UNMAPPED,
+                     reinterpret_cast<void *>(catchMemUnmapped), this, 1, 0));
 
   // TODO: Do this also for all non-wrapper Dylibs (i.e., Dylibs that come with
   // the `.ipa` file).
@@ -642,6 +647,28 @@ bool DynamicLoader::handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size,
   OutputDebugStringA(" (");
   OutputDebugStringA(to_string(Size).c_str());
   OutputDebugStringA(").\n");
+  return true;
+}
+bool DynamicLoader::catchMemUnmapped(uc_engine *UC, uc_mem_type Type,
+                                     uint64_t Addr, int Size, int64_t Value,
+                                     void *Data) {
+  return reinterpret_cast<DynamicLoader *>(Data)->handleMemUnmapped(
+      Type, Addr, Size, Value);
+}
+bool DynamicLoader::handleMemUnmapped(uc_mem_type Type, uint64_t Addr, int Size,
+                                      int64_t Value) {
+  OutputDebugStringA("Info: unmapped memory manipulation at 0x");
+  OutputDebugStringA(to_hex_string(Addr).c_str());
+  OutputDebugStringA(" (");
+  OutputDebugStringA(to_string(Size).c_str());
+  OutputDebugStringA(").\n");
+
+  // Map the memory, so that emulation can continue.
+  Addr = alignToPageSize(Addr);
+  Size = roundToPageSize(Size);
+  mapMemory(Addr, Size, UC_PROT_READ | UC_PROT_WRITE,
+            reinterpret_cast<void *>(Addr));
+
   return true;
 }
 AddrInfo DynamicLoader::lookup(uint64_t Addr) {
