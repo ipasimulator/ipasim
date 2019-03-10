@@ -662,6 +662,7 @@ struct IpaSimulator {
 
   uc_engine *UC;
   DynamicLoader Dyld;
+  string MainBinary;
 
 private:
   uc_engine *initUC() {
@@ -674,9 +675,10 @@ static IpaSimulator IpaSim;
 
 extern "C" __declspec(dllexport) void start(
     const LaunchActivatedEventArgs &LaunchArgs) {
-  // Load test binary `ToDo`.
+  // Load sample binary `ToDo`.
   filesystem::path Dir(Package::Current().InstalledLocation().Path().c_str());
-  LoadedLibrary *App = IpaSim.Dyld.load((Dir / "sample" / "ToDo").string());
+  IpaSim.MainBinary = (Dir / "sample" / "ToDo").string();
+  LoadedLibrary *App = IpaSim.Dyld.load(IpaSim.MainBinary);
 
   // Execute it.
   IpaSim.Dyld.execute(App);
@@ -858,4 +860,7 @@ extern "C" __declspec(dllexport) void ipaSim_translate4(uint32_t *Addr...) {
   Addr[1] = reinterpret_cast<uint32_t>(
       IpaSim.Dyld.translate(reinterpret_cast<void *>(Addr[1]), Args));
   va_end(Args);
+}
+extern "C" __declspec(dllexport) const char *ipaSim_processPath() {
+  return IpaSim.MainBinary.c_str();
 }
