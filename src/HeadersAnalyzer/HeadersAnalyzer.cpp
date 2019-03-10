@@ -65,10 +65,12 @@ public:
     reportStatus("discovering TBDs");
 
     TBDHandler TH(HAC);
-    if constexpr (Sample)
+    if constexpr (Sample) {
       TH.handleFile("./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/"
                     "Frameworks/UIKit.framework/UIKit.tbd");
-    else {
+      TH.handleFile("./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/"
+                    "Frameworks/Foundation.framework/Foundation.tbd");
+    } else {
       vector<string> Dirs{
           "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
           "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/TextInput/"};

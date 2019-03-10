@@ -27,6 +27,9 @@ public:
   auto operator*() const { return Value.operator*(); }
   auto operator-> () const { return Value.operator->(); }
   operator bool() const { return Valid; }
+  bool operator<(const ContainerPtr &Other) const {
+    return *Value < *Other.Value;
+  }
   bool operator==(const ContainerPtr &Other) const {
     return Value == Other.Value;
   }
