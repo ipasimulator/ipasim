@@ -656,32 +656,37 @@ AddrInfo DynamicLoader::lookup(uint64_t Addr) {
 // `src/objc/dladdr.mm`.
 AddrInfo DynamicLoader::inspect(uint64_t Addr) { return lookup(Addr); }
 
-static DynamicLoader *DyldPtr = nullptr;
+struct IpaSimulator {
+  IpaSimulator() : UC(initUC()), Dyld(UC) {}
+  ~IpaSimulator() { callUC(uc_close(UC)); }
+
+  uc_engine *UC;
+  DynamicLoader Dyld;
+
+private:
+  uc_engine *initUC() {
+    callUC(uc_open(UC_ARCH_ARM, UC_MODE_ARM, &UC));
+    return UC;
+  }
+};
+
+static IpaSimulator IpaSim;
 
 extern "C" __declspec(dllexport) void start(
     const LaunchActivatedEventArgs &LaunchArgs) {
-  // Initialize Unicorn Engine.
-  uc_engine *UC;
-  callUC(uc_open(UC_ARCH_ARM, UC_MODE_ARM, &UC));
-
   // Load test binary `ToDo`.
   filesystem::path Dir(Package::Current().InstalledLocation().Path().c_str());
-  DynamicLoader Dyld(UC);
-  DyldPtr = &Dyld;
-  LoadedLibrary *App = Dyld.load((Dir / "ToDo").string());
+  LoadedLibrary *App = IpaSim.Dyld.load((Dir / "ToDo").string());
 
   // Execute it.
-  Dyld.execute(App);
+  IpaSim.Dyld.execute(App);
 
   // Call `UIApplicationLaunched`.
-  LoadedLibrary *UIKit = Dyld.load("UIKit.dll");
-  uint64_t LaunchAddr = UIKit->findSymbol(Dyld, "UIApplicationLaunched");
+  LoadedLibrary *UIKit = IpaSim.Dyld.load("UIKit.dll");
+  uint64_t LaunchAddr = UIKit->findSymbol(IpaSim.Dyld, "UIApplicationLaunched");
   auto *LaunchFunc = reinterpret_cast<void (*)(void *)>(LaunchAddr);
   // `get_abi` converts C++/WinRT object to its C++/CX equivalent.
   LaunchFunc(get_abi(LaunchArgs));
-
-  // Clean up Unicorn Engine.
-  callUC(uc_close(UC));
 
   // Let the user know we're done. This is here for testing purposes only.
   MessageDialog Dlg(L"Done.");
@@ -840,14 +845,10 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
   return Addr;
 }
 
-void *ipaSim_translateImpl(void *Addr, va_list Args) {
-  assert(DyldPtr && "DynamicLoader was expected to exist at this point");
-  return DyldPtr->translate(Addr, Args);
-}
 extern "C" __declspec(dllexport) void *ipaSim_translate(void *Addr...) {
   va_list Args;
   va_start(Args, Addr);
-  void *Result = ipaSim_translateImpl(Addr, Args);
+  void *Result = IpaSim.Dyld.translate(Addr, Args);
   va_end(Args);
   return Result;
 }
@@ -855,6 +856,6 @@ extern "C" __declspec(dllexport) void ipaSim_translate4(uint32_t *Addr...) {
   va_list Args;
   va_start(Args, Addr);
   Addr[1] = reinterpret_cast<uint32_t>(
-      ipaSim_translateImpl(reinterpret_cast<void *>(Addr[1]), Args));
+      IpaSim.Dyld.translate(reinterpret_cast<void *>(Addr[1]), Args));
   va_end(Args);
 }
