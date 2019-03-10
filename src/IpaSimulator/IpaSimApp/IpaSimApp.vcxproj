@@ -180,6 +180,9 @@ exit /B %errlev%</Command>
     <None Include="..\..\..\deps\WinObjC\Frameworks\Social.Xaml\prebuilt\Social.Xaml.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\deps\WinObjC\Frameworks\CoreFoundation\CharacterSets\**">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\LockScreenLogo.scale-200.png" />
