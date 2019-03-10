@@ -451,13 +451,16 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   call("libdyld.dll", "_dyld_initialize", reinterpret_cast<void *>(Hdr));
   call("libobjc.dll", "_objc_init");
 
+  // Start at entry point.
+  execute(Dylib->Bin.entrypoint() + Dylib->StartAddress);
+}
+void DynamicLoader::execute(uint64_t Addr) {
   // Point return address to kernel.
   uint32_t RetAddr = KernelAddr;
   callUC(uc_reg_write(UC, UC_ARM_REG_LR, &RetAddr));
 
   // Start execution.
-  callUC(
-      uc_emu_start(UC, Dylib->Bin.entrypoint() + Dylib->StartAddress, 0, 0, 0));
+  callUC(uc_emu_start(UC, Addr, 0, 0, 0));
 }
 bool DynamicLoader::catchFetchProtMem(uc_engine *UC, uc_mem_type Type,
                                       uint64_t Addr, int Size, int64_t Value,
@@ -569,6 +572,14 @@ void DynamicLoader::catchCode(uc_engine *UC, uint64_t Addr, uint32_t Size,
 void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
   AddrInfo AI(inspect(Addr));
   if (!AI.Lib) {
+    // Handle return to kernel.
+    // TODO: This shouldn't happen since kernel is unexecutable but it does.
+    // It's the same bug as described below.
+    if (Addr == KernelAddr) {
+      callUC(uc_emu_stop(UC));
+      return;
+    }
+
     error("unmapped address executed");
     return;
   }
@@ -744,7 +755,8 @@ static void noop() {}
 // If `Addr` points to emulated code, returns address of wrapper that should be
 // called instead. Otherwise, returns `Addr` unchanged.
 void *DynamicLoader::translate(void *Addr, va_list Args) {
-  AddrInfo AI(lookup(reinterpret_cast<uint64_t>(Addr)));
+  uint64_t AddrVal = reinterpret_cast<uint64_t>(Addr);
+  AddrInfo AI(lookup(AddrVal));
   if (auto *Dylib = dynamic_cast<LoadedDylib *>(AI.Lib)) {
     // The address points to Dylib.
 
@@ -812,7 +824,8 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
             }
           }
 
-          // TODO: Finally, call the function.
+          // Finally, call the function.
+          execute(AddrVal);
 
           // Since we already called the function, return a no-op.
           return reinterpret_cast<void *>(noop);

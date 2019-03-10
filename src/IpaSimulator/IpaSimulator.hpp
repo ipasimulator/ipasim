@@ -96,6 +96,7 @@ private:
   // `inspect`.
   AddrInfo lookup(uint64_t Addr);
   AddrInfo inspect(uint64_t Addr);
+  void execute(uint64_t Addr);
 
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
