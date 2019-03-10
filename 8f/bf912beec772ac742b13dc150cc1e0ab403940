@@ -1,0 +1,6 @@
+[ver:1,total:960]
+src/IpaSimulator/IpaSimulator.cpp:750,1552204800:750,m
+src/IpaSimulator/IpaSimulator.hpp:90,1552204800:90,r
+.gitattributes:60,1552204800:60,r
+src/IpaSimulator/IpaSimApp/App.cpp:30,1552204800:30,r
+src/IpaSimulator/IpaSimApp/sample/Info.plist:30,1552204800:30,r
