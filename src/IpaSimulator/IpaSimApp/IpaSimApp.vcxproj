@@ -120,7 +120,7 @@ exit /B %errlev%</Command>
     </AppxManifest>
     <None Include="IpaSimApp_TemporaryKey.pfx" />
     <None Include="packages.config" />
-    <None Include="..\..\..\samples\ToDo\**">
+    <None Include="sample\**">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="..\..\..\lib\unicorn\libgcc_s_dw2-1.dll">
