@@ -515,7 +515,8 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
     // Find Dylib with the corresponding wrapper.
     auto Entry = Idx->Map.find(RVA);
     if (Entry == Idx->Map.end()) {
-      error("cannot find RVA in WrapperIndex");
+      error("cannot find RVA 0x" + to_hex_string(RVA) + " in WrapperIndex of " +
+            WrapperPath.string());
       return false;
     }
     const string &Dylib = Idx->Dylibs[Entry->second];
