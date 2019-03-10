@@ -1,0 +1,13 @@
+[ver:1,total:1080]
+src/IpaSimulator/IpaSimulator.cpp:500,1552204800:500,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:248,1552204800:248,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:68,1552204800:68,m
+src/IpaSimulator/IpaSimApp/sample/Info.plist:60,1552204800:60,m
+src/IpaSimulator/IpaSimApp/App.cpp:60,1552204800:60,r
+.gitattributes:50,1552204800:50,m
+src/IpaSimulator/IpaSimApp/sample/ToDo:38,1552204800:38,m
+src/IpaSimulator/Debug/IpaSimApp/AppX/sample/Info.plist:20,1552204800:20,r
+src/IpaSimulator/IpaSimApp/sample/Base.lproj/LaunchScreen.storyboardc/01J-lp-oVM-view-Ze5-6b-2t3.nib:12,1552204800:12,m
+src/IpaSimulator/IpaSimApp/sample/Base.lproj/Main.storyboardc/UINavigationController-IxG-qz-oaA.nib:8,1552204800:8,m
+src/IpaSimulator/IpaSimApp/sample/Base.lproj/Main.storyboardc/ddi-JT-roz-view-ry9-AI-iRy.nib:8,1552204800:8,m
+src/IpaSimulator/IpaSimApp/sample/PkgInfo:8,1552204800:8,m
