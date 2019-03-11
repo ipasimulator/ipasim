@@ -1,0 +1,6 @@
+[ver:1,total:1560]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:735,1552305600:735,m
+src/IpaSimulator/IpaSimulator.cpp:555,1552302000:540,1552305600:15,r
+src/HeadersAnalyzer/HAContext.cpp:220,1552302000:60,1552305600:160,m
+src/HeadersAnalyzer/Config.hpp:30,1552305600:30,r
+.git/COMMIT_EDITMSG:20,1552305600:20,r
