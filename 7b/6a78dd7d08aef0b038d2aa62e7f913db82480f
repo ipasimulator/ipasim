@@ -4,3 +4,12 @@ src/IpaSimulator/IpaSimulator.cpp:555,1552302000:540,1552305600:15,r
 src/HeadersAnalyzer/HAContext.cpp:220,1552302000:60,1552305600:160,m
 src/HeadersAnalyzer/Config.hpp:30,1552305600:30,r
 .git/COMMIT_EDITMSG:20,1552305600:20,r
+
+[ver:1,total:3660]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:936,1552298400:270,1552302000:666,m
+src/HeadersAnalyzer/iOSHeaders.mm:692,1552298400:480,1552302000:212,m
+src/IpaSimulator/IpaSimulator.cpp:605,1552298400:560,1552302000:45,r
+src/HeadersAnalyzer/HAContext.cpp:602,1552298400:50,1552302000:552,m
+src/HeadersAnalyzer/Common.hpp:531,1552302000:531,m
+src/HeadersAnalyzer/HAContext.hpp:242,1552302000:242,m
+src/HeadersAnalyzer/Config.hpp:52,1552298400:20,1552302000:32,r
