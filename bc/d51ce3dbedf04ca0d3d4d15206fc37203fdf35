@@ -1,0 +1,11 @@
+[ver:1,total:900]
+src/IpaSimulator/IpaSimulator.cpp:740,1552316400:300,1552320000:240,1552327200:30,1552334400:150,1552338000:20,m
+.gitmodules:66,1552338000:66,r
+src/IpaSimulator/IpaSimApp/sample/archived-expanded-entitlements.xcent:26,1552338000:26,m
+src/IpaSimulator/IpaSimApp/sample/Calculator:20,1552338000:20,m
+src/IpaSimulator/IpaSimApp/sample/_CodeSignature/CodeResources:12,1552338000:12,m
+src/IpaSimulator/IpaSimApp/sample/Base.lproj/Main.storyboardc/UIViewController-BYZ-38-t0r.nib:12,1552338000:12,m
+src/IpaSimulator/IpaSimApp/sample/Base.lproj/LaunchScreen.storyboardc/UIViewController-01J-lp-oVM.nib:6,1552338000:6,m
+.gitattributes:6,1552338000:6,m
+src/IpaSimulator/IpaSimApp/sample/Base.lproj/LaunchScreen.storyboardc/01J-lp-oVM-view-Ze5-6b-2t3.nib:6,1552338000:6,m
+src/IpaSimulator/IpaSimApp/sample/Base.lproj/Main.storyboardc/BYZ-38-t0r-view-8bC-Xf-vdC.nib:6,1552338000:6,m
