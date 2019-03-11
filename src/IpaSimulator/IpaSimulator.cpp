@@ -573,6 +573,7 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
           break;
         case 'c': // char
         case '@': // id
+        case 'i': // int
           Returns = true;
           break;
         default:
@@ -594,7 +595,8 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
 
           switch (*T) {
           case '@':   // id
-          case ':': { // SEL
+          case ':':   // SEL
+          case 'i': { // int
             if (RegId > UC_ARM_REG_R3) {
               error("function has too many arguments");
               return false;
@@ -990,6 +992,7 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
         break;
       case 'c': // char
       case '@': // id
+      case 'i': // int
         Returns = true;
         break;
       default:
@@ -1012,7 +1015,8 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
 
         switch (*T) {
         case '@':   // id
-        case ':': { // SEL
+        case ':':   // SEL
+        case 'i': { // int
           uint32_t I32 = va_arg(Args, uint32_t);
           if (RegId > UC_ARM_REG_R3) {
             error("callback has too many arguments");
