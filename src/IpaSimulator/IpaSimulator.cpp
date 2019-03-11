@@ -864,7 +864,7 @@ extern "C" __declspec(dllexport) void start(
     const LaunchActivatedEventArgs &LaunchArgs) {
   // Load sample binary `ToDo`.
   filesystem::path Dir(Package::Current().InstalledLocation().Path().c_str());
-  IpaSim.MainBinary = (Dir / "sample" / "ToDo").string();
+  IpaSim.MainBinary = (Dir / "sample" / "Calculator").string();
   LoadedLibrary *App = IpaSim.Dyld.load(IpaSim.MainBinary);
 
   // Execute it.
