@@ -236,7 +236,8 @@ bool DynamicLoader::canSegmentsSlide(LIEF::MachO::Binary &Bin) {
 // TODO: What if the mappings overlap?
 void DynamicLoader::mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms,
                               void *Mem) {
-  callUC(uc_mem_map_ptr(UC, Addr, Size, Perms, Mem));
+  if (uc_mem_map_ptr(UC, Addr, Size, Perms, Mem))
+    error("couldn't map memory");
 }
 BinaryPath DynamicLoader::resolvePath(const string &Path) {
   if (!Path.empty() && Path[0] == '/') {
