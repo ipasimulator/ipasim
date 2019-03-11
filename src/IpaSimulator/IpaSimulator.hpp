@@ -19,6 +19,9 @@ public:
   virtual bool hasUnderscorePrefix() = 0;
   bool isInRange(uint64_t Addr);
   void checkInRange(uint64_t Addr);
+  const char *getMethodType(uint64_t Addr);
+  virtual uint64_t getSection(const std::string &Name,
+                              uint64_t *Size = nullptr) = 0;
 };
 
 class LoadedDylib : public LoadedLibrary {
@@ -29,7 +32,7 @@ public:
       : Fat(move(Fat)), Bin(Fat->at(0)) {}
   uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) override;
   bool hasUnderscorePrefix() override { return true; }
-  uint64_t getSection(const std::string &Name, uint64_t *Size = nullptr);
+  uint64_t getSection(const std::string &Name, uint64_t *Size) override;
 
 private:
   std::unique_ptr<LIEF::MachO::FatBinary> Fat;
@@ -38,9 +41,11 @@ private:
 class LoadedDll : public LoadedLibrary {
 public:
   HMODULE Ptr;
+  bool MachOPoser;
 
   uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) override;
   bool hasUnderscorePrefix() override { return false; }
+  uint64_t getSection(const std::string &Name, uint64_t *Size) override;
 };
 
 struct BinaryPath {

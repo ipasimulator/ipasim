@@ -37,24 +37,6 @@ template <class T> inline T &operator^=(T &a, T b) {
 static const uint8_t *bytes(const void *Ptr) {
   return reinterpret_cast<const uint8_t *>(Ptr);
 }
-static size_t getDylibSize(const void *Ptr) {
-  using namespace LIEF::MachO;
-
-  // Compute lib size by summing `vmsize`s of all `LC_SEGMENT` commands.
-  size_t Size = 0;
-  auto Header = reinterpret_cast<const mach_header *>(Ptr);
-  auto Cmd = reinterpret_cast<const load_command *>(Header + 1);
-  for (size_t I = 0; I != Header->ncmds; ++I) {
-    if (Cmd->cmd == (uint32_t)LOAD_COMMAND_TYPES::LC_SEGMENT) {
-      auto Seg = reinterpret_cast<const segment_command_32 *>(Cmd);
-      Size += Seg->vmsize;
-    }
-
-    // Move to the next `load_command`.
-    Cmd = reinterpret_cast<const load_command *>(bytes(Cmd) + Cmd->cmdsize);
-  }
-  return Size;
-}
 
 static void callUC(uc_err Err) {
   // TODO: Do more flexible error reporting here.
@@ -98,13 +80,54 @@ uint64_t LoadedDylib::findSymbol(DynamicLoader &DL, const string &Name) {
 }
 
 uint64_t LoadedDylib::getSection(const std::string &Name, uint64_t *Size) {
+  using namespace LIEF::MachO;
+
   if (!Bin.has_section(Name))
     return 0;
 
-  auto &Sect = Bin.get_section(Name);
+  Section &Sect = Bin.get_section(Name);
   if (Size)
     *Size = Sect.size();
   return Sect.address() + StartAddress;
+}
+
+uint64_t LoadedDll::getSection(const std::string &Name, uint64_t *Size) {
+  using namespace LIEF::MachO;
+
+  // We only support DLLs with `_mh_dylib_header`.
+  if (!MachOPoser)
+    return 0;
+
+  // Enumerate segments.
+  auto Header = reinterpret_cast<const mach_header *>(Ptr);
+  auto Cmd = reinterpret_cast<const load_command *>(Header + 1);
+  for (size_t I = 0; I != Header->ncmds; ++I) {
+    if (Cmd->cmd == (uint32_t)LOAD_COMMAND_TYPES::LC_SEGMENT) {
+      auto Seg = reinterpret_cast<const segment_command_32 *>(Cmd);
+
+      // Enumerate segment's sections.
+      auto Sect = reinterpret_cast<const section_32 *>(
+          bytes(Cmd) + sizeof(segment_command_32));
+      for (size_t J = 0; J != Seg->nsects; ++J) {
+        if (Sect->sectname == Name) {
+          // We have found it.
+          if (Size)
+            *Size = Sect->size;
+          return Sect->addr + StartAddress;
+        }
+
+        // Move to the next `section`.
+        Sect = reinterpret_cast<const section_32 *>(bytes(Sect) +
+                                                    sizeof(section_32));
+      }
+    }
+
+    // Move to the next `load_command`.
+    Cmd = reinterpret_cast<const load_command *>(bytes(Cmd) + Cmd->cmdsize);
+  }
+
+  // We haven't found it.
+  return 0;
 }
 
 uint64_t LoadedDll::findSymbol(DynamicLoader &DL, const string &Name) {
@@ -388,19 +411,22 @@ LoadedLibrary *DynamicLoader::loadPE(const string &Path) {
   LLP->Ptr = Lib;
 
   // Find out where it lies in memory.
+  MODULEINFO Info;
+  if (!GetModuleInformation(GetCurrentProcess(), Lib, &Info, sizeof(Info))) {
+    error("couldn't load module information", /* AppendLastError */ true);
+    return nullptr;
+  }
   if (uint64_t Hdr = LLP->findSymbol(*this, "_mh_dylib_header")) {
     // Map libraries that act as `.dylib`s without their PE headers.
     LLP->StartAddress = Hdr;
-    LLP->Size = getDylibSize(reinterpret_cast<const void *>(Hdr));
+    LLP->Size =
+        Info.SizeOfImage - (reinterpret_cast<uint64_t>(Info.lpBaseOfDll) - Hdr);
+    LLP->MachOPoser = true;
   } else {
     // Map other libraries in their entirety.
-    MODULEINFO Info;
-    if (!GetModuleInformation(GetCurrentProcess(), Lib, &Info, sizeof(Info))) {
-      error("couldn't load module information", /* AppendLastError */ true);
-      return nullptr;
-    }
-    LLP->StartAddress = (uint64_t)Info.lpBaseOfDll;
+    LLP->StartAddress = reinterpret_cast<uint64_t>(Info.lpBaseOfDll);
     LLP->Size = Info.SizeOfImage;
+    LLP->MachOPoser = false;
   }
 
   // Load the library into Unicorn engine.
