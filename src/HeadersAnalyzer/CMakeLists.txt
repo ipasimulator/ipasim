@@ -29,6 +29,7 @@ set (LLDB_LIBS
     lldbPluginCPlusPlusLanguage
     lldbPluginCXXItaniumABI
     lldbPluginDisassemblerLLVM
+    lldbPluginDynamicLoaderDarwinKernel
     lldbPluginDynamicLoaderHexagonDYLD
     lldbPluginDynamicLoaderMacOSXDYLD
     lldbPluginDynamicLoaderPosixDYLD
@@ -46,11 +47,14 @@ set (LLDB_LIBS
     lldbPluginInstrumentationRuntimeMainThreadChecker
     lldbPluginInstrumentationRuntimeTSan
     lldbPluginInstrumentationRuntimeUBSan
-    lldbPluginJavaLanguage
     lldbPluginJITLoaderGDB
+    lldbPluginJavaLanguage
     lldbPluginLanguageRuntimeGo
     lldbPluginLanguageRuntimeJava
     lldbPluginMemoryHistoryASan
+    lldbPluginOCamlLanguage
+    lldbPluginOSGo
+    lldbPluginOSPython
     lldbPluginObjCLanguage
     lldbPluginObjCPlusPlusLanguage
     lldbPluginObjectContainerBSDArchive
@@ -59,9 +63,6 @@ set (LLDB_LIBS
     lldbPluginObjectFileJIT
     lldbPluginObjectFileMachO
     lldbPluginObjectFilePECOFF
-    lldbPluginOCamlLanguage
-    lldbPluginOSGo
-    lldbPluginOSPython
     lldbPluginPlatformAndroid
     lldbPluginPlatformFreeBSD
     lldbPluginPlatformGDB
@@ -74,12 +75,12 @@ set (LLDB_LIBS
     lldbPluginPlatformWindows
     lldbPluginProcessElfCore
     lldbPluginProcessGDBRemote
+    lldbPluginProcessMachCore
     lldbPluginProcessMinidump
     lldbPluginProcessUtility
     lldbPluginProcessWindowsCommon
     lldbPluginRenderScriptRuntime
     lldbPluginScriptInterpreterNone
-    lldbPluginScriptInterpreterPython
     lldbPluginStructuredDataDarwinLog
     lldbPluginSymbolFileDWARF
     lldbPluginSymbolFilePDB
@@ -90,13 +91,14 @@ set (LLDB_LIBS
     lldbPluginUnwindAssemblyX86
     lldbSymbol
     lldbTarget
-    lldbUtility)
+    lldbUtility
+    lldbUtilityHelpers)
 
 set (CLANG_LIBS
-    clangAnalysis
     clangARCMigrate
     clangAST
     clangASTMatchers
+    clangAnalysis
     clangBasic
     clangCodeGen
     clangCrossTU
@@ -106,6 +108,8 @@ set (CLANG_LIBS
     clangFormat
     clangFrontend
     clangFrontendTool
+    clangHandleCXX
+    clangHandleLLVM
     clangIndex
     clangLex
     clangParse
@@ -119,6 +123,7 @@ set (CLANG_LIBS
     clangTooling
     clangToolingASTDiff
     clangToolingCore
+    clangToolingInclusions
     clangToolingRefactor)
 
 set (LLVM_LIBS
@@ -136,6 +141,7 @@ set (LLVM_LIBS
     LLVMBinaryFormat
     LLVMBitReader
     LLVMBitWriter
+    LLVMCFIVerify
     LLVMCodeGen
     LLVMCore
     LLVMCoroutines
@@ -147,17 +153,18 @@ set (LLVM_LIBS
     LLVMDemangle
     LLVMDlltoolDriver
     LLVMExecutionEngine
+    LLVMExegesis
+    LLVMExegesisX86
     LLVMFuzzMutate
     LLVMGlobalISel
+    LLVMIRReader
     LLVMInstCombine
     LLVMInstrumentation
     LLVMInterpreter
-    LLVMipo
-    LLVMIRReader
+    LLVMLTO
     LLVMLibDriver
     LLVMLineEditor
     LLVMLinker
-    LLVMLTO
     LLVMMC
     LLVMMCDisassembler
     LLVMMCJIT
@@ -176,7 +183,9 @@ set (LLVM_LIBS
     LLVMSelectionDAG
     LLVMSupport
     LLVMSymbolize
+    LLVMTableGen
     LLVMTarget
+    LLVMTestingSupport
     LLVMTransformUtils
     LLVMVectorize
     LLVMWindowsManifest
@@ -187,7 +196,8 @@ set (LLVM_LIBS
     LLVMX86Disassembler
     LLVMX86Info
     LLVMX86Utils
-    LLVMXRay)
+    LLVMXRay
+    LLVMipo)
 
 set (ALL_CLANG_LIBS ${LLDB_LIBS} ${CLANG_LIBS} ${LLVM_LIBS})
 
@@ -214,21 +224,44 @@ add_custom_target (clang-tablegen-targets
     USES_TERMINAL
     DEPENDS config-clang-x86-Debug)
 set (LLVM_TABLEGEN_TARGETS
+    # From `add_public_tablegen_target` in `deps/llvm`
     intrinsics_gen
     AttributeCompatFuncTableGen
-    COFFOptionsTableGen
-    CvtResTableGen
+    # AArch64CommonTableGen
+    # AMDGPUCommonTableGen
+    # ARCCommonTableGen
+    ARMCommonTableGen
+    # AVRCommonTableGen
+    # BPFCommonTableGen
+    # HexagonCommonTableGen
+    # LanaiCommonTableGen
+    # MipsCommonTableGen
+    # MSP430CommonTableGen
+    # Nios2CommonTableGen
+    # NVPTXCommonTableGen
+    # PowerPCCommonTableGen
+    # RISCVCommonTableGen
+    # SparcCommonTableGen
+    # SystemZCommonTableGen
+    # WebAssemblyCommonTableGen
+    X86CommonTableGen
+    # XCoreCommonTableGen
     DllOptionsTableGen
-    DriverOptionsTableGen
-    ELFOptionsTableGen
     LibOptionsTableGen
-    MinGWOptionsTableGen
+    InstCombineTableGen
+    CvtResTableGen
     MtTableGen
-    ObjcopyTableGen
-    OptsTestTableGen
+    ObjcopyOptsTableGen
+    StripOptsTableGen
     RcTableGen
-    WasmOptionsTableGen
-    X86CommonTableGen)
+    OptsTestTableGen
+
+    # From `add_public_tablegen_target` in `deps/lld`
+    COFFOptionsTableGen
+    ELFOptionsTableGen
+    DriverOptionsTableGen
+    MinGWOptionsTableGen
+    WasmOptionsTableGen)
 add_custom_target (llvm-tablegen-targets
     COMMENT "LLVM tablegen targets"
     COMMAND ninja ${LLVM_TABLEGEN_TARGETS}
@@ -338,7 +371,7 @@ set_source_files_properties (${srcs}
 add_custom_command (
     OUTPUT include/tapi/Driver/DiagnosticTAPIKinds.inc
     COMMAND "${CLANG_CMAKE_DIR}/bin/clang-tblgen.exe" "-o=${INC1}"
-        -gen-clang-diags-defs
+        "-I=${SOURCE_DIR}/deps/clang/include" -gen-clang-diags-defs
         "${SOURCE_DIR}/deps/tapi/include/tapi/Driver/DiagnosticTAPIKinds.td"
     DEPENDS "${CLANG_CMAKE_DIR}/bin/clang-tblgen.exe"
         "${SOURCE_DIR}/deps/tapi/include/tapi/Driver/DiagnosticTAPIKinds.td")
