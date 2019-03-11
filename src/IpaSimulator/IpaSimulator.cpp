@@ -565,7 +565,105 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
         OutputDebugStringA(T);
         OutputDebugStringA(".\n");
 
-        // TODO: Translate.
+        // Handle return value.
+        bool Returns;
+        switch (*T) {
+        case 'v': // void
+          Returns = false;
+          break;
+        case 'c': // char
+        case '@': // id
+          Returns = true;
+          break;
+        default:
+          error("unsupported return value");
+          return false;
+        }
+
+        // Process function arguments.
+        size_t ArgC = 0;
+        int RegId = UC_ARM_REG_R0;
+        uint32_t Args[4];
+        uint32_t *ArgsP = Args;
+        while (*(++T)) {
+          // Skip digits.
+          for (; '0' <= *T && *T <= '9'; ++T)
+            ;
+          if (!*T)
+            break;
+
+          switch (*T) {
+          case '@':   // id
+          case ':': { // SEL
+            if (RegId > UC_ARM_REG_R3) {
+              error("function has too many arguments");
+              return false;
+            }
+            callUC(uc_reg_read(UC, RegId++, ArgsP++));
+            ++ArgC;
+            break;
+          }
+          default:
+            error("unsupported argument type");
+            return false;
+          }
+        }
+
+        // Call the function.
+        if (Returns) {
+          uint32_t RetVal;
+          switch (ArgC) {
+          case 0:
+            RetVal = reinterpret_cast<uint32_t (*)()>(Addr)();
+            break;
+          case 1:
+            RetVal = reinterpret_cast<uint32_t (*)(uint32_t)>(Addr)(Args[0]);
+            break;
+          case 2:
+            RetVal = reinterpret_cast<uint32_t (*)(uint32_t, uint32_t)>(Addr)(
+                Args[0], Args[1]);
+            break;
+          case 3:
+            RetVal =
+                reinterpret_cast<uint32_t (*)(uint32_t, uint32_t, uint32_t)>(
+                    Addr)(Args[0], Args[1], Args[2]);
+            break;
+          case 4:
+            RetVal = reinterpret_cast<uint32_t (*)(uint32_t, uint32_t, uint32_t,
+                                                   uint32_t)>(Addr)(
+                Args[0], Args[1], Args[2], Args[3]);
+            break;
+          }
+          callUC(uc_reg_write(UC, UC_ARM_REG_R0, &RetVal));
+        } else {
+          switch (ArgC) {
+          case 0:
+            reinterpret_cast<void (*)()>(Addr)();
+            break;
+          case 1:
+            reinterpret_cast<void (*)(uint32_t)>(Addr)(Args[0]);
+            break;
+          case 2:
+            reinterpret_cast<void (*)(uint32_t, uint32_t)>(Addr)(Args[0],
+                                                                 Args[1]);
+            break;
+          case 3:
+            reinterpret_cast<void (*)(uint32_t, uint32_t, uint32_t)>(Addr)(
+                Args[0], Args[1], Args[2]);
+            break;
+          case 4:
+            reinterpret_cast<void (*)(uint32_t, uint32_t, uint32_t, uint32_t)>(
+                Addr)(Args[0], Args[1], Args[2], Args[3]);
+            break;
+          }
+        }
+
+        // Move R14 (LR) to R15 (PC) to return.
+        uint32_t LR;
+        callUC(uc_reg_read(UC, UC_ARM_REG_LR, &LR));
+        callUC(uc_reg_write(UC, UC_ARM_REG_PC, &LR));
+
+        return true;
       }
 
       error("cannot find RVA 0x" + to_hex_string(RVA) + " in WrapperIndex of " +
@@ -904,7 +1002,7 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
       va_arg(Args, uint32_t);
 
       // Next, process function arguments.
-      int regid = UC_ARM_REG_R0;
+      int RegId = UC_ARM_REG_R0;
       while (*(++T)) {
         // Skip digits.
         for (; '0' <= *T && *T <= '9'; ++T)
@@ -916,11 +1014,11 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
         case '@':   // id
         case ':': { // SEL
           uint32_t I32 = va_arg(Args, uint32_t);
-          if (regid > UC_ARM_REG_R3) {
-            error("callback has too much arguments");
+          if (RegId > UC_ARM_REG_R3) {
+            error("callback has too many arguments");
             return nullptr;
           }
-          callUC(uc_reg_write(UC, regid++, &I32));
+          callUC(uc_reg_write(UC, RegId++, &I32));
           break;
         }
         default:
