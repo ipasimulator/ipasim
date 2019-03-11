@@ -816,6 +816,29 @@ struct objc_class {
   bool isRealized() { return data()->flags & RW_REALIZED; }
 };
 
+const char *LoadedLibrary::getMethodType(uint64_t Addr) {
+  // Enumerate classes in the image.
+  uint64_t SecSize;
+  uint64_t SecAddr = getSection("__objc_classlist", &SecSize);
+  if (!SecAddr)
+    return nullptr;
+  auto *Classes = reinterpret_cast<objc_class **>(SecAddr);
+  for (size_t I = 0, Count = SecSize / sizeof(void *); I != Count; ++I) {
+    // Enumerate methods of every class.
+    objc_class *Class = Classes[I];
+    // TODO: Also iterate through (non-base) `methods` if class is realized.
+    method_list_t *Methods = Class->isRealized()
+                                 ? Class->data()->ro->baseMethodList
+                                 : Class->info->baseMethodList;
+    for (size_t J = 0; J != Methods->count; ++J) {
+      method_t &Method = Methods->methods[J];
+      if (reinterpret_cast<uint64_t>(Method.imp) == Addr)
+        return Method.types;
+    }
+  }
+  return nullptr;
+}
+
 static void noop() {}
 static void *returningWrapper() { return IpaSim.Dyld.getRetVal(); }
 
@@ -827,84 +850,65 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
   if (auto *Dylib = dynamic_cast<LoadedDylib *>(AI.Lib)) {
     // The address points to Dylib.
 
-    // Enumerate classes in the image.
-    uint64_t SecSize;
-    uint64_t SecAddr = Dylib->getSection("__objc_classlist", &SecSize);
-    if (!SecAddr)
-      return nullptr;
-    auto *Classes = reinterpret_cast<objc_class **>(SecAddr);
-    for (size_t I = 0, Count = SecSize / sizeof(void *); I != Count; ++I) {
-      // Enumerate methods of every class.
-      objc_class *Class = Classes[I];
-      // TODO: Also iterate through (non-base) `methods` if class is realized.
-      method_list_t *Methods = Class->isRealized()
-                                   ? Class->data()->ro->baseMethodList
-                                   : Class->info->baseMethodList;
-      for (size_t J = 0; J != Methods->count; ++J) {
-        method_t &Method = Methods->methods[J];
-        if (Method.imp == Addr) {
-          // We have found metadata of the callback method. Now, for simple
-          // methods, it's actually quite simple to translate i386 -> ARM calls
-          // dynamically, so that's what we do here.
-          // TODO: Generate wrappers for callbacks, too (see README of
-          // `HeadersAnalyzer` for more details).
+    if (const char *T = Dylib->getMethodType(AddrVal)) {
+      // We have found metadata of the callback method. Now, for simple
+      // methods, it's actually quite simple to translate i386 -> ARM calls
+      // dynamically, so that's what we do here.
+      // TODO: Generate wrappers for callbacks, too (see README of
+      // `HeadersAnalyzer` for more details).
 
-          const char *T = Method.types;
+      // First, handle the return value.
+      bool Returns;
+      switch (*T) {
+      case 'v': // void
+        Returns = false;
+        break;
+      case 'c': // char
+      case '@': // id
+        Returns = true;
+        break;
+      default:
+        error("unsupported return value of callback");
+        return nullptr;
+      }
 
-          // First, handle the return value.
-          bool Returns;
-          switch (*T) {
-          case 'v': // void
-            Returns = false;
-            break;
-          case 'c': // char
-          case '@': // id
-            Returns = true;
-            break;
-          default:
-            error("unsupported return value of callback");
+      // First variadic argument is actually return address on top of the
+      // stack. Just skip that.
+      va_arg(Args, uint32_t);
+
+      // Next, process function arguments.
+      int regid = UC_ARM_REG_R0;
+      while (*(++T)) {
+        // Skip digits.
+        for (; '0' <= *T && *T <= '9'; ++T)
+          ;
+        if (!*T)
+          break;
+
+        switch (*T) {
+        case '@':   // id
+        case ':': { // SEL
+          uint32_t I32 = va_arg(Args, uint32_t);
+          if (regid > UC_ARM_REG_R3) {
+            error("callback has too much arguments");
             return nullptr;
           }
-
-          // First variadic argument is actually return address on top of the
-          // stack. Just skip that.
-          va_arg(Args, uint32_t);
-
-          // Next, process function arguments.
-          int regid = UC_ARM_REG_R0;
-          while (*(++T)) {
-            // Skip digits.
-            for (; '0' <= *T && *T <= '9'; ++T)
-              ;
-            if (!*T)
-              break;
-
-            switch (*T) {
-            case '@':   // id
-            case ':': { // SEL
-              uint32_t I32 = va_arg(Args, uint32_t);
-              if (regid > UC_ARM_REG_R3) {
-                error("callback has too much arguments");
-                return nullptr;
-              }
-              callUC(uc_reg_write(UC, regid++, &I32));
-              break;
-            }
-            default:
-              error("unsupported callback argument type");
-              return nullptr;
-            }
-          }
-
-          // Finally, call the function.
-          execute(AddrVal);
-
-          // Since we already called the function, return a no-op.
-          if (Returns)
-            return reinterpret_cast<void *>(returningWrapper);
-          return reinterpret_cast<void *>(noop);
+          callUC(uc_reg_write(UC, regid++, &I32));
+          break;
+        }
+        default:
+          error("unsupported callback argument type");
+          return nullptr;
         }
       }
+
+      // Finally, call the function.
+      execute(AddrVal);
+
+      // Since we already called the function, return a no-op.
+      if (Returns)
+        return reinterpret_cast<void *>(returningWrapper);
+      return reinterpret_cast<void *>(noop);
     }
 
     error("callback not found");
