@@ -1,0 +1,10 @@
+[ver:1,total:1680]
+docs/llvm.md:750,1552334400:150,1552338000:600,r
+.gitmodules:180,1552338000:180,m
+src/IpaSimulator/IpaSimApp/App.cpp:180,1552320000:180,r
+docs/issues/26.md:150,1552327200:150,r
+docs/issues/25.md:140,1552334400:140,r
+src/HeadersAnalyzer/ClangHelper.cpp:140,1552334400:140,r
+src/HeadersAnalyzer/LLVMHelper.cpp:100,1552334400:100,r
+.vscode/c_cpp_properties.json:20,1552334400:20,d
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:20,1552334400:20,r
