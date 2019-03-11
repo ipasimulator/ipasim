@@ -943,26 +943,62 @@ struct objc_class {
   bool isRealized() { return data()->flags & RW_REALIZED; }
 };
 
+struct category_t {
+  const char *name;
+  objc_class *cls;
+  method_list_t *instanceMethods;
+  method_list_t *classMethods;
+
+  /*
+  struct protocol_list_t *protocols;
+  struct property_list_t *instanceProperties;
+  // Fields below this point are not always present on disk.
+  struct property_list_t *_classProperties;
+  */
+};
+
+static const char *findMethod(method_list_t *Methods, uint64_t Addr) {
+  if (!Methods)
+    return nullptr;
+  for (size_t J = 0; J != Methods->count; ++J) {
+    method_t &Method = Methods->methods[J];
+    if (reinterpret_cast<uint64_t>(Method.imp) == Addr)
+      return Method.types;
+  }
+  return nullptr;
+}
 const char *LoadedLibrary::getMethodType(uint64_t Addr) {
   // Enumerate classes in the image.
   uint64_t SecSize;
   uint64_t SecAddr = getSection("__objc_classlist", &SecSize);
-  if (!SecAddr)
-    return nullptr;
-  auto *Classes = reinterpret_cast<objc_class **>(SecAddr);
-  for (size_t I = 0, Count = SecSize / sizeof(void *); I != Count; ++I) {
-    // Enumerate methods of every class.
-    objc_class *Class = Classes[I];
-    // TODO: Also iterate through (non-base) `methods` if class is realized.
-    if (method_list_t *Methods = Class->isRealized()
-                                     ? Class->data()->ro->baseMethodList
-                                     : Class->info->baseMethodList)
-      for (size_t J = 0; J != Methods->count; ++J) {
-        method_t &Method = Methods->methods[J];
-        if (reinterpret_cast<uint64_t>(Method.imp) == Addr)
-          return Method.types;
-      }
+  if (SecAddr) {
+    auto *Classes = reinterpret_cast<objc_class **>(SecAddr);
+    for (size_t I = 0, Count = SecSize / sizeof(void *); I != Count; ++I) {
+      // Enumerate methods of every class.
+      objc_class *Class = Classes[I];
+      // TODO: Also iterate through (non-base) `methods` if class is realized.
+      if (const char *T =
+              findMethod(Class->isRealized() ? Class->data()->ro->baseMethodList
+                                             : Class->info->baseMethodList,
+                         Addr))
+        return T;
+    }
   }
+
+  // Try also categories.
+  SecAddr = getSection("__objc_catlist", &SecSize);
+  if (SecAddr) {
+    auto *Categories = reinterpret_cast<category_t **>(SecAddr);
+    for (size_t I = 0, Count = SecSize / sizeof(void *); I != Count; ++I) {
+      // Enumerate methods of every category.
+      category_t *Category = Categories[I];
+      if (const char *T = findMethod(Category->classMethods, Addr))
+        return T;
+      if (const char *T = findMethod(Category->instanceMethods, Addr))
+        return T;
+    }
+  }
+
   return nullptr;
 }
 
