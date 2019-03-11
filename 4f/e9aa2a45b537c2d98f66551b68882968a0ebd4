@@ -1,0 +1,4 @@
+[ver:1,total:420]
+src/IpaSimulator/IpaSimulator.cpp:370,1552291200:370,m
+src/IpaSimulator/IpaSimulator.hpp:30,1552291200:30,r
+cmake/lief-x86-Debug/include/LIEF/MachO/Structures.hpp:20,1552291200:20,r
