@@ -65,12 +65,10 @@ public:
     reportStatus("discovering TBDs");
 
     TBDHandler TH(HAC);
-    if constexpr (Sample) {
-      TH.handleFile("./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/"
-                    "Frameworks/UIKit.framework/UIKit.tbd");
-      TH.handleFile("./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/"
-                    "Frameworks/Foundation.framework/Foundation.tbd");
-    } else {
+    if constexpr (Sample)
+      TH.handleFile(
+          "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/libobjc.A.tbd");
+    else {
       vector<string> Dirs{
           "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
           "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/TextInput/"};
@@ -102,18 +100,19 @@ public:
 
     // Note that groups must be added just once and together because references
     // to them are invalidated after that.
-    HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/Frameworks/"});
+    HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/"});
     if constexpr (!Sample) {
-      HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/"});
+      HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/Frameworks/"});
       HAC.DLLGroups.push_back(
           {"./deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/"});
       HAC.DLLGroups.push_back({"./lib/crt/"});
     }
     size_t I = 0;
 
-    if constexpr (Sample)
-      HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("UIKit.dll"));
-    else {
+    // Our Objective-C runtime
+    HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("libobjc.dll"));
+
+    if constexpr (!Sample) {
       // WinObjC DLLs (i.e., Windows versions of Apple's frameworks)
       DLLGroup &FxGroup = HAC.DLLGroups[I++];
       for (auto &File : directory_iterator(FxGroup.Dir)) {
@@ -126,9 +125,6 @@ public:
             FxGroup.DLLs.push_back(DLLEntry(DLLPath.filename().string()));
         }
       }
-
-      // Our Objective-C runtime
-      HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("libobjc.dll"));
 
       // Prebuilt `libdispatch.dll`
       HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("libdispatch.dll"));
@@ -258,15 +254,12 @@ public:
             // `SEL`, both actually `void *`). If it's a `stret` messenger, it
             // has one more parameter at the front (a `void *` for struct
             // return).
-            Exp->Stret = !Exp->Name.compare(
-                Exp->Name.size() - HAContext::StretLength,
-                HAContext::StretLength, HAContext::StretPostfix);
+            Exp->Stret = endsWith(Exp->Name, HAContext::StretPostfix);
           };
 
           // Find Objective-C messengers. Note that they used to be variadic,
           // but that's deprecated and so we cannot rely on that.
-          if (!Exp->Name.compare(0, HAContext::MsgSendLength,
-                                 HAContext::MsgSendPrefix)) {
+          if (startsWith(Exp->Name, HAContext::MsgSendPrefix)) {
             Exp->Messenger = true;
             IsStretSetter();
 
@@ -278,8 +271,7 @@ public:
           // are declared as `void -> void`, but we need them to have the few
           // first arguments they base their lookup on, so that we transfer them
           // correctly.
-          if (!Exp->Name.compare(0, HAContext::MsgLookupLength,
-                                 HAContext::MsgLookupPrefix)) {
+          if (startsWith(Exp->Name, HAContext::MsgLookupPrefix)) {
             IsStretSetter();
             Exp->Type = LookupTy;
 
@@ -570,8 +562,8 @@ public:
           FunctionGuard MessengerGuard(IR, MessengerFunc);
 
           // Construct name of the corresponding lookup function.
-          Twine LookupName(Twine(HAContext::MsgLookupPrefix) +
-                           (Exp.Name.c_str() + HAContext::MsgSendLength));
+          Twine LookupName(Twine(HAContext::MsgLookupPrefix.S) +
+                           (Exp.Name.c_str() + HAContext::MsgSendPrefix.Len));
 
           // If the corresponding lookup function doesn't exist, don't call it
           // (so that we don't have unresolved references in the resulting
@@ -779,6 +771,8 @@ private:
     // Compile to LLVM IR.
     Clang.executeCodeGenAction<EmitLLVMOnlyAction>();
   }
+  // TODO: Cannot it happen that RVAs from multiple DLLs wrapped by the same
+  // Dylib will collide?
   void createAlias(const ExportEntry &Exp, llvm::Function *Func) {
     llvm::StringRef RVAStr = LLVM.Saver.save(to_string(Exp.RVA));
     llvm::GlobalAlias::create(Twine("\01$__ipaSim_wraps_") + RVAStr, Func);

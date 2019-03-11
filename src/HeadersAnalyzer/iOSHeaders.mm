@@ -7,7 +7,9 @@
 #include <objc/message.h>
 #include <objc/objc.h>
 #include <objc/runtime.h>
+#endif
 #include <objc-abi.h>
+#if !defined(IPASIM_CG_SAMPLE)
 #include <objc-internal.h>
 #include <Accelerate/Accelerate.h>
 #include <Accounts/Accounts.h>
@@ -75,8 +77,12 @@
 #include <StoreKit/StoreKit.h>
 #include <SystemConfiguration/SystemConfiguration.h>
 #include <Twitter/Twitter.h>
-#endif
 #include <UIKit/UIKit.h>
-#if !defined(IPASIM_CG_SAMPLE)
 #include <WebKit/WebKit.h>
 #endif
+
+// These don't have C declarations anywhere, since they're only used in
+// assembly, but we want to have wrappers generated for them, too.
+OBJC_EXPORT void _objc_msgNil(void /* id self, SEL op, ... */);
+OBJC_EXPORT void _objc_msgNil_stret(void /* id self, SEL op, ... */);
+OBJC_EXPORT void _objc_msgNil_fpret(void /* id self, SEL op, ... */);

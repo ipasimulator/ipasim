@@ -130,12 +130,10 @@ public:
   ClassExportList iOSClasses;
   GroupList DLLGroups;
 
-  static constexpr const char *MsgSendPrefix = "_objc_msgSend";
-  static constexpr size_t MsgSendLength = length(MsgSendPrefix);
-  static constexpr const char *StretPostfix = "_stret";
-  static constexpr size_t StretLength = length(StretPostfix);
-  static constexpr const char *MsgLookupPrefix = "_objc_msgLookup";
-  static constexpr size_t MsgLookupLength = length(MsgLookupPrefix);
+  static constexpr ConstexprString MsgSendPrefix = "_objc_msgSend";
+  static constexpr ConstexprString StretPostfix = "_stret";
+  static constexpr ConstexprString MsgLookupPrefix = "_objc_msgLookup";
+  static constexpr ConstexprString MsgNilPrefix = "__objc_msgNil";
 
   bool isClassMethod(const std::string &Name);
   // This is an inverse of `CGObjCCommonMac::GetNameForMethod`.

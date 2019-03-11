@@ -20,6 +20,24 @@ std::filesystem::path createOutputDir(const char *Path);
 // Strings.
 // `constexpr` `strlen`. Usage: `constexpr size_t len = length(ConstExprVar);`.
 size_t constexpr length(const char *S) { return *S ? 1 + length(S + 1) : 0; }
+struct ConstexprString {
+  constexpr ConstexprString(const char *S) : S(S), Len(length(S)) {}
+
+  const char *S;
+  size_t Len;
+};
+inline bool startsWith(const std::string &S, const std::string &Prefix) {
+  return !S.compare(0, Prefix.length(), Prefix);
+}
+inline bool startsWith(const std::string &S, ConstexprString Prefix) {
+  return !S.compare(0, Prefix.Len, Prefix.S);
+}
+inline bool endsWith(const std::string &S, const std::string &Suffix) {
+  return !S.compare(S.length() - Suffix.length(), Suffix.length(), Suffix);
+}
+inline bool endsWith(const std::string &S, ConstexprString Suffix) {
+  return !S.compare(S.length() - Suffix.Len, Suffix.Len, Suffix.S);
+}
 
 // Iterators.
 

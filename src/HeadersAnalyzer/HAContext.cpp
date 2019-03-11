@@ -65,6 +65,12 @@ bool HAContext::isInteresting(const string &Name, ExportPtr &Exp) {
         Exp->Dylib = Class->Dylibs.front();
       std::for_each(Class->Dylibs.begin(), Class->Dylibs.end(),
                     [&Exp](auto &Dylib) { Dylib->Exports.push_back(Exp); });
+    }
+    // Also, we are interested in `msgNil` family of functions.
+    else if (startsWith(Name, MsgNilPrefix)) {
+      Exp = iOSExps.insert(ExportEntry(Name)).first;
+      Exp->Dylib = iOSLibs.find(Dylib("/usr/lib/libobjc.A.dylib"));
+      Exp->Dylib->Exports.push_back(Exp);
     } else {
       warnUninteresting<LibType::Dylib>(Name);
       return false;
