@@ -1,0 +1,6 @@
+[ver:1,total:3360]
+src/IpaSimulator/IpaSimulator.cpp:2280,1552309200:990,1552312800:1020,1552316400:270,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:480,1552309200:150,1552312800:330,r
+Dockerfile:330,1552312800:330,r
+src/IpaSimulator/IpaSimApp/App.cpp:210,1552316400:210,r
+lib/unicorn/include/unicorn/unicorn.h:60,1552309200:60,r
