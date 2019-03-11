@@ -17,15 +17,15 @@
 [submodule "deps/llvm"]
 	path = deps/llvm
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/llvm
-	branch = port
+	branch = port_70
 [submodule "deps/clang"]
 	path = deps/clang
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/clang
-	branch = port
+	branch = port_70
 [submodule "deps/lld"]
 	path = deps/lld
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/lld
-	branch = port
+	branch = port_70
 [submodule "deps/LIEF"]
 	path = deps/LIEF
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/LIEF
@@ -37,4 +37,4 @@
 [submodule "deps/lldb"]
 	path = deps/lldb
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/lldb
-	branch = port
+	branch = port_70
