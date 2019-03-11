@@ -1,0 +1,6 @@
+[ver:1,total:3300]
+src/IpaSimulator/IpaSimulator.cpp:3184,1552291200:1150,1552294800:2034,m
+src/dyld/dyld.cpp:56,1552291200:20,1552294800:36,r
+src/HeadersAnalyzer/HAContext.cpp:30,1552294800:30,r
+cmake/lief-x86-Debug/include/LIEF/MachO/Structures.hpp:15,1552291200:15,r
+src/IpaSimulator/IpaSimulator.hpp:15,1552291200:15,r
