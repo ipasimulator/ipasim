@@ -99,26 +99,42 @@ uint64_t LoadedDll::getSection(const std::string &Name, uint64_t *Size) {
     return 0;
 
   // Enumerate segments.
-  auto Header = reinterpret_cast<const mach_header *>(Ptr);
+  uint64_t Slide, Addr;
+  bool HasSlide = false, HasAddr = false;
+  auto Header = reinterpret_cast<const mach_header *>(StartAddress);
   auto Cmd = reinterpret_cast<const load_command *>(Header + 1);
   for (size_t I = 0; I != Header->ncmds; ++I) {
     if (Cmd->cmd == (uint32_t)LOAD_COMMAND_TYPES::LC_SEGMENT) {
       auto Seg = reinterpret_cast<const segment_command_32 *>(Cmd);
 
-      // Enumerate segment's sections.
-      auto Sect = reinterpret_cast<const section_32 *>(
-          bytes(Cmd) + sizeof(segment_command_32));
-      for (size_t J = 0; J != Seg->nsects; ++J) {
-        if (Sect->sectname == Name) {
-          // We have found it.
-          if (Size)
-            *Size = Sect->size;
-          return Sect->addr + StartAddress;
-        }
+      // Look for segment `__TEXT` to compute slide.
+      if (!HasSlide && !strncmp(Seg->segname, "__TEXT", 16)) {
+        Slide = StartAddress - Seg->vmaddr;
+        HasSlide = true;
+        if (HasAddr)
+          break;
+      }
 
-        // Move to the next `section`.
-        Sect = reinterpret_cast<const section_32 *>(bytes(Sect) +
-                                                    sizeof(section_32));
+      // Enumerate segment's sections.
+      if (!HasAddr) {
+        auto Sect = reinterpret_cast<const section_32 *>(
+            bytes(Cmd) + sizeof(segment_command_32));
+        for (size_t J = 0; J != Seg->nsects; ++J) {
+          // Note that `Sect->sectname` is not necessarily null-terminated!
+          if (!strncmp(Sect->sectname, Name.c_str(), 16)) {
+            // We have found it.
+            if (Size)
+              *Size = Sect->size;
+            Addr = Sect->addr;
+            HasAddr = true;
+            if (HasSlide)
+              break;
+          }
+
+          // Move to the next `section`.
+          Sect = reinterpret_cast<const section_32 *>(bytes(Sect) +
+                                                      sizeof(section_32));
+        }
       }
     }
 
@@ -126,7 +142,8 @@ uint64_t LoadedDll::getSection(const std::string &Name, uint64_t *Size) {
     Cmd = reinterpret_cast<const load_command *>(bytes(Cmd) + Cmd->cmdsize);
   }
 
-  // We haven't found it.
+  if (HasSlide && HasAddr)
+    return Addr + Slide;
   return 0;
 }
 
@@ -541,6 +558,16 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
     // Find Dylib with the corresponding wrapper.
     auto Entry = Idx->Map.find(RVA);
     if (Entry == Idx->Map.end()) {
+      // If there's no corresponding wrapper, maybe this is a simple Objective-C
+      // method and we can translate it dynamically.
+      if (const char *T = AI.Lib->getMethodType(Addr)) {
+        OutputDebugStringA("Info: dynamically handling method of type ");
+        OutputDebugStringA(T);
+        OutputDebugStringA(".\n");
+
+        // TODO: Translate.
+      }
+
       error("cannot find RVA 0x" + to_hex_string(RVA) + " in WrapperIndex of " +
             WrapperPath.string());
       return false;
@@ -605,7 +632,7 @@ void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
   AddrInfo AI(inspect(Addr));
   if (!AI.Lib) {
     // Handle return to kernel.
-    // TODO: This shouldn't happen since kernel is unexecutable but it does.
+    // TODO: This shouldn't happen since kernel is non-executable but it does.
     // It's the same bug as described below.
     if (Addr == KernelAddr) {
       callUC(uc_emu_stop(UC));
@@ -827,14 +854,14 @@ const char *LoadedLibrary::getMethodType(uint64_t Addr) {
     // Enumerate methods of every class.
     objc_class *Class = Classes[I];
     // TODO: Also iterate through (non-base) `methods` if class is realized.
-    method_list_t *Methods = Class->isRealized()
-                                 ? Class->data()->ro->baseMethodList
-                                 : Class->info->baseMethodList;
-    for (size_t J = 0; J != Methods->count; ++J) {
-      method_t &Method = Methods->methods[J];
-      if (reinterpret_cast<uint64_t>(Method.imp) == Addr)
-        return Method.types;
-    }
+    if (method_list_t *Methods = Class->isRealized()
+                                     ? Class->data()->ro->baseMethodList
+                                     : Class->info->baseMethodList)
+      for (size_t J = 0; J != Methods->count; ++J) {
+        method_t &Method = Methods->methods[J];
+        if (reinterpret_cast<uint64_t>(Method.imp) == Addr)
+          return Method.types;
+      }
   }
   return nullptr;
 }
