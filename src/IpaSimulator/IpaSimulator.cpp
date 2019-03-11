@@ -993,6 +993,7 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
       case 'c': // char
       case '@': // id
       case 'i': // int
+      case 'f': // float
         Returns = true;
         break;
       default:
