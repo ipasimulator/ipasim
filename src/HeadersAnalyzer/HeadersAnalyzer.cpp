@@ -609,6 +609,25 @@ public:
           continue;
         }
 
+        // TODO: For some reason, order matters here a lot. Other orderings can
+        // even generate wrong machine code.
+
+        // Reserve space for arguments.
+        vector<llvm::Value *> APs;
+        vector<string> ArgNos;
+        APs.reserve(Func->arg_size());
+        ArgNos.reserve(Func->arg_size());
+        for (llvm::Argument &Arg : Func->args()) {
+          string ArgNo = to_string(Arg.getArgNo());
+          ArgNos.push_back(ArgNo);
+          APs.push_back(
+              IR.Builder.CreateAlloca(Arg.getType(), nullptr, "ap" + ArgNo));
+        }
+
+        // Load arguments.
+        for (auto [I, Arg] : withIndices(Func->args()))
+          IR.Builder.CreateStore(&Arg, APs[I]);
+
         auto [Struct, Union] = IR.createParamStruct(Exp);
 
         // Allocate the union.
@@ -619,20 +638,13 @@ public:
             IR.Builder.CreateBitCast(S, Struct->getPointerTo(), "sp");
 
         // Process arguments.
-        for (llvm::Argument &Arg : Func->args()) {
-          string ArgNo = to_string(Arg.getArgNo());
-
-          // Load the argument.
-          llvm::Value *AP =
-              IR.Builder.CreateAlloca(Arg.getType(), nullptr, "ap" + ArgNo);
-          IR.Builder.CreateStore(&Arg, AP);
-
+        for (auto [I, Arg] : withIndices(Func->args())) {
           // Get pointer to the corresponding structure's element.
           llvm::Value *EP = IR.Builder.CreateStructGEP(
-              Struct, SP, Arg.getArgNo(), "ep" + ArgNo);
+              Struct, SP, Arg.getArgNo(), "ep" + ArgNos[I]);
 
           // Store argument address in it.
-          IR.Builder.CreateStore(AP, EP);
+          IR.Builder.CreateStore(APs[I], EP);
         }
 
         // Call the DLL wrapper function.
