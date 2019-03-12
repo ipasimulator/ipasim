@@ -3,10 +3,10 @@
 <plist version="1.0">
 <dict>
 	<key>application-identifier</key>
-	<string>cz.jjonescz.apps.Calculator</string>
+	<string>24T862NSQ6.cz.jjonescz.apps.ToDo</string>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>cz.jjonescz.apps.Calculator</string>
+		<string>24T862NSQ6.cz.jjonescz.apps.ToDo</string>
 	</array>
 </dict>
 </plist>
