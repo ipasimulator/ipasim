@@ -4,33 +4,9 @@
 <dict>
 	<key>files</key>
 	<dict>
-		<key>Base.lproj/LaunchScreen.storyboardc/01J-lp-oVM-view-Ze5-6b-2t3.nib</key>
-		<data>
-		vRa3TYwH43CR0yUi1RMiPEtQ4mQ=
-		</data>
-		<key>Base.lproj/LaunchScreen.storyboardc/Info.plist</key>
-		<data>
-		n2t8gsDpfE6XkhG31p7IQJRxTxU=
-		</data>
-		<key>Base.lproj/LaunchScreen.storyboardc/UIViewController-01J-lp-oVM.nib</key>
-		<data>
-		RYr13rkjgqGOULVT+bgy1LHy++c=
-		</data>
-		<key>Base.lproj/Main.storyboardc/Info.plist</key>
-		<data>
-		RYeIFlPDaD272QyPhyD98/oHhpU=
-		</data>
-		<key>Base.lproj/Main.storyboardc/UINavigationController-IxG-qz-oaA.nib</key>
-		<data>
-		l++pQfnnYmHX5pLGq7kvqbpgIsQ=
-		</data>
-		<key>Base.lproj/Main.storyboardc/ddi-JT-roz-view-ry9-AI-iRy.nib</key>
-		<data>
-		CtqMxl+Pv1W/FM7szz3AOk/LO50=
-		</data>
 		<key>Info.plist</key>
 		<data>
-		2rHmvsaZd3JqJkjo8WNhetcnGx0=
+		R/pLpDV6/CzRm2KfWn4tuUnCA/w=
 		</data>
 		<key>PkgInfo</key>
 		<data>
@@ -38,86 +14,20 @@
 		</data>
 		<key>archived-expanded-entitlements.xcent</key>
 		<data>
-		vvbnAIqQkT08QP6sM8A1RAmZraw=
+		fsfXOCkhsd+hk5azKhTkfwsia8I=
 		</data>
 	</dict>
 	<key>files2</key>
 	<dict>
-		<key>Base.lproj/LaunchScreen.storyboardc/01J-lp-oVM-view-Ze5-6b-2t3.nib</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			vRa3TYwH43CR0yUi1RMiPEtQ4mQ=
-			</data>
-			<key>hash2</key>
-			<data>
-			+NOB6x+Nud0ODHDnfpnZvAnmnugpi5QnzWxJxTi0aRI=
-			</data>
-		</dict>
-		<key>Base.lproj/LaunchScreen.storyboardc/Info.plist</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			n2t8gsDpfE6XkhG31p7IQJRxTxU=
-			</data>
-			<key>hash2</key>
-			<data>
-			HyVdXMU7Ux4/KalAao30mpWOK/lEPT4gvYN09wf31cg=
-			</data>
-		</dict>
-		<key>Base.lproj/LaunchScreen.storyboardc/UIViewController-01J-lp-oVM.nib</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			RYr13rkjgqGOULVT+bgy1LHy++c=
-			</data>
-			<key>hash2</key>
-			<data>
-			flzhqMwdoaCt7S0TBNaKKKzZ+CeoutIJ4mVbo7m7bl8=
-			</data>
-		</dict>
-		<key>Base.lproj/Main.storyboardc/Info.plist</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			RYeIFlPDaD272QyPhyD98/oHhpU=
-			</data>
-			<key>hash2</key>
-			<data>
-			oLzaIkcON8fAV1M9rG0eZ8GQWMhVlepV34r/XujV1vA=
-			</data>
-		</dict>
-		<key>Base.lproj/Main.storyboardc/UINavigationController-IxG-qz-oaA.nib</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			l++pQfnnYmHX5pLGq7kvqbpgIsQ=
-			</data>
-			<key>hash2</key>
-			<data>
-			26GhuRjXUYI4zGocgvY1g43T+Bgmuk9gptRMnTYlPQI=
-			</data>
-		</dict>
-		<key>Base.lproj/Main.storyboardc/ddi-JT-roz-view-ry9-AI-iRy.nib</key>
-		<dict>
-			<key>hash</key>
-			<data>
-			CtqMxl+Pv1W/FM7szz3AOk/LO50=
-			</data>
-			<key>hash2</key>
-			<data>
-			2Pi/rBi5hg98FHRBpo5yAco1r5TjDCR7umC95x2/h+w=
-			</data>
-		</dict>
 		<key>archived-expanded-entitlements.xcent</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			vvbnAIqQkT08QP6sM8A1RAmZraw=
+			fsfXOCkhsd+hk5azKhTkfwsia8I=
 			</data>
 			<key>hash2</key>
 			<data>
-			KPljk3EXSsHf6Mt9k/EdtghS7LVPNgHGahtK3jFIpUA=
+			eysTvv4pycl9A5J52mnASYb26QoHtI2CqKNRmGsEKC4=
 			</data>
 		</dict>
 	</dict>

@@ -3,10 +3,10 @@
 <plist version="1.0">
 <dict>
 	<key>application-identifier</key>
-	<string>24T862NSQ6.cz.jjonescz.apps.ToDo</string>
+	<string>MSFT.HelloUI</string>
 	<key>keychain-access-groups</key>
 	<array>
-		<string>24T862NSQ6.cz.jjonescz.apps.ToDo</string>
+		<string>MSFT.HelloUI</string>
 	</array>
 </dict>
 </plist>
