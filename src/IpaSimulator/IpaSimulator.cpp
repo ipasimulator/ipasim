@@ -1111,6 +1111,27 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
   return Addr;
 }
 
+void DynamicLoader::callLoad(void *load, void *self, void *sel) {
+  uint64_t Addr = reinterpret_cast<uint64_t>(load);
+  AddrInfo AI(lookup(Addr));
+  if (!dynamic_cast<LoadedDylib *>(AI.Lib)) {
+    // Target load method is not inside any emulated Dylib, so it must be native
+    // executable code and we can simply call it.
+    reinterpret_cast<void (*)(void *, void *)>(load)(self, sel);
+  } else {
+    // Target load method is inside some emulated library.
+
+    // Pass arguments.
+    uint32_t I32 = reinterpret_cast<uint32_t>(self);
+    callUC(uc_reg_write(UC, UC_ARM_REG_R0, &I32));
+    I32 = reinterpret_cast<uint32_t>(sel);
+    callUC(uc_reg_write(UC, UC_ARM_REG_R1, &I32));
+
+    // And call it.
+    execute(Addr);
+  }
+}
+
 extern "C" __declspec(dllexport) void *ipaSim_translate(void *Addr...) {
   va_list Args;
   va_start(Args, Addr);
@@ -1127,4 +1148,8 @@ extern "C" __declspec(dllexport) void ipaSim_translate4(uint32_t *Addr...) {
 }
 extern "C" __declspec(dllexport) const char *ipaSim_processPath() {
   return IpaSim.MainBinary.c_str();
+}
+extern "C" __declspec(dllexport) void ipaSim_callLoad(void *load, void *self,
+                                                      void *sel) {
+  IpaSim.Dyld.callLoad(load, self, sel);
 }

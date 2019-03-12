@@ -66,6 +66,7 @@ public:
   void execute(LoadedLibrary *Lib);
   void *translate(void *Addr, va_list Args);
   void *getRetVal();
+  void callLoad(void *load, void *self, void *sel);
 
 private:
   void error(const std::string &Msg, bool AppendLastError = false);
