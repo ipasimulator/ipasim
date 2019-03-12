@@ -1,0 +1,10 @@
+[ver:1,total:240]
+src/IpaSimulator/IpaSimulator.cpp:120,1552399200:120,r
+src/IpaSimulator/IpaSimApp/sample/_CodeSignature/CodeResources:60,1552399200:60,m
+src/IpaSimulator/IpaSimApp/sample/Base.lproj/Main.storyboardc/ddi-JT-roz-view-ry9-AI-iRy.nib:12,1552399200:12,m
+src/IpaSimulator/IpaSimApp/sample/ToDo:8,1552399200:8,m
+.gitattributes:8,1552399200:8,m
+src/IpaSimulator/IpaSimApp/sample/Base.lproj/LaunchScreen.storyboardc/01J-lp-oVM-view-Ze5-6b-2t3.nib:8,1552399200:8,m
+src/IpaSimulator/IpaSimApp/sample/Base.lproj/LaunchScreen.storyboardc/UIViewController-01J-lp-oVM.nib:8,1552399200:8,m
+src/IpaSimulator/IpaSimApp/sample/Base.lproj/Main.storyboardc/UINavigationController-IxG-qz-oaA.nib:8,1552399200:8,m
+src/IpaSimulator/IpaSimApp/sample/archived-expanded-entitlements.xcent:8,1552399200:8,m
