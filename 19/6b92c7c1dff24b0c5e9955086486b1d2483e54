@@ -1,0 +1,8 @@
+[ver:1,total:3360]
+src/IpaSimulator/IpaSimulator.cpp:1275,1552388400:300,1552392000:975,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:866,1552392000:866,m
+cmake/ipasim-x86-Debug/cg/89.o.ll:529,1552388400:60,1552392000:469,r
+src/HeadersAnalyzer/LLDHelper.cpp:360,1552384800:180,1552388400:180,r
+src/HeadersAnalyzer/LLVMHelper.cpp:180,1552388400:180,r
+src/HeadersAnalyzer/Config.hpp:120,1552392000:120,r
+cmake/ipasim-x86-Debug/cg/0.o.ll:30,1552392000:30,r
