@@ -1,0 +1,7 @@
+[ver:1,total:914]
+CMakeLists.txt:462,1552406400:330,1552410000:102,1552413600:30,r
+scripts/CommonVariables.cmake:252,1552406400:60,1552410000:162,1552413600:30,r
+docs/objc.md:140,1552406400:140,r
+src/HeadersAnalyzer/iOSHeaders.mm:20,1552406400:20,r
+docs/llvm.md:20,1552406400:20,r
+docs/english.md:20,1552406400:20,r
