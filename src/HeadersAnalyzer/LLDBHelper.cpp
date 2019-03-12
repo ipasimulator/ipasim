@@ -35,7 +35,9 @@ void LLDBHelper::load(const char *DLL, const char *PDB) {
   // since we work directly with `IPDBSession` which is a LLVM object that can
   // work without LLDB.
   ModuleSpec ModuleSpec(FileSpec(DLL, /* resolve_path */ true));
-  ModuleSpec.GetSymbolFileSpec().SetFile(PDB, /* resolve_path */ true);
+  ModuleSpec.GetSymbolFileSpec().SetFile(
+      PDB, /* resolve_path */ true,
+      ModuleSpec.GetSymbolFileSpec().GetPathStyle());
   Module = Debugger->GetSelectedOrDummyTarget()->GetSharedModule(ModuleSpec);
   Buffer.reset(new DataBufferHeap);
   Obj = std::make_unique<ObjectFileDummy>(Module, Buffer);

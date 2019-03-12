@@ -51,14 +51,16 @@ void LLDHelper::linkDylib(StringRef Output, StringRef ObjectFile,
 }
 void LLDHelper::executeArgs() {
   TerminationGuard TG(Args.terminate());
-  auto ArgsRef(Args.get());
-  int Argc = ArgsRef.size();
-  auto Argv = const_cast<const char **>(ArgsRef.data());
 
-  if (llvm::sys::ExecuteAndWait(ArgsRef[0], Argv)) {
+  // Convert `const char *`s to `StringRef`s.
+  llvm::SmallVector<StringRef, 256> ArgsRef;
+  for (const char *Arg : Args.get())
+    ArgsRef.push_back(Arg);
+
+  if (llvm::sys::ExecuteAndWait(ArgsRef[0], ArgsRef)) {
     string CmdLine;
-    for (const char *Arg : ArgsRef)
-      CmdLine = CmdLine + " " + Arg;
+    for (StringRef Arg : ArgsRef)
+      CmdLine = CmdLine + " " + Arg.str();
     reportError(Twine("failed to execute:") + CmdLine);
   }
 }
