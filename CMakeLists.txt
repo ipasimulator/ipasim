@@ -82,6 +82,7 @@ else (SUPERBUILD)
 
     option (USE_ORIG_CLANG "Use the original instead of our patched Clang. For \
 testing purposes only." OFF)
+    option (USE_DEBUG_CLANG "Use Debug version of our patched Clang." OFF)
 
     project (ipaSim LANGUAGES C CXX ASM)
 
@@ -91,8 +92,13 @@ testing purposes only." OFF)
     # Now, the compiler was tested, so we can change it to our
     # possibly-not-yet-existing patched Clang. See #2.
     if (NOT USE_ORIG_CLANG)
-        set (CLANG_EXE "${BUILT_CLANG_EXE}")
-        set (LLD_LINK_EXE "${BUILT_LLD_LINK_EXE}")
+        if (USE_DEBUG_CLANG)
+            set (CLANG_EXE "${BUILT_DEBUG_CLANG_EXE}")
+            set (LLD_LINK_EXE "${BUILT_DEBUG_LLD_LINK_EXE}")
+        else (USE_DEBUG_CLANG)
+            set (CLANG_EXE "${BUILT_CLANG_EXE}")
+            set (LLD_LINK_EXE "${BUILT_LLD_LINK_EXE}")
+        endif (USE_DEBUG_CLANG)
     endif (NOT USE_ORIG_CLANG)
     set (CMAKE_C_COMPILER "${CLANG_EXE}")
     set (CMAKE_CXX_COMPILER "${CLANG_EXE}")
