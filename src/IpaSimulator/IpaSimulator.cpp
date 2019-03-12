@@ -1029,6 +1029,21 @@ static const char *findMethod(method_list_t *Methods, uint64_t Addr) {
   }
   return nullptr;
 }
+static const char *findMethod(objc_class *Class, uint64_t Addr) {
+  // TODO: Isn't this first part redundant for realized classes?
+  if (const char *T =
+          findMethod(Class->isRealized() ? Class->data()->ro->baseMethodList
+                                         : Class->info->baseMethodList,
+                     Addr))
+    return T;
+  if (Class->isRealized())
+    for (auto *L = Class->data()->methods.beginLists(),
+              *End = Class->data()->methods.endLists();
+         L != End; ++L)
+      if (const char *T = findMethod(*L, Addr))
+        return T;
+  return nullptr;
+}
 const char *LoadedLibrary::getMethodType(uint64_t Addr) {
   // Enumerate classes in the image.
   uint64_t SecSize;
@@ -1036,19 +1051,13 @@ const char *LoadedLibrary::getMethodType(uint64_t Addr) {
   if (SecAddr) {
     auto *Classes = reinterpret_cast<objc_class **>(SecAddr);
     for (size_t I = 0, Count = SecSize / sizeof(void *); I != Count; ++I) {
-      // Enumerate methods of every class.
+      // Enumerate methods of every class and its meta-class.
       objc_class *Class = Classes[I];
-      if (const char *T =
-              findMethod(Class->isRealized() ? Class->data()->ro->baseMethodList
-                                             : Class->info->baseMethodList,
-                         Addr))
+      if (const char *T = findMethod(Class, Addr))
         return T;
-      if (Class->isRealized())
-        for (auto *L = Class->data()->methods.beginLists(),
-                  *End = Class->data()->methods.endLists();
-             L != End; ++L)
-          if (const char *T = findMethod(*L, Addr))
-            return T;
+      if (const char *T =
+              findMethod(reinterpret_cast<objc_class *>(Class->isa), Addr))
+        return T;
     }
   }
 
