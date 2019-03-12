@@ -371,7 +371,7 @@ set_source_files_properties (${srcs}
 add_custom_command (
     OUTPUT include/tapi/Driver/DiagnosticTAPIKinds.inc
     COMMAND "${CLANG_CMAKE_DIR}/bin/clang-tblgen.exe" "-o=${INC1}"
-        "-I=${SOURCE_DIR}/deps/clang/include" -gen-clang-diags-defs
+        -gen-clang-diags-defs
         "${SOURCE_DIR}/deps/tapi/include/tapi/Driver/DiagnosticTAPIKinds.td"
     DEPENDS "${CLANG_CMAKE_DIR}/bin/clang-tblgen.exe"
         "${SOURCE_DIR}/deps/tapi/include/tapi/Driver/DiagnosticTAPIKinds.td")
