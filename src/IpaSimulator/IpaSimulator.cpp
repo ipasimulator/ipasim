@@ -575,6 +575,7 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
         case 'c': // char
         case '@': // id
         case 'i': // int
+        case 'I': // unsigned int
           Returns = true;
           break;
         default:
@@ -597,7 +598,8 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
           switch (*T) {
           case '@':   // id
           case ':':   // SEL
-          case 'i': { // int
+          case 'i':   // int
+          case 'I': { // unsigned int
             if (RegId > UC_ARM_REG_R3) {
               error("function has too many arguments");
               return false;
@@ -864,7 +866,7 @@ extern "C" __declspec(dllexport) void start(
     const LaunchActivatedEventArgs &LaunchArgs) {
   // Load sample binary `ToDo`.
   filesystem::path Dir(Package::Current().InstalledLocation().Path().c_str());
-  IpaSim.MainBinary = (Dir / "sample" / "Calculator").string();
+  IpaSim.MainBinary = (Dir / "sample" / "ToDo").string();
   LoadedLibrary *App = IpaSim.Dyld.load(IpaSim.MainBinary);
 
   // Execute it.
@@ -1030,6 +1032,7 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
       case 'c': // char
       case '@': // id
       case 'i': // int
+      case 'I': // unsigned int
       case 'f': // float
         Returns = true;
         break;
@@ -1054,7 +1057,8 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
         switch (*T) {
         case '@':   // id
         case ':':   // SEL
-        case 'i': { // int
+        case 'i':   // int
+        case 'I': { // unsigned int
           uint32_t I32 = va_arg(Args, uint32_t);
           if (RegId > UC_ARM_REG_R3) {
             error("callback has too many arguments");
