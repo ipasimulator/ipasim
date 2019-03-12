@@ -1,0 +1,6 @@
+[ver:1,total:465]
+src/HeadersAnalyzer/LLVMHelper.cpp:240,1552395600:240,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:120,1552395600:120,r
+src/HeadersAnalyzer/Config.hpp:45,1552395600:45,r
+src/HeadersAnalyzer/LLVMHelper.hpp:30,1552395600:30,r
+src/HeadersAnalyzer/LLDHelper.cpp:30,1552395600:30,r
