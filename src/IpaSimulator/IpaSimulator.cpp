@@ -725,6 +725,25 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   callUC(uc_reg_read(UC, UC_ARM_REG_LR, &LR));
   callUC(uc_reg_write(UC, UC_ARM_REG_PC, &LR));
 
+  // Log details about the return.
+  if (LR == KernelAddr)
+    OutputDebugStringA("Info: returning to kernel.");
+  else {
+    AddrInfo AI(lookup(LR));
+    if (!AI.Lib) {
+      OutputDebugStringA("Info: returning to 0x");
+      OutputDebugStringA(to_hex_string(LR).c_str());
+      OutputDebugStringA(".\n");
+    } else {
+      OutputDebugStringA("Info: returning to ");
+      OutputDebugStringA(AI.LibPath->c_str());
+      OutputDebugStringA(" at 0x");
+      uint64_t RVA = LR - AI.Lib->StartAddress;
+      OutputDebugStringA(to_hex_string(RVA).c_str());
+      OutputDebugStringA(".\n");
+    }
+  }
+
   return true;
 }
 void DynamicLoader::catchCode(uc_engine *UC, uint64_t Addr, uint32_t Size,
@@ -767,6 +786,9 @@ void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
   OutputDebugStringA(to_hex_string(Reg).c_str());
   OutputDebugStringA(", R1 = 0x");
   callUC(uc_reg_read(UC, UC_ARM_REG_R1, &Reg));
+  OutputDebugStringA(to_hex_string(Reg).c_str());
+  OutputDebugStringA(", R7 = 0x");
+  callUC(uc_reg_read(UC, UC_ARM_REG_R7, &Reg));
   OutputDebugStringA(to_hex_string(Reg).c_str());
   OutputDebugStringA(", R12 = 0x");
   callUC(uc_reg_read(UC, UC_ARM_REG_R12, &Reg));
