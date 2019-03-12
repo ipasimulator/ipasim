@@ -1,0 +1,8 @@
+[ver:1,total:1380]
+src/HeadersAnalyzer/LLDHelper.cpp:370,1552384800:370,m
+src/HeadersAnalyzer/LLVMHelper.hpp:325,1552384800:325,r
+src/HeadersAnalyzer/LLVMHelper.cpp:305,1552384800:305,r
+src/HeadersAnalyzer/LLDBHelper.cpp:278,1552384800:278,m
+src/HeadersAnalyzer/CMakeLists.txt:60,1552384800:60,r
+src/HeadersAnalyzer/LLDHelper.hpp:27,1552384800:27,r
+docs/llvm.md:15,1552384800:15,r
