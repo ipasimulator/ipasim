@@ -937,14 +937,51 @@ struct class_ro_t {
   void *baseProperties;
 };
 
+template <typename Element, typename List> class list_array_tt {
+  struct array_t {
+    uint32_t count;
+    List *lists[0];
+  };
+
+private:
+  union {
+    List *list;
+    uintptr_t arrayAndFlag;
+  };
+
+  bool hasArray() const { return arrayAndFlag & 1; }
+  array_t *array() { return (array_t *)(arrayAndFlag & ~1); }
+
+public:
+  List **beginLists() {
+    if (hasArray()) {
+      return array()->lists;
+    } else {
+      return &list;
+    }
+  }
+
+  List **endLists() {
+    if (hasArray()) {
+      return array()->lists + array()->count;
+    } else if (list) {
+      return &list + 1;
+    } else {
+      return &list;
+    }
+  }
+};
+
+using method_array_t = list_array_tt<method_t, method_list_t>;
+
 struct class_rw_t {
   uint32_t flags;
   uint32_t version;
 
   const class_ro_t *ro;
 
-  /*
   method_array_t methods;
+  /*
   property_array_t properties;
   protocol_array_t protocols;
 
@@ -1001,12 +1038,17 @@ const char *LoadedLibrary::getMethodType(uint64_t Addr) {
     for (size_t I = 0, Count = SecSize / sizeof(void *); I != Count; ++I) {
       // Enumerate methods of every class.
       objc_class *Class = Classes[I];
-      // TODO: Also iterate through (non-base) `methods` if class is realized.
       if (const char *T =
               findMethod(Class->isRealized() ? Class->data()->ro->baseMethodList
                                              : Class->info->baseMethodList,
                          Addr))
         return T;
+      if (Class->isRealized())
+        for (auto *L = Class->data()->methods.beginLists(),
+                  *End = Class->data()->methods.endLists();
+             L != End; ++L)
+          if (const char *T = findMethod(*L, Addr))
+            return T;
     }
   }
 
