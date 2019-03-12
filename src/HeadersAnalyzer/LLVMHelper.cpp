@@ -200,6 +200,8 @@ void IRHelper::emitObj(StringRef Path) {
   Clang.Args.add("-o");
   Clang.Args.add(Path.data());
   // TODO: Use THUMB, but make sure it's emulated correctly.
-  Clang.Args.add("-mno-thumb");
+  if (TM->getTargetTriple().isARM())
+    Clang.Args.add("-mno-thumb");
+  Clang.Args.add("-Wno-override-module");
   Clang.executeArgs();
 }
