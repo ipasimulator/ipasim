@@ -363,22 +363,20 @@ public:
 
           FunctionGuard WrapperGuard(IR, Wrapper);
 
-          llvm::Value *UP;
+          llvm::StructType *Struct;
+          llvm::Value *SP;
           vector<llvm::Value *> Args;
           if (Exp.isTrivial()) {
-            // Trivial functions (`void -> void`) have no arguments, so no union
-            // pointer exists - we set it to `nullptr` to check that we don't
-            // use it anywhere in the following code.
-            UP = nullptr;
+            // Trivial functions (`void -> void`) have no arguments, so no
+            // struct pointer nor type exist - we set them to `nullptr` to check
+            // that we don't use them anywhere in the following code.
+            Struct = nullptr;
+            SP = nullptr;
           } else {
-            auto [Struct, Union] = IR.createParamStruct(Exp);
-
-            // The union pointer is in the first argument.
-            UP = Wrapper->args().begin();
-
-            // Get pointer to the structure inside the union.
-            llvm::Value *SP =
-                IR.Builder.CreateBitCast(UP, Struct->getPointerTo(), "sp");
+            // The struct pointer is the first argument.
+            Struct = IR.createParamStruct(Exp);
+            SP = IR.Builder.CreateBitCast(Wrapper->args().begin(),
+                                          Struct->getPointerTo(), "sp");
 
             // Process arguments.
             Args.reserve(Exp.Type->getNumParams());
@@ -425,8 +423,8 @@ public:
 
           if (R) {
             // Get pointer to the return value inside the union.
-            llvm::Value *RP = IR.Builder.CreateBitCast(
-                UP, Exp.Type->getReturnType()->getPointerTo(), "rp");
+            llvm::Value *RP = IR.Builder.CreateStructGEP(
+                Struct, SP, Exp.Type->getNumParams(), "rp");
 
             // Save return value back into the structure.
             IR.Builder.CreateStore(R, RP);
@@ -610,7 +608,8 @@ public:
         }
 
         // TODO: For some reason, order matters here a lot. Other orderings can
-        // even generate wrong machine code.
+        // even generate wrong machine code. Or does it? Maybe the bug was
+        // somewhere else...
 
         // Reserve space for arguments.
         vector<llvm::Value *> APs;
@@ -624,18 +623,13 @@ public:
               IR.Builder.CreateAlloca(Arg.getType(), nullptr, "ap" + ArgNo));
         }
 
+        // Allocate the struct.
+        llvm::StructType *Struct = IR.createParamStruct(Exp);
+        llvm::Value *SP = IR.Builder.CreateAlloca(Struct, nullptr, "sp");
+
         // Load arguments.
         for (auto [I, Arg] : withIndices(Func->args()))
           IR.Builder.CreateStore(&Arg, APs[I]);
-
-        auto [Struct, Union] = IR.createParamStruct(Exp);
-
-        // Allocate the union.
-        llvm::Value *S = IR.Builder.CreateAlloca(Union, nullptr, "s");
-
-        // Get pointer to the structure inside it.
-        llvm::Value *SP =
-            IR.Builder.CreateBitCast(S, Struct->getPointerTo(), "sp");
 
         // Process arguments.
         for (auto [I, Arg] : withIndices(Func->args())) {
@@ -656,9 +650,9 @@ public:
         llvm::Type *RetTy = Exp.Type->getReturnType();
         if (!RetTy->isVoidTy()) {
 
-          // Get pointer to the return value inside the union.
+          // Get pointer to the return value inside the struct.
           llvm::Value *RP =
-              IR.Builder.CreateBitCast(S, RetTy->getPointerTo(), "rp");
+              IR.Builder.CreateStructGEP(Struct, SP, Func->arg_size(), "rp");
 
           // Load and return it.
           llvm::Value *R = IR.Builder.CreateLoad(RP, "r");

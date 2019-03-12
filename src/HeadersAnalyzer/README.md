@@ -132,30 +132,26 @@ In C++ they would look roughly like this:
 ```cpp
 // The iOS (ARM) wrapper.
 int main(int argc, char **argv) {
-  union {
-    struct {
-      int *arg0;
-      char ***arg1;
-    } args;
+  struct {
+    int *arg0;
+    char ***arg1;
     int retval;
   } s;
-  s.args.arg0 = &argc;
-  s.args.arg1 = &argv;
+  s.arg0 = &argc;
+  s.arg1 = &argv;
   $__ipaSim_wrapper_main(&s);
   return s.retval;
 }
 
 // The DLL (i386) wrapper.
 void $__ipaSim_wrapper_main(void *args) {
-  union {
-    struct {
-      int *arg0;
-      char ***arg1;
-    } args;
+  struct {
+    int *arg0;
+    char ***arg1;
     int retval;
   } *argsp = (decltype(argsp))args;
   // Here we call the real native function.
-  argsp->retval = main(*argsp->args.arg0, *argsp->args.arg1);
+  argsp->retval = main(*argsp->arg0, *argsp->arg1);
 }
 ```
 
@@ -193,33 +189,29 @@ We generate wrappers similar to the following ones.
 ```cpp
 // The DLL (i386) wrapper.
 int main(int argc, char **argv) {
-  union {
-    struct {
-      void (*addr)(int, char **);
-      int *arg0;
-      char ***arg1;
-    } x;
+  struct {
+    void (*addr)(int, char **);
+    int *arg0;
+    char ***arg1;
     int retval;
   } s;
-  s.x.addr = ipaSim_getAddr(); // API of `IpaSimLibrary`
-  s.x.arg0 = &argc;
-  s.x.arg1 = &argv;
+  s.addr = ipaSim_getAddr(); // API of `IpaSimLibrary`
+  s.arg0 = &argc;
+  s.arg1 = &argv;
   $__ipaSim_cwrapper_main(&s);
   return s.retval;
 }
 
 // The iOS (ARM) wrapper.
 void $__ipaSim_cwrapper_main(void *args) {
-  union {
-    struct {
-      void (*addr)(int, char **);
-      int *arg0;
-      char ***arg1;
-    } x;
+  struct {
+    void (*addr)(int, char **);
+    int *arg0;
+    char ***arg1;
     int retval;
   } *argsp = (decltype(argsp))args;
   // Here we call the actual emulated callback function.
-  argsp->retval = argsp->addr(*argsp->x.arg0, *argsp->x.arg1);
+  argsp->retval = argsp->addr(*argsp->arg0, *argsp->arg1);
 }
 ```
 

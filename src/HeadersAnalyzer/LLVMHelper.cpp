@@ -127,41 +127,30 @@ void IRHelper::defineFunc(llvm::Function *Func) {
 // TODO: Store types with size less than pointer size directly in the structure
 // (instead of storing pointer to it as we are doing now). But make sure it'll
 // be aligned equally on both architectures.
-pair<StructType *, StructType *>
-IRHelper::createParamStruct(const ExportEntry &Exp) {
+// TODO: Originally, this used union to share space for arguments and return
+// value, but it generated wrong machine code. However, we still would like to
+// share the space if possible.
+StructType *IRHelper::createParamStruct(const ExportEntry &Exp) {
   Type *RetTy = Exp.Type->getReturnType();
 
   // If the function has no arguments, we don't really need a struct, we just
   // want to use the return value. We create a trivial structure type for
   // compatibility with and simplicity of our callers, though.
-  if (!Exp.Type->getNumParams()) {
-    StructType *Struct = StructType::create(RetTy, "struct");
-    StructType *Union = StructType::create(Struct, "union");
-    return {Struct, Union};
-  }
+  if (!Exp.Type->getNumParams())
+    return StructType::create(RetTy, "struct");
 
   // Map parameter types to their pointers.
   vector<Type *> ParamPointers;
-  ParamPointers.reserve(Exp.Type->getNumParams());
+  ParamPointers.reserve(Exp.Type->getNumParams() + (RetTy->isVoidTy() ? 0 : 1));
   for (Type *Ty : Exp.Type->params()) {
     ParamPointers.push_back(Ty->getPointerTo());
   }
+  if (!RetTy->isVoidTy())
+    ParamPointers.push_back(RetTy);
 
   // Create a structure that we use to store the function's arguments and return
-  // value. It's actually a union of a structure and of the return value where
-  // the structure in the union contains addresses of the arguments.
-  StructType *Struct = StructType::create(ParamPointers, "struct");
-
-  // In LLVM IR, union is simply a struct containing the largest element.
-  Type *ContainedTy;
-  if (RetTy->isVoidTy() ||
-      Struct->getScalarSizeInBits() >= RetTy->getScalarSizeInBits())
-    ContainedTy = Struct;
-  else
-    ContainedTy = RetTy;
-  StructType *Union = StructType::create("union", ContainedTy);
-
-  return {Struct, Union};
+  // value. It contains space for the return value and addresses of arguments.
+  return StructType::create(ParamPointers, "struct");
 }
 
 Value *IRHelper::createCall(Function *Func, ArrayRef<Value *> Args,
