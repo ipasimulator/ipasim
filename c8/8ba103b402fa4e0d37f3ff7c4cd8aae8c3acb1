@@ -2,3 +2,7 @@
 src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:120,1552471200:120,m
 src/IpaSimulator/IpaSimApp/Package.appxmanifest:75,1552471200:75,r
 src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:45,1552471200:45,m
+
+[ver:1,total:540]
+src/IpaSimulator/CMakeLists.txt:330,1552467600:270,1552471200:60,m
+CMakeLists.txt:210,1552467600:210,r
