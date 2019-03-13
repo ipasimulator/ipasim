@@ -535,6 +535,9 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   if (!AI.Lib) {
     // Handle return to kernel.
     if (Addr == KernelAddr) {
+      OutputDebugStringA("Info: executing kernel at 0x");
+      OutputDebugStringA(to_hex_string(Addr).c_str());
+      OutputDebugStringA(" (as protected).\n");
       callUC(uc_emu_stop(UC));
       return true;
     }
@@ -763,6 +766,9 @@ void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
     // TODO: This shouldn't happen since kernel is non-executable but it does.
     // It's the same bug as described below.
     if (Addr == KernelAddr) {
+      OutputDebugStringA("Info: executing kernel at 0x");
+      OutputDebugStringA(to_hex_string(Addr).c_str());
+      OutputDebugStringA(".\n");
       callUC(uc_emu_stop(UC));
       return;
     }
