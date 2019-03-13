@@ -225,6 +225,7 @@ Universal Windows/x86/cassowary-0.60-Debug.lib")
     add_custom_target (Frameworks)
 
     add_subdirectory (src)
+    add_subdirectory (deps/unicorn)
     add_subdirectory (deps/WinObjC/Frameworks)
     add_subdirectory (samples)
 
