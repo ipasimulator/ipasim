@@ -38,3 +38,7 @@
 	path = deps/lldb
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/lldb
 	branch = port_70
+[submodule "deps/unicorn"]
+	path = deps/unicorn
+	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/unicorn
+	branch = port
