@@ -195,6 +195,10 @@ LoadedLibrary *DynamicLoader::load(const string &Path) {
     return nullptr;
   }
 
+  OutputDebugStringA("Info: loading library ");
+  OutputDebugStringA(BP.Path.c_str());
+  OutputDebugStringA("...\n");
+
   LoadedLibrary *L;
   if (LIEF::MachO::is_macho(BP.Path))
     L = loadMachO(BP.Path);
@@ -214,7 +218,7 @@ LoadedLibrary *DynamicLoader::load(const string &Path) {
 
 // Reports non-fatal error to the user.
 void DynamicLoader::error(const string &Msg, bool AppendLastError) {
-  hstring HS(to_hstring("Error occurred: " + Msg));
+  hstring HS(to_hstring("Error occurred: " + Msg + "."));
   if (AppendLastError) {
     hresult_error Err(HRESULT_FROM_WIN32(GetLastError()));
     HS = HS + L"\n" + Err.message();
@@ -400,7 +404,8 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
     string SymName(BInfo.symbol().name());
     uint64_t SymAddr = Lib->findSymbol(*this, SymName);
     if (!SymAddr) {
-      error("external symbol couldn't be resolved");
+      error("external symbol " + SymName + " from library " + LibName +
+            " couldn't be resolved");
       continue;
     }
 
@@ -885,8 +890,8 @@ private:
 
 static IpaSimulator IpaSim;
 
-extern "C" __declspec(dllexport) void start(const hstring &Path,
-    const LaunchActivatedEventArgs &LaunchArgs) {
+extern "C" __declspec(dllexport) void start(
+    const hstring &Path, const LaunchActivatedEventArgs &LaunchArgs) {
   // Load the binary.
   IpaSim.MainBinary = to_string(Path);
   LoadedLibrary *App = IpaSim.Dyld.load(IpaSim.MainBinary);

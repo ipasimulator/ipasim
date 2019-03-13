@@ -87,6 +87,7 @@ static IAsyncAction start(LaunchActivatedEventArgs LaunchArgs) {
   // Copy the folder into app's data.
   // TODO: Without this, files inside the folder cannot be opened by standard
   // C++ means (e.g., `fstream`). But maybe we could workaround that.
+  // TODO: Delete old files first.
   Folder = co_await copyFolder(Folder, ApplicationData::Current().LocalCacheFolder());
   Bin = co_await Folder.GetFileAsync(Bin.Name());
 
