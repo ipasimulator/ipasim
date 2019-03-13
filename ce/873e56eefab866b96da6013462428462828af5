@@ -1,0 +1,11 @@
+[ver:1,total:900]
+src/IpaSimulator/IpaSimulator.cpp:450,1552467600:450,r
+docs/objc.md:132,1552467600:132,r
+docs/git.md:128,1552467600:128,r
+.gitmodules:120,1552467600:120,m
+scripts/push_all.cmd:30,1552467600:30,m
+docs/porting.md:8,1552467600:8,r
+docs/debug.md:8,1552467600:8,r
+docs/english.md:8,1552467600:8,r
+docs/dyld.md:8,1552467600:8,r
+docs/cmake.md:8,1552467600:8,r
