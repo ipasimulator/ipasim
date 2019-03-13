@@ -12,15 +12,10 @@ target_include_directories (IpaSimLibrary PRIVATE
 
 target_compile_definitions (IpaSimLibrary PRIVATE
     # To enable coroutines support in C++/WinRT.
-    _RESUMABLE_FUNCTIONS_SUPPORTED)
-
-# Unicorn Engine
-add_library (Unicorn SHARED IMPORTED)
-set_target_properties (Unicorn PROPERTIES
-    IMPORTED_LOCATION "${SOURCE_DIR}/lib/unicorn/unicorn.dll"
-    IMPORTED_IMPLIB "${SOURCE_DIR}/lib/unicorn/unicorn.lib")
-target_include_directories (Unicorn INTERFACE
-    "${SOURCE_DIR}/lib/unicorn/include")
+    _RESUMABLE_FUNCTIONS_SUPPORTED
+    # Don't include `winsock.h`, it interferes with Unicorn's `winsock2.h`. See
+    # <https://stackoverflow.com/a/1372836>.
+    _WINSOCKAPI_)
 
 # LIEF
 add_custom_target (lief-x86-Debug
@@ -45,7 +40,7 @@ target_compile_definitions (LIEF INTERFACE NOMINMAX)
 target_link_libraries (LIEF INTERFACE msvcrtd)
 add_dependencies (LIEF lief-x86-Debug)
 
-target_link_libraries (IpaSimLibrary PRIVATE WindowsApp.lib Unicorn LIEF)
+target_link_libraries (IpaSimLibrary PRIVATE WindowsApp.lib unicorn LIEF)
 
 # TODO: Actually build AppX with this target.
 add_custom_target (IpaSimApp)
