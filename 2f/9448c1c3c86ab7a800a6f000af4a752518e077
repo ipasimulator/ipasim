@@ -1,0 +1,6 @@
+[ver:1,total:420]
+CMakeLists.txt:210,1552467600:210,m
+docs/git.md:80,1552467600:80,r
+src/HeadersAnalyzer/CMakeLists.txt:60,1552467600:60,r
+scripts/push_all.cmd:40,1552467600:40,r
+src/HeadersAnalyzer/ClangHelper.hpp:30,1552467600:30,r
