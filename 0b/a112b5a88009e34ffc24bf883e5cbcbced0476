@@ -1,0 +1,12 @@
+[ver:1,total:7140]
+src/IpaSimulator/IpaSimulator.cpp:4470,1552417200:420,1552420800:1620,1552424400:540,1552460400:1605,1552464000:170,1552467600:115,m
+src/IpaSimulator/IpaSimApp/App.cpp:1518,1552424400:240,1552460400:713,1552464000:400,1552467600:165,m
+src/IpaSimulator/CMakeLists.txt:574,1552420800:60,1552424400:240,1552460400:264,1552467600:10,m
+src/IpaSimulator/IpaSimApp/Package.appxmanifest:234,1552460400:234,r
+Dockerfile:120,1552424400:60,1552460400:60,r
+src/IpaSimulator/IpaSimApp/pch.h:112,1552460400:62,1552464000:30,1552467600:20,m
+src/IpaSimulator/IpaSimApp/pch.cpp:42,1552460400:42,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:30,1552467600:30,m
+src/IpaSimulator/App.xaml.cpp:20,1552460400:20,r
+.gitattributes:10,1552467600:10,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:10,1552467600:10,m
