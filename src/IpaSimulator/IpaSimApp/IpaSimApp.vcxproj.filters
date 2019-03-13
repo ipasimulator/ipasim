@@ -54,9 +54,6 @@
     <None Include="..\..\..\lib\unicorn\libgcc_s_dw2-1.dll" />
     <None Include="..\..\..\lib\unicorn\libwinpthread-1.dll" />
     <None Include="..\..\..\lib\unicorn\unicorn.dll" />
-    <None Include="sample\**">
-      <Filter>bin</Filter>
-    </None>
     <None Include="gen\**">
       <Filter>bin</Filter>
     </None>

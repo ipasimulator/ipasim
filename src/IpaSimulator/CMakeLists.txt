@@ -4,11 +4,15 @@ set (SOURCE_FILES
 add_library (IpaSimLibrary SHARED ${SOURCE_FILES})
 add_prep_dep (IpaSimLibrary)
 
-target_compile_options (IpaSimLibrary PRIVATE -std=c++17)
+target_compile_options (IpaSimLibrary PRIVATE -std=c++17 -fcoroutines-ts)
 
 target_include_directories (IpaSimLibrary PRIVATE
     # For `WrapperIndex.hpp`
     "${SOURCE_DIR}/src/HeadersAnalyzer/include")
+
+target_compile_definitions (IpaSimLibrary PRIVATE
+    # To enable coroutines support in C++/WinRT.
+    _RESUMABLE_FUNCTIONS_SUPPORTED)
 
 # Unicorn Engine
 add_library (Unicorn SHARED IMPORTED)

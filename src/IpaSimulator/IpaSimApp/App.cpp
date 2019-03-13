@@ -8,10 +8,14 @@
 #include "App.h"
 #include "MainPage.h"
 
+using namespace std;
 using namespace winrt;
 using namespace Windows::ApplicationModel;
 using namespace Windows::ApplicationModel::Activation;
 using namespace Windows::Foundation;
+using namespace Windows::Storage;
+using namespace Windows::Storage::AccessCache;
+using namespace Windows::Storage::Pickers;
 using namespace Windows::UI::Xaml;
 using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::UI::Xaml::Navigation;
@@ -39,22 +43,67 @@ App::App()
 #endif
 }
 
+static bool endsWith(const std::string &S, const std::string &Suffix) {
+  return !S.compare(S.length() - Suffix.length(), Suffix.length(), Suffix);
+}
+
+static IAsyncOperation<StorageFolder> copyFolder(StorageFolder Source, StorageFolder Target) {
+  StorageFolder Dest = co_await Target.CreateFolderAsync(
+      Source.Name(), CreationCollisionOption::ReplaceExisting);
+  for (StorageFile &File : co_await Source.GetFilesAsync())
+    co_await File.CopyAsync(Dest, File.Name(), NameCollisionOption::ReplaceExisting);
+  for (StorageFolder &Folder : co_await Source.GetFoldersAsync())
+    co_await copyFolder(Folder, Dest);
+  co_return Dest;
+}
+
+// TODO: Move this into `IpaSimLibrary` when possible.
+static IAsyncAction start(LaunchActivatedEventArgs LaunchArgs) {
+  // Ask user for folder containing the binary.
+  FolderPicker FP;
+  FP.FileTypeFilter().Append(L"*");
+  StorageFolder Folder(co_await FP.PickSingleFolderAsync());
+  if (!Folder) {
+    OutputDebugStringA("Error: no folder selected.");
+    co_return;
+  }
+  // TODO: This is not used right now.
+  StorageApplicationPermissions::FutureAccessList().AddOrReplace(
+      L"PickedFolderToken", Folder);
+
+  // Find binary in the folder.
+  string FolderName(to_string(Folder.Name()));
+  if (!endsWith(FolderName, ".app")) {
+    OutputDebugStringA("Error: wrong folder selected.");
+    co_return;
+  }
+  string BinaryName(FolderName.substr(0, FolderName.length() - 4));
+  IStorageItem Bin(co_await Folder.TryGetItemAsync(to_hstring(BinaryName)));
+  if (!Bin) {
+    OutputDebugStringA("Error: cannot find binary.");
+    co_return;
+  }
+
+  // Copy the folder into app's data.
+  // TODO: Without this, files inside the folder cannot be opened by standard
+  // C++ means (e.g., `fstream`). But maybe we could workaround that.
+  Folder = co_await copyFolder(Folder, ApplicationData::Current().LocalCacheFolder());
+  Bin = co_await Folder.GetFileAsync(Bin.Name());
+
+  // Execute the main logic which is stored inside `IpaSimLibrary`.
+  HMODULE lib = check_pointer(LoadPackagedLibrary(L"libIpaSimLibrary.dll", 0));
+  FARPROC startFunc = check_pointer(GetProcAddress(lib, "start"));
+  ((void (*)(const hstring &, const LaunchActivatedEventArgs &))startFunc)(
+      Bin.Path(), LaunchArgs);
+  check_bool(FreeLibrary(lib));
+}
+
 /// <summary>
 /// Invoked when the application is launched normally by the end user.  Other entry points
 /// will be used such as when the application is launched to open a specific file.
 /// </summary>
 /// <param name="e">Details about the launch request and process.</param>
 void App::OnLaunched(LaunchActivatedEventArgs const& e) {
-    // Execute the main logic which is stored inside `IpaSimLibrary`.
-    // TODO: Is this the right place to do it?
-    HMODULE lib = check_pointer(LoadPackagedLibrary(L"libIpaSimLibrary.dll", 0));
-    FARPROC startFunc = check_pointer(GetProcAddress(lib, "start"));
-    ((void (*)(const LaunchActivatedEventArgs &))startFunc)(e);
-    check_bool(FreeLibrary(lib));
-
-    // TODO: Don't execute the rest if we emulate.
-    return;
-
     Frame rootFrame{ nullptr };
     auto content = Window::Current().Content();
     if (content)
@@ -108,6 +157,9 @@ void App::OnLaunched(LaunchActivatedEventArgs const& e) {
             Window::Current().Activate();
         }
     }
+
+    // TODO: Where is the right place to do this?
+    start(e);
 }
 
 /// <summary>

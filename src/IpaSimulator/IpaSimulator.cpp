@@ -15,6 +15,7 @@ using namespace std;
 using namespace winrt;
 using namespace Windows::ApplicationModel;
 using namespace Windows::ApplicationModel::Activation;
+using namespace Windows::Foundation;
 using namespace Windows::Storage;
 using namespace Windows::UI::Popups;
 
@@ -884,11 +885,10 @@ private:
 
 static IpaSimulator IpaSim;
 
-extern "C" __declspec(dllexport) void start(
+extern "C" __declspec(dllexport) void start(const hstring &Path,
     const LaunchActivatedEventArgs &LaunchArgs) {
-  // Load sample binary `HelloUI`.
-  filesystem::path Dir(Package::Current().InstalledLocation().Path().c_str());
-  IpaSim.MainBinary = (Dir / "sample" / "HelloUI").string();
+  // Load the binary.
+  IpaSim.MainBinary = to_string(Path);
   LoadedLibrary *App = IpaSim.Dyld.load(IpaSim.MainBinary);
 
   // Execute it.
