@@ -1,6 +1,7 @@
 #include <LIEF/LIEF.hpp>
 #include <Windows.h>
 #include <cstdarg>
+#include <stack>
 #include <string>
 #include <unicorn/unicorn.h>
 
@@ -108,10 +109,12 @@ private:
   AddrInfo lookup(uint64_t Addr);
   AddrInfo inspect(uint64_t Addr);
   void execute(uint64_t Addr);
+  void returnToKernel();
 
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
   uc_engine *const UC;
   std::map<std::string, std::unique_ptr<LoadedLibrary>> LIs;
   uint64_t KernelAddr;
+  std::stack<uint64_t> LRs; // stack of return addresses
 };

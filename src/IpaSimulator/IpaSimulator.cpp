@@ -510,12 +510,26 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   execute(Dylib->Bin.entrypoint() + Dylib->StartAddress);
 }
 void DynamicLoader::execute(uint64_t Addr) {
+  // Save LR.
+  uint64_t LR;
+  callUC(uc_reg_read(UC, UC_ARM_REG_LR, &LR));
+  LRs.push(LR);
+
   // Point return address to kernel.
   uint32_t RetAddr = KernelAddr;
   callUC(uc_reg_write(UC, UC_ARM_REG_LR, &RetAddr));
 
   // Start execution.
   callUC(uc_emu_start(UC, Addr, 0, 0, 0));
+}
+void DynamicLoader::returnToKernel() {
+  // Restore LR.
+  uint64_t LR = LRs.top();
+  LRs.pop();
+  callUC(uc_reg_write(UC, UC_ARM_REG_LR, &LR));
+
+  // Stop execution.
+  callUC(uc_emu_stop(UC));
 }
 bool DynamicLoader::catchFetchProtMem(uc_engine *UC, uc_mem_type Type,
                                       uint64_t Addr, int Size, int64_t Value,
@@ -538,7 +552,7 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
       OutputDebugStringA("Info: executing kernel at 0x");
       OutputDebugStringA(to_hex_string(Addr).c_str());
       OutputDebugStringA(" (as protected).\n");
-      callUC(uc_emu_stop(UC));
+      returnToKernel();
       return true;
     }
 
@@ -769,7 +783,7 @@ void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
       OutputDebugStringA("Info: executing kernel at 0x");
       OutputDebugStringA(to_hex_string(Addr).c_str());
       OutputDebugStringA(".\n");
-      callUC(uc_emu_stop(UC));
+      returnToKernel();
       return;
     }
 
