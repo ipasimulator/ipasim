@@ -110,11 +110,13 @@ private:
   AddrInfo inspect(uint64_t Addr);
   void execute(uint64_t Addr);
   void returnToKernel();
+  void returnToEmulation();
 
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
   uc_engine *const UC;
   std::map<std::string, std::unique_ptr<LoadedLibrary>> LIs;
   uint64_t KernelAddr;
-  std::stack<uint64_t> LRs; // stack of return addresses
+  std::stack<uint32_t> LRs; // stack of return addresses
+  bool Running; // `true` iff the Unicorn Engine is emulating some code
 };

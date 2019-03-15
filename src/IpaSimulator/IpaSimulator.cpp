@@ -39,6 +39,12 @@ static const uint8_t *bytes(const void *Ptr) {
   return reinterpret_cast<const uint8_t *>(Ptr);
 }
 
+template <typename T> static string to_hex_string(T Value) {
+  std::stringstream SS;
+  SS << std::hex << Value;
+  return SS.str();
+}
+
 static void callUC(uc_err Err) {
   // TODO: Do more flexible error reporting here.
   if (Err)
@@ -510,8 +516,22 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   execute(Dylib->Bin.entrypoint() + Dylib->StartAddress);
 }
 void DynamicLoader::execute(uint64_t Addr) {
+  AddrInfo AI(lookup(Addr));
+  if (!AI.Lib) {
+    OutputDebugStringA("Info: starting emulation at 0x");
+    OutputDebugStringA(to_hex_string(Addr).c_str());
+    OutputDebugStringA(".\n");
+  } else {
+    OutputDebugStringA("Info: starting emulation in ");
+    OutputDebugStringA(AI.LibPath->c_str());
+    OutputDebugStringA(" at 0x");
+    uint64_t RVA = Addr - AI.Lib->StartAddress;
+    OutputDebugStringA(to_hex_string(RVA).c_str());
+    OutputDebugStringA(".\n");
+  }
+
   // Save LR.
-  uint64_t LR;
+  uint32_t LR;
   callUC(uc_reg_read(UC, UC_ARM_REG_LR, &LR));
   LRs.push(LR);
 
@@ -520,27 +540,58 @@ void DynamicLoader::execute(uint64_t Addr) {
   callUC(uc_reg_write(UC, UC_ARM_REG_LR, &RetAddr));
 
   // Start execution.
+  Running = true;
   callUC(uc_emu_start(UC, Addr, 0, 0, 0));
 }
 void DynamicLoader::returnToKernel() {
   // Restore LR.
-  uint64_t LR = LRs.top();
+  uint32_t LR = LRs.top();
   LRs.pop();
   callUC(uc_reg_write(UC, UC_ARM_REG_LR, &LR));
 
   // Stop execution.
   callUC(uc_emu_stop(UC));
+  Running = false;
+}
+void DynamicLoader::returnToEmulation() {
+  // Move R14 (LR) to R15 (PC) to return.
+  uint32_t LR;
+  callUC(uc_reg_read(UC, UC_ARM_REG_LR, &LR));
+
+  // Log details about the return.
+  if (LR == KernelAddr)
+    OutputDebugStringA("Info: returning to kernel");
+  else {
+    AddrInfo AI(lookup(LR));
+    if (!AI.Lib) {
+      OutputDebugStringA("Info: returning to 0x");
+      OutputDebugStringA(to_hex_string(LR).c_str());
+    } else {
+      OutputDebugStringA("Info: returning to ");
+      OutputDebugStringA(AI.LibPath->c_str());
+      OutputDebugStringA(" at 0x");
+      uint64_t RVA = LR - AI.Lib->StartAddress;
+      OutputDebugStringA(to_hex_string(RVA).c_str());
+    }
+  }
+
+  // The emulation might have stopped because the native code could call the
+  // emulated code (i.e., some callback) and callbacks stop execution when they
+  // complete.
+  if (!Running) {
+    Running = true;
+    OutputDebugStringA(" (restarting emulation).\n");
+    callUC(uc_emu_start(UC, LR, 0, 0, 0));
+  } else {
+    callUC(uc_reg_write(UC, UC_ARM_REG_PC, &LR));
+    OutputDebugStringA(".\n");
+  }
 }
 bool DynamicLoader::catchFetchProtMem(uc_engine *UC, uc_mem_type Type,
                                       uint64_t Addr, int Size, int64_t Value,
                                       void *Data) {
   return reinterpret_cast<DynamicLoader *>(Data)->handleFetchProtMem(
       Type, Addr, Size, Value);
-}
-template <typename T> static string to_hex_string(T Value) {
-  std::stringstream SS;
-  SS << std::hex << Value;
-  return SS.str();
 }
 bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
                                        int Size, int64_t Value) {
@@ -686,11 +737,7 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
           }
         }
 
-        // Move R14 (LR) to R15 (PC) to return.
-        uint32_t LR;
-        callUC(uc_reg_read(UC, UC_ARM_REG_LR, &LR));
-        callUC(uc_reg_write(UC, UC_ARM_REG_PC, &LR));
-
+        returnToEmulation();
         return true;
       }
 
@@ -743,30 +790,7 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   auto *Func = reinterpret_cast<void (*)(uint32_t)>(Addr);
   Func(R0);
 
-  // Move R14 (LR) to R15 (PC) to return.
-  uint32_t LR;
-  callUC(uc_reg_read(UC, UC_ARM_REG_LR, &LR));
-  callUC(uc_reg_write(UC, UC_ARM_REG_PC, &LR));
-
-  // Log details about the return.
-  if (LR == KernelAddr)
-    OutputDebugStringA("Info: returning to kernel.");
-  else {
-    AddrInfo AI(lookup(LR));
-    if (!AI.Lib) {
-      OutputDebugStringA("Info: returning to 0x");
-      OutputDebugStringA(to_hex_string(LR).c_str());
-      OutputDebugStringA(".\n");
-    } else {
-      OutputDebugStringA("Info: returning to ");
-      OutputDebugStringA(AI.LibPath->c_str());
-      OutputDebugStringA(" at 0x");
-      uint64_t RVA = LR - AI.Lib->StartAddress;
-      OutputDebugStringA(to_hex_string(RVA).c_str());
-      OutputDebugStringA(".\n");
-    }
-  }
-
+  returnToEmulation();
   return true;
 }
 void DynamicLoader::catchCode(uc_engine *UC, uint64_t Addr, uint32_t Size,
@@ -801,6 +825,7 @@ void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
     return;
   }
 
+#if 0
   OutputDebugStringA("Info: executing ");
   OutputDebugStringA(AI.LibPath->c_str());
   OutputDebugStringA(" at 0x");
@@ -836,6 +861,7 @@ void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
   callUC(uc_reg_read(UC, UC_ARM_REG_R14, &Reg));
   OutputDebugStringA(to_hex_string(Reg).c_str());
   OutputDebugStringA("].\n");
+#endif
 }
 bool DynamicLoader::catchMemWrite(uc_engine *UC, uc_mem_type Type,
                                   uint64_t Addr, int Size, int64_t Value,
@@ -845,6 +871,7 @@ bool DynamicLoader::catchMemWrite(uc_engine *UC, uc_mem_type Type,
 }
 bool DynamicLoader::handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size,
                                    int64_t Value) {
+#if 0
   OutputDebugStringA("Info: writing [0x");
   OutputDebugStringA(to_hex_string(Addr).c_str());
   OutputDebugStringA("] := 0x");
@@ -852,6 +879,7 @@ bool DynamicLoader::handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size,
   OutputDebugStringA(" (");
   OutputDebugStringA(to_string(Size).c_str());
   OutputDebugStringA(").\n");
+#endif
   return true;
 }
 bool DynamicLoader::catchMemUnmapped(uc_engine *UC, uc_mem_type Type,
