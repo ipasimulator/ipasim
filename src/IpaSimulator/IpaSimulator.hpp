@@ -1,6 +1,7 @@
 #include <LIEF/LIEF.hpp>
 #include <Windows.h>
 #include <cstdarg>
+#include <functional>
 #include <stack>
 #include <string>
 #include <unicorn/unicorn.h>
@@ -111,6 +112,7 @@ private:
   void execute(uint64_t Addr);
   void returnToKernel();
   void returnToEmulation();
+  void continueOutsideEmulation(std::function<void()> Cont);
 
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
@@ -119,5 +121,6 @@ private:
   uint64_t KernelAddr;
   std::stack<uint32_t> LRs; // stack of return addresses
   bool Running; // `true` iff the Unicorn Engine is emulating some code
-  bool Restart;
+  bool Restart, Continue;
+  std::function<void()> Continuation;
 };

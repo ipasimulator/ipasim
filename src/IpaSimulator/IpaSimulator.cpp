@@ -182,7 +182,7 @@ static bool endsWith(const std::string &S, const std::string &Suffix) {
 }
 
 DynamicLoader::DynamicLoader(uc_engine *UC)
-    : UC(UC), Running(false), Restart(false) {
+    : UC(UC), Running(false), Restart(false), Continue(false) {
   // Map "kernel" page.
   void *KernelPtr = _aligned_malloc(PageSize, PageSize);
   KernelAddr = reinterpret_cast<uint64_t>(KernelPtr);
@@ -541,12 +541,24 @@ void DynamicLoader::execute(uint64_t Addr) {
   callUC(uc_reg_write(UC, UC_ARM_REG_LR, &RetAddr));
 
   // Start execution.
-  do {
-    Restart = false;
+  for (;;) {
     Running = true;
     callUC(uc_emu_start(UC, Addr, 0, 0, 0));
     assert(!Running && "Flag `Running` was not updated correctly.");
-  } while (Restart);
+
+    if (Continue) {
+      Continue = false;
+      Continuation();
+    }
+
+    if (Restart) {
+      // If restarting, continue where we left off.
+      Restart = false;
+      callUC(uc_reg_read(UC, UC_ARM_REG_LR, &LR));
+      Addr = LR;
+    } else
+      break;
+  }
 }
 void DynamicLoader::returnToKernel() {
   // Restore LR.
@@ -565,7 +577,7 @@ void DynamicLoader::returnToEmulation() {
 
   // Log details about the return.
   if (LR == KernelAddr)
-    OutputDebugStringA("Info: returning to kernel");
+    OutputDebugStringA("Info: returning to kernel.\n");
   else {
     AddrInfo AI(lookup(LR));
     if (!AI.Lib) {
@@ -578,21 +590,11 @@ void DynamicLoader::returnToEmulation() {
       uint64_t RVA = LR - AI.Lib->StartAddress;
       OutputDebugStringA(to_hex_string(RVA).c_str());
     }
-  }
-
-  // The emulation might have stopped because the native code could call the
-  // emulated code (i.e., some callback) and callbacks stop execution when they
-  // complete. But calling `uc_emu_start` here (inside a hook) is not a good
-  // idea. Instead, we need to call it when emulation completely stops (i.e.,
-  // Unicorn returns from `uc_emu_start`). See also
-  // <https://github.com/unicorn-engine/unicorn/issues/591>.
-  if (!Running) {
-    OutputDebugStringA(" (restarting emulation).\n");
-    Restart = true;
-  } else {
-    callUC(uc_reg_write(UC, UC_ARM_REG_PC, &LR));
     OutputDebugStringA(".\n");
   }
+
+  assert(!Running);
+  Restart = true;
 }
 bool DynamicLoader::catchFetchProtMem(uc_engine *UC, uc_mem_type Type,
                                       uint64_t Addr, int Size, int64_t Value,
@@ -695,56 +697,59 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
           }
         }
 
-        // Call the function.
-        if (Returns) {
-          uint32_t RetVal;
-          switch (ArgC) {
-          case 0:
-            RetVal = reinterpret_cast<uint32_t (*)()>(Addr)();
-            break;
-          case 1:
-            RetVal = reinterpret_cast<uint32_t (*)(uint32_t)>(Addr)(Args[0]);
-            break;
-          case 2:
-            RetVal = reinterpret_cast<uint32_t (*)(uint32_t, uint32_t)>(Addr)(
-                Args[0], Args[1]);
-            break;
-          case 3:
-            RetVal =
-                reinterpret_cast<uint32_t (*)(uint32_t, uint32_t, uint32_t)>(
-                    Addr)(Args[0], Args[1], Args[2]);
-            break;
-          case 4:
-            RetVal = reinterpret_cast<uint32_t (*)(uint32_t, uint32_t, uint32_t,
-                                                   uint32_t)>(Addr)(
-                Args[0], Args[1], Args[2], Args[3]);
-            break;
+        continueOutsideEmulation([=]() {
+          // Call the function.
+          if (Returns) {
+            uint32_t RetVal;
+            switch (ArgC) {
+            case 0:
+              RetVal = reinterpret_cast<uint32_t (*)()>(Addr)();
+              break;
+            case 1:
+              RetVal = reinterpret_cast<uint32_t (*)(uint32_t)>(Addr)(Args[0]);
+              break;
+            case 2:
+              RetVal = reinterpret_cast<uint32_t (*)(uint32_t, uint32_t)>(Addr)(
+                  Args[0], Args[1]);
+              break;
+            case 3:
+              RetVal =
+                  reinterpret_cast<uint32_t (*)(uint32_t, uint32_t, uint32_t)>(
+                      Addr)(Args[0], Args[1], Args[2]);
+              break;
+            case 4:
+              RetVal = reinterpret_cast<uint32_t (*)(uint32_t, uint32_t,
+                                                     uint32_t, uint32_t)>(Addr)(
+                  Args[0], Args[1], Args[2], Args[3]);
+              break;
+            }
+            callUC(uc_reg_write(UC, UC_ARM_REG_R0, &RetVal));
+          } else {
+            switch (ArgC) {
+            case 0:
+              reinterpret_cast<void (*)()>(Addr)();
+              break;
+            case 1:
+              reinterpret_cast<void (*)(uint32_t)>(Addr)(Args[0]);
+              break;
+            case 2:
+              reinterpret_cast<void (*)(uint32_t, uint32_t)>(Addr)(Args[0],
+                                                                   Args[1]);
+              break;
+            case 3:
+              reinterpret_cast<void (*)(uint32_t, uint32_t, uint32_t)>(Addr)(
+                  Args[0], Args[1], Args[2]);
+              break;
+            case 4:
+              reinterpret_cast<void (*)(uint32_t, uint32_t, uint32_t,
+                                        uint32_t)>(Addr)(Args[0], Args[1],
+                                                         Args[2], Args[3]);
+              break;
+            }
           }
-          callUC(uc_reg_write(UC, UC_ARM_REG_R0, &RetVal));
-        } else {
-          switch (ArgC) {
-          case 0:
-            reinterpret_cast<void (*)()>(Addr)();
-            break;
-          case 1:
-            reinterpret_cast<void (*)(uint32_t)>(Addr)(Args[0]);
-            break;
-          case 2:
-            reinterpret_cast<void (*)(uint32_t, uint32_t)>(Addr)(Args[0],
-                                                                 Args[1]);
-            break;
-          case 3:
-            reinterpret_cast<void (*)(uint32_t, uint32_t, uint32_t)>(Addr)(
-                Args[0], Args[1], Args[2]);
-            break;
-          case 4:
-            reinterpret_cast<void (*)(uint32_t, uint32_t, uint32_t, uint32_t)>(
-                Addr)(Args[0], Args[1], Args[2], Args[3]);
-            break;
-          }
-        }
 
-        returnToEmulation();
+          returnToEmulation();
+        });
         return true;
       }
 
@@ -793,11 +798,13 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   uint32_t R0;
   callUC(uc_reg_read(UC, UC_ARM_REG_R0, &R0));
 
-  // Call the target function.
-  auto *Func = reinterpret_cast<void (*)(uint32_t)>(Addr);
-  Func(R0);
+  continueOutsideEmulation([=]() {
+    // Call the target function.
+    auto *Func = reinterpret_cast<void (*)(uint32_t)>(Addr);
+    Func(R0);
 
-  returnToEmulation();
+    returnToEmulation();
+  });
   return true;
 }
 void DynamicLoader::catchCode(uc_engine *UC, uint64_t Addr, uint32_t Size,
@@ -926,6 +933,20 @@ void *DynamicLoader::getRetVal() {
   uint32_t Reg;
   callUC(uc_reg_read(UC, UC_ARM_REG_R0, &Reg));
   return reinterpret_cast<void *>(Reg);
+}
+// Calling `uc_emu_start` inside `emu_start` (e.g., inside a hook) is not very
+// good idea. Instead, we need to call it when emulation completely stops (i.e.,
+// Unicorn returns from `uc_emu_start`). That's what this function is used for.
+// All code that calls or could call `uc_emu_start` should be deferred using
+// this function. See also
+// <https://github.com/unicorn-engine/unicorn/issues/591>.
+void DynamicLoader::continueOutsideEmulation(function<void()> Cont) {
+  assert(!Continue && "Only one continuation is supported.");
+  Continue = true;
+  Continuation = Cont;
+
+  callUC(uc_emu_stop(UC));
+  Running = false;
 }
 
 struct IpaSimulator {
