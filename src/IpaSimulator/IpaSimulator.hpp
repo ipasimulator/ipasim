@@ -119,4 +119,5 @@ private:
   uint64_t KernelAddr;
   std::stack<uint32_t> LRs; // stack of return addresses
   bool Running; // `true` iff the Unicorn Engine is emulating some code
+  bool Restart;
 };

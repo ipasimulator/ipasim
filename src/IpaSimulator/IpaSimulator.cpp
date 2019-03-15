@@ -181,7 +181,8 @@ static bool endsWith(const std::string &S, const std::string &Suffix) {
   return !S.compare(S.length() - Suffix.length(), Suffix.length(), Suffix);
 }
 
-DynamicLoader::DynamicLoader(uc_engine *UC) : UC(UC) {
+DynamicLoader::DynamicLoader(uc_engine *UC)
+    : UC(UC), Running(false), Restart(false) {
   // Map "kernel" page.
   void *KernelPtr = _aligned_malloc(PageSize, PageSize);
   KernelAddr = reinterpret_cast<uint64_t>(KernelPtr);
@@ -540,8 +541,12 @@ void DynamicLoader::execute(uint64_t Addr) {
   callUC(uc_reg_write(UC, UC_ARM_REG_LR, &RetAddr));
 
   // Start execution.
-  Running = true;
-  callUC(uc_emu_start(UC, Addr, 0, 0, 0));
+  do {
+    Restart = false;
+    Running = true;
+    callUC(uc_emu_start(UC, Addr, 0, 0, 0));
+    assert(!Running && "Flag `Running` was not updated correctly.");
+  } while (Restart);
 }
 void DynamicLoader::returnToKernel() {
   // Restore LR.
@@ -577,11 +582,13 @@ void DynamicLoader::returnToEmulation() {
 
   // The emulation might have stopped because the native code could call the
   // emulated code (i.e., some callback) and callbacks stop execution when they
-  // complete.
+  // complete. But calling `uc_emu_start` here (inside a hook) is not a good
+  // idea. Instead, we need to call it when emulation completely stops (i.e.,
+  // Unicorn returns from `uc_emu_start`). See also
+  // <https://github.com/unicorn-engine/unicorn/issues/591>.
   if (!Running) {
-    Running = true;
     OutputDebugStringA(" (restarting emulation).\n");
-    callUC(uc_emu_start(UC, LR, 0, 0, 0));
+    Restart = true;
   } else {
     callUC(uc_reg_write(UC, UC_ARM_REG_PC, &LR));
     OutputDebugStringA(".\n");
