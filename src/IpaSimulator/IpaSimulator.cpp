@@ -45,10 +45,32 @@ template <typename T> static string to_hex_string(T Value) {
   return SS.str();
 }
 
-static void callUC(uc_err Err) {
-  // TODO: Do more flexible error reporting here.
-  if (Err)
+static void callUCSimple(uc_err Err) {
+  // TODO: Throw better exceptions.
+  if (Err != UC_ERR_OK)
     throw "unicorn error";
+}
+void DynamicLoader::callUC(uc_err Err) {
+  if (Err != UC_ERR_OK) {
+    OutputDebugStringA("Error: unicorn failed with ");
+    OutputDebugStringA(to_string(Err).c_str());
+    uint32_t Addr;
+    callUCSimple(uc_reg_read(UC, UC_ARM_REG_PC, &Addr));
+    AddrInfo AI(lookup(Addr));
+    if (!AI.Lib) {
+      OutputDebugStringA(" at 0x");
+      OutputDebugStringA(to_hex_string(Addr).c_str());
+    } else {
+      OutputDebugStringA(" in ");
+      OutputDebugStringA(AI.LibPath->c_str());
+      OutputDebugStringA(" at 0x");
+      uint64_t RVA = Addr - AI.Lib->StartAddress;
+      OutputDebugStringA(to_hex_string(RVA).c_str());
+    }
+    OutputDebugStringA(".\n");
+    // TODO: Throw better exceptions.
+    throw "unicorn error";
+  }
 }
 
 bool LoadedLibrary::isInRange(uint64_t Addr) {
@@ -951,7 +973,7 @@ void DynamicLoader::continueOutsideEmulation(function<void()> Cont) {
 
 struct IpaSimulator {
   IpaSimulator() : UC(initUC()), Dyld(UC) {}
-  ~IpaSimulator() { callUC(uc_close(UC)); }
+  ~IpaSimulator() { callUCSimple(uc_close(UC)); }
 
   uc_engine *UC;
   DynamicLoader Dyld;
@@ -959,7 +981,7 @@ struct IpaSimulator {
 
 private:
   uc_engine *initUC() {
-    callUC(uc_open(UC_ARCH_ARM, UC_MODE_ARM, &UC));
+    callUCSimple(uc_open(UC_ARCH_ARM, UC_MODE_ARM, &UC));
     return UC;
   }
 };
