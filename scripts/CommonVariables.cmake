@@ -166,7 +166,9 @@ set (WINOBJC_CLANG_OPTIONS
     # From `sdk-build.props`.
     # TODO: Add `-Werror`?
     -Wno-c++17-extensions -Wno-nullability-completeness
-    -Wno-c++17-compat-mangling -Wno-microsoft --system-header-prefix=winrt/)
+    -Wno-c++17-compat-mangling -Wno-microsoft --system-header-prefix=winrt/
+    # New Clang started complaining...
+    -Wno-c++11-narrowing)
 
 # Common compiler definitions for WinObjC projects.
 set (WINOBJC_DEFS
