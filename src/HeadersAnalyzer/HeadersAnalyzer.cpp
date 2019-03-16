@@ -571,7 +571,7 @@ public:
               HAC.iOSExps.end()) {
             reportError(Twine("lookup function not found (") + LookupName +
                         ")");
-            IR.Builder.CreateRetVoid();
+            IR.Builder.CreateUnreachable();
             continue;
           }
 
