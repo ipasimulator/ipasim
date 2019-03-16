@@ -348,11 +348,6 @@ public:
           if (!Exp.Type || Exp.Messenger)
             continue;
 
-          // TODO: Handle variadic functions specially.
-          if (Exp.Type->isVarArg())
-            reportError(Twine("unhandled variadic function (") + Exp.Name +
-                        ")");
-
           // Declarations.
           llvm::Function *Func = Exp.ObjCMethod ? nullptr : IR.declareFunc(Exp);
           llvm::Function *Wrapper = IR.declareFunc(Exp, /* Wrapper */ true);
@@ -368,6 +363,15 @@ public:
           DylibIR.Builder.CreateRetVoid();
 
           FunctionGuard WrapperGuard(IR, Wrapper);
+
+          // TODO: Handle variadic functions specially. For now, we simply don't
+          // call them.
+          if (Exp.Type->isVarArg()) {
+            reportError(Twine("unhandled variadic function (") + Exp.Name +
+                        ")");
+            IR.Builder.CreateRetVoid();
+            continue;
+          }
 
           llvm::StructType *Struct;
           llvm::Value *SP;
