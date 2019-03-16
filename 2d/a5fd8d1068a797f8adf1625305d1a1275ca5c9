@@ -1,0 +1,4 @@
+[ver:1,total:790]
+src/IpaSimulator/IpaSimulator.cpp:360,1552752000:360,r
+scripts/CommonVariables.cmake:270,1552755600:180,1552759200:90,m
+src/HeadersAnalyzer/ErrorReporting.cpp:160,1552755600:160,r
