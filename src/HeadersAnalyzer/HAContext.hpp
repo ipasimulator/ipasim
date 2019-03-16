@@ -82,7 +82,8 @@ enum class ExportStatus { NotFound = 0, Found, Overloaded, FoundInDLL };
 struct ExportEntry {
   ExportEntry(std::string Name)
       : Name(move(Name)), Status(ExportStatus::NotFound), RVA(0), Type(nullptr),
-        ObjCMethod(false), Messenger(false), Stret(false) {}
+        ObjCMethod(false), Messenger(false), Stret(false), Super(false),
+        Super2(false) {}
 
   std::string Name;
   mutable ExportStatus Status;
@@ -91,6 +92,8 @@ struct ExportEntry {
   mutable bool ObjCMethod : 1;
   mutable bool Messenger : 1;
   mutable bool Stret : 1;
+  mutable bool Super : 1;
+  mutable bool Super2 : 1;
   mutable GroupPtr DLLGroup;
   mutable DLLPtr DLL;
   mutable DylibPtr Dylib; // first Dylib that implements this function

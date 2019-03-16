@@ -250,19 +250,24 @@ public:
           if (DataSymbol)
             return;
 
-          auto IsStretSetter = [&]() {
+          auto FlagsSetter = [&]() {
             // If it's a normal messenger, it has two parameters (`id` and
             // `SEL`, both actually `void *`). If it's a `stret` messenger, it
             // has one more parameter at the front (a `void *` for struct
             // return).
             Exp->Stret = endsWith(Exp->Name, HAContext::StretPostfix);
+            // Also recognize `Super` functions.
+            if (Exp->Name.find("Super2") != string::npos)
+              Exp->Super2 = true;
+            else if (Exp->Name.find("Super") != string::npos)
+              Exp->Super = true;
           };
 
           // Find Objective-C messengers. Note that they used to be variadic,
           // but that's deprecated and so we cannot rely on that.
           if (startsWith(Exp->Name, HAContext::MsgSendPrefix)) {
             Exp->Messenger = true;
-            IsStretSetter();
+            FlagsSetter();
 
             // Don't verify their types.
             return;
@@ -273,7 +278,7 @@ public:
           // first arguments they base their lookup on, so that we transfer them
           // correctly.
           if (startsWith(Exp->Name, HAContext::MsgLookupPrefix)) {
-            IsStretSetter();
+            FlagsSetter();
             Exp->Type = LookupTy;
 
             // Don't verify their types.
@@ -586,6 +591,29 @@ public:
 
           // Call the lookup function and jump to its result.
           llvm::Value *IMP = IR.Builder.CreateCall(LookupFunc, Args, "imp");
+          // Also access `super->class` or `super->class->super_class` if
+          // necessary.
+          if (Exp.Super) {
+            llvm::Value *Super = Args[Exp.Stret ? 1 : 0];
+            llvm::Value *SP = IR.Builder.CreateBitCast(
+                Super, llvm::Type::getInt32PtrTy(LLVM.Ctx), "sp");
+            llvm::Value *SelfP = IR.Builder.CreateConstInBoundsGEP1_32(
+                llvm::Type::getInt32Ty(LLVM.Ctx), SP, 1, "selfp");
+            llvm::Value *Self = IR.Builder.CreateLoad(SelfP, "self");
+            Args[Exp.Stret ? 1 : 0] =
+                IR.Builder.CreateIntToPtr(Self, VoidPtrTy);
+          } else if (Exp.Super2) {
+            llvm::Value *Super = Args[Exp.Stret ? 1 : 0];
+            llvm::Value *SP = IR.Builder.CreateBitCast(
+                Super, llvm::Type::getInt32PtrTy(LLVM.Ctx), "sp");
+            llvm::Value *SelfP = IR.Builder.CreateConstInBoundsGEP1_32(
+                llvm::Type::getInt32Ty(LLVM.Ctx), SP, 1, "selfp");
+            llvm::Value *SelfP2 = IR.Builder.CreateConstInBoundsGEP1_32(
+                llvm::Type::getInt32Ty(LLVM.Ctx), SelfP, 1, "selfp2");
+            llvm::Value *Self2 = IR.Builder.CreateLoad(SelfP2, "self");
+            Args[Exp.Stret ? 1 : 0] =
+                IR.Builder.CreateIntToPtr(Self2, VoidPtrTy);
+          }
           llvm::CallInst *Call = IR.Builder.CreateCall(
               MessengerFunc->getFunctionType(), IMP, Args);
           Call->setTailCallKind(llvm::CallInst::TCK_MustTail);
@@ -643,8 +671,7 @@ public:
         }
 
         // Call the DLL wrapper function.
-        llvm::Value *VP = IR.Builder.CreateBitCast(
-            SP, llvm::Type::getInt8PtrTy(LLVM.Ctx), "vp");
+        llvm::Value *VP = IR.Builder.CreateBitCast(SP, VoidPtrTy, "vp");
         IR.Builder.CreateCall(Wrapper, {VP});
 
         // Return.
