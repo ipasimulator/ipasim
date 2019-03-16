@@ -631,7 +631,7 @@ void DynamicLoader::DynamicCaller::loadArg(size_t Size) {
       // TODO: Don't read SP every time.
       uint32_t SP;
       Dyld.callUC(uc_reg_read(Dyld.UC, UC_ARM_REG_SP, &SP));
-      SP = SP - Args.size() * 4;
+      SP = SP + (Args.size() - 4) * 4;
       Args.push_back(*reinterpret_cast<uint32_t *>(SP));
     }
   }
@@ -658,6 +658,53 @@ bool DynamicLoader::DynamicCaller::call(bool Returns, uint32_t Addr) {
   return true;
 
 #undef CASE
+}
+
+// TODO: Use this everywhere.
+size_t DynamicLoader::TypeDecoder::getNextTypeSizeImpl() {
+  switch (*T) {
+  case 'v': // void
+    return 0;
+  case 'c': // char
+  case '@': // id
+  case ':': // SEL
+  case 'i': // int
+  case 'I': // unsigned int
+  case 'f': // float
+    return 4;
+  case '{': { // struct
+    // Skip name of the struct.
+    for (++T; *T != '='; ++T)
+      if (!*T) {
+        Dyld.error("struct type ended unexpectedly");
+        return InvalidSize;
+      }
+    ++T;
+
+    // Parse type recursively.
+    size_t TotalSize = 0;
+    do {
+      size_t Size = getNextTypeSize();
+      if (Size == InvalidSize)
+        return InvalidSize;
+      TotalSize += Size;
+    } while (*T != '}');
+
+    return TotalSize;
+  }
+  default:
+    Dyld.error("unsupported type encoding");
+    return InvalidSize;
+  }
+}
+size_t DynamicLoader::TypeDecoder::getNextTypeSize() {
+  size_t Result = getNextTypeSizeImpl();
+
+  // Skip digits.
+  for (++T; '0' <= *T && *T <= '9'; ++T)
+    ;
+
+  return Result;
 }
 
 bool DynamicLoader::catchFetchProtMem(uc_engine *UC, uc_mem_type Type,
@@ -714,66 +761,28 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
         OutputDebugStringA(".\n");
 
         // Handle return value.
+        TypeDecoder TD(*this, T);
         bool Returns;
-        switch (*T) {
-        case 'v': // void
+        switch (TD.getNextTypeSize()) {
+        case 0:
           Returns = false;
           break;
-        case 'c': // char
-        case '@': // id
-        case 'i': // int
-        case 'I': // unsigned int
+        case 4:
           Returns = true;
           break;
         default:
-          error("unsupported return value");
+          error("unsupported return type");
           return false;
         }
 
         // Process function arguments.
         // TODO: Use `unique_ptr`.
         shared_ptr<DynamicCaller> DC(new DynamicCaller(*this));
-        while (*(++T)) {
-          // Skip digits.
-          for (; '0' <= *T && *T <= '9'; ++T)
-            ;
-          if (!*T)
-            break;
-
-          switch (*T) {
-          case '@': // id
-          case ':': // SEL
-          case 'i': // int
-          case 'I': // unsigned int
-            DC->loadArg(4);
-            break;
-          case '{': { // struct
-            // Skip definition of the struct.
-            size_t NumBraces = 1;
-            for (++T; NumBraces; ++T) {
-              switch (*T) {
-              case '}':
-                --NumBraces;
-                break;
-              case '{':
-                ++NumBraces;
-                continue;
-              case 0:
-                error("struct type ended unexpectedly");
-                return false;
-              }
-            }
-
-            // Parse struct size.
-            // TODO: This is probably useless number and doesn't represent the
-            // real size.
-            DC->loadArg(atoi(T));
-            break;
-          }
-          default:
-            error("unsupported argument type");
+        while (TD.hasNext()) {
+          size_t Size = TD.getNextTypeSize();
+          if (Size == TypeDecoder::InvalidSize)
             return false;
-          }
+          DC->loadArg(Size);
         }
 
         continueOutsideEmulation([=]() {

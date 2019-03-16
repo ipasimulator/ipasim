@@ -163,4 +163,19 @@ private:
     int RegId; // uc_arm_reg
     std::vector<uint32_t> Args;
   };
+
+  class TypeDecoder {
+  public:
+    TypeDecoder(DynamicLoader &Dyld, const char *T) : Dyld(Dyld), T(T) {}
+    size_t getNextTypeSize();
+    bool hasNext() { return *T; }
+
+    static const size_t InvalidSize = -1;
+
+  private:
+    DynamicLoader &Dyld;
+    const char *T;
+
+    size_t getNextTypeSizeImpl();
+  };
 };
