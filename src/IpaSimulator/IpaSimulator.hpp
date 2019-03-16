@@ -22,6 +22,7 @@ public:
   bool isInRange(uint64_t Addr);
   void checkInRange(uint64_t Addr);
   const char *getMethodType(uint64_t Addr);
+  const char *getClassOfMethod(uint64_t Addr);
   virtual uint64_t getSection(const std::string &Name,
                               uint64_t *Size = nullptr) = 0;
 };

@@ -1096,7 +1096,7 @@ struct class_rw_t {
 };
 
 struct objc_class {
-  void *isa;
+  objc_class *isa;
   void *superclass;
   void *cache;
   void *vtable;
@@ -1106,6 +1106,7 @@ struct objc_class {
     return (class_rw_t *)((uintptr_t)info & FAST_DATA_MASK);
   }
   bool isRealized() { return data()->flags & RW_REALIZED; }
+  const class_ro_t *getInfo() { return isRealized() ? data()->ro : info; }
 };
 
 struct category_t {
@@ -1134,10 +1135,7 @@ static const char *findMethod(method_list_t *Methods, uint64_t Addr) {
 }
 static const char *findMethod(objc_class *Class, uint64_t Addr) {
   // TODO: Isn't this first part redundant for realized classes?
-  if (const char *T =
-          findMethod(Class->isRealized() ? Class->data()->ro->baseMethodList
-                                         : Class->info->baseMethodList,
-                     Addr))
+  if (const char *T = findMethod(Class->getInfo()->baseMethodList, Addr))
     return T;
   if (Class->isRealized())
     for (auto *L = Class->data()->methods.beginLists(),
@@ -1145,6 +1143,38 @@ static const char *findMethod(objc_class *Class, uint64_t Addr) {
          L != End; ++L)
       if (const char *T = findMethod(*L, Addr))
         return T;
+  return nullptr;
+}
+const char *LoadedLibrary::getClassOfMethod(uint64_t Addr) {
+  // Enumerate classes in the image.
+  uint64_t SecSize;
+  uint64_t SecAddr = getSection("__objc_classlist", &SecSize);
+  if (SecAddr) {
+    auto *Classes = reinterpret_cast<objc_class **>(SecAddr);
+    for (size_t I = 0, Count = SecSize / sizeof(void *); I != Count; ++I) {
+      // Enumerate methods of every class and its meta-class.
+      objc_class *Class = Classes[I];
+      if (const char *T = findMethod(Class, Addr))
+        return Class->getInfo()->name;
+      if (const char *T = findMethod(Class->isa, Addr))
+        return Class->isa->getInfo()->name;
+    }
+  }
+
+  // Try also non-lazy classes.
+  SecAddr = getSection("__objc_nlclslist", &SecSize);
+  if (SecAddr) {
+    auto *Classes = reinterpret_cast<objc_class **>(SecAddr);
+    for (size_t I = 0, Count = SecSize / sizeof(void *); I != Count; ++I) {
+      // Enumerate methods of every class and its meta-class.
+      objc_class *Class = Classes[I];
+      if (const char *T = findMethod(Class, Addr))
+        return Class->getInfo()->name;
+      if (const char *T = findMethod(Class->isa, Addr))
+        return Class->isa->getInfo()->name;
+    }
+  }
+
   return nullptr;
 }
 const char *LoadedLibrary::getMethodType(uint64_t Addr) {
@@ -1158,8 +1188,7 @@ const char *LoadedLibrary::getMethodType(uint64_t Addr) {
       objc_class *Class = Classes[I];
       if (const char *T = findMethod(Class, Addr))
         return T;
-      if (const char *T =
-              findMethod(reinterpret_cast<objc_class *>(Class->isa), Addr))
+      if (const char *T = findMethod(Class->isa, Addr))
         return T;
     }
   }
@@ -1274,6 +1303,10 @@ void DynamicLoader::callLoad(void *load, void *self, void *sel) {
     reinterpret_cast<void (*)(void *, void *)>(load)(self, sel);
   } else {
     // Target load method is inside some emulated library.
+
+    // HACK: Don't load `__ARCLite__` as it's buggy.
+    if (string("__ARCLite__") == AI.Lib->getClassOfMethod(Addr))
+      return;
 
     // Pass arguments.
     uint32_t I32 = reinterpret_cast<uint32_t>(self);
