@@ -796,6 +796,7 @@ int main() {
     HA.generateDLLs();
     HA.generateDylibs();
     HA.writeReport();
+    reportStatus("completed, exiting");
   } catch (const FatalError &) {
     return 1;
   }
