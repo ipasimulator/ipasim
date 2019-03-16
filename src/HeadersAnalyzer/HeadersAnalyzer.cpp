@@ -40,6 +40,7 @@
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Transforms/Utils/FunctionComparator.h>
 
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -797,6 +798,9 @@ int main() {
     HA.generateDylibs();
     HA.writeReport();
     reportStatus("completed, exiting");
+
+    // HACK: Running destructors is too slow.
+    quick_exit(0);
   } catch (const FatalError &) {
     return 1;
   }
