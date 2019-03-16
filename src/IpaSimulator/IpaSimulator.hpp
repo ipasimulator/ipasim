@@ -125,4 +125,42 @@ private:
   bool Running; // `true` iff the Unicorn Engine is emulating some code
   bool Restart, Continue;
   std::function<void()> Continuation;
+
+  class DynamicCaller {
+  public:
+    DynamicCaller(DynamicLoader &Dyld) : Dyld(Dyld), RegId(UC_ARM_REG_R0) {}
+    void loadArg(size_t Size);
+    bool call(bool Returns, uint32_t Addr);
+    template <size_t N> void call0(bool Returns, uint32_t Addr) {
+      if (Returns)
+        call1<N, true>(Addr);
+      else
+        call1<N, false>(Addr);
+    }
+    template <size_t N, bool Returns> void call1(uint32_t Addr) {
+      call2<N, Returns>(Addr);
+    }
+    template <size_t N, bool Returns, typename... ArgTypes>
+    void call2(uint32_t Addr, ArgTypes... Params) {
+      if constexpr (N > 0)
+        call2<N - 1, Returns, ArgTypes..., uint32_t>(Addr, Params...,
+                                                     Args[Args.size() - N]);
+      else
+        call3<Returns, ArgTypes...>(Addr, Params...);
+    }
+    template <bool Returns, typename... ArgTypes>
+    void call3(uint32_t Addr, ArgTypes... Params) {
+      if constexpr (Returns) {
+        uint32_t RetVal =
+            reinterpret_cast<uint32_t (*)(ArgTypes...)>(Addr)(Params...);
+        Dyld.callUC(uc_reg_write(Dyld.UC, UC_ARM_REG_R0, &RetVal));
+      } else
+        reinterpret_cast<void (*)(ArgTypes...)>(Addr)(Params...);
+    }
+
+  private:
+    DynamicLoader &Dyld;
+    int RegId; // uc_arm_reg
+    std::vector<uint32_t> Args;
+  };
 };

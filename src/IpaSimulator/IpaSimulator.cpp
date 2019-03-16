@@ -618,6 +618,48 @@ void DynamicLoader::returnToEmulation() {
   assert(!Running);
   Restart = true;
 }
+
+void DynamicLoader::DynamicCaller::loadArg(size_t Size) {
+  for (size_t I = 0; I != Size; I += 4) {
+    if (RegId <= UC_ARM_REG_R3) {
+      // We have some registers left, use them.
+      uint32_t I32;
+      Dyld.callUC(uc_reg_read(Dyld.UC, RegId++, &I32));
+      Args.push_back(I32);
+    } else {
+      // Otherwise, use stack.
+      // TODO: Don't read SP every time.
+      uint32_t SP;
+      Dyld.callUC(uc_reg_read(Dyld.UC, UC_ARM_REG_SP, &SP));
+      SP = SP - Args.size() * 4;
+      Args.push_back(*reinterpret_cast<uint32_t *>(SP));
+    }
+  }
+}
+
+bool DynamicLoader::DynamicCaller::call(bool Returns, uint32_t Addr) {
+#define CASE(N)                                                                \
+  case N:                                                                      \
+    call0<N>(Returns, Addr);                                                   \
+    break
+
+  switch (Args.size()) {
+    CASE(0);
+    CASE(1);
+    CASE(2);
+    CASE(3);
+    CASE(4);
+    CASE(5);
+    CASE(6);
+  default:
+    Dyld.error("function has too many arguments");
+    return false;
+  }
+  return true;
+
+#undef CASE
+}
+
 bool DynamicLoader::catchFetchProtMem(uc_engine *UC, uc_mem_type Type,
                                       uint64_t Addr, int Size, int64_t Value,
                                       void *Data) {
@@ -689,10 +731,8 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
         }
 
         // Process function arguments.
-        size_t ArgC = 0;
-        int RegId = UC_ARM_REG_R0;
-        uint32_t Args[4];
-        uint32_t *ArgsP = Args;
+        // TODO: Use `unique_ptr`.
+        shared_ptr<DynamicCaller> DC(new DynamicCaller(*this));
         while (*(++T)) {
           // Skip digits.
           for (; '0' <= *T && *T <= '9'; ++T)
@@ -701,18 +741,12 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
             break;
 
           switch (*T) {
-          case '@':   // id
-          case ':':   // SEL
-          case 'i':   // int
-          case 'I': { // unsigned int
-            if (RegId > UC_ARM_REG_R3) {
-              error("function has too many arguments");
-              return false;
-            }
-            callUC(uc_reg_read(UC, RegId++, ArgsP++));
-            ++ArgC;
+          case '@': // id
+          case ':': // SEL
+          case 'i': // int
+          case 'I': // unsigned int
+            DC->loadArg(4);
             break;
-          }
           case '{': { // struct
             // Skip definition of the struct.
             size_t NumBraces = 1;
@@ -733,17 +767,7 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
             // Parse struct size.
             // TODO: This is probably useless number and doesn't represent the
             // real size.
-            int Size = atoi(T);
-
-            // Structs are passed in registers.
-            for (int I = 0; I != Size; I += 4) {
-              if (RegId > UC_ARM_REG_R3) {
-                error("function has too many arguments");
-                return false;
-              }
-              callUC(uc_reg_read(UC, RegId++, ArgsP++));
-              ++ArgC;
-            }
+            DC->loadArg(atoi(T));
             break;
           }
           default:
@@ -754,54 +778,8 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
 
         continueOutsideEmulation([=]() {
           // Call the function.
-          if (Returns) {
-            uint32_t RetVal;
-            switch (ArgC) {
-            case 0:
-              RetVal = reinterpret_cast<uint32_t (*)()>(Addr)();
-              break;
-            case 1:
-              RetVal = reinterpret_cast<uint32_t (*)(uint32_t)>(Addr)(Args[0]);
-              break;
-            case 2:
-              RetVal = reinterpret_cast<uint32_t (*)(uint32_t, uint32_t)>(Addr)(
-                  Args[0], Args[1]);
-              break;
-            case 3:
-              RetVal =
-                  reinterpret_cast<uint32_t (*)(uint32_t, uint32_t, uint32_t)>(
-                      Addr)(Args[0], Args[1], Args[2]);
-              break;
-            case 4:
-              RetVal = reinterpret_cast<uint32_t (*)(uint32_t, uint32_t,
-                                                     uint32_t, uint32_t)>(Addr)(
-                  Args[0], Args[1], Args[2], Args[3]);
-              break;
-            }
-            callUC(uc_reg_write(UC, UC_ARM_REG_R0, &RetVal));
-          } else {
-            switch (ArgC) {
-            case 0:
-              reinterpret_cast<void (*)()>(Addr)();
-              break;
-            case 1:
-              reinterpret_cast<void (*)(uint32_t)>(Addr)(Args[0]);
-              break;
-            case 2:
-              reinterpret_cast<void (*)(uint32_t, uint32_t)>(Addr)(Args[0],
-                                                                   Args[1]);
-              break;
-            case 3:
-              reinterpret_cast<void (*)(uint32_t, uint32_t, uint32_t)>(Addr)(
-                  Args[0], Args[1], Args[2]);
-              break;
-            case 4:
-              reinterpret_cast<void (*)(uint32_t, uint32_t, uint32_t,
-                                        uint32_t)>(Addr)(Args[0], Args[1],
-                                                         Args[2], Args[3]);
-              break;
-            }
-          }
+          if (!DC->call(Returns, Addr))
+            return;
 
           returnToEmulation();
         });
