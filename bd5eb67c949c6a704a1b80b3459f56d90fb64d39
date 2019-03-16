@@ -1,0 +1,5 @@
+[ver:1,total:1365]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:916,1552770000:916,m
+src/HeadersAnalyzer/iOSHeaders.mm:344,1552770000:344,m
+src/HeadersAnalyzer/LLVMHelper.hpp:90,1552770000:90,r
+src/HeadersAnalyzer/Common.hpp:15,1552770000:15,r
