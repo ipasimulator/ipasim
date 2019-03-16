@@ -713,6 +713,39 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
             ++ArgC;
             break;
           }
+          case '{': { // struct
+            // Skip definition of the struct.
+            size_t NumBraces = 1;
+            for (++T; NumBraces; ++T) {
+              switch (*T) {
+              case '}':
+                --NumBraces;
+                break;
+              case '{':
+                ++NumBraces;
+                continue;
+              case 0:
+                error("struct type ended unexpectedly");
+                return false;
+              }
+            }
+
+            // Parse struct size.
+            // TODO: This is probably useless number and doesn't represent the
+            // real size.
+            int Size = atoi(T);
+
+            // Structs are passed in registers.
+            for (int I = 0; I != Size; I += 4) {
+              if (RegId > UC_ARM_REG_R3) {
+                error("function has too many arguments");
+                return false;
+              }
+              callUC(uc_reg_read(UC, RegId++, ArgsP++));
+              ++ArgC;
+            }
+            break;
+          }
           default:
             error("unsupported argument type");
             return false;
