@@ -77,10 +77,12 @@
 #include <Twitter/Twitter.h>
 #include <UIKit/UIKit.h>
 #include <WebKit/WebKit.h>
+#endif
 
 // These don't have C declarations anywhere, since they're only used in
 // assembly, but we want to have wrappers generated for them, too.
 OBJC_EXPORT void _objc_msgNil(void /* id self, SEL op, ... */);
 OBJC_EXPORT void _objc_msgNil_stret(void /* id self, SEL op, ... */);
 OBJC_EXPORT void _objc_msgNil_fpret(void /* id self, SEL op, ... */);
-#endif
+OBJC_EXPORT void objc_msgLookupSuper(void);
+OBJC_EXPORT void objc_msgLookupSuper_stret(void);
