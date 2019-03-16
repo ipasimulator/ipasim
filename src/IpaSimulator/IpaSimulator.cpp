@@ -660,7 +660,6 @@ bool DynamicLoader::DynamicCaller::call(bool Returns, uint32_t Addr) {
 #undef CASE
 }
 
-// TODO: Use this everywhere.
 size_t DynamicLoader::TypeDecoder::getNextTypeSizeImpl() {
   switch (*T) {
   case 'v': // void
@@ -1247,22 +1246,22 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
       // dynamically, so that's what we do here.
       // TODO: Generate wrappers for callbacks, too (see README of
       // `HeadersAnalyzer` for more details).
+      OutputDebugStringA("Info: dynamically handling callback of type ");
+      OutputDebugStringA(T);
+      OutputDebugStringA(".\n");
 
       // First, handle the return value.
+      TypeDecoder TD(*this, T);
       bool Returns;
-      switch (*T) {
-      case 'v': // void
+      switch (TD.getNextTypeSize()) {
+      case 0:
         Returns = false;
         break;
-      case 'c': // char
-      case '@': // id
-      case 'i': // int
-      case 'I': // unsigned int
-      case 'f': // float
+      case 4:
         Returns = true;
         break;
       default:
-        error("unsupported return value of callback");
+        error("unsupported return type of callback");
         return nullptr;
       }
 
@@ -1272,18 +1271,11 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
 
       // Next, process function arguments.
       int RegId = UC_ARM_REG_R0;
-      while (*(++T)) {
-        // Skip digits.
-        for (; '0' <= *T && *T <= '9'; ++T)
-          ;
-        if (!*T)
-          break;
-
-        switch (*T) {
-        case '@':   // id
-        case ':':   // SEL
-        case 'i':   // int
-        case 'I': { // unsigned int
+      while (TD.hasNext()) {
+        switch (TD.getNextTypeSize()) {
+        case TypeDecoder::InvalidSize:
+          return nullptr;
+        case 4: {
           uint32_t I32 = va_arg(Args, uint32_t);
           if (RegId > UC_ARM_REG_R3) {
             error("callback has too many arguments");
