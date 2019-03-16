@@ -1,5 +1,4 @@
-# This script is used by
-# `deps/WinObjC/Frameworks/CoreFoundation/CMakeLists.txt`. See #13.
+# This script is used by `scripts/CommonVariables.cmake`. See #13.
 
 list (APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/scripts")
 include (CommonVariables)

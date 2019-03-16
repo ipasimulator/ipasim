@@ -40,6 +40,21 @@ target_compile_definitions (LIEF INTERFACE NOMINMAX)
 target_link_libraries (LIEF INTERFACE msvcrtd)
 add_dependencies (LIEF lief-x86-Debug)
 
+# Copy ANGLE binaries.
+add_custom_command (
+    OUTPUT "${IPASIM_CMAKE_DIR}/bin/libEGL.dll"
+        "${IPASIM_CMAKE_DIR}/bin/libGLESv2.dll"
+    COMMAND "${CMAKE_COMMAND}" "-DSOURCE_DIR=${SOURCE_DIR}"
+        "-DBINARY_DIR=${BINARY_DIR}"
+        -P "${SOURCE_DIR}/scripts/CopyANGLE.cmake"
+    COMMENT "Copy ANGLE binaries"
+    DEPENDS "${SOURCE_DIR}/scripts/CopyANGLE.cmake"
+        "${SOURCE_DIR}/scripts/CommonVariables.cmake")
+add_custom_target (AngleBinaries
+    DEPENDS "${IPASIM_CMAKE_DIR}/bin/libEGL.dll"
+        "${IPASIM_CMAKE_DIR}/bin/libGLESv2.dll")
+add_dependencies (IpaSimLibrary AngleBinaries)
+
 target_link_libraries (IpaSimLibrary PRIVATE WindowsApp.lib unicorn LIEF)
 
 # TODO: Actually build AppX with this target.

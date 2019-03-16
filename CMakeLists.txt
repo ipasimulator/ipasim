@@ -201,7 +201,6 @@ Universal Windows/x86/${name}.lib")
 Universal Windows/x86/cassowary-0.60-Debug.lib")
 
     # NuGet package ANGLE.WindowsStore.
-    set (ANGLE_DIR "C:/packages/ANGLE.WindowsStore.2.1.13")
     add_library (EGL SHARED IMPORTED)
     set_target_properties (EGL PROPERTIES
         IMPORTED_LOCATION "${ANGLE_DIR}/bin/UAP/Win32/libEGL.dll"
