@@ -1,0 +1,8 @@
+[ver:1,total:1320]
+src/IpaSimulator/IpaSimulator.cpp:606,1552748400:606,r
+src/IpaSimulator/CMakeLists.txt:242,1552748400:212,1552752000:30,m
+scripts/CopyANGLE.cmake:166,1552748400:136,1552752000:30,m
+scripts/CopyWocHeaders.cmake:120,1552748400:120,m
+CMakeLists.txt:95,1552748400:95,m
+scripts/CommonVariables.cmake:61,1552748400:61,m
+Dockerfile:30,1552748400:30,r
