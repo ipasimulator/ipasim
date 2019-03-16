@@ -50,8 +50,10 @@
   <ItemGroup>
     <None Include="IpaSimApp_TemporaryKey.pfx" />
     <None Include="packages.config" />
-    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libIpaSimLibrary.dll" />
     <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libunicorn.dll" />
+    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libIpaSimLibrary.dll" />
+    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libEGL.dll" />
+    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libGLESv2.dll" />
     <None Include="gen\**">
       <Filter>bin</Filter>
     </None>
