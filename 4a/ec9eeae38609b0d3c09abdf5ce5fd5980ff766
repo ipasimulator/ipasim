@@ -1,0 +1,5 @@
+[ver:1,total:180]
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:60,1552752000:60,m
+src/IpaSimulator/IpaSimulator.cpp:60,1552752000:60,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:48,1552752000:48,m
+scripts/CopyANGLE.cmake:12,1552752000:12,r
