@@ -3,7 +3,7 @@ set (ORIG_SOURCE_FILES
     src/apply.c
     src/benchmark.c
     src/data.c
-    src/init.c
+    #src/init.c
     src/introspection.c
     #src/io.c
     src/mach.c
@@ -42,7 +42,7 @@ set (ORIG_SOURCE_FILES
     src/shims/atomic_sfb.h
     src/shims/getprogname.h
     src/shims/hw_config.h
-    src/shims/linux_stubs.c
+    #src/shims/linux_stubs.c
     src/shims/linux_stubs.h
     src/shims/lock.c
     src/shims/lock.h
@@ -76,4 +76,4 @@ target_compile_options (dispatch PRIVATE
     -fblocks
     -fobjc-runtime=macosx-10.13.0)
 
-target_link_libraries (dispatch PRIVATE pthread)
+target_link_libraries (dispatch PRIVATE pthread objc)
