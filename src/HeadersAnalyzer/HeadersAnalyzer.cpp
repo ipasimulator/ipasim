@@ -595,28 +595,17 @@ public:
 
           // Call the lookup function and jump to its result.
           llvm::Value *IMP = IR.Builder.CreateCall(LookupFunc, Args, "imp");
-          // Also access `super->class` or `super->class->super_class` if
-          // necessary.
-          if (Exp.Super) {
+          // Also replace `super` with `super->receiver` if necessary.
+          if (Exp.Super || Exp.Super2) {
             llvm::Value *Super = Args[Exp.Stret ? 1 : 0];
-            llvm::Value *SP = IR.Builder.CreateBitCast(
-                Super, llvm::Type::getInt32PtrTy(LLVM.Ctx), "sp");
-            llvm::Value *SelfP = IR.Builder.CreateConstInBoundsGEP1_32(
-                llvm::Type::getInt32Ty(LLVM.Ctx), SP, 1, "selfp");
-            llvm::Value *Self = IR.Builder.CreateLoad(SelfP, "self");
+            llvm::Value *SuperP = IR.Builder.CreateBitCast(
+                Super, llvm::Type::getInt32PtrTy(LLVM.Ctx), "superP");
+            llvm::Value *ReceiverP = IR.Builder.CreateConstInBoundsGEP1_32(
+                llvm::Type::getInt32Ty(LLVM.Ctx), SuperP, 0, "receiverP");
+            llvm::Value *Receiver =
+                IR.Builder.CreateLoad(ReceiverP, "receiver");
             Args[Exp.Stret ? 1 : 0] =
-                IR.Builder.CreateIntToPtr(Self, VoidPtrTy);
-          } else if (Exp.Super2) {
-            llvm::Value *Super = Args[Exp.Stret ? 1 : 0];
-            llvm::Value *SP = IR.Builder.CreateBitCast(
-                Super, llvm::Type::getInt32PtrTy(LLVM.Ctx), "sp");
-            llvm::Value *SelfP = IR.Builder.CreateConstInBoundsGEP1_32(
-                llvm::Type::getInt32Ty(LLVM.Ctx), SP, 1, "selfp");
-            llvm::Value *SelfP2 = IR.Builder.CreateConstInBoundsGEP1_32(
-                llvm::Type::getInt32Ty(LLVM.Ctx), SelfP, 1, "selfp2");
-            llvm::Value *Self2 = IR.Builder.CreateLoad(SelfP2, "self");
-            Args[Exp.Stret ? 1 : 0] =
-                IR.Builder.CreateIntToPtr(Self2, VoidPtrTy);
+                IR.Builder.CreateIntToPtr(Receiver, VoidPtrTy);
           }
           llvm::CallInst *Call = IR.Builder.CreateCall(
               MessengerFunc->getFunctionType(), IMP, Args);
