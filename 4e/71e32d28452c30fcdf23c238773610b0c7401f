@@ -1,0 +1,4 @@
+[ver:1,total:1560]
+src/IpaSimulator/IpaSimulator.cpp:1460,1552809600:1460,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:80,1552809600:80,r
+src/IpaSimulator/IpaSimulator.hpp:20,1552809600:20,r
