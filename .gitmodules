@@ -42,3 +42,7 @@
 	path = deps/unicorn
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/unicorn
 	branch = port
+[submodule "deps/libdispatch"]
+	path = deps/libdispatch
+	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/libdispatch
+	branch = port
