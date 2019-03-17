@@ -666,6 +666,10 @@ size_t DynamicLoader::TypeDecoder::getNextTypeSizeImpl() {
   case 'I': // unsigned int
   case 'f': // float
     return 4;
+  case '^': // pointer to type
+    ++T;
+    getNextTypeSizeImpl(); // Skip the underlying type, it's not important.
+    return 4;
   case '{': { // struct
     // Skip name of the struct.
     for (++T; *T != '='; ++T)
@@ -675,14 +679,14 @@ size_t DynamicLoader::TypeDecoder::getNextTypeSizeImpl() {
       }
     ++T;
 
-    // Parse type recursively.
+    // Parse type recursively (note that the struct can be also empty).
     size_t TotalSize = 0;
-    do {
+    while (*T != '}') {
       size_t Size = getNextTypeSize();
       if (Size == InvalidSize)
         return InvalidSize;
       TotalSize += Size;
-    } while (*T != '}');
+    }
 
     return TotalSize;
   }
