@@ -469,7 +469,7 @@ LoadedLibrary *DynamicLoader::loadPE(const string &Path) {
     // Map libraries that act as `.dylib`s without their PE headers.
     LLP->StartAddress = Hdr;
     LLP->Size =
-        Info.SizeOfImage - (reinterpret_cast<uint64_t>(Info.lpBaseOfDll) - Hdr);
+        Info.SizeOfImage - (Hdr - reinterpret_cast<uint64_t>(Info.lpBaseOfDll));
     LLP->MachOPoser = true;
   } else {
     // Map other libraries in their entirety.
