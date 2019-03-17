@@ -1,0 +1,6 @@
+[ver:1,total:600]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:360,1552820400:180,1552824000:180,r
+src/IpaSimulator/IpaSimApp/App.xaml:100,1552820400:100,r
+.gitmodules:60,1552824000:60,m
+scripts/push_all.cmd:60,1552824000:60,m
+src/IpaSimulator/IpaSimulator.cpp:20,1552820400:20,r
