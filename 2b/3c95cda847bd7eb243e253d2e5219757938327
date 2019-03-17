@@ -1,0 +1,5 @@
+[ver:1,total:2046]
+src/IpaSimulator/IpaSimulator.cpp:1257,1552813200:1140,1552816800:72,1552820400:45,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:699,1552816800:624,1552820400:75,m
+src/IpaSimulator/IpaSimApp/App.xaml:60,1552820400:60,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:30,1552820400:30,m
