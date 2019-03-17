@@ -162,16 +162,6 @@ testing purposes only." OFF)
     target_include_directories (woc-Logging INTERFACE
         "${SOURCE_DIR}/deps/WinObjC/tools/Logging/include")
 
-    # Library `libdispatch.dll`.
-    # TODO: Don't hardcode the architecture, maybe even build it from sources
-    # (they are in `deps/WinObjC/deps/3rdparty/libdispatch`).
-    add_library (dispatch SHARED IMPORTED)
-    set_target_properties (dispatch PROPERTIES
-        IMPORTED_LOCATION "${SOURCE_DIR}/deps/WinObjC/tools/deps/prebuilt/\
-Universal Windows/x86/libdispatch.dll"
-        IMPORTED_IMPLIB "${SOURCE_DIR}/deps/WinObjC/tools/deps/prebuilt/\
-Universal Windows/x86/libdispatch.dll.a")
-
     function (add_prebuilt_lib_core name dllname)
         add_library ("${name}" SHARED IMPORTED)
         set_target_properties ("${name}" PROPERTIES
@@ -225,6 +215,7 @@ Universal Windows/x86/cassowary-0.60-Debug.lib")
 
     add_subdirectory (src)
     add_subdirectory (deps/unicorn)
+    add_subdirectory (deps/WinObjC/deps/3rdparty/libdispatch)
     add_subdirectory (deps/WinObjC/Frameworks)
     add_subdirectory (samples)
 
