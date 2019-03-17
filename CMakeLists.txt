@@ -215,7 +215,6 @@ Universal Windows/x86/cassowary-0.60-Debug.lib")
 
     add_subdirectory (src)
     add_subdirectory (deps/unicorn)
-    add_subdirectory (deps/WinObjC/deps/3rdparty/libdispatch)
     add_subdirectory (deps/WinObjC/Frameworks)
     add_subdirectory (samples)
 
