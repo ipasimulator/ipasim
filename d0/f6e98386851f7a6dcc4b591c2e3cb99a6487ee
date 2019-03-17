@@ -1,0 +1,7 @@
+[ver:1,total:420]
+src/IpaSimulator/IpaSimulator.cpp:120,1552809600:120,r
+src/IpaSimulator/IpaSimApp/MainPage.xaml:105,1552809600:105,m
+samples/HelloUIWrapper/App.xaml.cpp:60,1552809600:60,r
+src/IpaSimulator/IpaSimApp/App.h:60,1552809600:60,r
+src/IpaSimulator/IpaSimApp/MainPage.cpp:45,1552809600:45,m
+src/IpaSimulator/IpaSimApp/MainPage.h:30,1552809600:30,m
