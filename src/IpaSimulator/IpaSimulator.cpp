@@ -942,6 +942,8 @@ bool DynamicLoader::catchMemUnmapped(uc_engine *UC, uc_mem_type Type,
   return reinterpret_cast<DynamicLoader *>(Data)->handleMemUnmapped(
       Type, Addr, Size, Value);
 }
+// TODO: Maybe this happens when the emulated app accesses some non-directly
+// dependent DLL and we should load it as a whole.
 bool DynamicLoader::handleMemUnmapped(uc_mem_type Type, uint64_t Addr, int Size,
                                       int64_t Value) {
   OutputDebugStringA("Info: unmapped memory manipulation at 0x");
