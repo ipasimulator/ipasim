@@ -134,6 +134,9 @@ exit /B %errlev%</Command>
     <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libGLESv2.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libdispatch.dll">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="gen\**">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -168,9 +171,6 @@ exit /B %errlev%</Command>
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libdyld.dll">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\deps\WinObjC\tools\deps\prebuilt\Universal Windows\x86\libdispatch.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="..\..\..\deps\WinObjC\Frameworks\UIKit.Xaml\prebuilt\UIKit.Xaml.dll">
