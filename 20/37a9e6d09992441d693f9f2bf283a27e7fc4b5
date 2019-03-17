@@ -1,0 +1,5 @@
+[ver:1,total:900]
+src/objc/CMakeLists.txt:480,1552820400:480,r
+src/IpaSimulator/IpaSimulator.cpp:210,1552820400:210,r
+src/objc/include/Availability.h:180,1552820400:180,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:30,1552820400:30,r
