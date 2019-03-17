@@ -206,7 +206,7 @@ DynamicLoader::DynamicLoader(uc_engine *UC)
   // Map "kernel" page.
   void *KernelPtr = _aligned_malloc(PageSize, PageSize);
   KernelAddr = reinterpret_cast<uint64_t>(KernelPtr);
-  mapMemory(KernelAddr, PageSize, UC_PROT_NONE, KernelPtr);
+  mapMemory(KernelAddr, PageSize, UC_PROT_NONE);
 }
 
 LoadedLibrary *DynamicLoader::load(const string &Path) {
@@ -264,10 +264,10 @@ bool DynamicLoader::canSegmentsSlide(LIEF::MachO::Binary &Bin) {
          (FType == FILE_TYPES::MH_EXECUTE && Bin.is_pie());
 }
 // TODO: What if the mappings overlap?
-void DynamicLoader::mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms,
-                              void *Mem) {
-  if (uc_mem_map_ptr(UC, Addr, Size, Perms, Mem))
-    error("couldn't map memory");
+void DynamicLoader::mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms) {
+  if (uc_mem_map_ptr(UC, Addr, Size, Perms, reinterpret_cast<void *>(Addr)))
+    error("couldn't map memory at 0x" + to_hex_string(Addr) + " of size 0x" +
+          to_hex_string(Size));
 }
 BinaryPath DynamicLoader::resolvePath(const string &Path) {
   if (!Path.empty() && Path[0] == '/') {
@@ -354,14 +354,14 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
 
     if (Perms == UC_PROT_NONE) {
       // No protection means we don't have to copy any data, we just map it.
-      mapMemory(VAddr, VSize, Perms, Mem);
+      mapMemory(VAddr, VSize, Perms);
     } else {
       // TODO: Memory-map the segment instead of copying it.
       auto &Buff = Seg.content();
       // TODO: Copy to the end of the allocated space if flag `SG_HIGHVM` is
       // present.
       memcpy(Mem, Buff.data(), Buff.size());
-      mapMemory(VAddr, VSize, Perms, Mem);
+      mapMemory(VAddr, VSize, Perms);
 
       // Clear the remaining memory.
       if (Buff.size() < VSize)
@@ -481,8 +481,7 @@ LoadedLibrary *DynamicLoader::loadPE(const string &Path) {
   // Load the library into Unicorn engine.
   uint64_t StartAddr = alignToPageSize(LLP->StartAddress);
   uint64_t Size = roundToPageSize(LLP->Size);
-  mapMemory(StartAddr, Size, UC_PROT_READ | UC_PROT_WRITE,
-            reinterpret_cast<void *>(StartAddr));
+  mapMemory(StartAddr, Size, UC_PROT_READ | UC_PROT_WRITE);
 
   return LLP;
 }
@@ -497,7 +496,7 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   size_t StackSize = 8 * 1024 * 1024; // 8 MiB
   void *StackPtr = _aligned_malloc(StackSize, PageSize);
   uint64_t StackAddr = reinterpret_cast<uint64_t>(StackPtr);
-  mapMemory(StackAddr, StackSize, UC_PROT_READ | UC_PROT_WRITE, StackPtr);
+  mapMemory(StackAddr, StackSize, UC_PROT_READ | UC_PROT_WRITE);
   // Reserve 12 bytes on the stack, so that our instruction logger can read
   // them.
   uint32_t StackTop = StackAddr + StackSize - 12;
@@ -950,8 +949,7 @@ bool DynamicLoader::handleMemUnmapped(uc_mem_type Type, uint64_t Addr, int Size,
   // Map the memory, so that emulation can continue.
   Addr = alignToPageSize(Addr);
   Size = roundToPageSize(Size);
-  mapMemory(Addr, Size, UC_PROT_READ | UC_PROT_WRITE,
-            reinterpret_cast<void *>(Addr));
+  mapMemory(Addr, Size, UC_PROT_READ | UC_PROT_WRITE);
 
   return true;
 }

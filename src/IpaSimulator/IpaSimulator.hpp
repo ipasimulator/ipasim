@@ -75,7 +75,7 @@ private:
   void error(const std::string &Msg, bool AppendLastError = false);
   void callUC(uc_err Err);
   bool canSegmentsSlide(LIEF::MachO::Binary &Bin);
-  void mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms, void *Mem);
+  void mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms);
   BinaryPath resolvePath(const std::string &Path);
   LoadedLibrary *loadMachO(const std::string &Path);
   LoadedLibrary *loadPE(const std::string &Path);
