@@ -1,0 +1,6 @@
+[ver:1,total:1200]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:600,1552852800:600,r
+src/dispatch/CMakeLists.txt:280,1552852800:280,m
+src/objc/include/sys/queue.h:180,1552849200:120,1552852800:60,r
+src/objc/CMakeLists.txt:120,1552852800:120,r
+CMakeLists.txt:20,1552852800:20,r
