@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "MainPage.h"
 
 using namespace winrt;
@@ -19,10 +19,5 @@ namespace winrt::IpaSimApp::implementation
     void MainPage::MyProperty(int32_t /* value */)
     {
         throw hresult_not_implemented();
-    }
-
-    void MainPage::ClickHandler(IInspectable const&, RoutedEventArgs const&)
-    {
-        myButton().Content(box_value(L"Clicked"));
     }
 }
