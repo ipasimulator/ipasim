@@ -5,7 +5,6 @@
 #include <psapi.h> // for `GetModuleInformation`
 #include <winrt/Windows.ApplicationModel.h>
 #include <winrt/Windows.Storage.h>
-#include <winrt/Windows.UI.Popups.h>
 #include <winrt/base.h>
 
 #include <filesystem>
@@ -17,7 +16,6 @@ using namespace Windows::ApplicationModel;
 using namespace Windows::ApplicationModel::Activation;
 using namespace Windows::Foundation;
 using namespace Windows::Storage;
-using namespace Windows::UI::Popups;
 
 // Binary operators on enums. Taken from
 // <https://stackoverflow.com/a/23152590/9080566>.
@@ -252,10 +250,8 @@ void DynamicLoader::error(const string &Msg, bool AppendLastError) {
     hresult_error Err(HRESULT_FROM_WIN32(GetLastError()));
     HS = HS + L"\n" + Err.message();
   }
-  MessageDialog Dlg(HS);
-  Dlg.ShowAsync();
 
-  // Also output the error to debugging console.
+  // Output the error to debugging console.
   HS = HS + L"\n";
   OutputDebugStringW(HS.c_str());
 }
@@ -1022,10 +1018,6 @@ extern "C" __declspec(dllexport) void start(
   auto *LaunchFunc = reinterpret_cast<void (*)(void *)>(LaunchAddr);
   // `get_abi` converts C++/WinRT object to its C++/CX equivalent.
   LaunchFunc(get_abi(LaunchArgs));
-
-  // Let the user know we're done. This is here for testing purposes only.
-  MessageDialog Dlg(L"Done.");
-  Dlg.ShowAsync();
 }
 
 struct method_t {
