@@ -1,4 +1,4 @@
-// TODO: Implement those functions.
+// TODO: Implement these functions.
 
 #include "..\..\deps\objc4\runtime\objc-private.h"
 
@@ -6,6 +6,16 @@ OBJC_EXPORT void dyld_stub_binder() { assert(false); }
 
 // The original is in libobjc2/arc.mm.
 OBJC_EXPORT void objc_delete_weak_refs(id obj) {}
+
+// See #27. This is a workaround, because if we imported
+// `dispatch_is_dispatch_object` directly, there would be a cycle.
+static bool(*dispatch_is_dispatch_object_p)(const void *);
+OBJC_EXPORT void objc_register_dispatch_is_dispatch_object(bool(*func)(const void *)) {
+    dispatch_is_dispatch_object_p = func;
+}
+bool dispatch_is_dispatch_object(const void *obj) {
+    return dispatch_is_dispatch_object_p(obj);
+}
 
 // Copied from libobjc2/encoding2.c.
 // TODO: Do these work correctly for our runtime? Maybe port Apple's NSGetSizeAndAlignment instead (if there is its source code).
