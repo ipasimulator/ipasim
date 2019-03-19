@@ -1354,3 +1354,9 @@ extern "C" __declspec(dllexport) void ipaSim_callBack1(void *FP, void *arg0) {
 extern "C" __declspec(dllexport) void ipaSim_callBack2(void *FP, void *arg0, void *arg1) {
   IpaSim.Dyld.callBack(FP, arg0, arg1);
 }
+extern "C" __declspec(dllexport) void *ipaSim_callBack1r(void *FP, void *arg0) {
+  return IpaSim.Dyld.callBackR(FP, arg0);
+}
+extern "C" __declspec(dllexport) void *ipaSim_callBack3r(void *FP, void *arg0, void *arg1, void *arg2) {
+  return IpaSim.Dyld.callBackR(FP, arg0, arg1, arg2);
+}

@@ -73,6 +73,9 @@ public:
   template <typename... ArgTypes> bool callBack(void *FP, ArgTypes... Args) {
     return DynamicBackCaller(*this).callBack<ArgTypes...>(FP, Args...);
   }
+  template <typename... ArgTypes> void *callBackR(void *FP, ArgTypes... Args) {
+    return DynamicBackCaller(*this).callBackR<ArgTypes...>(FP, Args...);
+  }
 
 private:
   void error(const std::string &Msg, bool AppendLastError = false);
@@ -172,8 +175,7 @@ private:
     DynamicBackCaller(DynamicLoader &Dyld) : Dyld(Dyld), RegId(UC_ARM_REG_R0) {}
 
     bool pushArgs() { return true; }
-    template <typename... ArgTypes>
-    bool pushArgs(void *Arg, ArgTypes... Args) {
+    template <typename... ArgTypes> bool pushArgs(void *Arg, ArgTypes... Args) {
       if (RegId > UC_ARM_REG_R3) {
         // TODO: This should happen at compile-time.
         Dyld.error("callback has too many arguments");
@@ -199,6 +201,16 @@ private:
         Dyld.execute(Addr);
         return true;
       }
+    }
+    template <typename... ArgTypes>
+    void *callBackR(void *FP, ArgTypes... Args) {
+      if (!callBack(FP, Args...))
+        return nullptr;
+
+      // Fetch return value.
+      uint32_t R0;
+      Dyld.callUC(uc_reg_read(Dyld.UC, UC_ARM_REG_R0, &R0));
+      return reinterpret_cast<void *>(R0);
     }
 
   private:
