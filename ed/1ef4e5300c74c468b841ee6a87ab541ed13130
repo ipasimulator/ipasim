@@ -1,0 +1,5 @@
+[ver:1,total:1860]
+src/IpaSimulator/IpaSimulator.hpp:915,1553004000:915,m
+src/IpaSimulator/IpaSimulator.cpp:795,1553004000:795,m
+src/objc/stubs.mm:120,1553004000:120,r
+src/IpaSimulator/IpaSimApp/MainPage.cpp:30,1553004000:30,r
