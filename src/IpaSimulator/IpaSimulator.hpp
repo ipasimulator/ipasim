@@ -70,6 +70,9 @@ public:
   void *translate(void *Addr, va_list Args);
   void *getRetVal();
   void callLoad(void *load, void *self, void *sel);
+  template <typename... ArgTypes> bool callBack(void *FP, ArgTypes... Args) {
+    return DynamicBackCaller(*this).callBack<ArgTypes...>(FP, Args...);
+  }
 
 private:
   void error(const std::string &Msg, bool AppendLastError = false);
@@ -156,6 +159,46 @@ private:
         Dyld.callUC(uc_reg_write(Dyld.UC, UC_ARM_REG_R0, &RetVal));
       } else
         reinterpret_cast<void (*)(ArgTypes...)>(Addr)(Params...);
+    }
+
+  private:
+    DynamicLoader &Dyld;
+    int RegId; // uc_arm_reg
+    std::vector<uint32_t> Args;
+  };
+
+  class DynamicBackCaller {
+  public:
+    DynamicBackCaller(DynamicLoader &Dyld) : Dyld(Dyld), RegId(UC_ARM_REG_R0) {}
+
+    bool pushArgs() { return true; }
+    template <typename... ArgTypes>
+    bool pushArgs(void *Arg, ArgTypes... Args) {
+      if (RegId > UC_ARM_REG_R3) {
+        // TODO: This should happen at compile-time.
+        Dyld.error("callback has too many arguments");
+        return false;
+      }
+      Dyld.callUC(uc_reg_write(Dyld.UC, RegId++, Arg));
+      return pushArgs(Args...);
+    }
+    template <typename... ArgTypes> bool callBack(void *FP, ArgTypes... Args) {
+      uint64_t Addr = reinterpret_cast<uint64_t>(FP);
+      AddrInfo AI(Dyld.lookup(Addr));
+      if (!dynamic_cast<LoadedDylib *>(AI.Lib)) {
+        // Target load method is not inside any emulated Dylib, so it must be
+        // native executable code and we can simply call it.
+        reinterpret_cast<void (*)(ArgTypes...)>(FP)(Args...);
+        return true;
+      } else {
+        // Target load method is inside some emulated library.
+
+        if (!pushArgs(Args...))
+          return false;
+
+        Dyld.execute(Addr);
+        return true;
+      }
     }
 
   private:

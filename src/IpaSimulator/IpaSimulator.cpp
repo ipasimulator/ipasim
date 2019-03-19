@@ -1348,3 +1348,9 @@ extern "C" __declspec(dllexport) void ipaSim_callLoad(void *load, void *self,
                                                       void *sel) {
   IpaSim.Dyld.callLoad(load, self, sel);
 }
+extern "C" __declspec(dllexport) void ipaSim_callBack1(void *FP, void *arg0) {
+  IpaSim.Dyld.callBack(FP, arg0);
+}
+extern "C" __declspec(dllexport) void ipaSim_callBack2(void *FP, void *arg0, void *arg1) {
+  IpaSim.Dyld.callBack(FP, arg0, arg1);
+}
