@@ -1,0 +1,5 @@
+[ver:1,total:2160]
+src/IpaSimulator/IpaSimulator.cpp:800,1553000400:600,1553004000:200,r
+src/objc/stubs.mm:680,1553000400:460,1553004000:220,m
+docs/issues/27.md:540,1553000400:540,m
+src/objc/CMakeLists.txt:140,1553000400:140,r
