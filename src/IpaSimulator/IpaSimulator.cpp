@@ -1241,7 +1241,8 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
       // methods, it's actually quite simple to translate i386 -> ARM calls
       // dynamically, so that's what we do here.
       // TODO: Generate wrappers for callbacks, too (see README of
-      // `HeadersAnalyzer` for more details).
+      // `HeadersAnalyzer` for more details). Or generate them at runtime using
+      // `libffi`, `ffcall`, `libffcall` or some other FFI library.
       OutputDebugStringA("Info: dynamically handling callback of type ");
       OutputDebugStringA(T);
       OutputDebugStringA(".\n");
@@ -1351,12 +1352,15 @@ extern "C" __declspec(dllexport) void ipaSim_callLoad(void *load, void *self,
 extern "C" __declspec(dllexport) void ipaSim_callBack1(void *FP, void *arg0) {
   IpaSim.Dyld.callBack(FP, arg0);
 }
-extern "C" __declspec(dllexport) void ipaSim_callBack2(void *FP, void *arg0, void *arg1) {
+extern "C" __declspec(dllexport) void ipaSim_callBack2(void *FP, void *arg0,
+                                                       void *arg1) {
   IpaSim.Dyld.callBack(FP, arg0, arg1);
 }
 extern "C" __declspec(dllexport) void *ipaSim_callBack1r(void *FP, void *arg0) {
   return IpaSim.Dyld.callBackR(FP, arg0);
 }
-extern "C" __declspec(dllexport) void *ipaSim_callBack3r(void *FP, void *arg0, void *arg1, void *arg2) {
+extern "C" __declspec(dllexport) void *ipaSim_callBack3r(void *FP, void *arg0,
+                                                         void *arg1,
+                                                         void *arg2) {
   return IpaSim.Dyld.callBackR(FP, arg0, arg1, arg2);
 }
