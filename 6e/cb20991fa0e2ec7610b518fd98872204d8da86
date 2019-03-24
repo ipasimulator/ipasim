@@ -1,0 +1,5 @@
+[ver:1,total:840]
+src/IpaSimulator/IpaSimulator.cpp:720,1553414400:720,m
+src/IpaSimulator/IpaSimulator.hpp:60,1553414400:60,m
+src/IpaSimulator/CMakeLists.txt:30,1553414400:30,r
+scripts/Libffi-x86-Debug.cmake:30,1553414400:30,r
