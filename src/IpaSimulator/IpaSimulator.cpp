@@ -1205,6 +1205,7 @@ void DynamicLoader::dumpAddr(uint64_t Addr) {
 }
 
 struct Trampoline {
+  ffi_cif CIF;
   bool Returns;
   size_t ArgC;
   uint64_t Addr;
@@ -1221,7 +1222,7 @@ void DynamicLoader::handleTrampoline(void *Ret, void **Args, void *Data) {
   // Pass arguments.
   int RegId = UC_ARM_REG_R0;
   for (size_t I = 0, ArgC = Tr->ArgC; I != ArgC; ++I) {
-    uint32_t I32 = reinterpret_cast<uint32_t>(Args[I]);
+    uint32_t I32 = *reinterpret_cast<uint32_t *>(Args[I]);
     callUC(uc_reg_write(UC, RegId++, &I32));
   }
 
@@ -1232,15 +1233,13 @@ void DynamicLoader::handleTrampoline(void *Ret, void **Args, void *Data) {
   if (Tr->Returns) {
     uint32_t Reg;
     callUC(uc_reg_read(UC, UC_ARM_REG_R0, &Reg));
-    *reinterpret_cast<uint32_t *>(Ret) = Reg;
+    *reinterpret_cast<ffi_arg *>(Ret) = Reg;
   }
 }
 static void ipaSim_handleTrampoline(ffi_cif *, void *Ret, void **Args,
                                     void *Data) {
   IpaSim.Dyld.handleTrampoline(Ret, Args, Data);
 }
-static ffi_type *PtrArgs[4] = {&ffi_type_pointer, &ffi_type_pointer,
-                               &ffi_type_pointer, &ffi_type_pointer};
 
 // If `Addr` points to emulated code, returns address of wrapper that should be
 // called instead. Otherwise, returns `Addr` unchanged.
@@ -1305,13 +1304,15 @@ void *DynamicLoader::translate(void *Addr) {
         error("couldn't allocate closure");
         return nullptr;
       }
-      ffi_cif CIF;
-      if (ffi_prep_cif(&CIF, FFI_DEFAULT_ABI, Tr->ArgC, &ffi_type_void,
-                       PtrArgs) != FFI_OK) {
+      static ffi_type *ArgTypes[4] = {&ffi_type_uint32, &ffi_type_uint32,
+                                      &ffi_type_uint32, &ffi_type_uint32};
+      if (ffi_prep_cif(&Tr->CIF, FFI_MS_CDECL, Tr->ArgC,
+                       Tr->Returns ? &ffi_type_uint32 : &ffi_type_void,
+                       ArgTypes) != FFI_OK) {
         error("couldn't prepare CIF");
         return nullptr;
       }
-      if (ffi_prep_closure_loc(Closure, &CIF, ipaSim_handleTrampoline, Tr,
+      if (ffi_prep_closure_loc(Closure, &Tr->CIF, ipaSim_handleTrampoline, Tr,
                                Ptr) != FFI_OK) {
         error("couldn't prepare closure");
         return nullptr;
