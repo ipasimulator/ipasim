@@ -46,3 +46,7 @@
 	path = deps/libdispatch
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/libdispatch
 	branch = port
+[submodule "deps/Libffi"]
+	path = deps/Libffi
+	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/Libffi
+	branch = port

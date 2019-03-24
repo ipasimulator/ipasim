@@ -2,6 +2,7 @@
 
 #include "WrapperIndex.hpp"
 
+#include <ffi.h>
 #include <psapi.h> // for `GetModuleInformation`
 #include <winrt/Windows.ApplicationModel.h>
 #include <winrt/Windows.Storage.h>
@@ -970,11 +971,6 @@ AddrInfo DynamicLoader::lookup(uint64_t Addr) {
 // TODO: Find symbol name and also use this function to implement
 // `src/objc/dladdr.mm`.
 AddrInfo DynamicLoader::inspect(uint64_t Addr) { return lookup(Addr); }
-void *DynamicLoader::getRetVal() {
-  uint32_t Reg;
-  callUC(uc_reg_read(UC, UC_ARM_REG_R0, &Reg));
-  return reinterpret_cast<void *>(Reg);
-}
 // Calling `uc_emu_start` inside `emu_start` (e.g., inside a hook) is not very
 // good idea. Instead, we need to call it when emulation completely stops (i.e.,
 // Unicorn returns from `uc_emu_start`). That's what this function is used for.
@@ -1225,60 +1221,89 @@ const char *LoadedLibrary::getMethodType(uint64_t Addr) {
   return nullptr;
 }
 
-static void noop() {}
-static void *returningWrapper() { return IpaSim.Dyld.getRetVal(); }
+struct Trampoline {
+  bool Returns;
+  size_t ArgC;
+  uint64_t Addr;
+};
+void DynamicLoader::handleTrampoline(void *Ret, void **Args, void *Data) {
+  auto *Tr = reinterpret_cast<Trampoline *>(Data);
+  OutputDebugStringA("Info: handling trampoline (arguments: ");
+  OutputDebugStringA(to_string(Tr->ArgC).c_str());
+  if (Tr->Returns)
+    OutputDebugStringA(", returns).\n");
+  else
+    OutputDebugStringA(", void).\n");
+
+  // Pass arguments.
+  int RegId = UC_ARM_REG_R0;
+  for (size_t I = 0, ArgC = Tr->ArgC; I != ArgC; ++I) {
+    uint32_t I32 = reinterpret_cast<uint32_t>(Args[I]);
+    callUC(uc_reg_write(UC, RegId++, &I32));
+  }
+
+  // Call the function.
+  execute(Tr->Addr);
+
+  // Extract return value.
+  if (Tr->Returns) {
+    uint32_t Reg;
+    callUC(uc_reg_read(UC, UC_ARM_REG_R0, &Reg));
+    *reinterpret_cast<uint32_t *>(Ret) = Reg;
+  }
+}
+static void ipaSim_handleTrampoline(ffi_cif *, void *Ret, void **Args,
+                                    void *Data) {
+  IpaSim.Dyld.handleTrampoline(Ret, Args, Data);
+}
+static ffi_type *PtrArgs[4] = {&ffi_type_pointer, &ffi_type_pointer,
+                               &ffi_type_pointer, &ffi_type_pointer};
 
 // If `Addr` points to emulated code, returns address of wrapper that should be
 // called instead. Otherwise, returns `Addr` unchanged.
-void *DynamicLoader::translate(void *Addr, va_list Args) {
+void *DynamicLoader::translate(void *Addr) {
   uint64_t AddrVal = reinterpret_cast<uint64_t>(Addr);
   AddrInfo AI(lookup(AddrVal));
   if (auto *Dylib = dynamic_cast<LoadedDylib *>(AI.Lib)) {
     // The address points to Dylib.
 
     if (const char *T = Dylib->getMethodType(AddrVal)) {
-      // We have found metadata of the callback method. Now, for simple
-      // methods, it's actually quite simple to translate i386 -> ARM calls
-      // dynamically, so that's what we do here.
+      // We have found metadata of the callback method. Now, for simple methods,
+      // it's actually quite simple to translate i386 -> ARM calls dynamically,
+      // so that's what we do here.
       // TODO: Generate wrappers for callbacks, too (see README of
-      // `HeadersAnalyzer` for more details). Or generate them at runtime using
-      // `libffi`, `ffcall`, `libffcall` or some other FFI library.
+      // `HeadersAnalyzer` for more details).
       OutputDebugStringA("Info: dynamically handling callback of type ");
       OutputDebugStringA(T);
       OutputDebugStringA(".\n");
 
       // First, handle the return value.
       TypeDecoder TD(*this, T);
-      bool Returns;
+      auto *Tr = new Trampoline;
       switch (TD.getNextTypeSize()) {
       case 0:
-        Returns = false;
+        Tr->Returns = false;
         break;
       case 4:
-        Returns = true;
+        Tr->Returns = true;
         break;
       default:
         error("unsupported return type of callback");
         return nullptr;
       }
 
-      // First variadic argument is actually return address on top of the
-      // stack. Just skip that.
-      va_arg(Args, uint32_t);
-
       // Next, process function arguments.
-      int RegId = UC_ARM_REG_R0;
+      Tr->ArgC = 0;
       while (TD.hasNext()) {
         switch (TD.getNextTypeSize()) {
         case TypeDecoder::InvalidSize:
           return nullptr;
         case 4: {
-          uint32_t I32 = va_arg(Args, uint32_t);
-          if (RegId > UC_ARM_REG_R3) {
+          if (Tr->ArgC > 3) {
             error("callback has too many arguments");
             return nullptr;
           }
-          callUC(uc_reg_write(UC, RegId++, &I32));
+          ++Tr->ArgC;
           break;
         }
         default:
@@ -1287,13 +1312,28 @@ void *DynamicLoader::translate(void *Addr, va_list Args) {
         }
       }
 
-      // Finally, call the function.
-      execute(AddrVal);
-
-      // Since we already called the function, return a no-op.
-      if (Returns)
-        return reinterpret_cast<void *>(returningWrapper);
-      return reinterpret_cast<void *>(noop);
+      // Now, create trampoline.
+      Tr->Addr = AddrVal;
+      void *Ptr;
+      // TODO: `Closure` nor `Tr` are never deallocated.
+      auto *Closure = reinterpret_cast<ffi_closure *>(
+          ffi_closure_alloc(sizeof(ffi_closure), &Ptr));
+      if (!Closure) {
+        error("couldn't allocate closure");
+        return nullptr;
+      }
+      ffi_cif CIF;
+      if (ffi_prep_cif(&CIF, FFI_DEFAULT_ABI, Tr->ArgC, &ffi_type_void,
+                       PtrArgs) != FFI_OK) {
+        error("couldn't prepare CIF");
+        return nullptr;
+      }
+      if (ffi_prep_closure_loc(Closure, &CIF, ipaSim_handleTrampoline, Tr,
+                               Ptr) != FFI_OK) {
+        error("couldn't prepare closure");
+        return nullptr;
+      }
+      return Ptr;
     }
 
     error("callback not found");
@@ -1328,19 +1368,12 @@ void DynamicLoader::callLoad(void *load, void *self, void *sel) {
   }
 }
 
-extern "C" __declspec(dllexport) void *ipaSim_translate(void *Addr...) {
-  va_list Args;
-  va_start(Args, Addr);
-  void *Result = IpaSim.Dyld.translate(Addr, Args);
-  va_end(Args);
-  return Result;
+extern "C" __declspec(dllexport) void *ipaSim_translate(void *Addr) {
+  return IpaSim.Dyld.translate(Addr);
 }
-extern "C" __declspec(dllexport) void ipaSim_translate4(uint32_t *Addr...) {
-  va_list Args;
-  va_start(Args, Addr);
+extern "C" __declspec(dllexport) void ipaSim_translate4(uint32_t *Addr) {
   Addr[1] = reinterpret_cast<uint32_t>(
-      IpaSim.Dyld.translate(reinterpret_cast<void *>(Addr[1]), Args));
-  va_end(Args);
+      IpaSim.Dyld.translate(reinterpret_cast<void *>(Addr[1])));
 }
 extern "C" __declspec(dllexport) const char *ipaSim_processPath() {
   return IpaSim.MainBinary.c_str();

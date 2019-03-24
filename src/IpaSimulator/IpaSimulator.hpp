@@ -1,6 +1,5 @@
 #include <LIEF/LIEF.hpp>
 #include <Windows.h>
-#include <cstdarg>
 #include <functional>
 #include <stack>
 #include <string>
@@ -67,8 +66,8 @@ public:
   DynamicLoader(uc_engine *UC);
   LoadedLibrary *load(const std::string &Path);
   void execute(LoadedLibrary *Lib);
-  void *translate(void *Addr, va_list Args);
-  void *getRetVal();
+  void *translate(void *Addr);
+  void handleTrampoline(void *Ret, void **Args, void *Data);
   void callLoad(void *load, void *self, void *sel);
   template <typename... ArgTypes> bool callBack(void *FP, ArgTypes... Args) {
     return DynamicBackCaller(*this).callBack<ArgTypes...>(FP, Args...);
