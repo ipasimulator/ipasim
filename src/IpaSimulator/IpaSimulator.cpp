@@ -55,17 +55,8 @@ void DynamicLoader::callUC(uc_err Err) {
     OutputDebugStringA(to_string(Err).c_str());
     uint32_t Addr;
     callUCSimple(uc_reg_read(UC, UC_ARM_REG_PC, &Addr));
-    AddrInfo AI(lookup(Addr));
-    if (!AI.Lib) {
-      OutputDebugStringA(" at 0x");
-      OutputDebugStringA(to_hex_string(Addr).c_str());
-    } else {
-      OutputDebugStringA(" in ");
-      OutputDebugStringA(AI.LibPath->c_str());
-      OutputDebugStringA(" at 0x");
-      uint64_t RVA = Addr - AI.Lib->StartAddress;
-      OutputDebugStringA(to_hex_string(RVA).c_str());
-    }
+    OutputDebugStringA(" at ");
+    dumpAddr(Addr);
     OutputDebugStringA(".\n");
     // TODO: Throw better exceptions.
     throw "unicorn error";
@@ -535,19 +526,9 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   execute(Dylib->Bin.entrypoint() + Dylib->StartAddress);
 }
 void DynamicLoader::execute(uint64_t Addr) {
-  AddrInfo AI(lookup(Addr));
-  if (!AI.Lib) {
-    OutputDebugStringA("Info: starting emulation at 0x");
-    OutputDebugStringA(to_hex_string(Addr).c_str());
-    OutputDebugStringA(".\n");
-  } else {
-    OutputDebugStringA("Info: starting emulation in ");
-    OutputDebugStringA(AI.LibPath->c_str());
-    OutputDebugStringA(" at 0x");
-    uint64_t RVA = Addr - AI.Lib->StartAddress;
-    OutputDebugStringA(to_hex_string(RVA).c_str());
-    OutputDebugStringA(".\n");
-  }
+  OutputDebugStringA("Info: starting emulation at ");
+  dumpAddr(Addr);
+  OutputDebugStringA(".\n");
 
   // Save LR.
   uint32_t LR;
@@ -594,22 +575,9 @@ void DynamicLoader::returnToEmulation() {
   callUC(uc_reg_read(UC, UC_ARM_REG_LR, &LR));
 
   // Log details about the return.
-  if (LR == KernelAddr)
-    OutputDebugStringA("Info: returning to kernel.\n");
-  else {
-    AddrInfo AI(lookup(LR));
-    if (!AI.Lib) {
-      OutputDebugStringA("Info: returning to 0x");
-      OutputDebugStringA(to_hex_string(LR).c_str());
-    } else {
-      OutputDebugStringA("Info: returning to ");
-      OutputDebugStringA(AI.LibPath->c_str());
-      OutputDebugStringA(" at 0x");
-      uint64_t RVA = LR - AI.Lib->StartAddress;
-      OutputDebugStringA(to_hex_string(RVA).c_str());
-    }
-    OutputDebugStringA(".\n");
-  }
+  OutputDebugStringA("Info: returning to ");
+  dumpAddr(LR);
+  OutputDebugStringA(".\n");
 
   assert(!Running);
   Restart = true;
@@ -817,11 +785,8 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   }
 
   // Log details.
-  OutputDebugStringA("Info: fetch prot. mem. in ");
-  OutputDebugStringA(AI.LibPath->c_str());
-  OutputDebugStringA(" at 0x");
-  uint64_t RVA = Addr - AI.Lib->StartAddress;
-  OutputDebugStringA(to_hex_string(RVA).c_str());
+  OutputDebugStringA("Info: fetch prot. mem. at ");
+  dumpAddr(Addr, AI);
   if (!Wrapper)
     OutputDebugStringA(" (not a wrapper)");
   OutputDebugStringA(".\n");
@@ -881,11 +846,8 @@ void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
   }
 
 #if 0
-  OutputDebugStringA("Info: executing ");
-  OutputDebugStringA(AI.LibPath->c_str());
-  OutputDebugStringA(" at 0x");
-  uint64_t RVA = Addr - AI.Lib->StartAddress;
-  OutputDebugStringA(to_hex_string(RVA).c_str());
+  OutputDebugStringA("Info: executing at ");
+  dumpAddr(Addr, AI);
   OutputDebugStringA(" [R0 = 0x");
   uint32_t Reg;
   callUC(uc_reg_read(UC, UC_ARM_REG_R0, &Reg));
@@ -927,10 +889,10 @@ bool DynamicLoader::catchMemWrite(uc_engine *UC, uc_mem_type Type,
 bool DynamicLoader::handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size,
                                    int64_t Value) {
 #if 0
-  OutputDebugStringA("Info: writing [0x");
-  OutputDebugStringA(to_hex_string(Addr).c_str());
-  OutputDebugStringA("] := 0x");
-  OutputDebugStringA(to_hex_string(Value).c_str());
+  OutputDebugStringA("Info: writing [");
+  dumpAddr(Addr);
+  OutputDebugStringA("] := ");
+  dumpAddr(Value);
   OutputDebugStringA(" (");
   OutputDebugStringA(to_string(Size).c_str());
   OutputDebugStringA(").\n");
@@ -947,8 +909,8 @@ bool DynamicLoader::catchMemUnmapped(uc_engine *UC, uc_mem_type Type,
 // dependent DLL and we should load it as a whole.
 bool DynamicLoader::handleMemUnmapped(uc_mem_type Type, uint64_t Addr, int Size,
                                       int64_t Value) {
-  OutputDebugStringA("Info: unmapped memory manipulation at 0x");
-  OutputDebugStringA(to_hex_string(Addr).c_str());
+  OutputDebugStringA("Info: unmapped memory manipulation at ");
+  dumpAddr(Addr);
   OutputDebugStringA(" (");
   OutputDebugStringA(to_string(Size).c_str());
   OutputDebugStringA(").\n");
@@ -1219,6 +1181,27 @@ const char *LoadedLibrary::getMethodType(uint64_t Addr) {
   }
 
   return nullptr;
+}
+
+void DynamicLoader::dumpAddr(uint64_t Addr, const AddrInfo &AI) {
+  if (!AI.Lib) {
+    OutputDebugStringA("0x");
+    OutputDebugStringA(to_hex_string(Addr).c_str());
+  } else {
+    OutputDebugStringA(AI.LibPath->c_str());
+    OutputDebugStringA("+0x");
+    uint64_t RVA = Addr - AI.Lib->StartAddress;
+    OutputDebugStringA(to_hex_string(RVA).c_str());
+  }
+}
+void DynamicLoader::dumpAddr(uint64_t Addr) {
+  if (Addr == KernelAddr) {
+    OutputDebugStringA("kernel!0x");
+    OutputDebugStringA(to_hex_string(Addr).c_str());
+  } else {
+    AddrInfo AI(lookup(Addr));
+    dumpAddr(Addr, AI);
+  }
 }
 
 struct Trampoline {

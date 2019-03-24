@@ -120,6 +120,8 @@ private:
   void returnToKernel();
   void returnToEmulation();
   void continueOutsideEmulation(std::function<void()> Cont);
+  void dumpAddr(uint64_t Addr);
+  void dumpAddr(uint64_t Addr, const AddrInfo &AI);
 
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
