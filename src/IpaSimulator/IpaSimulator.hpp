@@ -69,8 +69,8 @@ public:
   void *translate(void *Addr);
   void handleTrampoline(void *Ret, void **Args, void *Data);
   void callLoad(void *load, void *self, void *sel);
-  template <typename... ArgTypes> bool callBack(void *FP, ArgTypes... Args) {
-    return DynamicBackCaller(*this).callBack<ArgTypes...>(FP, Args...);
+  template <typename... ArgTypes> void callBack(void *FP, ArgTypes... Args) {
+    DynamicBackCaller(*this).callBack<ArgTypes...>(FP, Args...);
   }
   template <typename... ArgTypes> void *callBackR(void *FP, ArgTypes... Args) {
     return DynamicBackCaller(*this).callBackR<ArgTypes...>(FP, Args...);
@@ -173,40 +173,32 @@ private:
 
   class DynamicBackCaller {
   public:
-    DynamicBackCaller(DynamicLoader &Dyld) : Dyld(Dyld), RegId(UC_ARM_REG_R0) {}
+    DynamicBackCaller(DynamicLoader &Dyld) : Dyld(Dyld) {}
 
-    bool pushArgs() { return true; }
-    template <typename... ArgTypes> bool pushArgs(void *Arg, ArgTypes... Args) {
-      if (RegId > UC_ARM_REG_R3) {
-        // TODO: This should happen at compile-time.
-        Dyld.error("callback has too many arguments");
-        return false;
-      }
-      Dyld.callUC(uc_reg_write(Dyld.UC, RegId++, Arg));
-      return pushArgs(Args...);
+    template <int RegId> void pushArgs() {}
+    template <int RegId, typename... ArgTypes>
+    void pushArgs(void *Arg, ArgTypes... Args) {
+      static_assert(UC_ARM_REG_R0 <= RegId && RegId <= UC_ARM_REG_R3,
+                    "Callback has too many arguments.");
+      Dyld.callUC(uc_reg_write(Dyld.UC, RegId, Arg));
+      pushArgs<RegId + 1>(Args...);
     }
-    template <typename... ArgTypes> bool callBack(void *FP, ArgTypes... Args) {
+    template <typename... ArgTypes> void callBack(void *FP, ArgTypes... Args) {
       uint64_t Addr = reinterpret_cast<uint64_t>(FP);
       AddrInfo AI(Dyld.lookup(Addr));
       if (!dynamic_cast<LoadedDylib *>(AI.Lib)) {
         // Target load method is not inside any emulated Dylib, so it must be
         // native executable code and we can simply call it.
         reinterpret_cast<void (*)(ArgTypes...)>(FP)(Args...);
-        return true;
       } else {
         // Target load method is inside some emulated library.
-
-        if (!pushArgs(Args...))
-          return false;
-
+        pushArgs<UC_ARM_REG_R0>(Args...);
         Dyld.execute(Addr);
-        return true;
       }
     }
     template <typename... ArgTypes>
     void *callBackR(void *FP, ArgTypes... Args) {
-      if (!callBack(FP, Args...))
-        return nullptr;
+      callBack(FP, Args...);
 
       // Fetch return value.
       uint32_t R0;
@@ -216,7 +208,6 @@ private:
 
   private:
     DynamicLoader &Dyld;
-    int RegId; // uc_arm_reg
     std::vector<uint32_t> Args;
   };
 
