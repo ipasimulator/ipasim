@@ -1,0 +1,9 @@
+[ver:1,total:1020]
+src/IpaSimulator/IpaSimApp/App.cpp:417,1553518800:417,m
+src/IpaSimulator/IpaSimApp/MainPage.idl:227,1553518800:227,m
+src/IpaSimulator/IpaSimApp/MainPage.xaml:134,1553518800:134,m
+src/IpaSimulator/IpaSimApp/MainPage.cpp:114,1553518800:114,m
+src/IpaSimulator/IpaSimApp/MainPage.h:81,1553518800:81,m
+src/IpaSimulator/IpaSimApp/Generated Files/MainPage.g.h:25,1553518800:25,r
+src/IpaSimulator/IpaSimulator.cpp:12,1553518800:12,r
+src/IpaSimulator/IpaSimApp/Generated Files/MainPage.xaml.g.h:10,1553518800:10,r
