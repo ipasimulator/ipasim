@@ -92,6 +92,7 @@ static IAsyncAction start(LaunchActivatedEventArgs LaunchArgs) {
   Bin = co_await Folder.GetFileAsync(Bin.Name());
 
   // Execute the main logic which is stored inside `IpaSimLibrary`.
+  // TODO: Link this instead of loading it dynamically.
   HMODULE lib = check_pointer(LoadPackagedLibrary(L"libIpaSimLibrary.dll", 0));
   FARPROC startFunc = check_pointer(GetProcAddress(lib, "start"));
   ((void (*)(const hstring &, const LaunchActivatedEventArgs &))startFunc)(
