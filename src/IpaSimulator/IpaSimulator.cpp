@@ -78,20 +78,23 @@ uint64_t LoadedDylib::findSymbol(DynamicLoader &DL, const string &Name) {
   if (!Bin.has_symbol(Name)) {
     // Try also re-exported libraries.
     for (DylibCommand &Lib : Bin.libraries()) {
-      if (Lib.command() == LOAD_COMMAND_TYPES::LC_REEXPORT_DYLIB) {
-        LoadedLibrary *LL = DL.load(Lib.name());
+      if (Lib.command() != LOAD_COMMAND_TYPES::LC_REEXPORT_DYLIB)
+        continue;
 
-        // If the target library is DLL, it doesn't have underscore prefixes, so
-        // we need to remove it.
-        uint64_t SymAddr;
-        if (!LL->hasUnderscorePrefix() && Name[0] == '_')
-          SymAddr = LL->findSymbol(DL, Name.substr(1));
-        else
-          SymAddr = LL->findSymbol(DL, Name);
+      LoadedLibrary *LL = DL.load(Lib.name());
+      if (!LL)
+        continue;
 
-        if (SymAddr)
-          return SymAddr;
-      }
+      // If the target library is DLL, it doesn't have underscore prefixes, so
+      // we need to remove it.
+      uint64_t SymAddr;
+      if (!LL->hasUnderscorePrefix() && Name[0] == '_')
+        SymAddr = LL->findSymbol(DL, Name.substr(1));
+      else
+        SymAddr = LL->findSymbol(DL, Name);
+
+      if (SymAddr)
+        return SymAddr;
     }
     return 0;
   }
@@ -229,8 +232,9 @@ LoadedLibrary *DynamicLoader::load(const string &Path) {
   }
 
   // Recognize wrapper DLLs.
-  L->IsWrapperDLL = BP.Relative && startsWith(BP.Path, "gen\\") &&
-                    endsWith(BP.Path, ".wrapper.dll");
+  if (L)
+    L->IsWrapperDLL = BP.Relative && startsWith(BP.Path, "gen\\") &&
+                      endsWith(BP.Path, ".wrapper.dll");
 
   return L;
 }
@@ -970,6 +974,8 @@ extern "C" __declspec(dllexport) void start(
   // Load the binary.
   IpaSim.MainBinary = to_string(Path);
   LoadedLibrary *App = IpaSim.Dyld.load(IpaSim.MainBinary);
+  if (!App)
+    return;
 
   // Execute it.
   IpaSim.Dyld.execute(App);
