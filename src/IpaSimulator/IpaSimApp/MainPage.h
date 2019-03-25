@@ -12,8 +12,11 @@ namespace winrt::IpaSimApp::implementation
     {
         MainPage();
 
-        int32_t MyProperty();
-        void MyProperty(int32_t value);
+        bool Loaded();
+        void Loaded(bool value);
+
+    private:
+        bool loaded_;
     };
 }
 

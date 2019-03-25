@@ -11,13 +11,17 @@ namespace winrt::IpaSimApp::implementation
         InitializeComponent();
     }
 
-    int32_t MainPage::MyProperty()
+    bool MainPage::Loaded()
     {
-        throw hresult_not_implemented();
+        return loaded_;
     }
 
-    void MainPage::MyProperty(int32_t /* value */)
+    void MainPage::Loaded(bool value)
     {
-        throw hresult_not_implemented();
+        loaded_ = value;
+        if (value)
+            statusText().Text(L"Done.");
+        else
+            statusText().Text(L"Loading...");
     }
 }

@@ -8,6 +8,6 @@
     mc:Ignorable="d">
 
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <TextBlock>Loading...</TextBlock>
+        <TextBlock Name="statusText">Loading...</TextBlock>
     </StackPanel>
 </Page>

@@ -97,6 +97,11 @@ static IAsyncAction start(LaunchActivatedEventArgs LaunchArgs) {
   ((void (*)(const hstring &, const LaunchActivatedEventArgs &))startFunc)(
       Bin.Path(), LaunchArgs);
   check_bool(FreeLibrary(lib));
+
+  // Change status from "Loading..." to "Done.".
+  if (auto F = Window::Current().Content().try_as<Frame>())
+    if (auto Page = F.Content().try_as<IpaSimApp::MainPage>())
+      Page.Loaded(true);
 }
 
 /// <summary>
