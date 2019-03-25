@@ -1,0 +1,6 @@
+[ver:1,total:4980]
+src/IpaSimulator/IpaSimulator.cpp:4505,1553500800:360,1553504400:1515,1553508000:180,1553511600:2300,1553515200:150,m
+src/IpaSimulator/CMakeLists.txt:230,1553511600:140,1553515200:90,m
+src/IpaSimulator/IpaSimulator.hpp:200,1553500800:180,1553511600:20,r
+src/dyld/dyld.cpp:30,1553504400:30,r
+src/dyld/dyld.h:15,1553504400:15,r
