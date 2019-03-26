@@ -298,10 +298,27 @@ public:
             return;
 
           // Verify that the function has the same signature as the iOS one.
-          if constexpr (CompareTypes)
+          if constexpr (CompareTypes) {
+            // TODO: #28 is not considered here.
             if (!TC.areEquivalent(Exp->Type, Func))
-              reportError("functions' signatures are not equivalent (" +
+              reportError(Twine("functions' signatures are not equivalent (") +
                           Exp->Name + ")");
+          } else if constexpr (is_same_v<decltype(Func),
+                                         llvm::pdb::PDBSymbolFunc &>) {
+            // Check at least number of arguments.
+            size_t DylibCount = Exp->Type->getNumParams();
+            size_t DLLCount = Func.getSignature()->getCount();
+
+            if (DylibCount == DLLCount + 1)
+              // See #28.
+              Exp->DylibStretOnly = true;
+            else if (DylibCount != DLLCount)
+              reportError(Twine("function '") + Exp->Name +
+                          "' has different number of arguments in iOS headers "
+                          "and in DLL (" +
+                          to_string(DylibCount) + " v. " + to_string(DLLCount) +
+                          ")");
+          }
         };
         for (auto &Func : LLDB.enumerate<PDBSymbolFunc>())
           Analyzer(Func);
