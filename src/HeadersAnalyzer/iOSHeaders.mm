@@ -2,13 +2,13 @@
 // See <objc/objc-api.h>.
 #define OBJC_OLD_DISPATCH_PROTOTYPES 0
 
+#if !defined(IPASIM_CG_SAMPLE)
 #include <objc/NSObject.h>
 #include <objc/message.h>
 #include <objc/objc.h>
 #include <objc/runtime.h>
 #include <objc-abi.h>
 #include <objc-internal.h>
-#if !defined(IPASIM_CG_SAMPLE)
 #include <Accelerate/Accelerate.h>
 #include <Accounts/Accounts.h>
 #include <AddressBook/AddressBook.h>
@@ -67,7 +67,9 @@
 #include <OpenGLES/gltypes.h>
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
+#endif
 #include <QuartzCore/QuartzCore.h>
+#if !defined(IPASIM_CG_SAMPLE)
 #include <QuickLook/QuickLook.h>
 #include <SafariServices/SafariServices.h>
 #include <Security/Security.h>
@@ -77,7 +79,6 @@
 #include <Twitter/Twitter.h>
 #include <UIKit/UIKit.h>
 #include <WebKit/WebKit.h>
-#endif
 
 // These don't have C declarations anywhere, since they're only used in
 // assembly, but we want to have wrappers generated for them, too.
@@ -86,3 +87,4 @@ OBJC_EXPORT void _objc_msgNil_stret(void /* id self, SEL op, ... */);
 OBJC_EXPORT void _objc_msgNil_fpret(void /* id self, SEL op, ... */);
 OBJC_EXPORT void objc_msgLookupSuper(void);
 OBJC_EXPORT void objc_msgLookupSuper_stret(void);
+#endif
