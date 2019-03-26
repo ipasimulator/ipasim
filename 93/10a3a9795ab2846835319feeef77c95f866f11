@@ -1,0 +1,7 @@
+[ver:1,total:720]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:410,1553637600:180,1553641200:230,m
+samples/issue28.mm:180,1553637600:180,r
+src/HeadersAnalyzer/iOSHeaders.mm:50,1553641200:50,m
+src/HeadersAnalyzer/HAContext.cpp:30,1553641200:30,r
+src/HeadersAnalyzer/HAContext.hpp:30,1553641200:30,r
+cmake/ipasim-x86-Debug/cg/exports.txt:20,1553641200:20,r
