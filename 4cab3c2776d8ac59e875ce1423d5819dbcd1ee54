@@ -1,0 +1,8 @@
+[ver:1,total:2880]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1783,1553641200:1783,m
+src/HeadersAnalyzer/LLDBHelper.cpp:455,1553641200:455,r
+src/HeadersAnalyzer/HAContext.hpp:277,1553641200:277,m
+docs/issues/28.md:240,1553641200:240,m
+src/HeadersAnalyzer/LLDBHelper.hpp:75,1553641200:75,r
+src/HeadersAnalyzer/LLVMHelper.cpp:30,1553641200:30,r
+cmake/ipasim-x86-Debug/cg/exports.txt:20,1553641200:20,r
