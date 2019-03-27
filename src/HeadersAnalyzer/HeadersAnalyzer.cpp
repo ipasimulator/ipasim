@@ -305,6 +305,12 @@ public:
                           Exp->Name + ")");
           } else if constexpr (is_same_v<decltype(Func),
                                          llvm::pdb::PDBSymbolFunc &>) {
+            if (!Func.getSignature()) {
+              reportError(Twine("function doesn't have a signature (") +
+                          Exp->Name + ")");
+              return;
+            }
+
             // Check at least number of arguments.
             size_t DylibCount = Exp->getDylibType()->getNumParams();
             size_t DLLCount = Func.getSignature()->getCount();
