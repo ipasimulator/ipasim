@@ -1,0 +1,7 @@
+[ver:1,total:2054]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1273,1553680800:1273,m
+docs/issues/28.md:509,1553677200:467,1553680800:42,m
+src/HeadersAnalyzer/LLVMHelper.hpp:205,1553680800:205,m
+src/HeadersAnalyzer/HAContext.cpp:33,1553680800:33,r
+cmake/ipasim-x86-Debug/cg/0.o.ll:17,1553680800:17,r
+cmake/ipasim-x86-Debug/cg/QuartzCore.obj.ll:17,1553680800:17,r
