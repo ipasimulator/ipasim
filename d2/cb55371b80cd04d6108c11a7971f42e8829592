@@ -1,0 +1,14 @@
+[ver:1,total:6121]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:2586,1553644800:240,1553648400:180,1553652000:180,1553655600:180,1553659200:180,1553662800:180,1553666400:180,1553670000:180,1553673600:360,1553677200:515,1553680800:211,m
+src/HeadersAnalyzer/HAContext.hpp:2376,1553644800:249,1553677200:1065,1553680800:1062,m
+src/HeadersAnalyzer/Config.hpp:358,1553637600:180,1553644800:17,1553677200:60,1553680800:101,m
+src/HeadersAnalyzer/LLVMHelper.cpp:230,1553677200:160,1553680800:70,m
+samples/issue28.mm:185,1553677200:185,r
+src/HeadersAnalyzer/LLVMHelper.hpp:150,1553677200:80,1553680800:70,m
+src/HeadersAnalyzer/Common.hpp:88,1553644800:34,1553677200:20,1553680800:34,m
+src/HeadersAnalyzer/README.md:60,1553677200:60,r
+cmake/ipasim-x86-Debug/cg/QuartzCore.o.ll:24,1553677200:24,r
+cmake/ipasim-x86-Debug/cg/0.o.ll:24,1553677200:24,r
+cmake/ipasim-x86-Debug/cg/QuartzCore.obj.ll:20,1553677200:20,r
+src/HeadersAnalyzer/LLDHelper.cpp:10,1553677200:10,r
+src/HeadersAnalyzer/ClangHelper.cpp:10,1553677200:10,r
