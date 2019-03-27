@@ -1,0 +1,5 @@
+[ver:1,total:780]
+src/IpaSimulator/IpaSimulator.cpp:360,1553688000:360,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:300,1553688000:300,r
+src/IpaSimulator/IpaSimulator.hpp:90,1553688000:90,r
+src/objc/stubs.mm:30,1553688000:30,r
