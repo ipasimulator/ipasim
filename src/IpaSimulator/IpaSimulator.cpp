@@ -1333,31 +1333,6 @@ void *DynamicLoader::translate(void *Addr) {
   return Addr;
 }
 
-void DynamicLoader::callLoad(void *load, void *self, void *sel) {
-  uint64_t Addr = reinterpret_cast<uint64_t>(load);
-  AddrInfo AI(lookup(Addr));
-  if (!dynamic_cast<LoadedDylib *>(AI.Lib)) {
-    // Target load method is not inside any emulated Dylib, so it must be native
-    // executable code and we can simply call it.
-    reinterpret_cast<void (*)(void *, void *)>(load)(self, sel);
-  } else {
-    // Target load method is inside some emulated library.
-
-    // HACK: Don't load `__ARCLite__` as it's buggy.
-    if (string("__ARCLite__") == AI.Lib->getClassOfMethod(Addr))
-      return;
-
-    // Pass arguments.
-    uint32_t I32 = reinterpret_cast<uint32_t>(self);
-    callUC(uc_reg_write(UC, UC_ARM_REG_R0, &I32));
-    I32 = reinterpret_cast<uint32_t>(sel);
-    callUC(uc_reg_write(UC, UC_ARM_REG_R1, &I32));
-
-    // And call it.
-    execute(Addr);
-  }
-}
-
 extern "C" __declspec(dllexport) void *ipaSim_translate(void *Addr) {
   return IpaSim.Dyld.translate(Addr);
 }
@@ -1368,22 +1343,18 @@ extern "C" __declspec(dllexport) void ipaSim_translate4(uint32_t *Addr) {
 extern "C" __declspec(dllexport) const char *ipaSim_processPath() {
   return IpaSim.MainBinary.c_str();
 }
-extern "C" __declspec(dllexport) void ipaSim_callLoad(void *load, void *self,
-                                                      void *sel) {
-  IpaSim.Dyld.callLoad(load, self, sel);
+extern "C" __declspec(dllexport) void ipaSim_callBack1(void *FP, void *Arg0) {
+  IpaSim.Dyld.callBack(FP, Arg0);
 }
-extern "C" __declspec(dllexport) void ipaSim_callBack1(void *FP, void *arg0) {
-  IpaSim.Dyld.callBack(FP, arg0);
+extern "C" __declspec(dllexport) void ipaSim_callBack2(void *FP, void *Arg0,
+                                                       void *Arg1) {
+  IpaSim.Dyld.callBack(FP, Arg0, Arg1);
 }
-extern "C" __declspec(dllexport) void ipaSim_callBack2(void *FP, void *arg0,
-                                                       void *arg1) {
-  IpaSim.Dyld.callBack(FP, arg0, arg1);
+extern "C" __declspec(dllexport) void *ipaSim_callBack1r(void *FP, void *Arg0) {
+  return IpaSim.Dyld.callBackR(FP, Arg0);
 }
-extern "C" __declspec(dllexport) void *ipaSim_callBack1r(void *FP, void *arg0) {
-  return IpaSim.Dyld.callBackR(FP, arg0);
-}
-extern "C" __declspec(dllexport) void *ipaSim_callBack3r(void *FP, void *arg0,
-                                                         void *arg1,
-                                                         void *arg2) {
-  return IpaSim.Dyld.callBackR(FP, arg0, arg1, arg2);
+extern "C" __declspec(dllexport) void *ipaSim_callBack3r(void *FP, void *Arg0,
+                                                         void *Arg1,
+                                                         void *Arg2) {
+  return IpaSim.Dyld.callBackR(FP, Arg0, Arg1, Arg2);
 }
