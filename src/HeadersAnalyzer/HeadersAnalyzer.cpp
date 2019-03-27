@@ -309,6 +309,7 @@ public:
             size_t DylibCount = Exp->getDylibType()->getNumParams();
             size_t DLLCount = Func.getSignature()->getCount();
 
+            // TODO: Also check that `Func`'s return type is NOT void.
             if (DylibCount == DLLCount + 1 &&
                 Exp->getDylibType()->getReturnType()->isVoidTy())
               // See #28.
