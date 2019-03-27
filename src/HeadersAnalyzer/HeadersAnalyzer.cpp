@@ -281,7 +281,7 @@ public:
           // correctly.
           if (startsWith(Exp->Name, HAContext::MsgLookupPrefix)) {
             FlagsSetter();
-            Exp->Type = LookupTy;
+            Exp->setType(LookupTy);
 
             // Don't verify their types.
             return;
@@ -294,22 +294,23 @@ public:
           // valid type for function argument!", file ..\..\lib\IR\Type.cpp,
           // line 288`.
           // TODO: Investigate and fix this bug.
-          if (Exp->Type->isVarArg())
+          if (Exp->getDylibType()->isVarArg())
             return;
 
           // Verify that the function has the same signature as the iOS one.
           if constexpr (CompareTypes) {
             // TODO: #28 is not considered here.
-            if (!TC.areEquivalent(Exp->Type, Func))
+            if (!TC.areEquivalent(Exp->getDylibType(), Func))
               reportError(Twine("functions' signatures are not equivalent (") +
                           Exp->Name + ")");
           } else if constexpr (is_same_v<decltype(Func),
                                          llvm::pdb::PDBSymbolFunc &>) {
             // Check at least number of arguments.
-            size_t DylibCount = Exp->Type->getNumParams();
+            size_t DylibCount = Exp->getDylibType()->getNumParams();
             size_t DLLCount = Func.getSignature()->getCount();
 
-            if (DylibCount == DLLCount + 1)
+            if (DylibCount == DLLCount + 1 &&
+                Exp->getDylibType()->getReturnType()->isVoidTy())
               // See #28.
               Exp->DylibStretOnly = true;
             else if (DylibCount != DLLCount)
@@ -352,7 +353,9 @@ public:
 
         // Declare reference symbol.
         llvm::GlobalValue *RefSymbol =
-            !DLL.ReferenceSymbol ? nullptr : IR.declare(*DLL.ReferenceSymbol);
+            !DLL.ReferenceSymbol
+                ? nullptr
+                : IR.declare<LibType::DLL>(*DLL.ReferenceSymbol);
         if (RefSymbol)
           RefSymbol->setDLLStorageClass(
               llvm::GlobalValue::DLLImportStorageClass);
@@ -364,13 +367,16 @@ public:
 
           // Don't generate wrappers for Objective-C messengers. We handle those
           // specially. Also don't generate wrappers for data.
-          if (!Exp.Type || Exp.Messenger)
+          if (!Exp.getDLLType() || Exp.Messenger)
             continue;
 
           // Declarations.
-          llvm::Function *Func = Exp.ObjCMethod ? nullptr : IR.declareFunc(Exp);
-          llvm::Function *Wrapper = IR.declareFunc(Exp, /* Wrapper */ true);
-          llvm::Function *Stub = DylibIR.declareFunc(Exp, /* Wrapper */ true);
+          llvm::Function *Func =
+              Exp.ObjCMethod ? nullptr : IR.declareFunc<LibType::DLL>(Exp);
+          llvm::Function *Wrapper =
+              IR.declareFunc<LibType::DLL>(Exp, /* Wrapper */ true);
+          llvm::Function *Stub =
+              DylibIR.declareFunc<LibType::Dylib>(Exp, /* Wrapper */ true);
 
           // Export the wrapper and import the original function.
           Wrapper->setDLLStorageClass(llvm::Function::DLLExportStorageClass);
@@ -385,7 +391,7 @@ public:
 
           // TODO: Handle variadic functions specially. For now, we simply don't
           // call them.
-          if (Exp.Type->isVarArg()) {
+          if (Exp.getDLLType()->isVarArg()) {
             reportError(Twine("unhandled variadic function (") + Exp.Name +
                         ")");
             IR.Builder.CreateRetVoid();
@@ -408,8 +414,9 @@ public:
                                           Struct->getPointerTo(), "sp");
 
             // Process arguments.
-            Args.reserve(Exp.Type->getNumParams());
-            for (auto [ArgIdx, ArgTy] : withIndices(Exp.Type->params())) {
+            Args.reserve(Exp.getDLLType()->getNumParams());
+            for (auto [ArgIdx, ArgTy] :
+                 withIndices(Exp.getDLLType()->params())) {
               string ArgNo = to_string(ArgIdx);
 
               // Load argument from the structure.
@@ -443,17 +450,17 @@ public:
             llvm::Value *ComputedPtr = IR.Builder.CreateInBoundsGEP(
                 llvm::Type::getInt8Ty(LLVM.Ctx), RefPtr, Addr);
             llvm::Value *FP = IR.Builder.CreateBitCast(
-                ComputedPtr, Exp.Type->getPointerTo(), "fp");
+                ComputedPtr, Exp.getDLLType()->getPointerTo(), "fp");
 
             // Call the original DLL function.
-            R = IR.createCall(Exp.Type, FP, Args, "r");
+            R = IR.createCall(Exp.getDLLType(), FP, Args, "r");
           } else
             R = IR.createCall(Func, Args, "r");
 
           if (R) {
             // Get pointer to the return value inside the union.
             llvm::Value *RP = IR.Builder.CreateStructGEP(
-                Struct, SP, Exp.Type->getNumParams(), "rp");
+                Struct, SP, Exp.getDLLType()->getNumParams(), "rp");
 
             // Save return value back into the structure.
             IR.Builder.CreateStore(R, RP);
@@ -564,7 +571,7 @@ public:
         }
 
         // Re-export data symbols. See #23.
-        if (!Exp.Type) {
+        if (!Exp.getDylibType()) {
           Lib.ReExports.insert({Exp.DLLGroup, Exp.DLL});
           continue;
         }
@@ -635,8 +642,9 @@ public:
         }
 
         // Declarations.
-        llvm::Function *Func = IR.declareFunc(Exp);
-        llvm::Function *Wrapper = IR.declareFunc(Exp, /* Wrapper */ true);
+        llvm::Function *Func = IR.declareFunc<LibType::Dylib>(Exp);
+        llvm::Function *Wrapper =
+            IR.declareFunc<LibType::Dylib>(Exp, /* Wrapper */ true);
         createAlias(Exp, Func);
 
         FunctionGuard FuncGuard(IR, Func);
@@ -687,7 +695,7 @@ public:
         IR.Builder.CreateCall(Wrapper, {VP});
 
         // Return.
-        llvm::Type *RetTy = Exp.Type->getReturnType();
+        llvm::Type *RetTy = Exp.getDylibType()->getReturnType();
         if (!RetTy->isVoidTy()) {
 
           // Get pointer to the return value inside the struct.
@@ -798,7 +806,7 @@ private:
     }
 
     // Save the function's signature.
-    Exp->Type = Type;
+    Exp->setType(Type);
   }
   void compileAppleHeaders() {
     ClangHelper Clang(LLVM);

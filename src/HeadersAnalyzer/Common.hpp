@@ -9,6 +9,13 @@
 #include <filesystem>
 #include <string>
 
+// LibType
+enum class LibType { None = 0, Dylib = 0x1, DLL = 0x2, Both = 0x3 };
+
+constexpr bool operator&(LibType Value, LibType Flag) {
+  return ((uint32_t)Value & (uint32_t)Flag) == (uint32_t)Flag;
+}
+
 // Prefix and postfix operators.
 #define prefix(op) &operator op()
 #define postfix(op) operator op(int)

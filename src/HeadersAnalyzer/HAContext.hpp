@@ -81,14 +81,14 @@ enum class ExportStatus { NotFound = 0, Found, Overloaded, FoundInDLL };
 
 struct ExportEntry {
   ExportEntry(std::string Name)
-      : Name(move(Name)), Status(ExportStatus::NotFound), RVA(0), Type(nullptr),
-        ObjCMethod(false), Messenger(false), Stret(false), Super(false),
-        Super2(false), DylibStretOnly(false) {}
+      : Name(move(Name)), Status(ExportStatus::NotFound), RVA(0),
+        DylibType(nullptr), DLLType(nullptr), ObjCMethod(false),
+        Messenger(false), Stret(false), Super(false), Super2(false),
+        DylibStretOnly(false) {}
 
   std::string Name;
   mutable ExportStatus Status;
   mutable uint32_t RVA;
-  mutable llvm::FunctionType *Type; // `nullptr` means this is not a function
   mutable bool ObjCMethod : 1;
   mutable bool Messenger : 1;
   mutable bool Stret : 1;
@@ -101,8 +101,42 @@ struct ExportEntry {
 
   bool operator<(const ExportEntry &Other) const { return Name < Other.Name; }
   bool isTrivial() const {
-    return !Type->getNumParams() && Type->getReturnType()->isVoidTy();
+    return !DylibStretOnly && !DylibType->getNumParams() &&
+           DylibType->getReturnType()->isVoidTy();
   }
+  void setType(llvm::FunctionType *T) const {
+    assert(!DLLType && "Cannot change type after DLLType has been generated.");
+    DylibType = T;
+  }
+  template <LibType T> llvm::FunctionType *getType() const {
+    if constexpr (T == LibType::Dylib)
+      return DylibType;
+    else {
+      static_assert(T == LibType::DLL, "Wrong LibType.");
+      if (!DylibStretOnly || !DylibType)
+        return DylibType;
+      if (!DLLType) {
+        // Manually craft type of the DLL function. It doesn't have the first
+        // parameter for struct return, but returns the struct directly instead.
+        // See #28.
+        DLLArgs.reserve(DylibType->getNumParams() - 1);
+        std::copy(DylibType->param_begin() + 1, DylibType->param_end(),
+                  std::back_inserter(DLLArgs));
+        DLLType = llvm::FunctionType::get(
+            (*DylibType->param_begin())->getPointerElementType(), DLLArgs,
+            DylibType->isVarArg());
+      }
+      return DLLType;
+    }
+  }
+  llvm::FunctionType *getDylibType() const { return getType<LibType::Dylib>(); }
+  llvm::FunctionType *getDLLType() const { return getType<LibType::DLL>(); }
+
+private:
+  // `nullptr` means this is not a function
+  mutable llvm::FunctionType *DylibType;
+  mutable llvm::FunctionType *DLLType;
+  mutable std::vector<llvm::Type *> DLLArgs;
 };
 
 struct Dylib {

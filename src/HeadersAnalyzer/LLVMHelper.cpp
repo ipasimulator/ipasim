@@ -79,15 +79,18 @@ IRHelper::IRHelper(LLVMHelper &LLVM, StringRef Name, StringRef Path,
 const char *const IRHelper::Windows32 = "i386-pc-windows-msvc";
 const char *const IRHelper::Apple = "armv7s-apple-ios10";
 
-GlobalValue *IRHelper::declare(const ExportEntry &Exp) {
-  if (Exp.Type)
-    return declareFunc(Exp);
+template <LibType T> GlobalValue *IRHelper::declare(const ExportEntry &Exp) {
+  if (Exp.getType<T>())
+    return declareFunc<T>(Exp);
 
   Twine RawName(Twine('\01') + Exp.Name);
   return static_cast<GlobalValue *>(
       Module.getOrInsertGlobal(LLVM.Saver.save(RawName), VoidPtrTy));
 }
+template GlobalValue *IRHelper::declare<LibType::Dylib>(const ExportEntry &);
+template GlobalValue *IRHelper::declare<LibType::DLL>(const ExportEntry &);
 
+template <LibType T>
 Function *IRHelper::declareFunc(const ExportEntry &Exp, bool Wrapper) {
   // This is needed to keep `to_string(Exp.RVA)` alive.
   StringRef WrapperRVA(LLVM.Saver.save(to_string(Exp.RVA)));
@@ -95,11 +98,16 @@ Function *IRHelper::declareFunc(const ExportEntry &Exp, bool Wrapper) {
   auto Name =
       Wrapper ? Twine("$__ipaSim_wrapper_") + WrapperRVA : Twine(Exp.Name);
 
-  FunctionType *Type =
-      Wrapper ? (Exp.isTrivial() ? TrivialWrapperTy : WrapperTy) : Exp.Type;
+  FunctionType *Type = Wrapper
+                           ? (Exp.isTrivial() ? TrivialWrapperTy : WrapperTy)
+                           : Exp.getType<T>();
 
   return declareFunc(Type, Name);
 }
+template Function *IRHelper::declareFunc<LibType::Dylib>(const ExportEntry &,
+                                                         bool);
+template Function *IRHelper::declareFunc<LibType::DLL>(const ExportEntry &,
+                                                       bool);
 
 Function *IRHelper::declareFunc(FunctionType *Type, const Twine &Name) {
   // Note that we add prefix `\01`, so that the name doesn't get mangled since
@@ -131,18 +139,19 @@ void IRHelper::defineFunc(llvm::Function *Func) {
 // value, but it generated wrong machine code. However, we still would like to
 // share the space if possible.
 StructType *IRHelper::createParamStruct(const ExportEntry &Exp) {
-  Type *RetTy = Exp.Type->getReturnType();
+  Type *RetTy = Exp.getDylibType()->getReturnType();
 
   // If the function has no arguments, we don't really need a struct, we just
   // want to use the return value. We create a trivial structure type for
   // compatibility with and simplicity of our callers, though.
-  if (!Exp.Type->getNumParams())
+  if (!Exp.getDylibType()->getNumParams())
     return StructType::create(RetTy, "struct");
 
   // Map parameter types to their pointers.
   vector<Type *> ParamPointers;
-  ParamPointers.reserve(Exp.Type->getNumParams() + (RetTy->isVoidTy() ? 0 : 1));
-  for (Type *Ty : Exp.Type->params()) {
+  ParamPointers.reserve(Exp.getDylibType()->getNumParams() +
+                        (RetTy->isVoidTy() ? 0 : 1));
+  for (Type *Ty : Exp.getDylibType()->params()) {
     ParamPointers.push_back(Ty->getPointerTo());
   }
   if (!RetTy->isVoidTy())
