@@ -1,2 +1,6 @@
 [ver:1,total:30]
 src/HeadersAnalyzer/HAContext.cpp:30,1553680800:30,m
+
+[ver:1,total:270]
+src/HeadersAnalyzer/HAContext.hpp:216,1553680800:216,m
+src/HeadersAnalyzer/HAContext.cpp:54,1553680800:54,m
