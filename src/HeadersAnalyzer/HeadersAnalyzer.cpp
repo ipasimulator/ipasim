@@ -423,10 +423,10 @@ public:
               string ArgNo = to_string(ArgIdx);
 
               // Load argument from the structure.
-              llvm::Value *APP =
-                  IR.Builder.CreateStructGEP(Struct, SP, ArgIdx, "app" + ArgNo);
-              llvm::Value *AP = IR.Builder.CreateLoad(APP, "ap" + ArgNo);
-              llvm::Value *A = IR.Builder.CreateLoad(AP, "a" + ArgNo);
+              llvm::Value *APP = IR.Builder.CreateStructGEP(
+                  Struct, SP, ArgIdx, Twine("app") + ArgNo);
+              llvm::Value *AP = IR.Builder.CreateLoad(APP, Twine("ap") + ArgNo);
+              llvm::Value *A = IR.Builder.CreateLoad(AP, Twine("a") + ArgNo);
 
               // Save the argument.
               Args.push_back(A);
@@ -438,8 +438,8 @@ public:
             // Objective-C methods are not exported, so we call them by
             // computing their address using their RVA.
             if (!DLL.ReferenceSymbol) {
-              reportError("no reference function, cannot emit Objective-C "
-                          "method DLL wrappers (" +
+              reportError(Twine("no reference function, cannot emit "
+                                "Objective-C method DLL wrappers (") +
                           DLL.Name + ")");
               continue;
             }
@@ -688,8 +688,8 @@ public:
         for (llvm::Argument &Arg : Func->args()) {
           string ArgNo = to_string(Arg.getArgNo());
           ArgNos.push_back(ArgNo);
-          APs.push_back(
-              IR.Builder.CreateAlloca(Arg.getType(), nullptr, "ap" + ArgNo));
+          APs.push_back(IR.Builder.CreateAlloca(Arg.getType(), nullptr,
+                                                Twine("ap") + ArgNo));
         }
 
         // Allocate the struct.
@@ -704,7 +704,7 @@ public:
         for (auto [I, Arg] : withIndices(Func->args())) {
           // Get pointer to the corresponding structure's element.
           llvm::Value *EP = IR.Builder.CreateStructGEP(
-              Struct, SP, Arg.getArgNo(), "ep" + ArgNos[I]);
+              Struct, SP, Arg.getArgNo(), Twine("ep") + ArgNos[I]);
 
           // Store argument address in it.
           IR.Builder.CreateStore(APs[I], EP);
@@ -814,7 +814,7 @@ private:
     switch (Exp->Status) {
     case ExportStatus::Found:
       Exp->Status = ExportStatus::Overloaded;
-      reportError("function overloaded (" + Name + ")");
+      reportError(Twine("function overloaded (") + Name + ")");
       return;
     case ExportStatus::Overloaded:
       return;
