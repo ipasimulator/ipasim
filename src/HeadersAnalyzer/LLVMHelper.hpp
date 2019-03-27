@@ -101,6 +101,9 @@ public:
                           const llvm::Twine &Name);
   void verifyFunction(llvm::Function *Func);
   void emitObj(llvm::StringRef Path);
+  uint64_t getSize(llvm::Type *T) {
+    return Module.getDataLayout().getTypeAllocSize(T);
+  }
 
 private:
   LLVMHelper &LLVM;

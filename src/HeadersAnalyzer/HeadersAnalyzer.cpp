@@ -417,6 +417,9 @@ public:
             Args.reserve(Exp.getDLLType()->getNumParams());
             for (auto [ArgIdx, ArgTy] :
                  withIndices(Exp.getDLLType()->params())) {
+              if (Exp.DylibStretOnly)
+                ++ArgIdx;
+
               string ArgNo = to_string(ArgIdx);
 
               // Load argument from the structure.
@@ -458,12 +461,29 @@ public:
             R = IR.createCall(Func, Args, "r");
 
           if (R) {
-            // Get pointer to the return value inside the union.
-            llvm::Value *RP = IR.Builder.CreateStructGEP(
-                Struct, SP, Exp.getDLLType()->getNumParams(), "rp");
+            // See #28.
+            if (Exp.DylibStretOnly) {
+              // Store the return value.
+              llvm::Value *RS = IR.Builder.CreateAlloca(R->getType());
+              IR.Builder.CreateStore(R, RS);
 
-            // Save return value back into the structure.
-            IR.Builder.CreateStore(R, RP);
+              // Load stret argument from the structure.
+              llvm::Value *SRPP =
+                  IR.Builder.CreateStructGEP(Struct, SP, 0, "srpp");
+              llvm::Value *SRP = IR.Builder.CreateLoad(SRPP, "srp");
+              llvm::Value *SR = IR.Builder.CreateLoad(SRP, "sr");
+
+              // Copy structure's content.
+              // TODO: Don't hardcode the alignments here.
+              IR.Builder.CreateMemCpy(SR, 4, RS, 4, IR.getSize(R->getType()));
+            } else { // !Exp.DylibStretOnly
+              // Get pointer to the return value inside the union.
+              llvm::Value *RP = IR.Builder.CreateStructGEP(
+                  Struct, SP, Exp.getDLLType()->getNumParams(), "rp");
+
+              // Save return value back into the structure.
+              IR.Builder.CreateStore(R, RP);
+            }
           }
 
           // Finish.
