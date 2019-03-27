@@ -111,9 +111,6 @@ public:
     size_t I = 0;
 
     if constexpr (!Sample) {
-      // Our Objective-C runtime
-      HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("libobjc.dll"));
-
       // WinObjC DLLs (i.e., Windows versions of Apple's frameworks)
       DLLGroup &FxGroup = HAC.DLLGroups[I++];
       for (auto &File : directory_iterator(FxGroup.Dir)) {
@@ -126,6 +123,9 @@ public:
             FxGroup.DLLs.push_back(DLLEntry(DLLPath.filename().string()));
         }
       }
+
+      // Our Objective-C runtime
+      HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("libobjc.dll"));
 
       // Prebuilt `libdispatch.dll`
       HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("libdispatch.dll"));
