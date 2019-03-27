@@ -11,6 +11,30 @@
 using namespace std;
 using namespace llvm;
 
+template <LibType T> llvm::FunctionType *ExportEntry::getType() const {
+  if constexpr (T == LibType::Dylib)
+    return DylibType;
+  else {
+    static_assert(T == LibType::DLL, "Wrong LibType.");
+    if (!DylibStretOnly || !DylibType)
+      return DylibType;
+    if (!DLLType) {
+      // Manually craft type of the DLL function. It doesn't have the first
+      // parameter for struct return, but returns the struct directly instead.
+      // See #28.
+      DLLArgs.reserve(DylibType->getNumParams() - 1);
+      std::copy(DylibType->param_begin() + 1, DylibType->param_end(),
+                std::back_inserter(DLLArgs));
+      DLLType = llvm::FunctionType::get(
+          (*DylibType->param_begin())->getPointerElementType(), DLLArgs,
+          DylibType->isVarArg());
+    }
+    return DLLType;
+  }
+}
+template llvm::FunctionType *ExportEntry::getType<LibType::Dylib>() const;
+template llvm::FunctionType *ExportEntry::getType<LibType::DLL>() const;
+
 bool HAContext::isClassMethod(const string &Name) {
   return (Name[0] == '+' || Name[0] == '-') && Name[1] == '[';
 }

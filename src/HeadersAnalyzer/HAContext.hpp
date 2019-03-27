@@ -108,27 +108,7 @@ struct ExportEntry {
     assert(!DLLType && "Cannot change type after DLLType has been generated.");
     DylibType = T;
   }
-  template <LibType T> llvm::FunctionType *getType() const {
-    if constexpr (T == LibType::Dylib)
-      return DylibType;
-    else {
-      static_assert(T == LibType::DLL, "Wrong LibType.");
-      if (!DylibStretOnly || !DylibType)
-        return DylibType;
-      if (!DLLType) {
-        // Manually craft type of the DLL function. It doesn't have the first
-        // parameter for struct return, but returns the struct directly instead.
-        // See #28.
-        DLLArgs.reserve(DylibType->getNumParams() - 1);
-        std::copy(DylibType->param_begin() + 1, DylibType->param_end(),
-                  std::back_inserter(DLLArgs));
-        DLLType = llvm::FunctionType::get(
-            (*DylibType->param_begin())->getPointerElementType(), DLLArgs,
-            DylibType->isVarArg());
-      }
-      return DLLType;
-    }
-  }
+  template <LibType T> llvm::FunctionType *getType() const;
   llvm::FunctionType *getDylibType() const { return getType<LibType::Dylib>(); }
   llvm::FunctionType *getDLLType() const { return getType<LibType::DLL>(); }
 
