@@ -17,11 +17,6 @@ namespace ipasim {
 
 enum class LibType { None = 0, Dylib = 0x1, DLL = 0x2, Both = 0x3 };
 
-// TODO: Generalize this for all enums.
-constexpr bool operator&(LibType Value, LibType Flag) {
-  return ((uint32_t)Value & (uint32_t)Flag) == (uint32_t)Flag;
-}
-
 // Wrapper over container iterator. Plus extra `operator bool`.
 template <typename T> class ContainerPtr {
 public:

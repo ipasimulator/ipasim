@@ -21,8 +21,8 @@ template <typename T> inline T operator~(T a) { return (T) ~(int)a; }
 template <typename T> inline T operator|(T a, T b) {
   return (T)((int)a | (int)b);
 }
-template <typename T> inline T operator&(T a, T b) {
-  return (T)((int)a & (int)b);
+template <typename T> constexpr bool operator&(T a, T b) {
+  return (T)((int)a & (int)b) == b;
 }
 template <typename T> inline T operator^(T a, T b) {
   return (T)((int)a ^ (int)b);
@@ -58,18 +58,13 @@ template <typename T> inline std::string to_hex_string(T Value) {
 size_t constexpr length(const char *S) { return *S ? 1 + length(S + 1) : 0; }
 struct ConstexprString {
   constexpr ConstexprString(const char *S) : S(S), Len(length(S)) {}
+  ConstexprString(const std::string &S) : S(S.data()), Len(S.length()) {}
 
   const char *S;
   size_t Len;
 };
-inline bool startsWith(const std::string &S, const std::string &Prefix) {
-  return !S.compare(0, Prefix.length(), Prefix);
-}
 inline bool startsWith(const std::string &S, ConstexprString Prefix) {
   return !S.compare(0, Prefix.Len, Prefix.S);
-}
-inline bool endsWith(const std::string &S, const std::string &Suffix) {
-  return !S.compare(S.length() - Suffix.length(), Suffix.length(), Suffix);
 }
 inline bool endsWith(const std::string &S, ConstexprString Suffix) {
   return !S.compare(S.length() - Suffix.Len, Suffix.Len, Suffix.S);
