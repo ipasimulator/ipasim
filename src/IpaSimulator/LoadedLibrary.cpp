@@ -1,9 +1,9 @@
 // LoadedLibrary.cpp
 
-#include "LoadedLibrary.hpp"
+#include "ipasim/LoadedLibrary.hpp"
 
-#include "Common.hpp"
-#include "DynamicLoader.hpp"
+#include "ipasim/Common.hpp"
+#include "ipasim/DynamicLoader.hpp"
 
 using namespace ipasim;
 using namespace std;

@@ -1,9 +1,9 @@
 // IpaSimulator.cpp
 
-#include "IpaSimulator.hpp"
+#include "ipasim/IpaSimulator.hpp"
 
-#include "DynamicLoader.hpp"
-#include "LoadedLibrary.hpp"
+#include "ipasim/DynamicLoader.hpp"
+#include "ipasim/LoadedLibrary.hpp"
 
 // From <winnt.h>
 // TODO: How are these undefined?

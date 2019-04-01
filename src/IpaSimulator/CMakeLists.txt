@@ -9,9 +9,7 @@ add_prep_dep (IpaSimLibrary)
 target_compile_options (IpaSimLibrary PRIVATE -std=c++17 -fcoroutines-ts)
 
 target_include_directories (IpaSimLibrary PRIVATE
-    "${SOURCE_DIR}/src"
-    # For `WrapperIndex.hpp`
-    "${SOURCE_DIR}/src/HeadersAnalyzer/include")
+    "${SOURCE_DIR}/include")
 
 target_compile_definitions (IpaSimLibrary PRIVATE
     # To enable coroutines support in C++/WinRT.

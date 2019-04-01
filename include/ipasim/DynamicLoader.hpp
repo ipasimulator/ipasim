@@ -3,7 +3,7 @@
 #ifndef IPASIM_DYNAMIC_LOADER_HPP
 #define IPASIM_DYNAMIC_LOADER_HPP
 
-#include "LoadedLibrary.hpp"
+#include "ipasim/LoadedLibrary.hpp"
 
 #include <functional>
 #include <map>

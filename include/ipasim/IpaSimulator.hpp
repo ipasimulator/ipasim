@@ -3,7 +3,7 @@
 #ifndef IPASIM_IPA_SIMULATOR_HPP
 #define IPASIM_IPA_SIMULATOR_HPP
 
-#include "DynamicLoader.hpp"
+#include "ipasim/DynamicLoader.hpp"
 
 #include <string>
 #include <unicorn/unicorn.h>
