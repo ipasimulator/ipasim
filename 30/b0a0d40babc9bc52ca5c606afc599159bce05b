@@ -1,0 +1,6 @@
+[ver:1,total:2400]
+include/ipasim/Common.hpp:1765,1554148800:1765,m
+include/ipasim/DynamicLoader.hpp:510,1554148800:510,m
+src/IpaSimulator/DynamicLoader.cpp:80,1554148800:80,m
+src/IpaSimulator/MainPage.xaml.cpp:30,1554148800:30,r
+src/IpaSimulator/IpaSimulator.cpp:15,1554148800:15,r
