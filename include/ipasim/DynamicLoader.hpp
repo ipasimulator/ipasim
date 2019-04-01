@@ -5,6 +5,8 @@
 
 #include "ipasim/LoadedLibrary.hpp"
 
+#include "ipasim/Common.hpp"
+
 #include <functional>
 #include <map>
 #include <stack>
@@ -132,7 +134,7 @@ private:
 
   private:
     DynamicLoader &Dyld;
-    int RegId; // uc_arm_reg
+    uc_arm_reg RegId;
     std::vector<uint32_t> Args;
   };
 
@@ -140,9 +142,11 @@ private:
   public:
     DynamicBackCaller(DynamicLoader &Dyld) : Dyld(Dyld) {}
 
-    template <int RegId> void pushArgs() {}
-    template <int RegId, typename... ArgTypes>
+    template <uc_arm_reg RegId> void pushArgs() {}
+    template <uc_arm_reg RegId, typename... ArgTypes>
     void pushArgs(void *Arg, ArgTypes... Args) {
+      using namespace ipasim;
+
       static_assert(UC_ARM_REG_R0 <= RegId && RegId <= UC_ARM_REG_R3,
                     "Callback has too many arguments.");
       Dyld.callUC(uc_reg_write(Dyld.UC, RegId, Arg));

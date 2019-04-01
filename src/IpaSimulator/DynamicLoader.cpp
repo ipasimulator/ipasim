@@ -773,7 +773,7 @@ void DynamicLoader::handleTrampoline(void *Ret, void **Args, void *Data) {
     OutputDebugStringA(", void).\n");
 
   // Pass arguments.
-  int RegId = UC_ARM_REG_R0;
+  uc_arm_reg RegId = UC_ARM_REG_R0;
   for (size_t I = 0, ArgC = Tr->ArgC; I != ArgC; ++I) {
     uint32_t I32 = *reinterpret_cast<uint32_t *>(Args[I]);
     callUC(uc_reg_write(UC, RegId++, &I32));

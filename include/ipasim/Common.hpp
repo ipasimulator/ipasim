@@ -17,24 +17,33 @@ namespace ipasim {
 // =============================================================================
 
 // Inspired by <https://stackoverflow.com/a/23152590/9080566>.
-template <typename T> inline T operator~(T a) { return (T) ~(int)a; }
-template <typename T> inline T operator|(T a, T b) {
+template <typename T> constexpr T operator~(T a) { return (T) ~(int)a; }
+template <typename T> constexpr T operator|(T a, T b) {
   return (T)((int)a | (int)b);
 }
 template <typename T> constexpr bool operator&(T a, T b) {
   return (T)((int)a & (int)b) == b;
 }
-template <typename T> inline T operator^(T a, T b) {
+template <typename T> constexpr T operator^(T a, T b) {
   return (T)((int)a ^ (int)b);
 }
-template <typename T> inline T &operator|=(T &a, T b) {
+template <typename T> constexpr T operator+(T a, int b) {
+  return (T)((int)a + b);
+}
+template <typename T> constexpr T operator++(T &a, int /* postfix */) {
+  return (T)(((int &)a)++);
+}
+template <typename T> constexpr T &operator|=(T &a, T b) {
   return (T &)((int &)a |= (int)b);
 }
-template <typename T> inline T &operator&=(T &a, T b) {
+template <typename T> constexpr T &operator&=(T &a, T b) {
   return (T &)((int &)a &= (int)b);
 }
-template <typename T> inline T &operator^=(T &a, T b) {
+template <typename T> constexpr T &operator^=(T &a, T b) {
   return (T &)((int &)a ^= (int)b);
+}
+template <typename T> constexpr T &operator+=(T &a, int b) {
+  return (T &)((int &)a += b);
 }
 
 // =============================================================================
