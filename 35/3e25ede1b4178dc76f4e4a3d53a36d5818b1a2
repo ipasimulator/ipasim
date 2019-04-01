@@ -1,0 +1,10 @@
+[ver:1,total:540]
+src/IpaSimulator/LoadedLibrary.cpp:170,1554127200:170,m
+src/IpaSimulator/IpaSimulator.cpp:101,1554127200:101,m
+src/IpaSimulator/DynamicLoader.cpp:76,1554127200:76,m
+include/ipasim/LoadedLibrary.hpp:51,1554127200:51,m
+src/IpaSimulator/CMakeLists.txt:43,1554127200:43,m
+include/ipasim/WrapperIndex.hpp:36,1554127200:36,m
+include/ipasim/IpaSimulator.hpp:21,1554127200:21,m
+include/ipasim/Common.hpp:21,1554127200:21,m
+include/ipasim/DynamicLoader.hpp:21,1554127200:21,m
