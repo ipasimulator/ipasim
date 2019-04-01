@@ -24,7 +24,7 @@ set (ORIG_SOURCE_FILES
     tsd.c)
 list (TRANSFORM ORIG_SOURCE_FILES PREPEND "${SOURCE_DIR}/deps/pthreads.2/")
 
-add_library (pthread SHARED ${ORIG_SOURCE_FILES} stubs.c)
+add_library (pthread SHARED ${ORIG_SOURCE_FILES})
 
 add_prep_dep (pthread)
 
