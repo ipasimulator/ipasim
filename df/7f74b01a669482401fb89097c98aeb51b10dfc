@@ -1,0 +1,6 @@
+[ver:1,total:720]
+include/ipasim/Common.hpp:470,1554145200:210,1554148800:260,m
+include/ipasim/HAContext.hpp:110,1554145200:30,1554148800:80,m
+src/HeadersAnalyzer/ErrorReporting.cpp:75,1554145200:75,r
+src/IpaSimulator/IpaSimulator.cpp:50,1554145200:30,1554148800:20,r
+include/ipasim/ErrorReporting.hpp:15,1554145200:15,r
