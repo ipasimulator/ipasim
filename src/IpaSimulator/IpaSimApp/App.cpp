@@ -94,7 +94,7 @@ static IAsyncAction start(LaunchActivatedEventArgs LaunchArgs) {
   // Execute the main logic which is stored inside `IpaSimLibrary`.
   // TODO: Link this instead of loading it dynamically.
   HMODULE lib = check_pointer(LoadPackagedLibrary(L"libIpaSimLibrary.dll", 0));
-  FARPROC startFunc = check_pointer(GetProcAddress(lib, "start"));
+  FARPROC startFunc = check_pointer(GetProcAddress(lib, "ipaSim_start"));
   ((void (*)(const hstring &, const LaunchActivatedEventArgs &))startFunc)(
       Bin.Path(), LaunchArgs);
   check_bool(FreeLibrary(lib));
