@@ -1,23 +1,16 @@
-// HeadersAnalyzer.cpp : Defines the entry point for the console application.
-//
+// HeadersAnalyzer.cpp
 
-#include "ClangHelper.hpp"
-#include "Config.hpp"
-#include "HAContext.hpp"
-#include "LLDBHelper.hpp"
-#include "LLDHelper.hpp"
-#include "LLVMHelper.hpp"
-#include "TapiHelper.hpp"
-
-#include <Plugins/SymbolFile/PDB/PDBASTParser.h>
-#include <Plugins/SymbolFile/PDB/SymbolFilePDB.h>
-#include <lldb/Core/Debugger.h>
-#include <lldb/Core/Module.h>
-#include <lldb/Symbol/ClangASTContext.h>
-#include <lldb/Symbol/ClangUtil.h>
-#include <lldb/Symbol/Type.h>
+#include "ipasim/ClangHelper.hpp"
+#include "ipasim/HAContext.hpp"
+#include "ipasim/HeadersAnalyzer/Config.hpp"
+#include "ipasim/LLDBHelper.hpp"
+#include "ipasim/LLDHelper.hpp"
+#include "ipasim/LLVMHelper.hpp"
+#include "ipasim/TapiHelper.hpp"
 
 #include <CodeGen/CodeGenModule.h>
+#include <Plugins/SymbolFile/PDB/PDBASTParser.h>
+#include <Plugins/SymbolFile/PDB/SymbolFilePDB.h>
 #include <clang/AST/RecursiveASTVisitor.h>
 #include <clang/AST/Type.h>
 #include <clang/CodeGen/CodeGenABITypes.h>
@@ -27,7 +20,15 @@
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Frontend/FrontendActions.h>
 #include <clang/Parse/ParseAST.h>
-
+#include <cstdlib>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <lldb/Core/Debugger.h>
+#include <lldb/Core/Module.h>
+#include <lldb/Symbol/ClangASTContext.h>
+#include <lldb/Symbol/ClangUtil.h>
+#include <lldb/Symbol/Type.h>
 #include <llvm/DebugInfo/PDB/PDBSymbolFunc.h>
 #include <llvm/DebugInfo/PDB/PDBSymbolPublicSymbol.h>
 #include <llvm/IR/DebugInfo.h>
@@ -39,18 +40,16 @@
 #include <llvm/Object/ObjectFile.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Transforms/Utils/FunctionComparator.h>
-
-#include <cstdlib>
-#include <filesystem>
-#include <fstream>
-#include <iostream>
 #include <vector>
 
 using namespace clang;
-using namespace frontend;
+using namespace clang::frontend;
+using namespace ipasim;
 using namespace std;
-using namespace filesystem;
+using namespace std::filesystem;
 using namespace tapi::internal;
+
+namespace {
 
 // TODO: Generate distinct wrappers only for functions with distinct signatures.
 // And then export those wrappers as aliases for all functions with the same
@@ -548,7 +547,7 @@ public:
           if (DLL.Name == "ucrtbased.dll")
             Clang.Args.add("./lib/crt/stubs.obj");
 
-          Clang.Args.add("-I./src/HeadersAnalyzer/include");
+          Clang.Args.add("-I./include");
           Clang.Args.add(IndexFile.c_str());
 
           Clang.linkDLL(
@@ -859,6 +858,8 @@ private:
     llvm::GlobalAlias::create(Twine("\01$__ipaSim_wraps_") + RVAStr, Func);
   }
 };
+
+} // namespace
 
 int main() {
   try {

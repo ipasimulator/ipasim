@@ -1,15 +1,16 @@
 // HAContext.cpp
 
-#include "HAContext.hpp"
+#include "ipasim/HAContext.hpp"
 
-#include "Common.hpp"
-#include "Config.hpp"
-#include "ErrorReporting.hpp"
+#include "ipasim/Common.hpp"
+#include "ipasim/ErrorReporting.hpp"
+#include "ipasim/HeadersAnalyzer/Config.hpp"
 
 #include <llvm/ADT/Twine.h>
 
-using namespace std;
+using namespace ipasim;
 using namespace llvm;
+using namespace std;
 
 template <LibType T> llvm::FunctionType *ExportEntry::getType() const {
   if constexpr (T == LibType::Dylib)

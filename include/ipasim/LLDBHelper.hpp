@@ -1,21 +1,21 @@
 // LLDBHelper.hpp
 
-#ifndef LLDBHELPER_HPP
-#define LLDBHELPER_HPP
+#ifndef IPASIM_LLDB_HELPER_HPP
+#define IPASIM_LLDB_HELPER_HPP
 
-#include "Common.hpp"
-#include "ErrorReporting.hpp"
+#include "ipasim/Common.hpp"
+#include "ipasim/ErrorReporting.hpp"
 
+#include <CodeGen/CodeGenModule.h>
 #include <Plugins/SymbolFile/PDB/PDBASTParser.h>
 #include <Plugins/SymbolFile/PDB/SymbolFilePDB.h>
 #include <lldb/Core/Debugger.h>
 #include <lldb/Symbol/ClangASTContext.h>
 #include <lldb/Symbol/ObjectFile.h>
-
-#include <CodeGen/CodeGenModule.h>
-
 #include <llvm/DebugInfo/PDB/PDBSymbolExe.h>
 #include <llvm/Transforms/Utils/FunctionComparator.h>
+
+namespace ipasim {
 
 class ObjectFileUnimplemented : public lldb_private::ObjectFile {
 public:
@@ -170,5 +170,7 @@ private:
   };
 };
 
-// !defined(LLDBHELPER_HPP)
+} // namespace ipasim
+
+// !defined(IPASIM_LLDB_HELPER_HPP)
 #endif

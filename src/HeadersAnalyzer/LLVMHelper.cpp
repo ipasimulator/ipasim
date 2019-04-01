@@ -1,11 +1,11 @@
 // LLVMHelper.cpp
 
-#include "LLVMHelper.hpp"
+#include "ipasim/LLVMHelper.hpp"
 
-#include "ClangHelper.hpp"
-#include "Common.hpp"
-#include "Config.hpp"
-#include "ErrorReporting.hpp"
+#include "ipasim/ClangHelper.hpp"
+#include "ipasim/Common.hpp"
+#include "ipasim/ErrorReporting.hpp"
+#include "ipasim/HeadersAnalyzer/Config.hpp"
 
 #include <llvm/ADT/None.h>
 #include <llvm/IR/LegacyPassManager.h>
@@ -18,6 +18,7 @@
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Target/TargetOptions.h>
 
+using namespace ipasim;
 using namespace llvm;
 using namespace llvm::cl;
 using namespace llvm::sys;

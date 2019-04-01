@@ -1,13 +1,15 @@
 // ClangHelper.hpp
 
-#ifndef CLANGHELPER_HPP
-#define CLANGHELPER_HPP
+#ifndef IPASIM_CLANG_HELPER_HPP
+#define IPASIM_CLANG_HELPER_HPP
 
-#include "ErrorReporting.hpp"
-#include "LLVMHelper.hpp"
+#include "ipasim/ErrorReporting.hpp"
+#include "ipasim/LLVMHelper.hpp"
 
 #include <CodeGen/CodeGenModule.h>
 #include <clang/Frontend/CompilerInstance.h>
+
+namespace ipasim {
 
 class ClangHelper {
 public:
@@ -44,5 +46,7 @@ private:
   }
 };
 
-// !defined(CLANGHELPER_HPP)
+} // namespace ipasim
+
+// !defined(IPASIM_CLANG_HELPER_HPP)
 #endif

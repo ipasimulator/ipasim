@@ -1,8 +1,8 @@
 // ClangHelper.cpp
 
-#include "ClangHelper.hpp"
+#include "ipasim/ClangHelper.hpp"
 
-#include "Config.hpp"
+#include "ipasim/HeadersAnalyzer/Config.hpp"
 
 #include <clang/Driver/Compilation.h>
 #include <clang/Driver/Driver.h>
@@ -10,6 +10,7 @@
 using namespace clang;
 using namespace clang::CodeGen;
 using namespace clang::driver;
+using namespace ipasim;
 using namespace std;
 using namespace llvm;
 

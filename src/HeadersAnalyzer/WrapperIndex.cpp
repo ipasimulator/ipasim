@@ -5,7 +5,7 @@
 // DLL function directly from some Dylib (e.g., through a pointer from
 // Objective-C metadata).
 
-#include "WrapperIndex.hpp"
+#include "ipasim/WrapperIndex.hpp"
 
 __declspec(dllexport) WrapperIndex Idx;
 

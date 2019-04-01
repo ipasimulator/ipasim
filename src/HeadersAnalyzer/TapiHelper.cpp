@@ -1,12 +1,13 @@
 // TapiHelper.cpp
 
-#include "TapiHelper.hpp"
+#include "ipasim/TapiHelper.hpp"
 
-#include "ErrorReporting.hpp"
+#include "ipasim/ErrorReporting.hpp"
 
 #include <clang/Basic/FileSystemOptions.h>
 
 using namespace clang;
+using namespace ipasim;
 using namespace llvm;
 using namespace std;
 using namespace tapi::internal;

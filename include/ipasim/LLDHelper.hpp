@@ -1,9 +1,11 @@
 // LLDHelper.hpp
 
-#ifndef LLDHELPER_HPP
-#define LLDHELPER_HPP
+#ifndef IPASIM_LLD_HELPER_HPP
+#define IPASIM_LLD_HELPER_HPP
 
-#include "LLVMHelper.hpp"
+#include "ipasim/LLVMHelper.hpp"
+
+namespace ipasim {
 
 class LLDHelper {
 public:
@@ -19,5 +21,7 @@ public:
   void executeArgs();
 };
 
-// !defined(LLDHELPER_HPP)
+} // namespace ipasim
+
+// !defined(IPASIM_LLD_HELPER_HPP)
 #endif

@@ -414,7 +414,6 @@ set_target_properties (dia PROPERTIES
 # HeadersAnalyzer
 set (SOURCE_FILES
     ClangHelper.cpp
-    Common.cpp
     ErrorReporting.cpp
     HAContext.cpp
     HeadersAnalyzer.cpp
@@ -429,6 +428,7 @@ add_prep_dep (HeadersAnalyzer) # TODO: Use original Clang for CodeGen.
 target_compile_options (HeadersAnalyzer PRIVATE -std=c++17)
 
 target_include_directories (HeadersAnalyzer PRIVATE
+    "${SOURCE_DIR}/include"
     # Private Clang headers
     ../../deps/clang/lib
     # Private LLDB headers

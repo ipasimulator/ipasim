@@ -1,18 +1,26 @@
 // HAContext.hpp
 
-#ifndef HACONTEXT_HPP
-#define HACONTEXT_HPP
+#ifndef IPASIM_HA_CONTEXT_HPP
+#define IPASIM_HA_CONTEXT_HPP
 
-#include "Common.hpp"
-
-#include <llvm/IR/DerivedTypes.h>
+#include "ipasim/Common.hpp"
 
 #include <cstdint>
 #include <filesystem>
+#include <llvm/IR/DerivedTypes.h>
 #include <map>
 #include <set>
 #include <string>
 #include <vector>
+
+namespace ipasim {
+
+enum class LibType { None = 0, Dylib = 0x1, DLL = 0x2, Both = 0x3 };
+
+// TODO: Generalize this for all enums.
+constexpr bool operator&(LibType Value, LibType Flag) {
+  return ((uint32_t)Value & (uint32_t)Flag) == (uint32_t)Flag;
+}
 
 // Wrapper over container iterator. Plus extra `operator bool`.
 template <typename T> class ContainerPtr {
@@ -166,5 +174,78 @@ public:
   };
 };
 
-// !defined(HACONTEXT_HPP)
+// =============================================================================
+// Iterators
+// =============================================================================
+
+template <typename T, typename FTy> class MappedContainer {
+public:
+  using ItTy = decltype(std::declval<T>().begin());
+
+  MappedContainer(T &&Container, FTy &&Func)
+      : Container(std::forward<T>(Container)), Func(std::forward<FTy>(Func)) {}
+
+  auto begin() { return Func(Container.begin()); }
+  auto end() { return Func(Container.end()); }
+
+private:
+  T &&Container;
+  FTy Func;
+};
+template <typename T, typename FTy>
+auto mapContainer(T &&Container, FTy &&Func) {
+  return MappedContainer<T, FTy>(std::forward<T>(Container),
+                                 std::forward<FTy>(Func));
+}
+template <typename T, typename FTy>
+auto mapIterator(T &&Container, FTy &&Func) {
+  return mapContainer(std::forward<T>(Container),
+                      [Func(std::forward<FTy>(Func))](auto It) {
+                        return llvm::map_iterator(std::move(It), Func);
+                      });
+}
+
+// Should work for, e.g., `T = std::vector<std::vector<uint32_t>::iterator>`.
+// Dereferences iterated values.
+template <typename T> auto deref(T &&Container) {
+  return mapIterator(std::forward<T>(Container),
+                     [](auto Value) { return *Value; });
+}
+
+template <typename ItTy>
+class WithPtrsIterator
+    : public llvm::iterator_adaptor_base<WithPtrsIterator<ItTy>, ItTy> {
+public:
+  WithPtrsIterator(ItTy It)
+      : WithPtrsIterator::iterator_adaptor_base(std::move(It)) {}
+
+  auto getCurrent() { return this->I; }
+  auto operator*() { return std::make_pair(this->I, *this->I); }
+};
+
+// Should work for, e.g., `T = std::vector<uint32_t>`. Maps iterated values to
+// pairs of their iterators and themselves.
+template <typename T> auto withPtrs(T &&Container) {
+  return mapContainer(std::forward<T>(Container),
+                      [](auto It) { return WithPtrsIterator(std::move(It)); });
+}
+
+class Counter {
+public:
+  template <typename T> auto operator()(T &Value) {
+    return std::pair<size_t, T &>(Idx++, Value);
+  }
+
+private:
+  size_t Idx = 0;
+};
+
+// Maps iterated values to pairs of their indices and themselves.
+template <typename T> auto withIndices(T &&Container) {
+  return mapIterator(std::forward<T>(Container), Counter());
+}
+
+} // namespace ipasim
+
+// !defined(IPASIM_HA_CONTEXT_HPP)
 #endif

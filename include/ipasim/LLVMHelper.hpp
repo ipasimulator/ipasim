@@ -1,9 +1,9 @@
 // LLVMHelper.hpp
 
-#ifndef LLVMHELPER_HPP
-#define LLVMHELPER_HPP
+#ifndef IPASIM_LLVM_HELPER_HPP
+#define IPASIM_LLVM_HELPER_HPP
 
-#include "HAContext.hpp"
+#include "ipasim/HAContext.hpp"
 
 #include <llvm/ADT/SmallVector.h>
 #include <llvm/IR/IRBuilder.h>
@@ -13,9 +13,10 @@
 #include <llvm/Support/COM.h>
 #include <llvm/Support/StringSaver.h>
 #include <llvm/Target/TargetMachine.h>
-
 #include <memory>
 #include <string>
+
+namespace ipasim {
 
 class LLVMInitializer {
 public:
@@ -125,5 +126,7 @@ private:
   llvm::Function *Func;
 };
 
-// !defined(LLVMHELPER_HPP)
+} // namespace ipasim
+
+// !defined(IPASIM_LLVM_HELPER_HPP)
 #endif

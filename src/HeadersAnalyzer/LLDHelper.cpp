@@ -1,15 +1,15 @@
 // LLDHelper.cpp
 
-#include "LLDHelper.hpp"
+#include "ipasim/LLDHelper.hpp"
 
-#include "ErrorReporting.hpp"
+#include "ipasim/ErrorReporting.hpp"
 
 #include <llvm/ADT/ArrayRef.h>
 #include <llvm/Support/Program.h>
-
 #include <string>
 #include <vector>
 
+using namespace ipasim;
 using namespace llvm;
 using namespace std;
 

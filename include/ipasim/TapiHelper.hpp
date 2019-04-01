@@ -1,13 +1,15 @@
 // TapiHelper.hpp
 
-#ifndef TAPIHELPER_HPP
-#define TAPIHELPER_HPP
+#ifndef IPASIM_TAPI_HELPER_HPP
+#define IPASIM_TAPI_HELPER_HPP
 
-#include "HAContext.hpp"
+#include "ipasim/HAContext.hpp"
 
 #include <tapi/Core/FileManager.h>
 #include <tapi/Core/InterfaceFile.h>
 #include <tapi/Core/InterfaceFileManager.h>
+
+namespace ipasim {
 
 class TBDHandler {
 public:
@@ -22,5 +24,7 @@ private:
   tapi::internal::InterfaceFileManager IFM;
 };
 
-// !defined(TAPIHELPER_HPP)
+} // namespace ipasim
+
+// !defined(IPASIM_TAPI_HELPER_HPP)
 #endif
