@@ -1,0 +1,5 @@
+[ver:1,total:1020]
+src/IpaSimulator/IpaSimulator.cpp:780,1554148800:120,1554152400:300,1554156000:180,1554184800:180,r
+include/ipasim/WrapperIndex.hpp:140,1554152400:140,r
+src/HeadersAnalyzer/WrapperIndex.cpp:80,1554152400:20,1554195600:60,m
+deps/pthreads.2/pthread_win32_attach_detach_np.c:20,1554152400:20,r
