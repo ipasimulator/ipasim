@@ -1,0 +1,10 @@
+[ver:1,total:1664]
+include/ipasim/Logger.hpp:530,1554202800:120,1554206400:410,r
+include/ipasim/Emulator.hpp:414,1554202800:414,d
+include/ipasim/ErrorReporting.hpp:266,1554202800:236,1554206400:30,r
+src/HeadersAnalyzer/ErrorReporting.cpp:210,1554202800:60,1554206400:150,r
+include/ipasim/IpaSimulator.hpp:104,1554202800:104,r
+scripts/CommonVariables.cmake:60,1554202800:60,r
+src/IpaSimulator/IpaSimApp/App.cpp:40,1554238800:40,m
+src/IpaSimulator/CMakeLists.txt:20,1554206400:20,r
+include/ipasim/HAContext.hpp:20,1554202800:20,r
