@@ -1,0 +1,6 @@
+[ver:1,total:1860]
+src/HeadersAnalyzer/CMakeLists.txt:799,1554199200:799,m
+scripts/CommonVariables.cmake:312,1554199200:312,m
+src/IpaSimulator/CMakeLists.txt:267,1554195600:240,1554199200:27,m
+cmake/ipasim-x86-Debug/compile_commands.json:242,1554199200:242,r
+src/IpaSimulator/DynamicLoader.cpp:240,1554195600:60,1554199200:180,r
