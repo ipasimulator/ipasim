@@ -50,9 +50,9 @@ static bool endsWith(const std::string &S, const std::string &Suffix) {
 static IAsyncOperation<StorageFolder> copyFolder(StorageFolder Source, StorageFolder Target) {
   StorageFolder Dest = co_await Target.CreateFolderAsync(
       Source.Name(), CreationCollisionOption::ReplaceExisting);
-  for (StorageFile &File : co_await Source.GetFilesAsync())
+  for (StorageFile File : co_await Source.GetFilesAsync())
     co_await File.CopyAsync(Dest, File.Name(), NameCollisionOption::ReplaceExisting);
-  for (StorageFolder &Folder : co_await Source.GetFoldersAsync())
+  for (StorageFolder Folder : co_await Source.GetFoldersAsync())
     co_await copyFolder(Folder, Dest);
   co_return Dest;
 }
