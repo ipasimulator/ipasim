@@ -249,3 +249,9 @@ function (woc_framework name)
     target_sources ("${name}" PRIVATE ${DYLD_INITIALIZER})
     target_link_libraries ("${name}" PRIVATE dyld objc pthread)
 endfunction (woc_framework)
+
+# Sets the provided headers as `SYSTEM INTERFACE` and (non-system) `PRIVATE`.
+function (library_headers lib)
+    target_include_directories ("${lib}" PRIVATE ${ARGN})
+    target_include_directories ("${lib}" SYSTEM INTERFACE ${ARGN})
+endfunction (library_headers)

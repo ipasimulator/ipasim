@@ -34,7 +34,7 @@ set (LIEF_INCLUDE_DIRS
     "${LIEF_CMAKE_DIR}/include")
 # CMake would complain if some include dirs didn't exist.
 file (MAKE_DIRECTORY ${LIEF_INCLUDE_DIRS})
-target_include_directories (LIEF INTERFACE ${LIEF_INCLUDE_DIRS})
+target_include_directories (LIEF SYSTEM INTERFACE ${LIEF_INCLUDE_DIRS})
 target_compile_options (LIEF INTERFACE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/my_iso646.h")
 target_compile_definitions (LIEF INTERFACE NOMINMAX)
@@ -56,7 +56,7 @@ set (LIBFFI_INCLUDE_DIRS
     "${SOURCE_DIR}/deps/Libffi/build/include")
 # CMake would complain if some include dirs didn't exist.
 file (MAKE_DIRECTORY ${LIBFFI_INCLUDE_DIRS})
-target_include_directories (ffi INTERFACE ${LIBFFI_INCLUDE_DIRS})
+target_include_directories (ffi SYSTEM INTERFACE ${LIBFFI_INCLUDE_DIRS})
 # From `/deps/Libffi/CMakeLists.txt`
 target_compile_definitions (ffi INTERFACE FFI_BUILDING)
 

@@ -283,7 +283,7 @@ function (add_clang_libs title names include_dirs tablegen_targets)
         target_compile_definitions ("${name}" INTERFACE _DEBUG _MT _DLL)
         target_link_libraries ("${name}" INTERFACE
             ucrtd vcruntimed msvcrtd msvcprtd)
-        target_include_directories ("${name}" INTERFACE ${include_dirs})
+        target_include_directories ("${name}" SYSTEM INTERFACE ${include_dirs})
         if (tablegen_targets)
             add_dependencies ("${name}" ${tablegen_targets})
         endif (tablegen_targets)
@@ -349,9 +349,10 @@ set (TAPI_SOURCES
 add_library (tapi STATIC ${TAPI_SOURCES})
 add_prep_dep (tapi) # TODO: Use original Clang for CodeGen. See also #12.
 
-target_compile_definitions (tapi PRIVATE TAPI_PORT PATH_MAX=_MAX_PATH)
+target_compile_definitions (tapi PRIVATE
+    TAPI_PORT PATH_MAX=_MAX_PATH _CRT_SECURE_NO_WARNINGS)
 
-target_include_directories (tapi PUBLIC
+library_headers (tapi
     "${CMAKE_CURRENT_BINARY_DIR}/include" # Headers generated with tblgens.
     ../../deps/tapi/include)
 
