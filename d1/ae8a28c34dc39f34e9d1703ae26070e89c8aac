@@ -1,0 +1,5 @@
+[ver:1,total:720]
+src/IpaSimulator/DynamicLoader.cpp:440,1554195600:440,m
+src/IpaSimulator/IpaSimulator.cpp:200,1554195600:200,r
+include/ipasim/WrapperIndex.hpp:50,1554195600:50,r
+src/HeadersAnalyzer/WrapperIndex.cpp:30,1554195600:30,m
