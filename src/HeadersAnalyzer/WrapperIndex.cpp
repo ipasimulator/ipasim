@@ -7,6 +7,8 @@
 
 #include "ipasim/WrapperIndex.hpp"
 
+using namespace ipasim;
+
 __declspec(dllexport) WrapperIndex Idx;
 
 #define ADD_LIBRARY(path) Idx.Dylibs.push_back(path)

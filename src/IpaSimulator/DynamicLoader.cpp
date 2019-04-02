@@ -484,7 +484,8 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
       return false;
 
     // Load `WrapperIndex`.
-    uint64_t IdxAddr = WrapperLib->findSymbol(*this, "?Idx@@3UWrapperIndex@@A");
+    uint64_t IdxAddr =
+        WrapperLib->findSymbol(*this, "?Idx@@3UWrapperIndex@ipasim@@A");
     auto *Idx = reinterpret_cast<WrapperIndex *>(IdxAddr);
 
     // TODO: Add real base address instead of hardcoded 0x1000.
