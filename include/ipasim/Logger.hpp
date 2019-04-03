@@ -12,11 +12,10 @@ class EndToken {};
 class WinErrorToken {};
 class AppendWinErrorToken {};
 
-class DebugStream;
-using StreamHandler = std::function<void(DebugStream &)>;
-
 class DebugStream {
 public:
+  using Handler = std::function<void(DebugStream &)>;
+
   DebugStream &operator<<(const std::string &S) { return *this << S.c_str(); }
   DebugStream &operator<<(const char *S) {
     OutputDebugStringA(S);
@@ -45,7 +44,7 @@ public:
   operator<<(const T &Any) {
     return *this << std::to_string(Any).c_str();
   }
-  DebugStream &operator<<(const StreamHandler &Handler) {
+  DebugStream &operator<<(const Handler &Handler) {
     Handler(*this);
     return *this;
   }

@@ -685,7 +685,8 @@ void DynamicLoader::continueOutsideEmulation(function<void()> Cont) {
   Running = false;
 }
 
-StreamHandler DynamicLoader::dumpAddr(uint64_t Addr, const AddrInfo &AI) {
+DebugStream::Handler DynamicLoader::dumpAddr(uint64_t Addr,
+                                             const AddrInfo &AI) {
   return [Addr, &AI](DebugStream &S) {
     if (!AI.Lib) {
       S << "0x" << to_hex_string(Addr);
@@ -696,7 +697,7 @@ StreamHandler DynamicLoader::dumpAddr(uint64_t Addr, const AddrInfo &AI) {
   };
 }
 
-StreamHandler DynamicLoader::dumpAddr(uint64_t Addr) {
+DebugStream::Handler DynamicLoader::dumpAddr(uint64_t Addr) {
   return [this, Addr](DebugStream &S) {
     if (Addr == KernelAddr) {
       S << "kernel!0x" << to_hex_string(Addr);
