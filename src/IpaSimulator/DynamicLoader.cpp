@@ -44,15 +44,11 @@ DynamicLoader::DynamicLoader(uc_engine *UC)
 
 void DynamicLoader::callUC(uc_err Err) {
   if (Err != UC_ERR_OK) {
-    OutputDebugStringA("Error: unicorn failed with ");
-    OutputDebugStringA(to_string(Err).c_str());
     uint32_t Addr;
     callUCSimple(uc_reg_read(UC, UC_ARM_REG_PC, &Addr));
-    OutputDebugStringA(" at ");
-    dumpAddr(Addr);
-    OutputDebugStringA(".\n");
-    // TODO: Throw better exceptions.
-    throw "unicorn error";
+    Log.error() << "unicorn failed with " << Err << " at " << dumpAddr(Addr)
+                << Log.end();
+    Log.throwFatal("unicorn error");
   }
 }
 
@@ -65,13 +61,11 @@ LoadedLibrary *DynamicLoader::load(const string &Path) {
 
   // Check that file exists.
   if (!BP.isFileValid()) {
-    error("invalid file: " + BP.Path);
+    Log.error() << "invalid file: " << BP.Path << Log.end();
     return nullptr;
   }
 
-  OutputDebugStringA("Info: loading library ");
-  OutputDebugStringA(BP.Path.c_str());
-  OutputDebugStringA("...\n");
+  Log.info() << "loading library " << BP.Path << "...\n";
 
   LoadedLibrary *L;
   if (LIEF::MachO::is_macho(BP.Path))
@@ -79,7 +73,7 @@ LoadedLibrary *DynamicLoader::load(const string &Path) {
   else if (LIEF::PE::is_pe(BP.Path))
     L = loadPE(BP.Path);
   else {
-    error("invalid binary type: " + BP.Path);
+    Log.error() << "invalid binary type: " << BP.Path << Log.end();
     return nullptr;
   }
 
@@ -89,19 +83,6 @@ LoadedLibrary *DynamicLoader::load(const string &Path) {
                       endsWith(BP.Path, ".wrapper.dll");
 
   return L;
-}
-
-// Reports non-fatal error to the user.
-void DynamicLoader::error(const string &Msg, bool AppendLastError) {
-  hstring HS(to_hstring("Error occurred: " + Msg + "."));
-  if (AppendLastError) {
-    hresult_error Err(HRESULT_FROM_WIN32(GetLastError()));
-    HS = HS + L"\n" + Err.message();
-  }
-
-  // Output the error to debugging console.
-  HS = HS + L"\n";
-  OutputDebugStringW(HS.c_str());
 }
 
 // Inspired by `ImageLoaderMachO::segmentsCanSlide`.
@@ -115,8 +96,8 @@ bool DynamicLoader::canSegmentsSlide(LIEF::MachO::Binary &Bin) {
 // TODO: What if the mappings overlap?
 void DynamicLoader::mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms) {
   if (uc_mem_map_ptr(UC, Addr, Size, Perms, reinterpret_cast<void *>(Addr)))
-    error("couldn't map memory at 0x" + to_hex_string(Addr) + " of size 0x" +
-          to_hex_string(Size));
+    Log.error() << "couldn't map memory at 0x" << to_hex_string(Addr)
+                << " of size 0x" << to_hex_string(Size) << Log.end();
 }
 
 BinaryPath DynamicLoader::resolvePath(const string &Path) {
@@ -145,12 +126,12 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
   // Check header.
   Header &Hdr = Bin.header();
   if (Hdr.cpu_type() != CPU_TYPES::CPU_TYPE_ARM)
-    error("expected ARM binary");
+    Log.error("expected ARM binary");
   // Ensure that segments are continuous (required by `relocateSegment`).
   if (Hdr.has(HEADER_FLAGS::MH_SPLIT_SEGS))
-    error("MH_SPLIT_SEGS not supported");
+    Log.error("MH_SPLIT_SEGS not supported");
   if (!canSegmentsSlide(Bin))
-    error("the binary is not slideable");
+    Log.error("the binary is not slideable");
 
   // Compute total size of all segments. Note that in Mach-O, segments must
   // slide together (see `ImageLoaderMachO::segmentsMustSlideTogether`).
@@ -163,7 +144,7 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
     uint64_t SegHigh = roundToPageSize(SegLow + Seg.virtual_size());
     if ((SegLow < HighAddr && SegLow >= LowAddr) ||
         (SegHigh > LowAddr && SegHigh <= HighAddr)) {
-      error("overlapping segments (after rounding to pagesize)");
+      Log.error("overlapping segments (after rounding to pagesize)");
     }
     if (SegLow < LowAddr) {
       LowAddr = SegLow;
@@ -177,7 +158,7 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
   uint64_t Size = HighAddr - LowAddr;
   uintptr_t Addr = (uintptr_t)_aligned_malloc(Size, PageSize);
   if (!Addr)
-    error("couldn't allocate memory for segments");
+    Log.error("couldn't allocate memory for segments");
   uint64_t Slide = Addr - LowAddr;
   LLP->StartAddress = Slide;
   LLP->Size = Size;
@@ -225,7 +206,7 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
         if (Rel.is_pc_relative() ||
             Rel.origin() != RELOCATION_ORIGINS::ORIGIN_DYLDINFO ||
             Rel.size() != 32 || (Rel.address() & R_SCATTERED) != 0)
-          error("unsupported relocation");
+          Log.error("unsupported relocation");
 
         // Find base address for this relocation. Inspired by
         // `ImageLoaderMachOClassic::getRelocBase`.
@@ -235,7 +216,7 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
 
         // TODO: Implement what `ImageLoader::containsAddress` does.
         if (RelAddr > VAddr + VSize || RelAddr < VAddr)
-          error("relocation target out of range");
+          Log.error("relocation target out of range");
 
         uint32_t *Val = (uint32_t *)RelAddr;
         // We actively leave NULL pointers untouched. Technically it would be
@@ -260,11 +241,11 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
          BInfo.binding_class() != BINDING_CLASS::BIND_CLASS_LAZY) ||
         BInfo.binding_type() != BIND_TYPES::BIND_TYPE_POINTER ||
         BInfo.addend()) {
-      error("unsupported binding info");
+      Log.error("unsupported binding info");
       continue;
     }
     if (!BInfo.has_library()) {
-      error("flat-namespace symbols are not supported yet");
+      Log.error("flat-namespace symbols are not supported yet");
       continue;
     }
 
@@ -272,7 +253,7 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
     string LibName(BInfo.library().name());
     LoadedLibrary *Lib = load(LibName);
     if (!Lib) {
-      error("symbol's library couldn't be loaded");
+      Log.error("symbol's library couldn't be loaded");
       continue;
     }
 
@@ -280,8 +261,8 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
     string SymName(BInfo.symbol().name());
     uint64_t SymAddr = Lib->findSymbol(*this, SymName);
     if (!SymAddr) {
-      error("external symbol " + SymName + " from library " + LibName +
-            " couldn't be resolved");
+      Log.error() << "external symbol " << SymName << " from library "
+                  << LibName << " couldn't be resolved" << Log.end();
       continue;
     }
 
@@ -305,7 +286,7 @@ LoadedLibrary *DynamicLoader::loadPE(const string &Path) {
   // Load it into memory.
   HMODULE Lib = LoadPackagedLibrary(to_hstring(Path).c_str(), 0);
   if (!Lib) {
-    error("couldn't load DLL: " + Path, /* AppendLastError */ true);
+    Log.error() << "couldn't load DLL: " << Path << Log.appendWinError();
     LIs.erase(Path);
     return nullptr;
   }
@@ -314,7 +295,7 @@ LoadedLibrary *DynamicLoader::loadPE(const string &Path) {
   // Find out where it lies in memory.
   MODULEINFO Info;
   if (!GetModuleInformation(GetCurrentProcess(), Lib, &Info, sizeof(Info))) {
-    error("couldn't load module information", /* AppendLastError */ true);
+    Log.winError("couldn't load module information");
     return nullptr;
   }
   if (uint64_t Hdr = LLP->findSymbol(*this, "_mh_dylib_header")) {
@@ -341,7 +322,7 @@ LoadedLibrary *DynamicLoader::loadPE(const string &Path) {
 void DynamicLoader::execute(LoadedLibrary *Lib) {
   auto *Dylib = dynamic_cast<LoadedDylib *>(Lib);
   if (!Dylib) {
-    error("we can only execute Dylibs right now");
+    Log.error("we can only execute Dylibs right now");
     return;
   }
 
@@ -387,9 +368,7 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
 }
 
 void DynamicLoader::execute(uint64_t Addr) {
-  OutputDebugStringA("Info: starting emulation at ");
-  dumpAddr(Addr);
-  OutputDebugStringA(".\n");
+  Log.info() << "starting emulation at " << dumpAddr(Addr) << Log.end();
 
   // Save LR.
   uint32_t LR;
@@ -438,9 +417,7 @@ void DynamicLoader::returnToEmulation() {
   callUC(uc_reg_read(UC, UC_ARM_REG_LR, &LR));
 
   // Log details about the return.
-  OutputDebugStringA("Info: returning to ");
-  dumpAddr(LR);
-  OutputDebugStringA(".\n");
+  Log.info() << "returning to " << dumpAddr(LR) << Log.end();
 
   assert(!Running);
   Restart = true;
@@ -460,14 +437,13 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   if (!AI.Lib) {
     // Handle return to kernel.
     if (Addr == KernelAddr) {
-      OutputDebugStringA("Info: executing kernel at 0x");
-      OutputDebugStringA(to_hex_string(Addr).c_str());
-      OutputDebugStringA(" (as protected).\n");
+      Log.info() << "executing kernel at 0x" << to_hex_string(Addr)
+                 << " (as protected)" << Log.end();
       returnToKernel();
       return true;
     }
 
-    error("unmapped address fetched");
+    Log.error("unmapped address fetched");
     return false;
   }
 
@@ -497,9 +473,7 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
       // If there's no corresponding wrapper, maybe this is a simple Objective-C
       // method and we can translate it dynamically.
       if (const char *T = AI.Lib->getMethodType(Addr)) {
-        OutputDebugStringA("Info: dynamically handling method of type ");
-        OutputDebugStringA(T);
-        OutputDebugStringA(".\n");
+        Log.info() << "dynamically handling method of type " << T << Log.end();
 
         // Handle return value.
         TypeDecoder TD(*this, T);
@@ -512,7 +486,7 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
           Returns = true;
           break;
         default:
-          error("unsupported return type");
+          Log.error("unsupported return type");
           return false;
         }
 
@@ -536,8 +510,9 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
         return true;
       }
 
-      error("cannot find RVA 0x" + to_hex_string(RVA) + " in WrapperIndex of " +
-            WrapperPath.string());
+      Log.error() << "cannot find RVA 0x" << to_hex_string(RVA)
+                  << " in WrapperIndex of " << WrapperPath.string()
+                  << Log.end();
       return false;
     }
     const string &Dylib = Idx->Dylibs[Entry->second];
@@ -548,8 +523,8 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
     // Find the correct wrapper using its alias.
     Addr = WrapperDylib->findSymbol(*this, "$__ipaSim_wraps_" + to_string(RVA));
     if (!Addr) {
-      error("cannot find wrapper for 0x" + to_hex_string(RVA) + " in " +
-            *AI.LibPath);
+      Log.error() << "cannot find wrapper for 0x" << to_hex_string(RVA)
+                  << " in " << *AI.LibPath << Log.end();
       return false;
     }
 
@@ -559,11 +534,10 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   }
 
   // Log details.
-  OutputDebugStringA("Info: fetch prot. mem. at ");
-  dumpAddr(Addr, AI);
+  Log.info() << "fetch prot. mem. at " << dumpAddr(Addr, AI);
   if (!Wrapper)
-    OutputDebugStringA(" (not a wrapper)");
-  OutputDebugStringA(".\n");
+    Log.infs() << " (not a wrapper)";
+  Log.infs() << Log.end();
 
   // If the target is not a wrapper, we simply jump to it, no need to translate
   // anything.
@@ -600,14 +574,13 @@ void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
     // TODO: This shouldn't happen since kernel is non-executable but it does.
     // It's the same bug as described below.
     if (Addr == KernelAddr) {
-      OutputDebugStringA("Info: executing kernel at 0x");
-      OutputDebugStringA(to_hex_string(Addr).c_str());
-      OutputDebugStringA(".\n");
+      Log.info() << "executing kernel at 0x" << to_hex_string(Addr)
+                 << Log.end();
       returnToKernel();
       return;
     }
 
-    error("unmapped address executed");
+    Log.error("unmapped address executed");
     return;
   }
 
@@ -621,39 +594,28 @@ void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
     return;
   }
 
-#if 0
-  OutputDebugStringA("Info: executing at ");
-  dumpAddr(Addr, AI);
-  OutputDebugStringA(" [R0 = 0x");
+#if 1
+  Log.info() << "executing at " << dumpAddr(Addr, AI);
   uint32_t Reg;
   callUC(uc_reg_read(UC, UC_ARM_REG_R0, &Reg));
-  OutputDebugStringA(to_hex_string(Reg).c_str());
-  OutputDebugStringA(", R1 = 0x");
+  Log.infs() << " [R0 = 0x" << to_hex_string(Reg);
   callUC(uc_reg_read(UC, UC_ARM_REG_R1, &Reg));
-  OutputDebugStringA(to_hex_string(Reg).c_str());
-  OutputDebugStringA(", R7 = 0x");
+  Log.infs() << ", R1 = 0x" << to_hex_string(Reg);
   callUC(uc_reg_read(UC, UC_ARM_REG_R7, &Reg));
-  OutputDebugStringA(to_hex_string(Reg).c_str());
-  OutputDebugStringA(", R12 = 0x");
+  Log.infs() << ", R7 = 0x" << to_hex_string(Reg);
   callUC(uc_reg_read(UC, UC_ARM_REG_R12, &Reg));
-  OutputDebugStringA(to_hex_string(Reg).c_str());
-  OutputDebugStringA(", R13 = 0x");
+  Log.infs() << ", R12 = 0x" << to_hex_string(Reg);
   callUC(uc_reg_read(UC, UC_ARM_REG_R13, &Reg));
-  OutputDebugStringA(to_hex_string(Reg).c_str());
-  OutputDebugStringA(", [R13] = 0x");
+  Log.infs() << ", R13 = 0x" << to_hex_string(Reg);
   uint32_t Word;
   callUC(uc_mem_read(UC, Reg, &Word, 4));
-  OutputDebugStringA(to_hex_string(Word).c_str());
-  OutputDebugStringA(", [R13+4] = 0x");
+  Log.infs() << ", [R13] = 0x" << to_hex_string(Word);
   callUC(uc_mem_read(UC, Reg + 4, &Word, 4));
-  OutputDebugStringA(to_hex_string(Word).c_str());
-  OutputDebugStringA(", [R13+8] = 0x");
+  Log.infs() << ", [R13+4] = 0x" << to_hex_string(Word);
   callUC(uc_mem_read(UC, Reg + 4, &Word, 4));
-  OutputDebugStringA(to_hex_string(Word).c_str());
-  OutputDebugStringA(", R14 = 0x");
+  Log.infs() << ", [R13+8] = 0x" << to_hex_string(Word);
   callUC(uc_reg_read(UC, UC_ARM_REG_R14, &Reg));
-  OutputDebugStringA(to_hex_string(Reg).c_str());
-  OutputDebugStringA("].\n");
+  Log.infs() << ", R14 = 0x" << to_hex_string(Reg) << "]" << Log.end();
 #endif
 }
 
@@ -666,14 +628,9 @@ bool DynamicLoader::catchMemWrite(uc_engine *UC, uc_mem_type Type,
 
 bool DynamicLoader::handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size,
                                    int64_t Value) {
-#if 0
-  OutputDebugStringA("Info: writing [");
-  dumpAddr(Addr);
-  OutputDebugStringA("] := ");
-  dumpAddr(Value);
-  OutputDebugStringA(" (");
-  OutputDebugStringA(to_string(Size).c_str());
-  OutputDebugStringA(").\n");
+#if 1
+  Log.info() << "writing [" << dumpAddr(Addr) << "] := " << dumpAddr(Value)
+             << " (" << Size << ")" << Log.end();
 #endif
   return true;
 }
@@ -689,11 +646,8 @@ bool DynamicLoader::catchMemUnmapped(uc_engine *UC, uc_mem_type Type,
 // dependent DLL and we should load it as a whole.
 bool DynamicLoader::handleMemUnmapped(uc_mem_type Type, uint64_t Addr, int Size,
                                       int64_t Value) {
-  OutputDebugStringA("Info: unmapped memory manipulation at ");
-  dumpAddr(Addr);
-  OutputDebugStringA(" (");
-  OutputDebugStringA(to_string(Size).c_str());
-  OutputDebugStringA(").\n");
+  Log.info() << "unmapped memory manipulation at " << dumpAddr(Addr) << " ("
+             << Size << ")" << Log.end();
 
   // Map the memory, so that emulation can continue.
   Addr = alignToPageSize(Addr);
@@ -731,26 +685,26 @@ void DynamicLoader::continueOutsideEmulation(function<void()> Cont) {
   Running = false;
 }
 
-void DynamicLoader::dumpAddr(uint64_t Addr, const AddrInfo &AI) {
-  if (!AI.Lib) {
-    OutputDebugStringA("0x");
-    OutputDebugStringA(to_hex_string(Addr).c_str());
-  } else {
-    OutputDebugStringA(AI.LibPath->c_str());
-    OutputDebugStringA("+0x");
-    uint64_t RVA = Addr - AI.Lib->StartAddress;
-    OutputDebugStringA(to_hex_string(RVA).c_str());
-  }
+StreamHandler DynamicLoader::dumpAddr(uint64_t Addr, const AddrInfo &AI) {
+  return [Addr, &AI](DebugStream &S) {
+    if (!AI.Lib) {
+      S << "0x" << to_hex_string(Addr);
+    } else {
+      uint64_t RVA = Addr - AI.Lib->StartAddress;
+      S << *AI.LibPath << "+0x" << to_hex_string(RVA);
+    }
+  };
 }
 
-void DynamicLoader::dumpAddr(uint64_t Addr) {
-  if (Addr == KernelAddr) {
-    OutputDebugStringA("kernel!0x");
-    OutputDebugStringA(to_hex_string(Addr).c_str());
-  } else {
-    AddrInfo AI(lookup(Addr));
-    dumpAddr(Addr, AI);
-  }
+StreamHandler DynamicLoader::dumpAddr(uint64_t Addr) {
+  return [this, Addr](DebugStream &S) {
+    if (Addr == KernelAddr) {
+      S << "kernel!0x" << to_hex_string(Addr);
+    } else {
+      AddrInfo AI(lookup(Addr));
+      dumpAddr(Addr, AI)(S);
+    }
+  };
 }
 
 namespace {
@@ -766,12 +720,11 @@ struct Trampoline {
 
 void DynamicLoader::handleTrampoline(void *Ret, void **Args, void *Data) {
   auto *Tr = reinterpret_cast<Trampoline *>(Data);
-  OutputDebugStringA("Info: handling trampoline (arguments: ");
-  OutputDebugStringA(to_string(Tr->ArgC).c_str());
+  Log.info() << "handling trampoline (arguments: " << Tr->ArgC;
   if (Tr->Returns)
-    OutputDebugStringA(", returns).\n");
+    Log.infs() << ", returns)" << Log.end();
   else
-    OutputDebugStringA(", void).\n");
+    Log.infs() << ", void)" << Log.end();
 
   // Pass arguments.
   uc_arm_reg RegId = UC_ARM_REG_R0;
@@ -810,9 +763,7 @@ void *DynamicLoader::translate(void *Addr) {
       // so that's what we do here.
       // TODO: Generate wrappers for callbacks, too (see README of
       // `HeadersAnalyzer` for more details).
-      OutputDebugStringA("Info: dynamically handling callback of type ");
-      OutputDebugStringA(T);
-      OutputDebugStringA(".\n");
+      Log.info() << "dynamically handling callback of type " << T << Log.end();
 
       // First, handle the return value.
       TypeDecoder TD(*this, T);
@@ -825,7 +776,7 @@ void *DynamicLoader::translate(void *Addr) {
         Tr->Returns = true;
         break;
       default:
-        error("unsupported return type of callback");
+        Log.error("unsupported return type of callback");
         return nullptr;
       }
 
@@ -837,14 +788,14 @@ void *DynamicLoader::translate(void *Addr) {
           return nullptr;
         case 4: {
           if (Tr->ArgC > 3) {
-            error("callback has too many arguments");
+            Log.error("callback has too many arguments");
             return nullptr;
           }
           ++Tr->ArgC;
           break;
         }
         default:
-          error("unsupported callback argument type");
+          Log.error("unsupported callback argument type");
           return nullptr;
         }
       }
@@ -856,7 +807,7 @@ void *DynamicLoader::translate(void *Addr) {
       auto *Closure = reinterpret_cast<ffi_closure *>(
           ffi_closure_alloc(sizeof(ffi_closure), &Ptr));
       if (!Closure) {
-        error("couldn't allocate closure");
+        Log.error("couldn't allocate closure");
         return nullptr;
       }
       static ffi_type *ArgTypes[4] = {&ffi_type_uint32, &ffi_type_uint32,
@@ -864,18 +815,18 @@ void *DynamicLoader::translate(void *Addr) {
       if (ffi_prep_cif(&Tr->CIF, FFI_MS_CDECL, Tr->ArgC,
                        Tr->Returns ? &ffi_type_uint32 : &ffi_type_void,
                        ArgTypes) != FFI_OK) {
-        error("couldn't prepare CIF");
+        Log.error("couldn't prepare CIF");
         return nullptr;
       }
       if (ffi_prep_closure_loc(Closure, &Tr->CIF, ipaSim_handleTrampoline, Tr,
                                Ptr) != FFI_OK) {
-        error("couldn't prepare closure");
+        Log.error("couldn't prepare closure");
         return nullptr;
       }
       return Ptr;
     }
 
-    error("callback not found");
+    Log.error("callback not found");
     return nullptr;
   }
 
@@ -919,7 +870,7 @@ bool DynamicLoader::DynamicCaller::call(bool Returns, uint32_t Addr) {
     CASE(5);
     CASE(6);
   default:
-    Dyld.error("function has too many arguments");
+    Dyld.Log.error("function has too many arguments");
     return false;
   }
   return true;
@@ -950,7 +901,7 @@ size_t DynamicLoader::TypeDecoder::getNextTypeSizeImpl() {
     // Skip name of the struct.
     for (++T; *T != '='; ++T)
       if (!*T) {
-        Dyld.error("struct type ended unexpectedly");
+        Dyld.Log.error("struct type ended unexpectedly");
         return InvalidSize;
       }
     ++T;
@@ -967,7 +918,7 @@ size_t DynamicLoader::TypeDecoder::getNextTypeSizeImpl() {
     return TotalSize;
   }
   default:
-    Dyld.error("unsupported type encoding");
+    Dyld.Log.error("unsupported type encoding");
     return InvalidSize;
   }
 }

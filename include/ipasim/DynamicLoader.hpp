@@ -6,6 +6,7 @@
 #include "ipasim/LoadedLibrary.hpp"
 
 #include "ipasim/Common.hpp"
+#include "ipasim/Logger.hpp"
 
 #include <functional>
 #include <map>
@@ -44,7 +45,6 @@ public:
   }
 
 private:
-  void error(const std::string &Msg, bool AppendLastError = false);
   void callUC(uc_err Err);
   bool canSegmentsSlide(LIEF::MachO::Binary &Bin);
   void mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms);
@@ -87,11 +87,12 @@ private:
   void returnToKernel();
   void returnToEmulation();
   void continueOutsideEmulation(std::function<void()> Cont);
-  void dumpAddr(uint64_t Addr);
-  void dumpAddr(uint64_t Addr, const AddrInfo &AI);
+  StreamHandler dumpAddr(uint64_t Addr);
+  StreamHandler dumpAddr(uint64_t Addr, const AddrInfo &AI);
 
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
+  Logger Log;
   uc_engine *const UC;
   std::map<std::string, std::unique_ptr<LoadedLibrary>> LIs;
   uint64_t KernelAddr;
