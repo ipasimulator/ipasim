@@ -92,7 +92,7 @@ private:
 
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
-  Logger Log;
+  DebugLogger Log;
   uc_engine *const UC;
   std::map<std::string, std::unique_ptr<LoadedLibrary>> LIs;
   uint64_t KernelAddr;

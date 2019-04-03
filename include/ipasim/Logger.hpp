@@ -50,7 +50,7 @@ public:
   }
 };
 
-class Logger {
+template <typename StreamTy> class Logger {
 public:
   void error(const std::string &Message) {
     error</* AppendLastError */ false>(Message);
@@ -58,10 +58,10 @@ public:
   void winError(const std::string &Message) {
     error</* AppendLastError */ true>(Message);
   }
-  DebugStream &error() { return errs() << "Error: "; }
-  DebugStream &info() { return infs() << "Info: "; }
-  DebugStream &errs() { return DS; }
-  DebugStream &infs() { return DS; }
+  StreamTy &error() { return errs() << "Error: "; }
+  StreamTy &info() { return infs() << "Info: "; }
+  StreamTy &errs() { return E; }
+  StreamTy &infs() { return O; }
   EndToken end() { return EndToken(); }
   WinErrorToken winError() { return WinErrorToken(); }
   AppendWinErrorToken appendWinError() { return AppendWinErrorToken(); }
@@ -74,8 +74,10 @@ private:
       errs() << winError() << "\n";
   }
 
-  DebugStream DS;
+  StreamTy O, E;
 };
+
+using DebugLogger = Logger<DebugStream>;
 
 } // namespace ipasim
 
