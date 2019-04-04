@@ -1,0 +1,5 @@
+[ver:1,total:480]
+src/HeadersAnalyzer/ErrorReporting.cpp:380,1554382800:380,m
+src/IpaSimulator/DynamicLoader.cpp:60,1554382800:60,r
+include/ipasim/ErrorReporting.hpp:20,1554382800:20,r
+include/ipasim/Common.hpp:20,1554382800:20,r
