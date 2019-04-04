@@ -44,7 +44,7 @@ void LLDBHelper::load(const char *DLL, const char *PDB) {
   // Initialization, actually.
   uint32_t abilities = SymbolFile->CalculateAbilities();
   if (abilities == 0)
-    reportFatalError(llvm::Twine("cannot load symbols for '") + DLL + "'");
+    Log.error() << "cannot load symbols for '" << DLL << "'" << Log.fatalEnd();
   RootSymbol = SymbolFile->GetPDBSession().getGlobalScope();
 }
 
@@ -65,10 +65,9 @@ bool TypeComparer::areEquivalent(llvm::FunctionType *Func,
   if (!Func2) {
     // TODO: Compare signatures from header files, then. Maybe by loading those
     // headers into LLDB.
-    reportError(
-        llvm::Twine(
-            "cannot compare signatures of a function and non-typed symbol `") +
-        SymbolFunc.getName() + "'");
+    Log.error()
+        << "cannot compare signatures of a function and non-typed symbol `"
+        << SymbolFunc.getName() << "'" << Log.end();
     return true;
   }
   return FunctionComparer::compareTypes(Module, Func, Func2) == 0;

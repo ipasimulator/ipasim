@@ -42,7 +42,7 @@ private:
 
   void executeAction(clang::FrontendAction &Act) {
     if (!CI.ExecuteAction(Act))
-      reportFatalError("cannot execute action");
+      Log.fatalError("cannot execute action");
   }
 };
 

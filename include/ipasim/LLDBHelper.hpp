@@ -23,7 +23,7 @@ public:
                           const lldb::DataBufferSP &Buffer)
       : ObjectFile(Module, nullptr, 0, 0, Buffer, 0) {}
 
-#define unimplemented reportFatalError("function is not implemented")
+#define unimplemented Log.fatalError("function is not implemented")
   void Dump(lldb_private::Stream *S) override { unimplemented; }
   uint32_t GetAddressByteSize() const override { unimplemented; }
   uint32_t GetDependentModules(lldb_private::FileSpecList &file_list) override {

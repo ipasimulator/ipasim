@@ -62,14 +62,14 @@ constexpr static const char *toString(LibType LibTy) {
   case LibType::Dylib:
     return "Dylib";
   default:
-    reportFatalError("invalid `LibType`");
+    Log.fatalError("invalid `LibType`");
   }
 }
 template <LibType LibTy> static void warnUninteresting(const string &Name) {
   if constexpr (WarnUninterestingFunctions & LibTy) {
     constexpr const char *LibStr = toString(LibTy);
-    reportWarning(Twine("found uninteresting function in ") + LibStr + " (" +
-                  Name + "), that's interesting");
+    Log.warning() << "found uninteresting function in " << LibStr << " ("
+                  << Name << "), that's interesting" << Log.end();
   }
 }
 
@@ -116,7 +116,7 @@ bool HAContext::isInterestingForWindows(const string &Name, ExportPtr &Exp,
     // It's not an error if we find multiple symbols for the exactly same
     // function (i.e., symbols have the same RVA).
     if (!IgnoreDuplicates && Exp->RVA != RVA)
-      reportError(Twine("found duplicate DLL export (") + Name + ")");
+      Log.error() << "found duplicate DLL export (" << Name << ")" << Log.end();
     return false;
   }
   return true;

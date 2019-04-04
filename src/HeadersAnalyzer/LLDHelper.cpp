@@ -61,6 +61,6 @@ void LLDHelper::executeArgs() {
     string CmdLine;
     for (StringRef Arg : ArgsRef)
       CmdLine = CmdLine + " " + Arg.str();
-    reportError(Twine("failed to execute:") + CmdLine);
+    Log.error() << "failed to execute:" << CmdLine << Log.end();
   }
 }

@@ -47,8 +47,7 @@ void DynamicLoader::callUC(uc_err Err) {
     uint32_t Addr;
     callUCSimple(uc_reg_read(UC, UC_ARM_REG_PC, &Addr));
     Log.error() << "unicorn failed with " << Err << " at " << dumpAddr(Addr)
-                << Log.end();
-    Log.throwFatal("unicorn error");
+                << Log.fatalEnd("Unicorn error.");
   }
 }
 

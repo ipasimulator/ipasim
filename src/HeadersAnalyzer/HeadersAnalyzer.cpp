@@ -62,7 +62,7 @@ public:
   HeadersAnalyzer() : LLVM(LLVMInit) {}
 
   void discoverTBDs() {
-    reportStatus("discovering TBDs");
+    Log.info("discovering TBDs");
 
     TBDHandler TH(HAC);
     if constexpr (Sample)
@@ -96,7 +96,7 @@ public:
           Exp->Dylib = LibPtr;
   }
   void discoverDLLs() {
-    reportStatus("discovering DLLs");
+    Log.info("discovering DLLs");
 
     // Note that groups must be added just once and together because references
     // to them are invalidated after that.
@@ -136,7 +136,7 @@ public:
     }
   }
   void parseAppleHeaders() {
-    reportStatus("parsing Apple headers");
+    Log.info("parsing Apple headers");
 
     compileAppleHeaders();
 
@@ -151,7 +151,7 @@ public:
     // not gonna be listed explicitly in `Module`'s tables.
   }
   void loadDLLs() {
-    reportStatus("loading DLLs");
+    Log.info("loading DLLs");
 
     using namespace llvm::pdb;
     LLDBHelper LLDB;
@@ -182,14 +182,14 @@ public:
         // Load DLL.
         auto DLLFile(llvm::object::ObjectFile::createObjectFile(DLLPathStr));
         if (!DLLFile) {
-          reportError(Twine(toString(DLLFile.takeError())) + " (" + DLLPathStr +
-                      ")");
+          Log.error() << toString(DLLFile.takeError()) << " (" << DLLPathStr
+                      << ")" << Log.end();
           continue;
         }
         auto COFF =
             dyn_cast<llvm::object::COFFObjectFile>(DLLFile->getBinary());
         if (!COFF) {
-          reportError(Twine("expected COFF (") + DLLPathStr + ")");
+          Log.error() << "expected COFF (" << DLLPathStr << ")" << Log.end();
           continue;
         }
 
@@ -198,8 +198,8 @@ public:
         for (auto &Export : COFF->export_directories()) {
           uint32_t ExportRVA;
           if (error_code Error = Export.getExportRVA(ExportRVA)) {
-            reportError(Twine("cannot get RVA of an export symbol (") +
-                        DLLPathStr + "): " + Error.message());
+            Log.error() << "cannot get RVA of an export symbol (" << DLLPathStr
+                        << "): " << Error.message() << Log.end();
             continue;
           }
           // Note that there can be aliases, so the current `ExportRVA` can
@@ -300,13 +300,13 @@ public:
           if constexpr (CompareTypes) {
             // TODO: #28 is not considered here.
             if (!TC.areEquivalent(Exp->getDylibType(), Func))
-              reportError(Twine("functions' signatures are not equivalent (") +
-                          Exp->Name + ")");
+              Log.error() << "functions' signatures are not equivalent ("
+                          << Exp->Name << ")" << Log.end();
           } else if constexpr (is_same_v<decltype(Func),
                                          llvm::pdb::PDBSymbolFunc &>) {
             if (!Func.getSignature()) {
-              reportError(Twine("function doesn't have a signature (") +
-                          Exp->Name + ")");
+              Log.error() << "function doesn't have a signature (" << Exp->Name
+                          << ")" << Log.end();
               return;
             }
 
@@ -320,11 +320,11 @@ public:
               // See #28.
               Exp->DylibStretOnly = true;
             else if (DylibCount != DLLCount)
-              reportError(Twine("function '") + Exp->Name +
-                          "' has different number of arguments in iOS headers "
-                          "and in DLL (" +
-                          to_string(DylibCount) + " v. " + to_string(DLLCount) +
-                          ")");
+              Log.error() << "function '" << Exp->Name
+                          << "' has different number of arguments in iOS "
+                             "headers and in DLL ("
+                          << to_string(DylibCount) << " v. "
+                          << to_string(DLLCount) << ")" << Log.end();
           }
         };
         for (auto &Func : LLDB.enumerate<PDBSymbolFunc>())
@@ -339,7 +339,7 @@ public:
     GenDir = createOutputDir("../build/ipasim-x86-Debug/gen/");
   }
   void generateDLLs() {
-    reportStatus("generating DLLs");
+    Log.info("generating DLLs");
 
     // Generate DLL wrappers and also stub Dylibs for them.
     for (const DLLGroup &DLLGroup : HAC.DLLGroups) {
@@ -352,7 +352,7 @@ public:
         // Since we are transferring data in memory across architectures, they
         // must have the same endianness for that to work.
         if (IR.isLittleEndian() != DylibIR.isLittleEndian())
-          reportError("target platforms don't have the same endianness");
+          Log.error("target platforms don't have the same endianness");
         else
           assert(IR.isBigEndian() == DylibIR.isBigEndian() &&
                  "Inconsistency in endianness.");
@@ -398,8 +398,8 @@ public:
           // TODO: Handle variadic functions specially. For now, we simply don't
           // call them.
           if (Exp.getDLLType()->isVarArg()) {
-            reportError(Twine("unhandled variadic function (") + Exp.Name +
-                        ")");
+            Log.error() << "unhandled variadic function (" << Exp.Name << ")"
+                        << Log.end();
             IR.Builder.CreateRetVoid();
             continue;
           }
@@ -444,9 +444,9 @@ public:
             // Objective-C methods are not exported, so we call them by
             // computing their address using their RVA.
             if (!DLL.ReferenceSymbol) {
-              reportError(Twine("no reference function, cannot emit "
-                                "Objective-C method DLL wrappers (") +
-                          DLL.Name + ")");
+              Log.error() << "no reference function, cannot emit Objective-C "
+                             "method DLL wrappers ("
+                          << DLL.Name << ")" << Log.end();
               continue;
             }
 
@@ -503,15 +503,15 @@ public:
           ofstream OS;
           OS.open(IndexFile, ios_base::out | ios_base::trunc);
           if (!OS) {
-            reportError(llvm::Twine("cannot create index file for ") +
-                        DLL.Name);
+            Log.error() << "cannot create index file for " << DLL.Name
+                        << Log.end();
             continue;
           }
 
           ifstream IS;
           IS.open("./src/HeadersAnalyzer/WrapperIndex.cpp");
           if (!IS) {
-            reportError("cannot open WrapperIndex.cpp");
+            Log.error("cannot open WrapperIndex.cpp");
             continue;
           }
 
@@ -571,7 +571,7 @@ public:
     }
   }
   void generateDylibs() {
-    reportStatus("generating Dylibs");
+    Log.info("generating Dylibs");
 
     size_t Unimplemented = 0;
     for (auto [LibIdx, Lib] : withIndices(HAC.iOSLibs)) {
@@ -587,9 +587,8 @@ public:
         if (Exp.Status != ExportStatus::FoundInDLL) {
           if constexpr (ErrorUnimplementedFunctions & LibType::DLL)
             if (Exp.Status == ExportStatus::Found)
-              reportError(
-                  Twine("function found in Dylib wasn't found in any DLL (") +
-                  Exp.Name + ")");
+              Log.error() << "function found in Dylib wasn't found in any DLL ("
+                          << Exp.Name << ")" << Log.end();
           if constexpr (SumUnimplementedFunctions & LibType::DLL)
             if (Exp.Status == ExportStatus::Found)
               ++Unimplemented;
@@ -630,8 +629,8 @@ public:
           // binary).
           if (HAC.iOSExps.find(ExportEntry(LookupName.str())) ==
               HAC.iOSExps.end()) {
-            reportError(Twine("lookup function not found (") + LookupName +
-                        ")");
+            Log.error() << "lookup function not found (" << LookupName << ")"
+                        << Log.end();
             IR.Builder.CreateUnreachable();
             continue;
           }
@@ -777,9 +776,8 @@ public:
 
     if constexpr (SumUnimplementedFunctions & LibType::DLL)
       if (Unimplemented)
-        reportError(
-            Twine("functions found in Dylibs weren't found in any DLL (") +
-            to_string(Unimplemented) + ")");
+        Log.error() << "functions found in Dylibs weren't found in any DLL ("
+                    << Unimplemented << ")" << Log.end();
   }
   void writeReport() {
     if (auto OS = createOutputFile((OutputDir / "exports.txt").string()))
@@ -820,7 +818,7 @@ private:
     switch (Exp->Status) {
     case ExportStatus::Found:
       Exp->Status = ExportStatus::Overloaded;
-      reportError(Twine("function overloaded (") + Name + ")");
+      Log.error() << "function overloaded (" << Name << ")" << Log.end();
       return;
     case ExportStatus::Overloaded:
       return;
@@ -828,7 +826,7 @@ private:
       Exp->Status = ExportStatus::Found;
       break;
     default:
-      reportFatalError("unexpected status of `ExportEntry`");
+      Log.fatalError("unexpected status of `ExportEntry`");
     }
 
     // Save the function's signature.
@@ -872,7 +870,7 @@ int main() {
     HA.generateDLLs();
     HA.generateDylibs();
     HA.writeReport();
-    reportStatus("completed, exiting");
+    Log.info("completed, exiting");
 
     // HACK: Running destructors is too slow.
     quick_exit(0);

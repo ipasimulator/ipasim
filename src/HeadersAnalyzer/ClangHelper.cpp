@@ -87,7 +87,7 @@ void ClangHelper::executeArgs() {
                    CI.getDiagnostics());
   unique_ptr<Compilation> C(TheDriver.BuildCompilation(ArgsRef));
   if (!C || C->containsError()) {
-    reportError("cannot build `Compilation`");
+    Log.error("cannot build `Compilation`");
     return;
   }
   SmallVector<pair<int, const Command *>, 4> FailingCommands;
@@ -96,7 +96,7 @@ void ClangHelper::executeArgs() {
     string CmdLine;
     for (const char *Arg : ArgsRef)
       CmdLine = CmdLine + " " + Arg;
-    reportError(Twine("failed to execute:") + CmdLine);
+    Log.error() << "failed to execute:" << CmdLine << Log.end();
     return;
   }
 }

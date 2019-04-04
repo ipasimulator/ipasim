@@ -3,16 +3,36 @@
 #ifndef IPASIM_LOGGER_HPP
 #define IPASIM_LOGGER_HPP
 
+#include <functional>
 #include <iostream>
 #include <ostream>
 #include <string>
+
+#if !defined(IPASIM_NO_WINDOWS_ERRORS)
 #include <winrt/base.h>
+#else
+__declspec(dllimport) __stdcall void OutputDebugStringA(const char *);
+__declspec(dllimport) __stdcall void OutputDebugStringW(const wchar_t *);
+#endif
+
+#define IPASIM_NORETURN [[noreturn]]
 
 namespace ipasim {
+
+class FatalError : public std::runtime_error {
+public:
+  FatalError(const char *Message) : runtime_error(Message) {}
+};
 
 class EndToken {};
 class WinErrorToken {};
 class AppendWinErrorToken {};
+class FatalEndToken {
+public:
+  FatalEndToken(const char *Message) : Message(Message) {}
+
+  const char *Message;
+};
 
 template <typename DerivedTy> class Stream {
 public:
@@ -26,14 +46,22 @@ public:
   DerivedTy &operator<<(const std::wstring &S) { return d() << S.c_str(); }
   DerivedTy &operator<<(EndToken) { return d() << ".\n"; }
   DerivedTy &operator<<(WinErrorToken) {
+#if !defined(IPASIM_NO_WINDOWS_ERRORS)
     using namespace winrt;
 
     // From `winrt::throw_last_error`
     hresult_error Err(HRESULT_FROM_WIN32(GetLastError()));
     return d() << Err.message().c_str();
+#else
+    return d() << "IPASIM_NO_WINDOWS_ERRORS";
+#endif
   }
   DerivedTy &operator<<(AppendWinErrorToken) {
     return d() << EndToken() << WinErrorToken() << "\n";
+  }
+  IPASIM_NORETURN DerivedTy &operator<<(FatalEndToken T) {
+    d() << EndToken();
+    throw FatalError(T.Message);
   }
   template <typename T>
   std::enable_if_t<
@@ -89,28 +117,30 @@ public:
   Logger() = default;
   Logger(StreamTy &&O, StreamTy &&E) : O(std::move(O)), E(std::move(E)) {}
 
-  void error(const std::string &Message) {
-    error</* AppendLastError */ false>(Message);
-  }
+  void error(const std::string &Message) { error() << Message << end(); }
+  void info(const std::string &Message) { info() << Message << end(); }
+  void warning(const std::string &Message) { warning() << Message << end(); }
   void winError(const std::string &Message) {
-    error</* AppendLastError */ true>(Message);
+    error(Message);
+    errs() << winError() << "\n";
   }
-  StreamTy &error() { return errs() << "Error: "; }
-  StreamTy &info() { return infs() << "Info: "; }
+  IPASIM_NORETURN void fatalError(const std::string &Message) {
+    error(Message);
+    throw FatalError(Message.c_str());
+  }
   StreamTy &errs() { return E; }
   StreamTy &infs() { return O; }
+  StreamTy &warns() { return E; }
+  StreamTy &error() { return errs() << "Error: "; }
+  StreamTy &info() { return infs() << "Info: "; }
+  StreamTy &warning() { return warns() << "Warning: "; }
   EndToken end() { return EndToken(); }
   WinErrorToken winError() { return WinErrorToken(); }
   AppendWinErrorToken appendWinError() { return AppendWinErrorToken(); }
-  void throwFatal(const char *Message) { throw std::runtime_error(Message); }
+  FatalEndToken fatalEnd(const char *Message) { return FatalEndToken(Message); }
+  FatalEndToken fatalEnd() { return FatalEndToken("Fatal error occurred."); }
 
 private:
-  template <bool AppendLastError> void error(const std::string &Message) {
-    error() << Message << end();
-    if constexpr (AppendLastError)
-      errs() << winError() << "\n";
-  }
-
   StreamTy O, E;
 };
 

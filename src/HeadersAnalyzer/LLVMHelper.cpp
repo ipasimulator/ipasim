@@ -34,7 +34,8 @@ LLVMInitializer::LLVMInitializer() : COM(COMThreadingMode::MultiThreaded) {
 
 void StringVector::loadConfigFile(StringRef File) {
   if (!readConfigFile(File, Saver, Vector)) {
-    reportFatalError("couldn't load config file (" + File + ")");
+    Log.error() << "couldn't load config file (" << File << ")"
+                << Log.fatalEnd();
   }
 }
 
@@ -53,7 +54,7 @@ IRHelper::IRHelper(LLVMHelper &LLVM, StringRef Name, StringRef Path,
   string Error;
   const Target *Target = TargetRegistry::lookupTarget(Triple, Error);
   if (!Target) {
-    reportError("cannot create target");
+    Log.error("cannot create target");
     return;
   }
 
@@ -185,7 +186,8 @@ void IRHelper::verifyFunction(Function *Func) {
   raw_string_ostream OS(Error);
   if (llvm::verifyFunction(*Func, &OS)) {
     OS.flush();
-    reportError("invalid IR code (" + Func->getName() + "): " + Error);
+    Log.error() << "invalid IR code (" << Func->getName() << "): " << Error
+                << Log.end();
   }
 }
 

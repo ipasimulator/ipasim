@@ -23,24 +23,26 @@ void TBDHandler::handleFile(const string &Path) {
   if (!FileOrError) {
     // If the file hasn't `.tbd` extension, it's OK that we cannot read it.
     if (HasTBDExtension)
-      reportError(Twine(toString(FileOrError.takeError())) + " (" + Path + ")");
+      Log.error() << toString(FileOrError.takeError()) << " (" << Path << ")"
+                  << Log.end();
     else
       consumeError(FileOrError.takeError());
     return;
   }
   // If we can read it and it hasn't `.tbd` extensions, well, that's weird.
   if (!HasTBDExtension)
-    reportWarning(Twine("TBD file without `.tbd` extension (") + Path + ")");
+    Log.warning() << "TBD file without `.tbd` extension (" << Path << ")"
+                  << Log.end();
   InterfaceFileBase *FileBase = *FileOrError;
   // TODO: Shouldn't this be `armv7s`?
   if (!FileBase->getArchitectures().contains(Architecture::armv7)) {
-    reportError(Twine("TBD file does not contain architecture ARMv7 (") + Path +
-                ")");
+    Log.error() << "TBD file does not contain architecture ARMv7 (" << Path
+                << ")" << Log.end();
     return;
   }
   auto *File = dynamic_cast<InterfaceFile *>(FileBase);
   if (!File) {
-    reportError(Twine("interface file expected (") + Path + ")");
+    Log.error() << "interface file expected (" << Path << ")" << Log.end();
     return;
   }
 
@@ -82,8 +84,8 @@ void TBDHandler::handleFile(const string &Path) {
       Name = Sym->getName();
       break;
     default:
-      reportError(Twine("unrecognized symbol type (") +
-                  Sym->getAnnotatedName() + ")");
+      Log.error() << "unrecognized symbol type (" << Sym->getAnnotatedName()
+                  << ")" << Log.end();
       continue;
     }
 
