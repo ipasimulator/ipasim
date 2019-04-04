@@ -18,6 +18,7 @@ namespace {
 class raw_std_ostream : public raw_ostream {
 public:
   raw_std_ostream(StdStream &Str) : Str(Str) {}
+  ~raw_std_ostream() { flush(); }
 
 private:
   StdStream &Str;
