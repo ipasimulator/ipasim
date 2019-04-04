@@ -9,8 +9,8 @@
 namespace ipasim {
 
 // Prefix and postfix operators
-#define prefix(op) &operator op()
-#define postfix(op) operator op(int)
+#define IPASIM_PREFIX(op) &operator op()
+#define IPASIM_POSTFIX(op) operator op(int)
 
 // =============================================================================
 // Enums

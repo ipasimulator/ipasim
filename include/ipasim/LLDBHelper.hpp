@@ -93,7 +93,7 @@ public:
     SymbolIterator(SymbolList<SymbolTy> &List, uint32_t Index)
         : List(List), Index(Index) {}
 
-    SymbolIterator prefix(++) {
+    SymbolIterator IPASIM_PREFIX(++) {
       ++Index;
       Current = nullptr;
       return *this;
