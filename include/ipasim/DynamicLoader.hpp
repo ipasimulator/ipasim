@@ -6,6 +6,7 @@
 #include "ipasim/LoadedLibrary.hpp"
 
 #include "ipasim/Common.hpp"
+#include "ipasim/Emulator.hpp"
 #include "ipasim/Logger.hpp"
 
 #include <functional>
@@ -31,7 +32,7 @@ struct AddrInfo {
 
 class DynamicLoader {
 public:
-  DynamicLoader(uc_engine *UC);
+  DynamicLoader();
   LoadedLibrary *load(const std::string &Path);
   void execute(LoadedLibrary *Lib);
   void *translate(void *Addr);
@@ -43,11 +44,15 @@ public:
   template <typename... ArgTypes> void *callBackR(void *FP, ArgTypes... Args) {
     return DynamicBackCaller(*this).callBackR<ArgTypes...>(FP, Args...);
   }
+  // Finds only library, no symbol information is inspected. To do that, call
+  // `inspect`.
+  AddrInfo lookup(uint64_t Addr);
+  AddrInfo inspect(uint64_t Addr);
+  DebugStream::Handler dumpAddr(uint64_t Addr);
+  DebugStream::Handler dumpAddr(uint64_t Addr, const AddrInfo &AI);
 
 private:
-  void callUC(uc_err Err);
   bool canSegmentsSlide(LIEF::MachO::Binary &Bin);
-  void mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms);
   BinaryPath resolvePath(const std::string &Path);
   LoadedLibrary *loadMachO(const std::string &Path);
   LoadedLibrary *loadPE(const std::string &Path);
@@ -79,21 +84,14 @@ private:
                                int Size, int64_t Value, void *Data);
   bool handleMemUnmapped(uc_mem_type Type, uint64_t Addr, int Size,
                          int64_t Value);
-  // Finds only library, no symbol information is inspected. To do that, call
-  // `inspect`.
-  AddrInfo lookup(uint64_t Addr);
-  AddrInfo inspect(uint64_t Addr);
   void execute(uint64_t Addr);
   void returnToKernel();
   void returnToEmulation();
   void continueOutsideEmulation(std::function<void()> Cont);
-  DebugStream::Handler dumpAddr(uint64_t Addr);
-  DebugStream::Handler dumpAddr(uint64_t Addr, const AddrInfo &AI);
 
   static constexpr int PageSize = 4096;
   static constexpr int R_SCATTERED = 0x80000000; // From `<mach-o/reloc.h>`.
-  DebugLogger Log;
-  uc_engine *const UC;
+  Emulator Emu;
   std::map<std::string, std::unique_ptr<LoadedLibrary>> LIs;
   uint64_t KernelAddr;
   std::stack<uint32_t> LRs; // stack of return addresses
@@ -128,7 +126,7 @@ private:
       if constexpr (Returns) {
         uint32_t RetVal =
             reinterpret_cast<uint32_t (*)(ArgTypes...)>(Addr)(Params...);
-        Dyld.callUC(uc_reg_write(Dyld.UC, UC_ARM_REG_R0, &RetVal));
+        Dyld.Emu.writeReg(UC_ARM_REG_R0, RetVal);
       } else
         reinterpret_cast<void (*)(ArgTypes...)>(Addr)(Params...);
     }
@@ -150,7 +148,7 @@ private:
 
       static_assert(UC_ARM_REG_R0 <= RegId && RegId <= UC_ARM_REG_R3,
                     "Callback has too many arguments.");
-      Dyld.callUC(uc_reg_write(Dyld.UC, RegId, Arg));
+      Dyld.Emu.writeReg(RegId, reinterpret_cast<uint32_t>(Arg));
       pushArgs<RegId + 1>(Args...);
     }
     template <typename... ArgTypes> void callBack(void *FP, ArgTypes... Args) {
@@ -171,9 +169,7 @@ private:
       callBack(FP, Args...);
 
       // Fetch return value.
-      uint32_t R0;
-      Dyld.callUC(uc_reg_read(Dyld.UC, UC_ARM_REG_R0, &R0));
-      return reinterpret_cast<void *>(R0);
+      return reinterpret_cast<void *>(Dyld.Emu.readReg(UC_ARM_REG_R0));
     }
 
   private:

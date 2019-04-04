@@ -5,11 +5,6 @@
 #include "ipasim/DynamicLoader.hpp"
 #include "ipasim/LoadedLibrary.hpp"
 
-// From <winnt.h>
-// TODO: How are these undefined?
-#define LANG_NEUTRAL 0x00
-#define SUBLANG_DEFAULT 0x01 // user default
-
 #include <string>
 #include <winrt/Windows.ApplicationModel.Activation.h>
 
@@ -19,6 +14,7 @@ using namespace winrt;
 using namespace Windows::ApplicationModel::Activation;
 
 IpaSimulator ipasim::IpaSim;
+DebugLogger ipasim::Log;
 
 #define IPASIM_API extern "C" __declspec(dllexport)
 

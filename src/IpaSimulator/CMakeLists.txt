@@ -1,5 +1,6 @@
 set (SOURCE_FILES
     DynamicLoader.cpp
+    Emulator.cpp
     IpaSimulator.cpp
     LoadedLibrary.cpp)
 

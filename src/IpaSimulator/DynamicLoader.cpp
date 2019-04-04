@@ -34,21 +34,12 @@ bool BinaryPath::isFileValid() const {
   }
 }
 
-DynamicLoader::DynamicLoader(uc_engine *UC)
-    : UC(UC), Running(false), Restart(false), Continue(false) {
+DynamicLoader::DynamicLoader()
+    : Emu(*this), Running(false), Restart(false), Continue(false) {
   // Map "kernel" page.
   void *KernelPtr = _aligned_malloc(PageSize, PageSize);
   KernelAddr = reinterpret_cast<uint64_t>(KernelPtr);
-  mapMemory(KernelAddr, PageSize, UC_PROT_NONE);
-}
-
-void DynamicLoader::callUC(uc_err Err) {
-  if (Err != UC_ERR_OK) {
-    uint32_t Addr;
-    callUCSimple(uc_reg_read(UC, UC_ARM_REG_PC, &Addr));
-    Log.error() << "unicorn failed with " << Err << " at " << dumpAddr(Addr)
-                << Log.fatalEnd("Unicorn error.");
-  }
+  Emu.mapMemory(KernelAddr, PageSize, UC_PROT_NONE);
 }
 
 LoadedLibrary *DynamicLoader::load(const string &Path) {
@@ -91,12 +82,6 @@ bool DynamicLoader::canSegmentsSlide(LIEF::MachO::Binary &Bin) {
   auto FType = Bin.header().file_type();
   return FType == FILE_TYPES::MH_DYLIB || FType == FILE_TYPES::MH_BUNDLE ||
          (FType == FILE_TYPES::MH_EXECUTE && Bin.is_pie());
-}
-// TODO: What if the mappings overlap?
-void DynamicLoader::mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms) {
-  if (uc_mem_map_ptr(UC, Addr, Size, Perms, reinterpret_cast<void *>(Addr)))
-    Log.error() << "couldn't map memory at 0x" << to_hex_string(Addr)
-                << " of size 0x" << to_hex_string(Size) << Log.end();
 }
 
 BinaryPath DynamicLoader::resolvePath(const string &Path) {
@@ -185,14 +170,14 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
 
     if (Perms == UC_PROT_NONE) {
       // No protection means we don't have to copy any data, we just map it.
-      mapMemory(VAddr, VSize, Perms);
+      Emu.mapMemory(VAddr, VSize, Perms);
     } else {
       // TODO: Memory-map the segment instead of copying it.
       auto &Buff = Seg.content();
       // TODO: Copy to the end of the allocated space if flag `SG_HIGHVM` is
       // present.
       memcpy(Mem, Buff.data(), Buff.size());
-      mapMemory(VAddr, VSize, Perms);
+      Emu.mapMemory(VAddr, VSize, Perms);
 
       // Clear the remaining memory.
       if (Buff.size() < VSize)
@@ -313,7 +298,7 @@ LoadedLibrary *DynamicLoader::loadPE(const string &Path) {
   // Load the library into Unicorn engine.
   uint64_t StartAddr = alignToPageSize(LLP->StartAddress);
   uint64_t Size = roundToPageSize(LLP->Size);
-  mapMemory(StartAddr, Size, UC_PROT_READ | UC_PROT_WRITE);
+  Emu.mapMemory(StartAddr, Size, UC_PROT_READ | UC_PROT_WRITE);
 
   return LLP;
 }
@@ -329,29 +314,23 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   size_t StackSize = 8 * 1024 * 1024; // 8 MiB
   void *StackPtr = _aligned_malloc(StackSize, PageSize);
   uint64_t StackAddr = reinterpret_cast<uint64_t>(StackPtr);
-  mapMemory(StackAddr, StackSize, UC_PROT_READ | UC_PROT_WRITE);
+  Emu.mapMemory(StackAddr, StackSize, UC_PROT_READ | UC_PROT_WRITE);
   // Reserve 12 bytes on the stack, so that our instruction logger can read
   // them.
-  uint32_t StackTop = StackAddr + StackSize - 12;
-  callUC(uc_reg_write(UC, UC_ARM_REG_SP, &StackTop));
+  Emu.writeReg(UC_ARM_REG_SP, StackAddr + StackSize - 12);
 
   // Install hooks. Hook `catchFetchProtMem` handles calls across platform
   // boundaries (iOS -> Windows). It works thanks to mapping Windows DLLs as
   // non-executable.
-  uc_hook Hook;
-  callUC(uc_hook_add(UC, &Hook, UC_HOOK_MEM_FETCH_PROT,
-                     reinterpret_cast<void *>(catchFetchProtMem), this, 1, 0));
+  Emu.hook(UC_HOOK_MEM_FETCH_PROT, catchFetchProtMem, this);
   // Hook `catchCode` logs execution for debugging purposes.
-  callUC(uc_hook_add(UC, &Hook, UC_HOOK_CODE,
-                     reinterpret_cast<void *>(catchCode), this, 1, 0));
+  Emu.hook(UC_HOOK_CODE, catchCode, this);
   // Hook `catchMemWrite` logs all memory writes.
-  callUC(uc_hook_add(UC, &Hook, UC_HOOK_MEM_WRITE,
-                     reinterpret_cast<void *>(catchMemWrite), this, 1, 0));
+  Emu.hook(UC_HOOK_MEM_WRITE, catchMemWrite, this);
   // Hook `catchMemUnmapped` allows through reading and writing to unmapped
   // memory (probably heap or other external objects).
-  callUC(uc_hook_add(UC, &Hook,
-                     UC_HOOK_MEM_READ_UNMAPPED | UC_HOOK_MEM_WRITE_UNMAPPED,
-                     reinterpret_cast<void *>(catchMemUnmapped), this, 1, 0));
+  Emu.hook(UC_HOOK_MEM_READ_UNMAPPED | UC_HOOK_MEM_WRITE_UNMAPPED,
+           catchMemUnmapped, this);
 
   // TODO: Do this also for all non-wrapper Dylibs (i.e., Dylibs that come with
   // the `.ipa` file).
@@ -370,18 +349,15 @@ void DynamicLoader::execute(uint64_t Addr) {
   Log.info() << "starting emulation at " << dumpAddr(Addr) << Log.end();
 
   // Save LR.
-  uint32_t LR;
-  callUC(uc_reg_read(UC, UC_ARM_REG_LR, &LR));
-  LRs.push(LR);
+  LRs.push(Emu.readReg(UC_ARM_REG_LR));
 
   // Point return address to kernel.
-  uint32_t RetAddr = KernelAddr;
-  callUC(uc_reg_write(UC, UC_ARM_REG_LR, &RetAddr));
+  Emu.writeReg(UC_ARM_REG_LR, KernelAddr);
 
   // Start execution.
   for (;;) {
     Running = true;
-    callUC(uc_emu_start(UC, Addr, 0, 0, 0));
+    Emu.start(Addr);
     assert(!Running && "Flag `Running` was not updated correctly.");
 
     if (Continue) {
@@ -392,8 +368,7 @@ void DynamicLoader::execute(uint64_t Addr) {
     if (Restart) {
       // If restarting, continue where we left off.
       Restart = false;
-      callUC(uc_reg_read(UC, UC_ARM_REG_LR, &LR));
-      Addr = LR;
+      Addr = Emu.readReg(UC_ARM_REG_LR);
     } else
       break;
   }
@@ -401,22 +376,18 @@ void DynamicLoader::execute(uint64_t Addr) {
 
 void DynamicLoader::returnToKernel() {
   // Restore LR.
-  uint32_t LR = LRs.top();
+  Emu.writeReg(UC_ARM_REG_LR, LRs.top());
   LRs.pop();
-  callUC(uc_reg_write(UC, UC_ARM_REG_LR, &LR));
 
   // Stop execution.
-  callUC(uc_emu_stop(UC));
+  Emu.stop();
   Running = false;
 }
 
 void DynamicLoader::returnToEmulation() {
-  // Move R14 (LR) to R15 (PC) to return.
-  uint32_t LR;
-  callUC(uc_reg_read(UC, UC_ARM_REG_LR, &LR));
-
   // Log details about the return.
-  Log.info() << "returning to " << dumpAddr(LR) << Log.end();
+  Log.info() << "returning to " << dumpAddr(Emu.readReg(UC_ARM_REG_LR))
+             << Log.end();
 
   assert(!Running);
   Restart = true;
@@ -541,15 +512,13 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   // If the target is not a wrapper, we simply jump to it, no need to translate
   // anything.
   if (!Wrapper) {
-    uint32_t PC = Addr;
-    callUC(uc_reg_write(UC, UC_ARM_REG_PC, &PC));
+    Emu.writeReg(UC_ARM_REG_PC, Addr);
     return true;
   }
 
   // Read register R0 containing address of our structure with function
   // arguments and return value.
-  uint32_t R0;
-  callUC(uc_reg_read(UC, UC_ARM_REG_R0, &R0));
+  uint32_t R0 = Emu.readReg(UC_ARM_REG_R0);
 
   continueOutsideEmulation([=]() {
     // Call the target function.
@@ -594,27 +563,17 @@ void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
   }
 
 #if 1
-  Log.info() << "executing at " << dumpAddr(Addr, AI);
-  uint32_t Reg;
-  callUC(uc_reg_read(UC, UC_ARM_REG_R0, &Reg));
-  Log.infs() << " [R0 = 0x" << to_hex_string(Reg);
-  callUC(uc_reg_read(UC, UC_ARM_REG_R1, &Reg));
-  Log.infs() << ", R1 = 0x" << to_hex_string(Reg);
-  callUC(uc_reg_read(UC, UC_ARM_REG_R7, &Reg));
-  Log.infs() << ", R7 = 0x" << to_hex_string(Reg);
-  callUC(uc_reg_read(UC, UC_ARM_REG_R12, &Reg));
-  Log.infs() << ", R12 = 0x" << to_hex_string(Reg);
-  callUC(uc_reg_read(UC, UC_ARM_REG_R13, &Reg));
-  Log.infs() << ", R13 = 0x" << to_hex_string(Reg);
-  uint32_t Word;
-  callUC(uc_mem_read(UC, Reg, &Word, 4));
-  Log.infs() << ", [R13] = 0x" << to_hex_string(Word);
-  callUC(uc_mem_read(UC, Reg + 4, &Word, 4));
-  Log.infs() << ", [R13+4] = 0x" << to_hex_string(Word);
-  callUC(uc_mem_read(UC, Reg + 4, &Word, 4));
-  Log.infs() << ", [R13+8] = 0x" << to_hex_string(Word);
-  callUC(uc_reg_read(UC, UC_ARM_REG_R14, &Reg));
-  Log.infs() << ", R14 = 0x" << to_hex_string(Reg) << "]" << Log.end();
+  auto *R13 = reinterpret_cast<uint32_t *>(Emu.readReg(UC_ARM_REG_R13));
+  Log.info() << "executing at " << dumpAddr(Addr, AI) << " [R0 = 0x"
+             << to_hex_string(Emu.readReg(UC_ARM_REG_R0)) << ", R1 = 0x"
+             << to_hex_string(Emu.readReg(UC_ARM_REG_R1)) << ", R7 = 0x"
+             << to_hex_string(Emu.readReg(UC_ARM_REG_R7)) << ", R12 = 0x"
+             << to_hex_string(Emu.readReg(UC_ARM_REG_R12)) << ", R13 = 0x"
+             << to_hex_string(Emu.readReg(UC_ARM_REG_R13)) << ", [R13] = 0x"
+             << to_hex_string(R13[0]) << ", [R13+4] = 0x"
+             << to_hex_string(R13[1]) << ", [R13+8] = 0x"
+             << to_hex_string(R13[2]) << ", R14 = 0x"
+             << to_hex_string(Emu.readReg(UC_ARM_REG_R14)) << "]" << Log.end();
 #endif
 }
 
@@ -651,7 +610,7 @@ bool DynamicLoader::handleMemUnmapped(uc_mem_type Type, uint64_t Addr, int Size,
   // Map the memory, so that emulation can continue.
   Addr = alignToPageSize(Addr);
   Size = roundToPageSize(Size);
-  mapMemory(Addr, Size, UC_PROT_READ | UC_PROT_WRITE);
+  Emu.mapMemory(Addr, Size, UC_PROT_READ | UC_PROT_WRITE);
 
   return true;
 }
@@ -680,7 +639,7 @@ void DynamicLoader::continueOutsideEmulation(function<void()> Cont) {
   Continue = true;
   Continuation = Cont;
 
-  callUC(uc_emu_stop(UC));
+  Emu.stop();
   Running = false;
 }
 
@@ -728,20 +687,15 @@ void DynamicLoader::handleTrampoline(void *Ret, void **Args, void *Data) {
 
   // Pass arguments.
   uc_arm_reg RegId = UC_ARM_REG_R0;
-  for (size_t I = 0, ArgC = Tr->ArgC; I != ArgC; ++I) {
-    uint32_t I32 = *reinterpret_cast<uint32_t *>(Args[I]);
-    callUC(uc_reg_write(UC, RegId++, &I32));
-  }
+  for (size_t I = 0, ArgC = Tr->ArgC; I != ArgC; ++I)
+    Emu.writeReg(RegId++, *reinterpret_cast<uint32_t *>(Args[I]));
 
   // Call the function.
   execute(Tr->Addr);
 
   // Extract return value.
-  if (Tr->Returns) {
-    uint32_t Reg;
-    callUC(uc_reg_read(UC, UC_ARM_REG_R0, &Reg));
-    *reinterpret_cast<ffi_arg *>(Ret) = Reg;
-  }
+  if (Tr->Returns)
+    *reinterpret_cast<ffi_arg *>(Ret) = Emu.readReg(UC_ARM_REG_R0);
 }
 
 static void ipaSim_handleTrampoline(ffi_cif *, void *Ret, void **Args,
@@ -839,16 +793,13 @@ void *DynamicLoader::translate(void *Addr) {
 
 void DynamicLoader::DynamicCaller::loadArg(size_t Size) {
   for (size_t I = 0; I != Size; I += 4) {
-    if (RegId <= UC_ARM_REG_R3) {
+    if (RegId <= UC_ARM_REG_R3)
       // We have some registers left, use them.
-      uint32_t I32;
-      Dyld.callUC(uc_reg_read(Dyld.UC, RegId++, &I32));
-      Args.push_back(I32);
-    } else {
+      Args.push_back(Dyld.Emu.readReg(RegId++));
+    else {
       // Otherwise, use stack.
       // TODO: Don't read SP every time.
-      uint32_t SP;
-      Dyld.callUC(uc_reg_read(Dyld.UC, UC_ARM_REG_SP, &SP));
+      uint32_t SP = Dyld.Emu.readReg(UC_ARM_REG_SP);
       SP = SP + (Args.size() - 4) * 4;
       Args.push_back(*reinterpret_cast<uint32_t *>(SP));
     }
@@ -870,7 +821,7 @@ bool DynamicLoader::DynamicCaller::call(bool Returns, uint32_t Addr) {
     CASE(5);
     CASE(6);
   default:
-    Dyld.Log.error("function has too many arguments");
+    Log.error("function has too many arguments");
     return false;
   }
   return true;
@@ -901,7 +852,7 @@ size_t DynamicLoader::TypeDecoder::getNextTypeSizeImpl() {
     // Skip name of the struct.
     for (++T; *T != '='; ++T)
       if (!*T) {
-        Dyld.Log.error("struct type ended unexpectedly");
+        Log.error("struct type ended unexpectedly");
         return InvalidSize;
       }
     ++T;
@@ -918,7 +869,7 @@ size_t DynamicLoader::TypeDecoder::getNextTypeSizeImpl() {
     return TotalSize;
   }
   default:
-    Dyld.Log.error("unsupported type encoding");
+    Log.error("unsupported type encoding");
     return InvalidSize;
   }
 }

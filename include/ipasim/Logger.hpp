@@ -9,6 +9,11 @@
 #include <string>
 
 #if !defined(IPASIM_NO_WINDOWS_ERRORS)
+// From <winnt.h>
+// TODO: How are these undefined?
+#define LANG_NEUTRAL 0x00
+#define SUBLANG_DEFAULT 0x01 // user default
+
 #include <winrt/base.h>
 #else
 __declspec(dllimport) __stdcall void OutputDebugStringA(const char *);
