@@ -70,18 +70,10 @@ private:
     auto *Ptr = reinterpret_cast<void (*)(Args...)>(Addr);
     Ptr(std::forward<Args>(Params)...);
   }
-  static bool catchFetchProtMem(uc_engine *UC, uc_mem_type Type, uint64_t Addr,
-                                int Size, int64_t Value, void *Data);
   bool handleFetchProtMem(uc_mem_type Type, uint64_t Addr, int Size,
                           int64_t Value);
-  static void catchCode(uc_engine *UC, uint64_t Addr, uint32_t Size,
-                        void *Data);
   void handleCode(uint64_t Addr, uint32_t Size);
-  static bool catchMemWrite(uc_engine *UC, uc_mem_type Type, uint64_t Addr,
-                            int Size, int64_t Value, void *Data);
   bool handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size, int64_t Value);
-  static bool catchMemUnmapped(uc_engine *UC, uc_mem_type Type, uint64_t Addr,
-                               int Size, int64_t Value, void *Data);
   bool handleMemUnmapped(uc_mem_type Type, uint64_t Addr, int Size,
                          int64_t Value);
   void execute(uint64_t Addr);

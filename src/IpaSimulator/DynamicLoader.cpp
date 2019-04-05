@@ -319,18 +319,18 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   // them.
   Emu.writeReg(UC_ARM_REG_SP, StackAddr + StackSize - 12);
 
-  // Install hooks. Hook `catchFetchProtMem` handles calls across platform
-  // boundaries (iOS -> Windows). It works thanks to mapping Windows DLLs as
-  // non-executable.
-  Emu.hook(UC_HOOK_MEM_FETCH_PROT, catchFetchProtMem, this);
-  // Hook `catchCode` logs execution for debugging purposes.
-  Emu.hook(UC_HOOK_CODE, catchCode, this);
-  // Hook `catchMemWrite` logs all memory writes.
-  Emu.hook(UC_HOOK_MEM_WRITE, catchMemWrite, this);
-  // Hook `catchMemUnmapped` allows through reading and writing to unmapped
-  // memory (probably heap or other external objects).
+  // Install hooks.
+  // This hook handles calls across platform boundaries (iOS -> Windows). It
+  // works thanks to mapping Windows DLLs as non-executable.
+  Emu.hook(UC_HOOK_MEM_FETCH_PROT, &DynamicLoader::handleFetchProtMem, this);
+  // This hook logs execution for debugging purposes.
+  Emu.hook(UC_HOOK_CODE, &DynamicLoader::handleCode, this);
+  // This hook logs all memory writes.
+  Emu.hook(UC_HOOK_MEM_WRITE, &DynamicLoader::handleMemWrite, this);
+  // This hook allows through reading and writing to unmapped memory (probably
+  // heap or other external objects).
   Emu.hook(UC_HOOK_MEM_READ_UNMAPPED | UC_HOOK_MEM_WRITE_UNMAPPED,
-           catchMemUnmapped, this);
+           &DynamicLoader::handleMemUnmapped, this);
 
   // TODO: Do this also for all non-wrapper Dylibs (i.e., Dylibs that come with
   // the `.ipa` file).
@@ -391,13 +391,6 @@ void DynamicLoader::returnToEmulation() {
 
   assert(!Running);
   Restart = true;
-}
-
-bool DynamicLoader::catchFetchProtMem(uc_engine *UC, uc_mem_type Type,
-                                      uint64_t Addr, int Size, int64_t Value,
-                                      void *Data) {
-  return reinterpret_cast<DynamicLoader *>(Data)->handleFetchProtMem(
-      Type, Addr, Size, Value);
 }
 
 bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
@@ -530,11 +523,6 @@ bool DynamicLoader::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   return true;
 }
 
-void DynamicLoader::catchCode(uc_engine *UC, uint64_t Addr, uint32_t Size,
-                              void *Data) {
-  reinterpret_cast<DynamicLoader *>(Data)->handleCode(Addr, Size);
-}
-
 void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
   AddrInfo AI(inspect(Addr));
   if (!AI.Lib) {
@@ -577,13 +565,6 @@ void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
 #endif
 }
 
-bool DynamicLoader::catchMemWrite(uc_engine *UC, uc_mem_type Type,
-                                  uint64_t Addr, int Size, int64_t Value,
-                                  void *Data) {
-  return reinterpret_cast<DynamicLoader *>(Data)->handleMemWrite(Type, Addr,
-                                                                 Size, Value);
-}
-
 bool DynamicLoader::handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size,
                                    int64_t Value) {
 #if 1
@@ -591,13 +572,6 @@ bool DynamicLoader::handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size,
              << " (" << Size << ")" << Log.end();
 #endif
   return true;
-}
-
-bool DynamicLoader::catchMemUnmapped(uc_engine *UC, uc_mem_type Type,
-                                     uint64_t Addr, int Size, int64_t Value,
-                                     void *Data) {
-  return reinterpret_cast<DynamicLoader *>(Data)->handleMemUnmapped(
-      Type, Addr, Size, Value);
 }
 
 // TODO: Maybe this happens when the emulated app accesses some non-directly

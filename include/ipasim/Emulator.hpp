@@ -10,6 +10,23 @@ namespace ipasim {
 
 class DynamicLoader;
 
+template <typename T, typename F> struct HookHelper {
+  struct DataTy {
+    T *Instance;
+    F T::*Handler;
+  };
+
+  template <typename FTy> struct FunctionTraits;
+
+  template <typename RetTy, typename... ArgTys>
+  struct FunctionTraits<RetTy(ArgTys...)> {
+    static RetTy hook(ArgTys &&... Args, void *Data) {
+      auto *D = reinterpret_cast<DataTy *>(Data);
+      return (D->Instance->*(D->Handler))(std::forward<ArgTys>(Args)...);
+    }
+  };
+};
+
 class Emulator {
 public:
   Emulator(DynamicLoader &Dyld) : UC(initUC()), Dyld(Dyld) {}
@@ -27,6 +44,12 @@ public:
     hook(Type, reinterpret_cast<void *>(Handler), Instance);
   }
   void hook(uc_hook_type Type, void *Handler, void *Instance);
+  template <typename T, typename F>
+  void hook(uc_hook_type Type, F T::*Handler, T *Instance) {
+    using HH = HookHelper<T, F>;
+    hook(Type, HH::template FunctionTraits<F>::hook,
+         new typename HH::DataTy{Instance, Handler});
+  }
 
 private:
   uc_engine *UC;
