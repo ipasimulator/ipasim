@@ -4,6 +4,7 @@
 
 #include "ipasim/Common.hpp"
 #include "ipasim/IpaSimulator.hpp"
+#include "ipasim/IpaSimulator/Config.hpp"
 #include "ipasim/WrapperIndex.hpp"
 
 #include <ffi.h>
@@ -325,8 +326,10 @@ void DynamicLoader::execute(LoadedLibrary *Lib) {
   Emu.hook(UC_HOOK_MEM_FETCH_PROT, &DynamicLoader::handleFetchProtMem, this);
   // This hook logs execution for debugging purposes.
   Emu.hook(UC_HOOK_CODE, &DynamicLoader::handleCode, this);
-  // This hook logs all memory writes.
-  Emu.hook(UC_HOOK_MEM_WRITE, &DynamicLoader::handleMemWrite, this);
+  if constexpr (PrintMemoryWrites) {
+    // This hook logs all memory writes.
+    Emu.hook(UC_HOOK_MEM_WRITE, &DynamicLoader::handleMemWrite, this);
+  }
   // This hook allows through reading and writing to unmapped memory (probably
   // heap or other external objects).
   Emu.hook(UC_HOOK_MEM_READ_UNMAPPED | UC_HOOK_MEM_WRITE_UNMAPPED,
@@ -550,27 +553,26 @@ void DynamicLoader::handleCode(uint64_t Addr, uint32_t Size) {
     return;
   }
 
-#if 1
-  auto *R13 = reinterpret_cast<uint32_t *>(Emu.readReg(UC_ARM_REG_R13));
-  Log.info() << "executing at " << dumpAddr(Addr, AI) << " [R0 = 0x"
-             << to_hex_string(Emu.readReg(UC_ARM_REG_R0)) << ", R1 = 0x"
-             << to_hex_string(Emu.readReg(UC_ARM_REG_R1)) << ", R7 = 0x"
-             << to_hex_string(Emu.readReg(UC_ARM_REG_R7)) << ", R12 = 0x"
-             << to_hex_string(Emu.readReg(UC_ARM_REG_R12)) << ", R13 = 0x"
-             << to_hex_string(Emu.readReg(UC_ARM_REG_R13)) << ", [R13] = 0x"
-             << to_hex_string(R13[0]) << ", [R13+4] = 0x"
-             << to_hex_string(R13[1]) << ", [R13+8] = 0x"
-             << to_hex_string(R13[2]) << ", R14 = 0x"
-             << to_hex_string(Emu.readReg(UC_ARM_REG_R14)) << "]" << Log.end();
-#endif
+  if constexpr (PrintInstructions) {
+    auto *R13 = reinterpret_cast<uint32_t *>(Emu.readReg(UC_ARM_REG_R13));
+    Log.info() << "executing at " << dumpAddr(Addr, AI) << " [R0 = 0x"
+               << to_hex_string(Emu.readReg(UC_ARM_REG_R0)) << ", R1 = 0x"
+               << to_hex_string(Emu.readReg(UC_ARM_REG_R1)) << ", R7 = 0x"
+               << to_hex_string(Emu.readReg(UC_ARM_REG_R7)) << ", R12 = 0x"
+               << to_hex_string(Emu.readReg(UC_ARM_REG_R12)) << ", R13 = 0x"
+               << to_hex_string(Emu.readReg(UC_ARM_REG_R13)) << ", [R13] = 0x"
+               << to_hex_string(R13[0]) << ", [R13+4] = 0x"
+               << to_hex_string(R13[1]) << ", [R13+8] = 0x"
+               << to_hex_string(R13[2]) << ", R14 = 0x"
+               << to_hex_string(Emu.readReg(UC_ARM_REG_R14)) << "]"
+               << Log.end();
+  }
 }
 
 bool DynamicLoader::handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size,
                                    int64_t Value) {
-#if 1
   Log.info() << "writing [" << dumpAddr(Addr) << "] := " << dumpAddr(Value)
              << " (" << Size << ")" << Log.end();
-#endif
   return true;
 }
 
