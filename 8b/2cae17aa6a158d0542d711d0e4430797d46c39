@@ -1,0 +1,10 @@
+[ver:1,total:1320]
+src/IpaSimulator/DynamicLoader.cpp:435,1554541200:160,1554634800:275,m
+include/ipasim/DynamicLoader.hpp:255,1554541200:140,1554634800:115,r
+include/ipasim/LoadedLibrary.hpp:215,1554541200:180,1554634800:35,r
+include/ipasim/IpaSimulator/Config.hpp:170,1554634800:170,m
+src/IpaSimulator/IpaSimulator.cpp:140,1554541200:140,r
+include/ipasim/HeadersAnalyzer/Config.hpp:50,1554634800:50,r
+include/ipasim/Emulator.hpp:20,1554541200:20,r
+src/IpaSimulator/Emulator.cpp:20,1554541200:20,r
+src/IpaSimulator/LoadedLibrary.cpp:15,1554634800:15,r
