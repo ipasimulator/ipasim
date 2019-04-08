@@ -32,12 +32,9 @@ IPASIM_API void ipaSim_start(const hstring &Path,
   // Execute it.
   IpaSim.Sys.execute(App);
 
-  // Call `UIApplicationLaunched`.
-  LoadedLibrary *UIKit = IpaSim.Dyld.load("UIKit.dll");
-  uint64_t LaunchAddr = UIKit->findSymbol(IpaSim.Dyld, "UIApplicationLaunched");
-  auto *LaunchFunc = reinterpret_cast<void (*)(void *)>(LaunchAddr);
-  // `get_abi` converts C++/WinRT object to its C++/CX equivalent.
-  LaunchFunc(get_abi(LaunchArgs));
+  // Call `UIApplicationLaunched`. `get_abi` converts C++/WinRT object to its
+  // C++/CX equivalent.
+  IpaSim.Sys.call("UIKit.dll", "UIApplicationLaunched", get_abi(LaunchArgs));
 }
 IPASIM_API void *ipaSim_translate(void *Addr) {
   return IpaSim.Sys.translate(Addr);

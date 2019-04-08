@@ -17,10 +17,6 @@ public:
   void execute(uint64_t Addr);
   void *translate(void *Addr);
   void handleTrampoline(void *Ret, void **Args, void *Data);
-  template <typename... ArgTypes> void callBack(void *FP, ArgTypes... Args);
-  template <typename... ArgTypes> void *callBackR(void *FP, ArgTypes... Args);
-
-private:
   template <typename... Args>
   void call(const std::string &Lib, const std::string &Func,
             Args &&... Params) {
@@ -29,6 +25,10 @@ private:
     auto *Ptr = reinterpret_cast<void (*)(Args...)>(Addr);
     Ptr(std::forward<Args>(Params)...);
   }
+  template <typename... ArgTypes> void callBack(void *FP, ArgTypes... Args);
+  template <typename... ArgTypes> void *callBackR(void *FP, ArgTypes... Args);
+
+private:
   bool handleFetchProtMem(uc_mem_type Type, uint64_t Addr, int Size,
                           int64_t Value);
   void handleCode(uint64_t Addr, uint32_t Size);
