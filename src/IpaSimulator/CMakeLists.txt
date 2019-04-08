@@ -2,7 +2,8 @@ set (SOURCE_FILES
     DynamicLoader.cpp
     Emulator.cpp
     IpaSimulator.cpp
-    LoadedLibrary.cpp)
+    LoadedLibrary.cpp
+    SysTranslator.cpp)
 
 add_library (IpaSimLibrary SHARED ${SOURCE_FILES})
 add_prep_dep (IpaSimLibrary)
