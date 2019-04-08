@@ -1,0 +1,9 @@
+[ver:1,total:780]
+src/IpaSimulator/IpaSimulator.cpp:380,1554742800:380,m
+src/IpaSimulator/IpaSimApp/App.cpp:236,1554742800:236,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:60,1554742800:60,r
+src/IpaSimulator/LoadedLibrary.cpp:30,1554742800:30,r
+src/HeadersAnalyzer/HeadersAnalyzer.vcxproj.user:30,1554742800:30,r
+src/IpaSimulator/IpaSimApp/pch.h:20,1554742800:20,m
+src/IpaSimulator/IpaSimApp/MainPage.idl:12,1554742800:12,r
+src/IpaSimulator/IpaSimApp/Generated Files/winrt/IpaSimApp.h:12,1554742800:12,r
