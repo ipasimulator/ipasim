@@ -10,22 +10,26 @@ namespace ipasim {
 
 class DynamicLoader;
 
-template <typename T, typename F> struct HookHelper {
+namespace hooks {
+
+template <typename T, typename F> struct FunctionHelper;
+
+template <typename T, typename RetTy, typename... ArgTys>
+struct FunctionHelper<T, RetTy(ArgTys...)> {
+  using F = RetTy(ArgTys...);
+
   struct DataTy {
     T *Instance;
-    F T::*Handler;
+    F T::*Handler; // `F T::*` is a member pointer
   };
 
-  template <typename FTy> struct FunctionTraits;
-
-  template <typename RetTy, typename... ArgTys>
-  struct FunctionTraits<RetTy(ArgTys...)> {
-    static RetTy hook(ArgTys &&... Args, void *Data) {
-      auto *D = reinterpret_cast<DataTy *>(Data);
-      return (D->Instance->*(D->Handler))(std::forward<ArgTys>(Args)...);
-    }
-  };
+  static RetTy hook(uc_engine *, ArgTys... Args, void *Data) {
+    auto *D = reinterpret_cast<DataTy *>(Data);
+    return (D->Instance->*(D->Handler))(Args...);
+  }
 };
+
+} // namespace hooks
 
 class Emulator {
 public:
@@ -46,9 +50,8 @@ public:
   void hook(uc_hook_type Type, void *Handler, void *Instance);
   template <typename T, typename F>
   void hook(uc_hook_type Type, F T::*Handler, T *Instance) {
-    using HH = HookHelper<T, F>;
-    hook(Type, HH::template FunctionTraits<F>::hook,
-         new typename HH::DataTy{Instance, Handler});
+    using Helper = hooks::FunctionHelper<T, F>;
+    hook(Type, Helper::hook, new typename Helper::DataTy{Instance, Handler});
   }
 
 private:

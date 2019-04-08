@@ -35,7 +35,7 @@ void Emulator::stop() { callUC(uc_emu_stop(UC)); }
 
 void Emulator::hook(uc_hook_type Type, void *Handler, void *Instance) {
   uc_hook Hook;
-  callUC(uc_hook_add(UC, &Hook, Type, Handler, Instance, 0, 0));
+  callUC(uc_hook_add(UC, &Hook, Type, Handler, Instance, 1, 0));
 }
 
 uc_engine *Emulator::initUC() {
