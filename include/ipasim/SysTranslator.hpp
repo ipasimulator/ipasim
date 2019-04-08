@@ -92,16 +92,6 @@ public:
   DynamicBackCaller(DynamicLoader &Dyld, Emulator &Emu, SysTranslator &Sys)
       : Dyld(Dyld), Emu(Emu), Sys(Sys) {}
 
-  template <uc_arm_reg RegId> void pushArgs() {}
-  template <uc_arm_reg RegId, typename... ArgTypes>
-  void pushArgs(void *Arg, ArgTypes... Args) {
-    using namespace ipasim;
-
-    static_assert(UC_ARM_REG_R0 <= RegId && RegId <= UC_ARM_REG_R3,
-                  "Callback has too many arguments.");
-    Emu.writeReg(RegId, reinterpret_cast<uint32_t>(Arg));
-    pushArgs<RegId + 1>(Args...);
-  }
   template <typename... ArgTypes> void callBack(void *FP, ArgTypes... Args) {
     uint64_t Addr = reinterpret_cast<uint64_t>(FP);
     AddrInfo AI(Dyld.lookup(Addr));
@@ -123,6 +113,17 @@ public:
   }
 
 private:
+  template <uc_arm_reg RegId> void pushArgs() {}
+  template <uc_arm_reg RegId, typename... ArgTypes>
+  void pushArgs(void *Arg, ArgTypes... Args) {
+    using namespace ipasim;
+
+    static_assert(UC_ARM_REG_R0 <= RegId && RegId <= UC_ARM_REG_R3,
+                  "Callback has too many arguments.");
+    Emu.writeReg(RegId, reinterpret_cast<uint32_t>(Arg));
+    pushArgs<RegId + 1>(Args...);
+  }
+
   DynamicLoader &Dyld;
   Emulator &Emu;
   SysTranslator &Sys;
