@@ -22,8 +22,8 @@ struct method_list_t {
   method_t methods[0];
 };
 
-#define FAST_DATA_MASK 0xfffffffcUL
-#define RW_REALIZED (1 << 31)
+constexpr int FAST_DATA_MASK = 0xfffffffcUL;
+constexpr int RW_REALIZED = 1 << 31;
 
 struct class_ro_t {
   uint32_t flags;
