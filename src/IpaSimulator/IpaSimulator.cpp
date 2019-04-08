@@ -21,20 +21,25 @@ DebugLogger ipasim::Log;
 
 #define IPASIM_API extern "C" __declspec(dllexport)
 
-IPASIM_API void ipaSim_start(const hstring &Path,
+IPASIM_API bool ipaSim_start(const hstring &Path,
                              const LaunchActivatedEventArgs &LaunchArgs) {
-  // Load the binary.
-  IpaSim.MainBinary = to_string(Path);
-  LoadedLibrary *App = IpaSim.Dyld.load(IpaSim.MainBinary);
-  if (!App)
-    return;
+  try {
+    // Load the binary.
+    IpaSim.MainBinary = to_string(Path);
+    LoadedLibrary *App = IpaSim.Dyld.load(IpaSim.MainBinary);
+    if (!App)
+      return false;
 
-  // Execute it.
-  IpaSim.Sys.execute(App);
+    // Execute it.
+    IpaSim.Sys.execute(App);
 
-  // Call `UIApplicationLaunched`. `get_abi` converts C++/WinRT object to its
-  // C++/CX equivalent.
-  IpaSim.Sys.call("UIKit.dll", "UIApplicationLaunched", get_abi(LaunchArgs));
+    // Call `UIApplicationLaunched`. `get_abi` converts C++/WinRT object to its
+    // C++/CX equivalent.
+    IpaSim.Sys.call("UIKit.dll", "UIApplicationLaunched", get_abi(LaunchArgs));
+  } catch (const FatalError &) {
+    return false;
+  }
+  return true;
 }
 IPASIM_API void *ipaSim_translate(void *Addr) {
   return IpaSim.Sys.translate(Addr);

@@ -16,6 +16,7 @@ using namespace Windows::Foundation;
 using namespace Windows::Storage;
 using namespace Windows::Storage::AccessCache;
 using namespace Windows::Storage::Pickers;
+using namespace Windows::UI::Popups;
 using namespace Windows::UI::Xaml;
 using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::UI::Xaml::Navigation;
@@ -95,14 +96,20 @@ static IAsyncAction start(LaunchActivatedEventArgs LaunchArgs) {
   // TODO: Link this instead of loading it dynamically.
   HMODULE lib = check_pointer(LoadPackagedLibrary(L"libIpaSimLibrary.dll", 0));
   FARPROC startFunc = check_pointer(GetProcAddress(lib, "ipaSim_start"));
-  ((void (*)(const hstring &, const LaunchActivatedEventArgs &))startFunc)(
-      Bin.Path(), LaunchArgs);
+  bool Result =
+      ((bool (*)(const hstring &, const LaunchActivatedEventArgs &))startFunc)(
+          Bin.Path(), LaunchArgs);
   check_bool(FreeLibrary(lib));
 
   // Change status from "Loading..." to "Done.".
   if (auto F = Window::Current().Content().try_as<Frame>())
     if (auto Page = F.Content().try_as<IpaSimApp::MainPage>())
       Page.Loaded(true);
+
+  if (!Result) {
+    MessageDialog MD(L"A fatal error occured.");
+    co_await MD.ShowAsync();
+  }
 }
 
 /// <summary>
