@@ -85,6 +85,7 @@ void SysTranslator::execute(uint64_t Addr) {
     if (Continue) {
       Continue = false;
       Continuation();
+      Continuation = nullptr;
     }
 
     if (Restart) {
@@ -115,16 +116,16 @@ void SysTranslator::returnToEmulation() {
   Restart = true;
 }
 
-// Calling `uc_emu_start` inside `emu_start` (e.g., inside a hook) is not very
-// good idea. Instead, we need to call it when emulation completely stops (i.e.,
-// Unicorn returns from `uc_emu_start`). That's what this function is used for.
-// All code that calls or could call `uc_emu_start` should be deferred using
-// this function. See also
+// Calling `uc_emu_start` inside `uc_emu_start` (e.g., inside a hook) is not
+// very good idea. Instead, we need to call it when emulation completely stops
+// (i.e., Unicorn returns from `uc_emu_start`). That's what this function is
+// used for. All code that calls or could call `uc_emu_start` should be deferred
+// using this function. See also
 // <https://github.com/unicorn-engine/unicorn/issues/591>.
-void SysTranslator::continueOutsideEmulation(function<void()> Cont) {
+void SysTranslator::continueOutsideEmulation(function<void()> &&Cont) {
   assert(!Continue && "Only one continuation is supported.");
   Continue = true;
-  Continuation = Cont;
+  Continuation = move(Cont);
 
   Emu.stop();
   Running = false;
@@ -191,8 +192,7 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
         }
 
         // Process function arguments.
-        // TODO: Use `unique_ptr`.
-        shared_ptr<DynamicCaller> DC(new DynamicCaller(Emu));
+        auto DC = make_unique<DynamicCaller>(Emu);
         while (TD.hasNext()) {
           size_t Size = TD.getNextTypeSize();
           if (Size == TypeDecoder::InvalidSize)
@@ -200,7 +200,9 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
           DC->loadArg(Size);
         }
 
-        continueOutsideEmulation([=]() {
+        continueOutsideEmulation([=, DCP = DC.release()]() {
+          unique_ptr<DynamicCaller> DC(DCP);
+
           // Call the function.
           if (!DC->call(Returns, Addr))
             return;

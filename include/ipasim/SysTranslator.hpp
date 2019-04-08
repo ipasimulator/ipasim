@@ -41,7 +41,7 @@ private:
                                      void *Data);
   void returnToKernel();
   void returnToEmulation();
-  void continueOutsideEmulation(std::function<void()> Cont);
+  void continueOutsideEmulation(std::function<void()> &&Cont);
 
   DynamicLoader &Dyld;
   Emulator &Emu;
