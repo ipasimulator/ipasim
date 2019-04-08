@@ -7,7 +7,6 @@
 #include "ipasim/IpaSimulator/Config.hpp"
 #include "ipasim/WrapperIndex.hpp"
 
-#include <ffi.h>
 #include <filesystem>
 
 using namespace ipasim;
@@ -348,8 +347,8 @@ void SysTranslator::handleTrampoline(void *Ret, void **Args, void *Data) {
     *reinterpret_cast<ffi_arg *>(Ret) = Emu.readReg(UC_ARM_REG_R0);
 }
 
-static void ipaSim_handleTrampoline(ffi_cif *, void *Ret, void **Args,
-                                    void *Data) {
+void SysTranslator::handleTrampolineStatic(ffi_cif *, void *Ret, void **Args,
+                                           void *Data) {
   IpaSim.Sys.handleTrampoline(Ret, Args, Data);
 }
 
@@ -422,7 +421,7 @@ void *SysTranslator::translate(void *Addr) {
         Log.error("couldn't prepare CIF");
         return nullptr;
       }
-      if (ffi_prep_closure_loc(Closure, &Tr->CIF, ipaSim_handleTrampoline, Tr,
+      if (ffi_prep_closure_loc(Closure, &Tr->CIF, handleTrampolineStatic, Tr,
                                Ptr) != FFI_OK) {
         Log.error("couldn't prepare closure");
         return nullptr;

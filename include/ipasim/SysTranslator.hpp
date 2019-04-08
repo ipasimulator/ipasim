@@ -7,6 +7,8 @@
 #include "ipasim/Emulator.hpp"
 #include "ipasim/LoadedLibrary.hpp"
 
+#include <ffi.h>
+
 namespace ipasim {
 
 class SysTranslator {
@@ -16,7 +18,6 @@ public:
   void execute(LoadedLibrary *Lib);
   void execute(uint64_t Addr);
   void *translate(void *Addr);
-  void handleTrampoline(void *Ret, void **Args, void *Data);
   template <typename... Args>
   void call(const std::string &Lib, const std::string &Func,
             Args &&... Params) {
@@ -35,6 +36,9 @@ private:
   bool handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size, int64_t Value);
   bool handleMemUnmapped(uc_mem_type Type, uint64_t Addr, int Size,
                          int64_t Value);
+  void handleTrampoline(void *Ret, void **Args, void *Data);
+  static void handleTrampolineStatic(ffi_cif *, void *Ret, void **Args,
+                                     void *Data);
   void returnToKernel();
   void returnToEmulation();
   void continueOutsideEmulation(std::function<void()> Cont);
