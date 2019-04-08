@@ -449,10 +449,8 @@ void DynamicCaller::loadArg(size_t Size) {
       Args.push_back(Emu.readReg(RegId++));
     else {
       // Otherwise, use stack.
-      // TODO: Don't read SP every time.
-      uint32_t SP = Emu.readReg(UC_ARM_REG_SP);
-      SP = SP + (Args.size() - 4) * 4;
       Args.push_back(*reinterpret_cast<uint32_t *>(SP));
+      SP += 4;
     }
   }
 }

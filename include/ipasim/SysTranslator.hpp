@@ -53,7 +53,8 @@ private:
 
 class DynamicCaller {
 public:
-  DynamicCaller(Emulator &Emu) : Emu(Emu), RegId(UC_ARM_REG_R0) {}
+  DynamicCaller(Emulator &Emu)
+      : Emu(Emu), RegId(UC_ARM_REG_R0), SP(Emu.readReg(UC_ARM_REG_SP)) {}
   void loadArg(size_t Size);
   bool call(bool Returns, uint32_t Addr);
 
@@ -84,6 +85,7 @@ private:
 
   Emulator &Emu;
   uc_arm_reg RegId;
+  uint32_t SP;
   std::vector<uint32_t> Args;
 };
 
