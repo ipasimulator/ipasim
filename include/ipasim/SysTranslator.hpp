@@ -56,25 +56,24 @@ public:
   DynamicCaller(Emulator &Emu) : Emu(Emu), RegId(UC_ARM_REG_R0) {}
   void loadArg(size_t Size);
   bool call(bool Returns, uint32_t Addr);
-  template <size_t N> void call0(bool Returns, uint32_t Addr) {
+
+private:
+  template <size_t N> void call(bool Returns, uint32_t Addr) {
     if (Returns)
-      call1<N, true>(Addr);
+      call<N, N, true>(Addr);
     else
-      call1<N, false>(Addr);
+      call<N, N, false>(Addr);
   }
-  template <size_t N, bool Returns> void call1(uint32_t Addr) {
-    call2<N, Returns>(Addr);
-  }
-  template <size_t N, bool Returns, typename... ArgTypes>
-  void call2(uint32_t Addr, ArgTypes... Params) {
+  template <size_t N, size_t C, bool Returns, typename... ArgTypes>
+  void call(uint32_t Addr, ArgTypes... Params) {
     if constexpr (N > 0)
-      call2<N - 1, Returns, ArgTypes..., uint32_t>(Addr, Params...,
-                                                   Args[Args.size() - N]);
+      call<N - 1, C, Returns, ArgTypes..., uint32_t>(Addr, Params...,
+                                                     Args[C - N]);
     else
-      call3<Returns, ArgTypes...>(Addr, Params...);
+      call<Returns, ArgTypes...>(Addr, Params...);
   }
   template <bool Returns, typename... ArgTypes>
-  void call3(uint32_t Addr, ArgTypes... Params) {
+  void call(uint32_t Addr, ArgTypes... Params) {
     if constexpr (Returns) {
       uint32_t RetVal =
           reinterpret_cast<uint32_t (*)(ArgTypes...)>(Addr)(Params...);
@@ -83,7 +82,6 @@ public:
       reinterpret_cast<void (*)(ArgTypes...)>(Addr)(Params...);
   }
 
-private:
   Emulator &Emu;
   uc_arm_reg RegId;
   std::vector<uint32_t> Args;

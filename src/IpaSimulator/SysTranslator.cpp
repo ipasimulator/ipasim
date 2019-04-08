@@ -458,7 +458,7 @@ void DynamicCaller::loadArg(size_t Size) {
 bool DynamicCaller::call(bool Returns, uint32_t Addr) {
 #define CASE(N)                                                                \
   case N:                                                                      \
-    call0<N>(Returns, Addr);                                                   \
+    call<N>(Returns, Addr);                                                    \
     break
 
   switch (Args.size()) {
