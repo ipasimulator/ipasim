@@ -1,0 +1,7 @@
+[ver:1,total:120]
+scripts/ci/start.ps1:29,1554836400:29,m
+.azure-ci.yml:23,1554836400:23,r
+scripts/ci/build.cmd:20,1554836400:20,m
+scripts/ci/stop.ps1:20,1554836400:20,m
+scripts/ci/auth.ps1:20,1554836400:20,r
+scripts/ci/git_askpass_helper.cmd:8,1554836400:8,r
