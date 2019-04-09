@@ -1,0 +1,7 @@
+[ver:1,total:120]
+scripts/ci/stop.ps1:60,1554836400:60,m
+scripts/ci/start.ps1:20,1554836400:20,m
+scripts/ci/README.md:10,1554836400:10,m
+scripts/ci/auth.ps1:10,1554836400:10,m
+scripts/ci/git_askpass_helper.cmd:10,1554836400:10,m
+scripts/install_agent.ps1:10,1554836400:10,r
