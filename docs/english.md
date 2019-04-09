@@ -18,6 +18,7 @@ To run commands in a container repeatedly, first run `docker-compose run --name 
 > ```
 >
 > or something similar, run `docker network connect ipasimulator_default ipasim`.
+> **TODO: This might not be correct since #8.**
 
 Why we use Windows and not Linux containers?
 That's because we need some Windows-dependent build tools.
