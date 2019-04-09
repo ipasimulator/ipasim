@@ -1,9 +1,12 @@
 # This script is meant to be run inside Azure VM to configure build agent. Don't
-# forget to provide PAT as the first argument.
+# forget to provide Personal Access Token as the first argument. This PAT only
+# needs "Deployment Groups (Read & manage)" access rights.
+
+# TODO: Disable Server Manager to start automatically at logon.
 
 cd \
 wget https://vstsagentpackage.azureedge.net/agent/2.144.0/vsts-agent-win-x64-2.144.0.zip -OutFile agent.zip
-rm -r a
+#rm -r a
 mkdir a
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 [System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD\agent.zip", "$PWD\a")
@@ -16,7 +19,7 @@ cd a
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Invoke-WebRequest "https://github.com/docker/compose/releases/download/1.23.2/docker-compose-Windows-x86_64.exe" -UseBasicParsing -OutFile $Env:ProgramFiles\docker\docker-compose.exe
 
-# TODO: Make `VSTSAgent` service depend on `docker` (by `sc config VSTSAgent... depend=docker`).
-# Then, manually (or maybe automate this, too) change Docker and VSTS Agent services to run Automatically, for Local System account and to restart on failures.
+# Make `VSTSAgent` service depends on `docker`.
+cmd /c sc config vstsagent.jjones.AzureVmAgent depend=docker
 
-# TODO: Install Git LFS.
+# TODO: Change Docker and VSTS Agent services to run Automatically, for Local System account and to restart on failures.
