@@ -19,7 +19,7 @@ rem Install Git LFS.
 git lfs install
 
 rem Clone sources.
-set GIT_ASKPASS=%CD%\git_askpass_helper.cmd
+set GIT_ASKPASS=%CD%\scripts\ci\git_askpass_helper.cmd
 if exist .\IPASimulator\ (
     rem See #14.
     cd IPASimulator
