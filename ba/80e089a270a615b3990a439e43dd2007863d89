@@ -1,0 +1,8 @@
+[ver:1,total:1440]
+scripts/ci/auth.ps1:600,1554836400:540,1554840000:60,m
+scripts/ci/start.ps1:300,1554836400:300,r
+scripts/azure/deploy.ps1:200,1554836400:20,1554840000:180,r
+scripts/azure/parameters.json:200,1554836400:140,1554840000:60,r
+scripts/azure/template.json:60,1554840000:60,r
+scripts/ci/README.md:60,1554836400:60,r
+scripts/ci/build.cmd:20,1554836400:20,r
