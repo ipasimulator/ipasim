@@ -1,0 +1,60 @@
+# For more information, see `/scripts/ci/README.md`.
+
+# Here are variables you have to set, so that this build can function:
+#
+# `git.token` ...Azure DevOps token to access sources of `IPASimulator`
+# `docker.password` ...password to Docker repository `jjones`
+#
+# Here are variables you can configure the build with along with values you can
+# set for them:
+#
+# `pull.docker.image`: 1 ...pulls the Docker image instead of building it
+# `pull.build.artifacts`: 1 ...pulls Docker image containing build artifacts,
+# effectively doing an incremental build
+# `shutdown.when.complete`: 1 ...shutdowns the computer in the end
+# `reset.repository`: 1 ...removes and then clones sources from scratch
+# (otherwise, if the repo already exists locally, it's only incrementally
+# updated to the latest version).
+# `build.tablegens.only`: 1 ...runs only a sample build command (bulding just
+# tablegens). This can be used to test incremental building (see also #14).
+# `azure.key`, `azure.app.id`, `azure.tenant` ...see `/scripts/ci/auth.ps1` for
+# more details
+#
+# Note that these variables are converted to uppercase and have dots replaced
+# with underscores before being visible as environment variables in batch
+# scripts.
+
+resources:
+- repo: self
+  fetchDepth: 1
+  clean: true
+  lfs: true
+trigger: none
+jobs:
+- job: StartVM
+  pool: Hosted VS2017
+  steps:
+  - powershell: ./scripts/ci/start.ps1
+    env:
+      AZURE_KEY: $(azure.key)
+      AZURE_APP_ID: $(azure.app.id)
+      AZURE_TENANT: $(azure.tenant)
+- job: Build
+  dependsOn: StartVM
+  pool: Default
+  steps:
+  - script: ./scripts/ci/build.cmd
+    env:
+      GIT_TOKEN: $(git.token)
+      DOCKER_PASSWORD: $(docker.password)
+  timeoutInMinutes: 0
+- job: StopVM
+  dependsOn: Build
+  condition: succeededOrFailed()
+  pool: Hosted VS2017
+  steps:
+  - powershell: ./scripts/ci/stop.ps1
+    env:
+      AZURE_KEY: $(azure.key)
+      AZURE_APP_ID: $(azure.app.id)
+      AZURE_TENANT: $(azure.tenant)
