@@ -1,0 +1,17 @@
+[ver:1,total:4470]
+scripts/install_agent.ps1:1300,1554832800:1140,1554836400:160,m
+Dockerfile:1087,1554804000:480,1554807600:340,1554811200:255,1554832800:12,r
+docker-compose.yml:1055,1554807600:446,1554811200:609,r
+.azure-ci.yml:246,1554832800:246,r
+scripts/azure/deploy.ps1:200,1554832800:180,1554836400:20,m
+scripts/install_vs.cmd:180,1554832800:180,r
+scripts/ci/build.cmd:102,1554832800:102,r
+scripts/ci/README.md:96,1554832800:96,r
+.editorconfig:60,1554832800:60,r
+scripts/azure/template.json:42,1554832800:12,1554836400:30,m
+scripts/azure/parameters.json:42,1554832800:12,1554836400:30,m
+scripts/azure/DeploymentHelper.cs:12,1554832800:12,d
+scripts/azure/deploy.sh:12,1554832800:12,d
+.gitignore:12,1554832800:12,r
+.clang-format:12,1554832800:12,r
+scripts/ci/git_askpass_helper.cmd:12,1554832800:12,r
