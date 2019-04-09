@@ -1,0 +1,9 @@
+[ver:1,total:660]
+scripts/ConvAsmObj.cmake:350,1554843600:350,m
+src/IpaSimulator/DynamicLoader.cpp:140,1554843600:140,r
+src/objc/CMakeLists.txt:70,1554843600:70,m
+src/IpaSimulator/IpaSimulator.cpp:20,1554843600:20,r
+src/IpaSimulator/SysTranslator.cpp:20,1554843600:20,r
+src/link/main.cpp:20,1554843600:20,r
+src/ninja-wrapper/main.cpp:20,1554843600:20,r
+src/IpaSimulator/Emulator.cpp:20,1554843600:20,r
