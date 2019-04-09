@@ -1,0 +1,8 @@
+[ver:1,total:540]
+src/IpaSimulator/SysTranslator.cpp:415,1554753600:180,1554804000:235,r
+samples/CMakeLists.txt:35,1554804000:35,r
+samples/HelloUILibrary/dllmain.cpp:20,1554804000:20,d
+samples/HelloUIWrapper/pch.h:20,1554804000:20,d
+.vscode/settings.json:20,1554804000:20,r
+include/ipasim/SysTranslator.hpp:15,1554804000:15,r
+samples/issue28.mm:15,1554804000:15,r
