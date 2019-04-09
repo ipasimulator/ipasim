@@ -1,0 +1,7 @@
+[ver:1,total:660]
+scripts/install_agent.ps1:185,1554836400:185,m
+.azure-ci.yml:170,1554836400:170,m
+scripts/ci/auth.ps1:165,1554836400:165,r
+scripts/ci/README.md:95,1554836400:95,r
+scripts/ci/build.cmd:30,1554836400:30,r
+.clang-format:15,1554836400:15,r
