@@ -1,6 +1,6 @@
 # This script is meant to be run inside Azure VM to configure build agent. Don't
 # forget to provide Personal Access Token as the first argument. This PAT only
-# needs "Deployment Groups (Read & manage)" access rights.
+# needs "Agent Pools (Read & manage); Code (Read); Code (Status)" access rights.
 
 # TODO: Disable Server Manager to start automatically at logon.
 

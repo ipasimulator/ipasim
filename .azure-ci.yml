@@ -2,23 +2,24 @@
 
 # Here are variables you have to set, so that this build can function:
 #
-# `git.token` ...Azure DevOps token to access sources of `IPASimulator`
-# `docker.password` ...password to Docker repository `jjones`
+# `git.token` ...Azure DevOps token to access sources of `IPASimulator`, you can
+# use the same one as in `/scripts/install_agent.ps1`.
+# `docker.password` ...password to Docker repository `jjones`.
 #
 # Here are variables you can configure the build with along with values you can
 # set for them:
 #
-# `pull.docker.image`: 1 ...pulls the Docker image instead of building it
+# `pull.docker.image`: 1 ...pulls the Docker image instead of building it.
 # `pull.build.artifacts`: 1 ...pulls Docker image containing build artifacts,
-# effectively doing an incremental build
-# `shutdown.when.complete`: 1 ...shutdowns the computer in the end
+# effectively doing an incremental build.
+# `shutdown.when.complete`: 1 ...shutdowns the computer in the end.
 # `reset.repository`: 1 ...removes and then clones sources from scratch
 # (otherwise, if the repo already exists locally, it's only incrementally
 # updated to the latest version).
 # `build.tablegens.only`: 1 ...runs only a sample build command (bulding just
 # tablegens). This can be used to test incremental building (see also #14).
-# `azure.key`, `azure.app.id`, `azure.tenant` ...see `/scripts/ci/auth.ps1` for
-# more details
+# `azure.key`, `azure.app.id`, `azure.tenant` ...see `/scripts/ci/README.md` for
+# more details.
 #
 # Note that these variables are converted to uppercase and have dots replaced
 # with underscores before being visible as environment variables in batch
