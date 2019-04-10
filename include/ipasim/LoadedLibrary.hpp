@@ -47,10 +47,7 @@ public:
   const char *getMethodType(uint64_t Addr);
   const char *getClassOfMethod(uint64_t Addr);
   virtual bool hasMachO() = 0;
-  MachO getMachO() {
-    assert(hasMachO());
-    return MachO(reinterpret_cast<const void *>(StartAddress));
-  }
+  virtual MachO getMachO() = 0;
 
 private:
   const char *getClassOfMethod(const std::string &Section, uint64_t Addr);
@@ -61,13 +58,19 @@ public:
   LIEF::MachO::Binary &Bin;
 
   LoadedDylib(std::unique_ptr<LIEF::MachO::FatBinary> &&Fat)
-      : Fat(move(Fat)), Bin(Fat->at(0)) {}
+      : Fat(move(Fat)), Bin(Fat->at(0)), Header(0) {}
   uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) override;
   bool hasUnderscorePrefix() override { return true; }
   bool hasMachO() override { return true; }
+  MachO getMachO() override {
+    if (!Header)
+      Header = StartAddress + Bin.imagebase();
+    return MachO(reinterpret_cast<const void *>(Header));
+  }
 
 private:
   std::unique_ptr<LIEF::MachO::FatBinary> Fat;
+  uint64_t Header;
 };
 
 class LoadedDll : public LoadedLibrary {
@@ -78,6 +81,10 @@ public:
   uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) override;
   bool hasUnderscorePrefix() override { return false; }
   bool hasMachO() override { return MachOPoser; }
+  MachO getMachO() override {
+    assert(hasMachO());
+    return MachO(reinterpret_cast<const void *>(StartAddress));
+  }
 };
 
 } // namespace ipasim
