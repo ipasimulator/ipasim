@@ -69,7 +69,7 @@ add_library (objc SHARED
     ${ORIG_SOURCE_FILES}
     ${LIBCLOSURE_SOURCE_FILES}
     ${SOURCE_FILES}
-    ${DYLD_INITIALIZER})
+    ${MACHO_INITIALIZER})
 
 # `runtime.c` needs to be compiled as C++ since there are errors otherwise.
 # TODO: Why?
@@ -118,13 +118,11 @@ macro (config_target target)
         "${SOURCE_DIR}/deps/apple-headers"
         "${SOURCE_DIR}/deps/libclosure")
 
-    target_link_libraries ("${target}" PRIVATE pthread dyld)
+    target_link_libraries ("${target}" PRIVATE pthread IpaSimLibrary)
 endmacro (config_target)
 config_target (objc)
 config_target (objc-asm)
 
 target_link_libraries (objc PRIVATE
     # Specify module definition file `libobjc.def`.
-    "-Wl,/def:${CMAKE_CURRENT_SOURCE_DIR}/libobjc.def"
-    # For function `_ipaSim_translate`
-    IpaSimLibrary)
+    "-Wl,/def:${CMAKE_CURRENT_SOURCE_DIR}/libobjc.def")

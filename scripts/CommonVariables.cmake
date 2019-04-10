@@ -224,7 +224,7 @@ set (WOCFX_LIBS
     MobileCoreServices)
 
 # Common file used by many libraries.
-set (DYLD_INITIALIZER "${SOURCE_DIR}/src/dyld/dyld_initializer.cpp")
+set (MACHO_INITIALIZER "${SOURCE_DIR}/src/MachOInitializer.cpp")
 
 function (add_objcuwp_libs)
     # For `ObjCUWP*.lib`s specified in header files inside
@@ -244,10 +244,10 @@ function (woc_framework name)
         IMPORT_PREFIX "")
     add_dependencies (Frameworks "${name}")
 
-    # Initialization compatible with our Objective-C runtime and Dyld. Also see
-    # #17.
-    target_sources ("${name}" PRIVATE ${DYLD_INITIALIZER})
-    target_link_libraries ("${name}" PRIVATE dyld objc pthread)
+    # Initialization compatible with our Objective-C runtime and dynamic loader
+    # (in IpaSimLibrary). Also see #17.
+    target_sources ("${name}" PRIVATE ${MACHO_INITIALIZER})
+    target_link_libraries ("${name}" PRIVATE IpaSimLibrary objc pthread)
 endfunction (woc_framework)
 
 # Sets the provided headers as `SYSTEM INTERFACE` and (non-system) `PRIVATE`.

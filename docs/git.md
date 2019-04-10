@@ -18,7 +18,6 @@ And usually when there is more than one sentence, only the first is on the first
 - [cg] - Code generation utilities (currently, that's the application called `HeadersAnalyzer` for historical reasons).
 - [llvm] - LLVM and Clang port (`/deps/llvm/` and `/deps/clang/`).
 - [woc] - WinObjC port (`/deps/WinObjC/`).
-- [dyld] - Our `dyld` (`/src/dyld/`).
 - [sam] - Samples (`/samples/`).
 - [rtoc] - `RTObjCInterop` (`/src/RTObjCInterop/`).
 - [build] - General build files (e.g., Docker and CMake files).

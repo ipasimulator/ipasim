@@ -5,8 +5,58 @@
 #include "ipasim/Common.hpp"
 #include "ipasim/DynamicLoader.hpp"
 
+#include <llvm/BinaryFormat/MachO.h>
+
 using namespace ipasim;
 using namespace std;
+
+uint64_t MachO::getSection(const string &Name, uint64_t *Size) {
+  using namespace llvm::MachO;
+
+  // Enumerate segments.
+  uint64_t Slide, Addr;
+  bool HasSlide = false, HasAddr = false;
+  auto HdrAddr = reinterpret_cast<uint64_t>(Hdr);
+  auto *Header = reinterpret_cast<const mach_header *>(Hdr);
+  auto *Cmd = reinterpret_cast<const load_command *>(Header + 1);
+  for (size_t I = 0; I != Header->ncmds; ++I) {
+    if (Cmd->cmd == LC_SEGMENT) {
+      auto *Seg = reinterpret_cast<const segment_command *>(Cmd);
+
+      // Look for segment `__TEXT` to compute slide.
+      if (!HasSlide && !strncmp(Seg->segname, "__TEXT", 16)) {
+        Slide = HdrAddr - Seg->vmaddr;
+        HasSlide = true;
+        if (HasAddr)
+          break;
+      }
+
+      // Enumerate segment's sections.
+      if (!HasAddr) {
+        auto *Sect = reinterpret_cast<const section *>(bytes(Cmd) +
+                                                       sizeof(segment_command));
+        for (auto *EndSect = Sect + Seg->nsects; Sect != EndSect; ++Sect)
+          // Note that `Sect->sectname` is not necessarily null-terminated!
+          if (!strncmp(Sect->sectname, Name.c_str(), 16)) {
+            // We have found it.
+            if (Size)
+              *Size = Sect->size;
+            Addr = Sect->addr;
+            HasAddr = true;
+            if (HasSlide)
+              break;
+          }
+      }
+    }
+
+    // Move to the next `load_command`.
+    Cmd = reinterpret_cast<const load_command *>(bytes(Cmd) + Cmd->cmdsize);
+  }
+
+  if (HasSlide && HasAddr)
+    return Addr + Slide;
+  return 0;
+}
 
 namespace {
 
@@ -150,46 +200,36 @@ static const char *findMethod(objc_class *Class, uint64_t Addr) {
   return nullptr;
 }
 
+const char *LoadedLibrary::getClassOfMethod(const string &Section,
+                                            uint64_t Addr) {
+  size_t Count;
+  if (auto *Classes = getMachO().getSectionData<objc_class *>(Section, &Count))
+    for (size_t I = 0; I != Count; ++I) {
+      // Enumerate methods of every class and its meta-class.
+      objc_class *Class = Classes[I];
+      if (const char *T = findMethod(Class, Addr))
+        return Class->getInfo()->name;
+      if (const char *T = findMethod(Class->isa, Addr))
+        return Class->isa->getInfo()->name;
+    }
+  return nullptr;
+}
+
 const char *LoadedLibrary::getClassOfMethod(uint64_t Addr) {
   // Enumerate classes in the image.
-  uint64_t SecSize;
-  uint64_t SecAddr = getSection("__objc_classlist", &SecSize);
-  if (SecAddr) {
-    auto *Classes = reinterpret_cast<objc_class **>(SecAddr);
-    for (size_t I = 0, Count = SecSize / sizeof(void *); I != Count; ++I) {
-      // Enumerate methods of every class and its meta-class.
-      objc_class *Class = Classes[I];
-      if (const char *T = findMethod(Class, Addr))
-        return Class->getInfo()->name;
-      if (const char *T = findMethod(Class->isa, Addr))
-        return Class->isa->getInfo()->name;
-    }
-  }
+  if (const char *R = getClassOfMethod("__objc_classlist", Addr))
+    return R;
 
   // Try also non-lazy classes.
-  SecAddr = getSection("__objc_nlclslist", &SecSize);
-  if (SecAddr) {
-    auto *Classes = reinterpret_cast<objc_class **>(SecAddr);
-    for (size_t I = 0, Count = SecSize / sizeof(void *); I != Count; ++I) {
-      // Enumerate methods of every class and its meta-class.
-      objc_class *Class = Classes[I];
-      if (const char *T = findMethod(Class, Addr))
-        return Class->getInfo()->name;
-      if (const char *T = findMethod(Class->isa, Addr))
-        return Class->isa->getInfo()->name;
-    }
-  }
-
-  return nullptr;
+  return getClassOfMethod("__objc_nlclslist", Addr);
 }
 
 const char *LoadedLibrary::getMethodType(uint64_t Addr) {
   // Enumerate classes in the image.
-  uint64_t SecSize;
-  uint64_t SecAddr = getSection("__objc_classlist", &SecSize);
-  if (SecAddr) {
-    auto *Classes = reinterpret_cast<objc_class **>(SecAddr);
-    for (size_t I = 0, Count = SecSize / sizeof(void *); I != Count; ++I) {
+  size_t Count;
+  if (auto *Classes =
+          getMachO().getSectionData<objc_class *>("__objc_classlist", &Count))
+    for (size_t I = 0; I != Count; ++I) {
       // Enumerate methods of every class and its meta-class.
       objc_class *Class = Classes[I];
       if (const char *T = findMethod(Class, Addr))
@@ -197,13 +237,11 @@ const char *LoadedLibrary::getMethodType(uint64_t Addr) {
       if (const char *T = findMethod(Class->isa, Addr))
         return T;
     }
-  }
 
   // Try also categories.
-  SecAddr = getSection("__objc_catlist", &SecSize);
-  if (SecAddr) {
-    auto *Categories = reinterpret_cast<category_t **>(SecAddr);
-    for (size_t I = 0, Count = SecSize / sizeof(void *); I != Count; ++I) {
+  if (auto *Categories =
+          getMachO().getSectionData<category_t *>("__objc_catlist", &Count))
+    for (size_t I = 0; I != Count; ++I) {
       // Enumerate methods of every category.
       category_t *Category = Categories[I];
       if (const char *T = findMethod(Category->classMethods, Addr))
@@ -211,7 +249,6 @@ const char *LoadedLibrary::getMethodType(uint64_t Addr) {
       if (const char *T = findMethod(Category->instanceMethods, Addr))
         return T;
     }
-  }
 
   return nullptr;
 }
@@ -253,74 +290,6 @@ uint64_t LoadedDylib::findSymbol(DynamicLoader &DL, const string &Name) {
     return 0;
   }
   return StartAddress + Bin.get_symbol(Name).value();
-}
-
-uint64_t LoadedDylib::getSection(const std::string &Name, uint64_t *Size) {
-  using namespace LIEF::MachO;
-
-  if (!Bin.has_section(Name))
-    return 0;
-
-  Section &Sect = Bin.get_section(Name);
-  if (Size)
-    *Size = Sect.size();
-  return Sect.address() + StartAddress;
-}
-
-uint64_t LoadedDll::getSection(const std::string &Name, uint64_t *Size) {
-  using namespace LIEF::MachO;
-
-  // We only support DLLs with `_mh_dylib_header`.
-  if (!MachOPoser)
-    return 0;
-
-  // Enumerate segments.
-  uint64_t Slide, Addr;
-  bool HasSlide = false, HasAddr = false;
-  auto Header = reinterpret_cast<const mach_header *>(StartAddress);
-  auto Cmd = reinterpret_cast<const load_command *>(Header + 1);
-  for (size_t I = 0; I != Header->ncmds; ++I) {
-    if (Cmd->cmd == (uint32_t)LOAD_COMMAND_TYPES::LC_SEGMENT) {
-      auto Seg = reinterpret_cast<const segment_command_32 *>(Cmd);
-
-      // Look for segment `__TEXT` to compute slide.
-      if (!HasSlide && !strncmp(Seg->segname, "__TEXT", 16)) {
-        Slide = StartAddress - Seg->vmaddr;
-        HasSlide = true;
-        if (HasAddr)
-          break;
-      }
-
-      // Enumerate segment's sections.
-      if (!HasAddr) {
-        auto Sect = reinterpret_cast<const section_32 *>(
-            bytes(Cmd) + sizeof(segment_command_32));
-        for (size_t J = 0; J != Seg->nsects; ++J) {
-          // Note that `Sect->sectname` is not necessarily null-terminated!
-          if (!strncmp(Sect->sectname, Name.c_str(), 16)) {
-            // We have found it.
-            if (Size)
-              *Size = Sect->size;
-            Addr = Sect->addr;
-            HasAddr = true;
-            if (HasSlide)
-              break;
-          }
-
-          // Move to the next `section`.
-          Sect = reinterpret_cast<const section_32 *>(bytes(Sect) +
-                                                      sizeof(section_32));
-        }
-      }
-    }
-
-    // Move to the next `load_command`.
-    Cmd = reinterpret_cast<const load_command *>(bytes(Cmd) + Cmd->cmdsize);
-  }
-
-  if (HasSlide && HasAddr)
-    return Addr + Slide;
-  return 0;
 }
 
 uint64_t LoadedDll::findSymbol(DynamicLoader &DL, const string &Name) {

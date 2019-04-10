@@ -74,6 +74,55 @@ LoadedLibrary *DynamicLoader::load(const string &Path) {
   return L;
 }
 
+void DynamicLoader::registerMachO(const void *Hdr) {
+  auto HdrPtr = reinterpret_cast<uintptr_t>(Hdr);
+
+  // Do nothing if already registered.
+  if (!HdrSet.insert(HdrPtr).second)
+    return;
+  Hdrs.push_back(Hdr);
+
+  // Fix some bindings.
+  size_t Count;
+  auto *FB = MachO(Hdr).getSectionData<uintptr_t **>("__fixbind", &Count);
+  for (auto *EndFB = FB + Count; FB != EndFB; ++FB)
+    if (*FB)
+      **FB = reinterpret_cast<uintptr_t *>(***FB);
+
+  // Call registered handlers.
+  handleMachOs(Hdrs.size() - 1, 0);
+}
+
+void DynamicLoader::handleMachOs(size_t HdrOffset, size_t HandlerOffset) {
+  // Handle Dylibs in reverse order, so that dependencies are resolved first,
+  // before libraries that depend on them.
+  vector<const char *> Paths;
+  Paths.reserve(Hdrs.size() - HdrOffset);
+  vector<const void *> Headers;
+  Headers.reserve(Hdrs.size() - HdrOffset);
+  for (ptrdiff_t I = Hdrs.size() - 1, End = HdrOffset - 1; I != End; --I) {
+    // TODO: Find out paths from `LLs`.
+    Paths.push_back(nullptr);
+    Headers.push_back(Hdrs[I]);
+  }
+
+  for (auto I = Handlers.begin() + HandlerOffset, End = Handlers.end();
+       I != End; ++I) {
+    MachOHandler &Handler = *I;
+    Handler.Mapped(Headers.size(), Paths.data(), Headers.data());
+    for (ptrdiff_t I = Hdrs.size() - 1, End = HdrOffset - 1; I != End; --I)
+      // TODO: Find out path from `LLs`.
+      Handler.Init(nullptr, Hdrs[I]);
+  }
+}
+
+void DynamicLoader::registerHandler(_dyld_objc_notify_mapped Mapped,
+                                    _dyld_objc_notify_init Init,
+                                    _dyld_objc_notify_unmapped Unmapped) {
+  Handlers.push_back(MachOHandler{Mapped, Init, Unmapped});
+  handleMachOs(0, Handlers.size() - 1);
+}
+
 // Inspired by `ImageLoaderMachO::segmentsCanSlide`.
 bool DynamicLoader::canSegmentsSlide(LIEF::MachO::Binary &Bin) {
   using namespace LIEF::MachO;

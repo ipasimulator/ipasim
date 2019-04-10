@@ -1,4 +1,3 @@
-add_subdirectory (dyld)
 add_subdirectory (HeadersAnalyzer)
 add_subdirectory (IpaSimulator)
 add_subdirectory (objc)

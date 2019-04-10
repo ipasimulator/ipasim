@@ -64,3 +64,10 @@ IPASIM_API void *ipaSim_callBack3r(void *FP, void *Arg0, void *Arg1,
                                    void *Arg2) {
   return IpaSim.Sys.callBackR(FP, Arg0, Arg1, Arg2);
 }
+IPASIM_API void ipaSim_register(void *Hdr) { IpaSim.Dyld.registerMachO(Hdr); }
+IPASIM_API void
+_dyld_objc_notify_register(_dyld_objc_notify_mapped Mapped,
+                           _dyld_objc_notify_init Init,
+                           _dyld_objc_notify_unmapped Unmapped) {
+  IpaSim.Dyld.registerHandler(Mapped, Init, Unmapped);
+}

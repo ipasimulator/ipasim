@@ -10,8 +10,14 @@ add_prep_dep (IpaSimLibrary)
 
 target_compile_options (IpaSimLibrary PRIVATE -std=c++17 -fcoroutines-ts)
 
+set (LLVM_INCLUDE_DIRS
+    "${DEBUG_CLANG_CMAKE_DIR}/include"
+    "${SOURCE_DIR}/deps/llvm/include")
+file (MAKE_DIRECTORY ${LLVM_INCLUDE_DIRS})
+
 target_include_directories (IpaSimLibrary PRIVATE
-    "${SOURCE_DIR}/include")
+    "${SOURCE_DIR}/include"
+    ${LLVM_INCLUDE_DIRS})
 
 target_compile_definitions (IpaSimLibrary PRIVATE
     # To enable coroutines support in C++/WinRT.
