@@ -1,0 +1,4 @@
+[ver:1,total:300]
+src/crt/stubs.cpp:180,1554904800:180,r
+src/dispatch/CMakeLists.txt:60,1554904800:60,d
+src/CMakeLists.txt:60,1554904800:60,r
