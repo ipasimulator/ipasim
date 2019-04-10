@@ -1,3 +1,5 @@
+# TODO: Split this file up.
+
 set (LLVM_BIN_DIR "C:/Program Files/LLVM/bin")
 
 set (CLANG_CMAKE_DIR "${BINARY_DIR}/clang-x86-Release")
@@ -169,7 +171,20 @@ set (WINOBJC_CLANG_OPTIONS
     -Wno-c++17-extensions -Wno-nullability-completeness
     -Wno-c++17-compat-mangling -Wno-microsoft --system-header-prefix=winrt/
     # New Clang started complaining...
-    -Wno-c++11-narrowing)
+    -Wno-c++11-narrowing
+    # TODO: Fix these, don't ignore them.
+    -Wno-c99-extensions -Wno-deprecated-declarations
+    -Wno-nonportable-include-path -Wno-macro-redefined
+    -Wno-objc-property-no-attribute -Wno-incompatible-property-type
+    -Wno-duplicate-decl-specifier -Wno-property-attribute-mismatch
+    -Wno-objc-macro-redefinition -Wno-extern-initializer -Wno-objc-method-access
+    -Wno-dll-attribute-on-redeclaration -Wno-writable-strings
+    -Wno-constant-logical-operand -Wno-ignored-attributes
+    -Wno-objc-property-synthesis -Wno-deprecated-register
+    -Wno-return-type-c-linkage -Wno-format-extra-args -Wno-missing-selector-name
+    -Wno-missing-declarations -Wno-incompatible-pointer-types -Wno-multichar
+    -Wno-extra-tokens -Wno-nonnull -Wno-mismatched-parameter-types -Wno-switch
+    -Wno-format-security)
 
 # Common compiler definitions for WinObjC projects.
 set (WINOBJC_DEFS
