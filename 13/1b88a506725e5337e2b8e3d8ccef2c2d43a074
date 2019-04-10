@@ -1,0 +1,12 @@
+[ver:1,total:1560]
+src/crt/CMakeLists.txt:338,1554904800:338,m
+lib/crt/CMakeLists.txt:251,1554904800:251,d
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:232,1554904800:232,m
+scripts/crt.cmd:167,1554904800:167,m
+lib/crt/README.md:159,1554904800:159,m
+lib/crt/.gitignore:138,1554904800:138,m
+scripts/CommonVariables.cmake:119,1554904800:119,r
+src/HeadersAnalyzer/CMakeLists.txt:87,1554904800:87,m
+lib/crt/stubs.cpp:27,1554904800:27,d
+src/CMakeLists.txt:22,1554904800:22,m
+scripts/clang-x86-Release.cmake:20,1554904800:20,r
