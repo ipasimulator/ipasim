@@ -58,9 +58,9 @@ void SysTranslator::execute(LoadedLibrary *Lib) {
   // the `.ipa` file).
   // TODO: Call also other (user) C++ initializers.
   // Initialize the binary with our Objective-C runtime. This simulates what
-  // `dyld_initializer.cpp` does.
+  // `MachOInitializer.cpp` does.
   uint64_t Hdr = Dylib->findSymbol(Dyld, "__mh_execute_header");
-  call("libdyld.dll", "_dyld_initialize", reinterpret_cast<void *>(Hdr));
+  IpaSim.Dyld.registerMachO(reinterpret_cast<void *>(Hdr));
   call("libobjc.dll", "_objc_init");
 
   // Start at entry point.
