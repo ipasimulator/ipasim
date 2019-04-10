@@ -453,7 +453,7 @@ add_custom_command (OUTPUT ${CG_OUTPUTS}
     COMMAND "${IPASIM_CMAKE_DIR}/bin/HeadersAnalyzer.exe"
     WORKING_DIRECTORY "${SOURCE_DIR}"
     USES_TERMINAL
-    DEPENDS HeadersAnalyzer Frameworks)
+    DEPENDS HeadersAnalyzer Frameworks crtlib)
 add_custom_target (CodeGen
     DEPENDS ${CG_OUTPUTS})
 

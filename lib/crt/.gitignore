@@ -1,5 +1,3 @@
-!*.pdb
-*.txt
-*.def
-*.exp
-!*.obj
+!ucrtbased.pdb
+ucrtbased.dll.a
+ucrtbased.dll.exp

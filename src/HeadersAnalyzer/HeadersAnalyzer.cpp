@@ -545,7 +545,8 @@ public:
           ClangHelper Clang(LLVM);
           // See #24.
           if (DLL.Name == "ucrtbased.dll")
-            Clang.Args.add("./lib/crt/stubs.obj");
+            Clang.Args.add("../build/ipasim-x86-Debug/src/crt/CMakeFiles/"
+                           "crtstubs.dir/stubs.cpp.obj");
 
           Clang.Args.add("-I./include");
           Clang.Args.add(IndexFile.c_str());

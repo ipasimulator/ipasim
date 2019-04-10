@@ -9,19 +9,3 @@ Visual Studio's symbol cache (after enabling Microsoft Symbol Servers).
 doesn't contain all symbols (e.g., `strrchr`). So, instead, we crafted our own
 import library. Inspiration was
 [an answer on StackOverflow](https://stackoverflow.com/a/9946390).
-
-```cmd
-dumpbin /exports ucrtbased.dll > exports.txt
-echo LIBRARY UCRTBASED > ucrtbased.def
-echo EXPORTS >> ucrtbased.def
-for /f "skip=19 tokens=4" %A in (exports.txt) do @echo %A >> ucrtbased.def
-lib /def:ucrtbased.def /out:ucrtbased.dll.a /machine:x86
-```
-
-`stubs.obj` was built by the following commands.
-
-```cmd
-clang -m32 -g -gcodeview -c stubs.cpp -o stubs.obj
-```
-
-**TODO: Build everything here by CMake.**
