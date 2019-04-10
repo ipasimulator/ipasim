@@ -2,3 +2,7 @@
 src/IpaSimulator/LoadedLibrary.cpp:400,1554908400:200,1554912000:200,r
 src/IpaSimulator/SysTranslator.cpp:160,1554908400:160,m
 src/IpaSimulator/DynamicLoader.cpp:40,1554908400:40,r
+
+[ver:1,total:240]
+src/IpaSimulator/SysTranslator.cpp:210,1554908400:210,m
+src/MachOInitializer.cpp:30,1554908400:30,r
