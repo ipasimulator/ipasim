@@ -1,0 +1,5 @@
+[ver:1,total:180]
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:80,1554908400:80,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:50,1554908400:50,m
+src/IpaSimulator/DynamicLoader.cpp:30,1554908400:30,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:20,1554908400:20,r
