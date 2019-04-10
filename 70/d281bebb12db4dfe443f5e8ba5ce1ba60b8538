@@ -1,2 +1,9 @@
 [ver:1,total:300]
 scripts/CommonVariables.cmake:300,1554901200:300,m
+
+[ver:1,total:60]
+scripts/CommonVariables.cmake:60,1554901200:60,m
+
+[ver:1,total:900]
+scripts/CommonVariables.cmake:840,1554901200:840,m
+docs/git.md:60,1554901200:60,r
