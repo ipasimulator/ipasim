@@ -1,0 +1,6 @@
+[ver:1,total:420]
+src/CMakeLists.txt:180,1554904800:180,r
+src/IpaSimulator/LoadedLibrary.cpp:120,1554908400:120,r
+src/IpaSimulator/DynamicLoader.cpp:80,1554908400:80,m
+include/ipasim/LoadedLibrary.hpp:20,1554908400:20,r
+include/ipasim/IpaSimulator.hpp:20,1554908400:20,r
