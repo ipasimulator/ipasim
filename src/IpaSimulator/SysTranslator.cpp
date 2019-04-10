@@ -45,10 +45,9 @@ void SysTranslator::execute(LoadedLibrary *Lib) {
   Emu.hook(UC_HOOK_MEM_FETCH_PROT, &SysTranslator::handleFetchProtMem, this);
   // This hook logs execution for debugging purposes.
   Emu.hook(UC_HOOK_CODE, &SysTranslator::handleCode, this);
-  if constexpr (PrintMemoryWrites) {
+  if constexpr (PrintMemoryWrites)
     // This hook logs all memory writes.
     Emu.hook(UC_HOOK_MEM_WRITE, &SysTranslator::handleMemWrite, this);
-  }
   // This hook allows through reading and writing to unmapped memory (probably
   // heap or other external objects).
   Emu.hook(UC_HOOK_MEM_READ_UNMAPPED | UC_HOOK_MEM_WRITE_UNMAPPED,
