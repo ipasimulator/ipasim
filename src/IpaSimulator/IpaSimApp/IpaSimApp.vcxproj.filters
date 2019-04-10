@@ -70,7 +70,6 @@
     <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\WinObjCRT.dll" />
     <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libpthread.dll" />
     <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libobjc.dll" />
-    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libdyld.dll" />
     <None Include="..\..\..\deps\WinObjC\Frameworks\UIKit.Xaml\prebuilt\UIKit.Xaml.dll" />
     <None Include="..\..\..\deps\WinObjC\Frameworks\Social.Xaml\prebuilt\Social.Xaml.dll" />
     <None Include="..\..\..\deps\WinObjC\Frameworks\CoreFoundation\CharacterSets\**">
