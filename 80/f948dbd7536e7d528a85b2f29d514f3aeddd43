@@ -1,0 +1,15 @@
+[ver:1,total:2640]
+CMakeLists.txt:950,1554915600:770,1554966000:180,r
+cmake/ipasim-x86-Debug/build.ninja:350,1554966000:350,r
+scripts/clang-x86-Release.cmake:315,1554966000:315,m
+scripts/clang-x86-Debug.cmake:233,1554966000:233,m
+scripts/build.ps1:200,1554915600:200,r
+src/IpaSimulator/SysTranslator.cpp:150,1554915600:150,r
+scripts/CommonVariables.cmake:150,1554915600:150,r
+cmake/build.ninja:70,1554966000:70,r
+scripts/ipaSim-x86-Debug.cmake:58,1554966000:58,r
+scripts/Libffi-x86-Debug.cmake:42,1554915600:30,1554966000:12,r
+scripts/lief-x86-Debug.cmake:32,1554915600:20,1554966000:12,r
+scripts/winobjc-x86-Debug.cmake:30,1554966000:30,r
+cmake/ipasim-x86-Debug/rules.ninja:30,1554966000:30,r
+cmake/rules.ninja:30,1554966000:30,r
