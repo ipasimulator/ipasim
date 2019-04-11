@@ -12,6 +12,8 @@ execute_process (
         "-DCMAKE_C_COMPILER=${LLVM_BIN_DIR}/clang-cl.exe"
         "-DCMAKE_CXX_COMPILER=${LLVM_BIN_DIR}/clang-cl.exe"
         "-DCMAKE_LINKER=${LLVM_BIN_DIR}/lld-link.exe"
+        "-DCMAKE_C_FLAGS=-m32"
+        "-DCMAKE_CXX_FLAGS=-m32"
         -DCMAKE_EXPORT_COMPILE_COMMANDS=On
         "${SOURCE_DIR}/deps/llvm"
     WORKING_DIRECTORY "${CLANG_CMAKE_DIR}")
