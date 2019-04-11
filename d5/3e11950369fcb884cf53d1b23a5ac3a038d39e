@@ -1,0 +1,5 @@
+[ver:1,total:180]
+src/CMakeLists.txt:60,1554966000:60,r
+scripts/clang-x86-Debug.cmake:60,1554966000:60,r
+src/IpaSimulator/CMakeLists.txt:30,1554966000:30,r
+src/HeadersAnalyzer/CMakeLists.txt:30,1554966000:30,r
