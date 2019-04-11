@@ -213,10 +213,10 @@ Universal Windows/x86/cassowary-0.60-Debug.lib")
     # See
     # https://medium.com/@alasher/colored-c-compiler-output-with-ninja-clang-gcc-10bfe7f2b949.
     # TODO: Do this for CL.exe, too.
-    option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output." ON)
+    option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output." OFF)
     if (FORCE_COLORED_OUTPUT)
         add_compile_options (-fcolor-diagnostics -fansi-escape-codes)
-    endif ()
+    endif (FORCE_COLORED_OUTPUT)
 
     # Target grouping all WinObjC Frameworks. See function `woc_framework`.
     add_custom_target (Frameworks)
