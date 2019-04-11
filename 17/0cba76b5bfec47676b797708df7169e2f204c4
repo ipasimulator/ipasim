@@ -1,0 +1,6 @@
+[ver:1,total:960]
+scripts/ci/auth.ps1:457,1554966000:457,m
+scripts/ci/start.ps1:309,1554966000:309,m
+.azure-ci.yml:137,1554966000:137,m
+scripts/ci/README.md:30,1554966000:30,r
+scripts/ci/stop.ps1:27,1554966000:27,m
