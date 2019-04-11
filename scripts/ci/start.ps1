@@ -1,2 +1,2 @@
 ./scripts/ci/auth.ps1
-Start-AzureVM -ServiceName "ipasim" -Name "ipasim-build" -Verbose
+Start-AzureRmVM -ResourceGroupName "ipasim" -Name "ipasim-build" -Verbose

@@ -5,6 +5,9 @@
 # `git.token` ...Azure DevOps token to access sources of `IPASimulator`, you can
 # use the same one as in `/scripts/install_agent.ps1`.
 # `docker.password` ...password to Docker repository `jjones`.
+# `azure.key`, `azure.app.id`, `azure.tenant` ...see `/scripts/ci/README.md` for
+# more details.
+# `azure.subscription.id` ...ID of the subscription the VM is located in.
 #
 # Here are variables you can configure the build with along with values you can
 # set for them:
@@ -18,8 +21,6 @@
 # updated to the latest version).
 # `build.tablegens.only`: 1 ...runs only a sample build command (bulding just
 # tablegens). This can be used to test incremental building (see also #14).
-# `azure.key`, `azure.app.id`, `azure.tenant` ...see `/scripts/ci/README.md` for
-# more details.
 #
 # Note that these variables are converted to uppercase and have dots replaced
 # with underscores before being visible as environment variables in batch
@@ -38,8 +39,6 @@ jobs:
   - powershell: ./scripts/ci/start.ps1
     env:
       AZURE_KEY: $(azure.key)
-      AZURE_APP_ID: $(azure.app.id)
-      AZURE_TENANT: $(azure.tenant)
 - job: Build
   dependsOn: StartVM
   pool: Default
@@ -57,5 +56,3 @@ jobs:
   - powershell: ./scripts/ci/stop.ps1
     env:
       AZURE_KEY: $(azure.key)
-      AZURE_APP_ID: $(azure.app.id)
-      AZURE_TENANT: $(azure.tenant)
