@@ -97,6 +97,10 @@ add_custom_command (
     DEPENDS "${CMAKE_SOURCE_DIR}/scripts/ConvAsmObj.cmake" objc-asm
         "$<TARGET_OBJECTS:objc-asm>")
 target_sources (objc PRIVATE ${CONV_OBJS})
+# TODO: This dependency should be added automatically, but it doesn't seem to
+# always work - see build #20190411.2.
+add_custom_target (objc-conv-asm DEPENDS ${CONV_OBJS})
+add_dependencies (objc objc-conv-asm)
 
 # Common configuration for normal sources (target `objc`) and `.s` files (target
 # `objc-asm`).
