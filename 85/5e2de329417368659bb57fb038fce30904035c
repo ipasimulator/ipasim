@@ -1,0 +1,15 @@
+[ver:1,total:1980]
+src/objc/CMakeLists.txt:825,1555002000:60,1555005600:120,1555074000:180,1555077600:60,1555081200:210,1555092000:195,m
+docs/objc.md:270,1555077600:270,r
+scripts/ci/build.cmd:270,1555009200:180,1555081200:30,1555092000:60,r
+deps/README.md:150,1555077600:150,r
+scripts/ConvAsmObj.cmake:150,1555081200:150,r
+scripts/ci/stop.ps1:135,1555092000:135,r
+src/pthread/CMakeLists.txt:54,1555077600:24,1555081200:30,r
+docs/porting.md:30,1555077600:30,r
+src/CMakeLists.txt:30,1555077600:30,r
+scripts/ci/start.ps1:15,1555092000:15,r
+scripts/ci/auth.ps1:15,1555092000:15,r
+deps/pthreads.2/COPYING:12,1555077600:12,r
+deps/pthreads.2/README:12,1555077600:12,r
+deps/pthreads.2/COPYING.LIB:12,1555077600:12,r
