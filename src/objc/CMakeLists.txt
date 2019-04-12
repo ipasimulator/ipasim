@@ -77,7 +77,7 @@ set_source_files_properties ("${SOURCE_DIR}/deps/libclosure/runtime.c"
     PROPERTIES COMPILE_OPTIONS -xc++)
 
 # Build `.s` files specially. First compile them to Mach-O object files and then
-# convert those to PE/COFF object files using utility `objconv.exe`.
+# convert those to COFF object files using utility `objconv.exe`.
 add_library (objc-asm OBJECT ${ORIG_ASM_FILES})
 set_target_properties (objc-asm PROPERTIES
     COMPILE_OPTIONS "-target;i386-apple-macosx10.13.0")
@@ -97,10 +97,6 @@ add_custom_command (
     DEPENDS "${CMAKE_SOURCE_DIR}/scripts/ConvAsmObj.cmake" objc-asm
         "$<TARGET_OBJECTS:objc-asm>")
 target_sources (objc PRIVATE ${CONV_OBJS})
-# TODO: This dependency should be added automatically, but it doesn't seem to
-# always work - see build #20190411.2.
-add_custom_target (objc-conv-asm DEPENDS ${CONV_OBJS})
-add_dependencies (objc objc-conv-asm)
 
 # Common configuration for normal sources (target `objc`) and `.s` files (target
 # `objc-asm`).
