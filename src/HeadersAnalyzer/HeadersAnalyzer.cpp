@@ -105,7 +105,7 @@ public:
       HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/"});
       HAC.DLLGroups.push_back(
           {"./deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/"});
-      HAC.DLLGroups.push_back({"./lib/crt/"});
+      HAC.DLLGroups.push_back({"./deps/crt/"});
     }
     size_t I = 0;
 
