@@ -1,4 +1,5 @@
 add_library (crtstubs OBJECT stubs.cpp)
+add_prep_dep (crtstubs)
 
 add_custom_command (OUTPUT "${SOURCE_DIR}/deps/crt/ucrtbased.dll.a"
     COMMAND "${SOURCE_DIR}/scripts/crt.cmd"
