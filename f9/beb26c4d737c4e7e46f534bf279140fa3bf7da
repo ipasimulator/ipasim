@@ -1,0 +1,4 @@
+[ver:1,total:720]
+src/IpaSimulator/DynamicLoader.cpp:240,1555146000:60,1555149600:180,m
+src/IpaSimulator/LoadedLibrary.cpp:240,1555146000:240,m
+scripts/CommonVariables.cmake:240,1555146000:240,r
