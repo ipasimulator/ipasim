@@ -1,0 +1,12 @@
+[ver:1,total:1320]
+src/IpaSimulator/LoadedLibrary.cpp:420,1555146000:420,m
+include/ipasim/LoadedLibrary.hpp:270,1555146000:270,m
+scripts/ci/build.cmd:195,1555092000:15,1555146000:180,r
+src/objc/CMakeLists.txt:165,1555092000:135,1555146000:30,r
+src/objc/getsecbyname.mm:105,1555146000:105,r
+deps/objconv/README.md:90,1555146000:90,r
+src/objc/dladdr.mm:15,1555146000:15,r
+scripts/backup.ps1:15,1555092000:15,r
+src/objc/libobjc.def:15,1555146000:15,r
+src/objc/cxxabi.mm:15,1555146000:15,r
+scripts/build.ps1:15,1555092000:15,r
