@@ -1,0 +1,5 @@
+[ver:1,total:1200]
+docs/llvm.md:440,1555153200:440,r
+src/objc/CMakeLists.txt:380,1555153200:280,1555156800:100,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:200,1555153200:120,1555156800:80,m
+src/crt/CMakeLists.txt:180,1555149600:180,r
