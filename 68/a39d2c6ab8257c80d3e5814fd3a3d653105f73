@@ -3,3 +3,10 @@ src/objc/CMakeLists.txt:125,1555156800:125,r
 .git/COMMIT_EDITMSG:75,1555156800:75,r
 src/HeadersAnalyzer/HeadersAnalyzer.cpp:50,1555156800:50,m
 .git/rebase-merge/git-rebase-todo:50,1555156800:50,r
+
+[ver:1,total:300]
+scripts/crt.cmd:150,1555149600:150,r
+src/crt/CMakeLists.txt:90,1555149600:90,m
+deps/crt/.gitignore:20,1555149600:20,m
+deps/crt/README.md:20,1555149600:20,m
+src/IpaSimulator/DynamicLoader.cpp:20,1555149600:20,r
