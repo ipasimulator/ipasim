@@ -84,7 +84,8 @@ void DynamicLoader::registerMachO(const void *Hdr) {
 
   // Fix some bindings.
   size_t Count;
-  if (auto *FB = MachO(Hdr).getSectionData<uintptr_t **>("__fixbind", &Count))
+  if (auto *FB = MachO(Hdr).getSectionData<uintptr_t **>(MachO::DataSegment,
+                                                         "__fixbind", &Count))
     for (auto *EndFB = FB + Count; FB != EndFB; ++FB)
       if (*FB)
         **FB = reinterpret_cast<uintptr_t *>(***FB);

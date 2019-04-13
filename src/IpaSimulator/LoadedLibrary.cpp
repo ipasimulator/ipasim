@@ -10,7 +10,10 @@
 using namespace ipasim;
 using namespace std;
 
-uint64_t MachO::getSection(const string &Name, uint64_t *Size) {
+// Inspired by
+// https://opensource.apple.com/source/cctools/cctools-895/libmacho/getsecbyname.c.auto.html.
+uint64_t MachO::getSection(const char *SegName, const char *SectName,
+                           uint64_t *Size) {
   using namespace llvm::MachO;
 
   // Enumerate segments.
@@ -23,8 +26,9 @@ uint64_t MachO::getSection(const string &Name, uint64_t *Size) {
     if (Cmd->cmd == LC_SEGMENT) {
       auto *Seg = reinterpret_cast<const segment_command *>(Cmd);
 
-      // Look for segment `__TEXT` to compute slide.
-      if (!HasSlide && !strncmp(Seg->segname, "__TEXT", 16)) {
+      // Look for segment `__TEXT` to compute slide. Note that section and
+      // segment names are not necessarily null-terminated!
+      if (!HasSlide && !strncmp(Seg->segname, "__TEXT", sizeof(Seg->segname))) {
         Slide = HdrAddr - Seg->vmaddr;
         HasSlide = true;
         if (HasAddr)
@@ -32,12 +36,12 @@ uint64_t MachO::getSection(const string &Name, uint64_t *Size) {
       }
 
       // Enumerate segment's sections.
-      if (!HasAddr) {
+      if (!HasAddr && !strncmp(Seg->segname, SegName, sizeof(Seg->segname))) {
         auto *Sect = reinterpret_cast<const section *>(bytes(Cmd) +
                                                        sizeof(segment_command));
         for (auto *EndSect = Sect + Seg->nsects; Sect != EndSect; ++Sect)
-          // Note that `Sect->sectname` is not necessarily null-terminated!
-          if (!strncmp(Sect->sectname, Name.c_str(), 16)) {
+          if (!strncmp(Sect->sectname, SectName, sizeof(Sect->sectname)) &&
+              !strncmp(Sect->segname, SegName, sizeof(Sect->segname))) {
             // We have found it.
             if (Size)
               *Size = Sect->size;
@@ -200,10 +204,11 @@ static const char *findMethod(objc_class *Class, uint64_t Addr) {
   return nullptr;
 }
 
-const char *LoadedLibrary::getClassOfMethod(const string &Section,
+const char *LoadedLibrary::getClassOfMethod(const char *Section,
                                             uint64_t Addr) {
   size_t Count;
-  if (auto *Classes = getMachO().getSectionData<objc_class *>(Section, &Count))
+  if (auto *Classes = getMachO().getSectionData<objc_class *>(
+          MachO::DataSegment, Section, &Count))
     for (size_t I = 0; I != Count; ++I) {
       // Enumerate methods of every class and its meta-class.
       objc_class *Class = Classes[I];
@@ -227,8 +232,8 @@ const char *LoadedLibrary::getClassOfMethod(uint64_t Addr) {
 const char *LoadedLibrary::getMethodType(uint64_t Addr) {
   // Enumerate classes in the image.
   size_t Count;
-  if (auto *Classes =
-          getMachO().getSectionData<objc_class *>("__objc_classlist", &Count))
+  if (auto *Classes = getMachO().getSectionData<objc_class *>(
+          MachO::DataSegment, "__objc_classlist", &Count))
     for (size_t I = 0; I != Count; ++I) {
       // Enumerate methods of every class and its meta-class.
       objc_class *Class = Classes[I];
@@ -239,8 +244,8 @@ const char *LoadedLibrary::getMethodType(uint64_t Addr) {
     }
 
   // Try also categories.
-  if (auto *Categories =
-          getMachO().getSectionData<category_t *>("__objc_catlist", &Count))
+  if (auto *Categories = getMachO().getSectionData<category_t *>(
+          MachO::DataSegment, "__objc_catlist", &Count))
     for (size_t I = 0; I != Count; ++I) {
       // Enumerate methods of every category.
       category_t *Category = Categories[I];

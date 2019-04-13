@@ -13,17 +13,22 @@ class MachO {
 public:
   MachO(const void *Hdr) : Hdr(Hdr) {}
 
+  static constexpr const char *DataSegment = "__DATA";
+
   template <typename T>
-  const T *getSectionData(const std::string &Name, size_t *Count = nullptr) {
+  const T *getSectionData(const char *SegName, const char *SectName,
+                          size_t *Count = nullptr) {
     if (!Count)
-      return reinterpret_cast<const T *>(getSection(Name));
+      return reinterpret_cast<const T *>(getSection(SegName, SectName));
 
     uint64_t Size;
-    auto *Result = reinterpret_cast<const T *>(getSection(Name, &Size));
+    auto *Result =
+        reinterpret_cast<const T *>(getSection(SegName, SectName, &Size));
     *Count = Size / sizeof(T);
     return Result;
   }
-  uint64_t getSection(const std::string &Name, uint64_t *Size = nullptr);
+  uint64_t getSection(const char *SegName, const char *SectName,
+                      uint64_t *Size = nullptr);
 
 private:
   const void *Hdr;
@@ -50,7 +55,7 @@ public:
   virtual MachO getMachO() = 0;
 
 private:
-  const char *getClassOfMethod(const std::string &Section, uint64_t Addr);
+  const char *getClassOfMethod(const char *Section, uint64_t Addr);
 };
 
 class LoadedDylib : public LoadedLibrary {
