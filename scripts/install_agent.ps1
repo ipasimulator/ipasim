@@ -23,3 +23,9 @@ Invoke-WebRequest "https://github.com/docker/compose/releases/download/1.23.2/do
 cmd /c sc config vstsagent.jjones.AzureVmAgent depend=docker
 
 # TODO: Change Docker and VSTS Agent services to run Automatically, for Local System account and to restart on failures.
+
+# Install Git LFS.
+cd \
+wget https://github.com/git-lfs/git-lfs/releases/download/v2.7.1/git-lfs-windows-v2.7.1.exe -OutFile git-lfs.exe
+.\git-lfs.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+rm git-lfs.exe
