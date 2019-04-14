@@ -1,0 +1,7 @@
+[ver:1,total:1620]
+docs/llvm.md:720,1555164000:360,1555174800:180,1555228800:60,1555232400:120,r
+scripts/ConvAsmObj.cmake:290,1555232400:290,m
+src/objc/CMakeLists.txt:190,1555232400:190,m
+scripts/ci/build.cmd:180,1555160400:180,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:180,1555156800:180,r
+docker-compose.yml:60,1555232400:60,r
