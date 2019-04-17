@@ -80,6 +80,8 @@ Or we could just somehow "use" the function's type since that all we care about 
 For example, emitting some global variable and initializing it with address to that function.
 But that would also require an AST-rewriting step or emitting textual code.
 
+**TODO: This doesn't get us inherited methods, so we don't have wrappers for them.**
+
 #### Our approach
 
 We chose the simplest (and we believe also the cleanest) solution - we used Clang's `LangOpts.EmitAllDecls` and made it emit really all declarations.
