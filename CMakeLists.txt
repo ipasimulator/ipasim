@@ -154,11 +154,11 @@ testing purposes only." OFF)
     # instead of `CMAKE_CXX_COMPILER` for linking.
     macro (update_commands lang)
         set ("CMAKE_${lang}_LINK_EXECUTABLE"
-            "<CMAKE_CXX_COMPILER> -fuse-ld=lld-link <FLAGS> \
+            "<CMAKE_CXX_COMPILER> -fuse-ld=lld-link -g <FLAGS> \
 <CMAKE_CXX_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> \
 -Wl,/implib:<TARGET_IMPLIB> <LINK_LIBRARIES>")
         set ("CMAKE_${lang}_CREATE_SHARED_LIBRARY"
-            "<CMAKE_CXX_COMPILER> -fuse-ld=lld-link \
+            "<CMAKE_CXX_COMPILER> -fuse-ld=lld-link -g \
 <CMAKE_SHARED_LIBRARY_CXX_FLAGS> <LANGUAGE_COMPILE_FLAGS> <LINK_FLAGS> \
 <CMAKE_SHARED_LIBRARY_CREATE_CXX_FLAGS> <SONAME_FLAG><TARGET_SONAME> \
 -o <TARGET> -Wl,/implib:<TARGET_IMPLIB> <OBJECTS> <LINK_LIBRARIES>")
