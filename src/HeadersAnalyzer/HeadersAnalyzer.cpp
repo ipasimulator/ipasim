@@ -59,7 +59,7 @@ namespace {
 // assembly-implemented functions.
 class HeadersAnalyzer {
 public:
-  HeadersAnalyzer() : LLVM(LLVMInit) {}
+  HeadersAnalyzer(path BuildDir) : BuildDir(move(BuildDir)), LLVM(LLVMInit) {}
 
   void discoverTBDs() {
     Log.info("discovering TBDs");
@@ -100,9 +100,9 @@ public:
 
     // Note that groups must be added just once and together because references
     // to them are invalidated after that.
-    HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/Frameworks/"});
+    HAC.DLLGroups.push_back({BuildDir / "bin/Frameworks/"});
     if constexpr (!Sample) {
-      HAC.DLLGroups.push_back({"../build/ipasim-x86-Debug/bin/"});
+      HAC.DLLGroups.push_back({BuildDir / "bin/"});
       HAC.DLLGroups.push_back(
           {"./deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/"});
       HAC.DLLGroups.push_back({"./deps/crt/"});
@@ -335,8 +335,8 @@ public:
     }
   }
   void createDirs() {
-    OutputDir = createOutputDir("../build/ipasim-x86-Debug/cg/");
-    GenDir = createOutputDir("../build/ipasim-x86-Debug/gen/");
+    OutputDir = createOutputDir((BuildDir / "cg/").string().c_str());
+    GenDir = createOutputDir((BuildDir / "gen/").string().c_str());
   }
   void generateDLLs() {
     Log.info("generating DLLs");
@@ -791,7 +791,7 @@ private:
   HAContext HAC;
   LLVMInitializer LLVMInit;
   LLVMHelper LLVM;
-  path OutputDir, GenDir;
+  path BuildDir, OutputDir, GenDir;
 
   // Some common types.
   llvm::Type *VoidTy = llvm::Type::getVoidTy(LLVM.Ctx);
@@ -860,9 +860,16 @@ private:
 
 } // namespace
 
-int main() {
+int main(int ArgC, char **ArgV) {
+  // Parse arguments.
+  if (ArgC != 2) {
+    Log.error() << "usage: " << ArgV[0] << " path-to-build-directory"
+                << Log.end();
+    return 2;
+  }
+
   try {
-    HeadersAnalyzer HA;
+    HeadersAnalyzer HA(ArgV[1]);
     HA.discoverTBDs();
     HA.discoverDLLs();
     HA.parseAppleHeaders();
