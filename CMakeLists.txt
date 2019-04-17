@@ -224,17 +224,6 @@ Universal Windows/x86/${name}.lib")
 
     add_prebuilt_lib (libxml2)
 
-    add_library (cassowary STATIC IMPORTED)
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set_target_properties (cassowary PROPERTIES
-            IMPORTED_LOCATION "${SOURCE_DIR}/deps/WinObjC/deps/prebuilt/\
-Universal Windows/x86/cassowary-0.60-Debug.lib")
-    else ()
-        set_target_properties (cassowary PROPERTIES
-            IMPORTED_LOCATION "${SOURCE_DIR}/deps/WinObjC/deps/prebuilt/\
-Universal Windows/x86/cassowary-0.60.lib")
-    endif ()
-
     # NuGet package ANGLE.WindowsStore.
     add_library (EGL SHARED IMPORTED)
     set_target_properties (EGL PROPERTIES
@@ -260,6 +249,7 @@ Universal Windows/x86/cassowary-0.60.lib")
 
     add_subdirectory (src)
     add_subdirectory (deps/unicorn)
+    add_subdirectory (deps/WinObjC/deps/3rdparty/cassowary-0.60)
     add_subdirectory (deps/WinObjC/deps/3rdparty/libdispatch)
     add_subdirectory (deps/WinObjC/Frameworks)
     add_subdirectory (samples)
