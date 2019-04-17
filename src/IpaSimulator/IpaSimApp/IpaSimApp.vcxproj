@@ -91,7 +91,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
     <PreBuildEvent>
-      <Command>robocopy ..\..\..\..\build\ipasim-x86-Debug\gen\ $(ProjectDir)gen\ * /MIR /NP /NFL /NDL
+      <Command>robocopy ..\..\..\..\build\ipasim-x86-$(Configuration)\gen\ $(ProjectDir)gen\ * /MIR /NP /NFL /NDL
 robocopy "..\..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\UIKit.Xaml"\ $(ProjectDir)UIKit.Xaml\ * /MIR /NP /NFL /NDL
 robocopy "..\..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\Social.Xaml"\ $(ProjectDir)Social.Xaml\ * /MIR /NP /NFL /NDL
 rem See &lt;https://weblogs.sqlteam.com/robv/2010/02/17/61106/&gt;.
@@ -122,25 +122,25 @@ exit /B %errlev%</Command>
     </AppxManifest>
     <None Include="IpaSimApp_TemporaryKey.pfx" />
     <None Include="packages.config" />
-    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libunicorn.dll">
+    <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\libunicorn.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libIpaSimLibrary.dll">
+    <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\libIpaSimLibrary.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libEGL.dll">
+    <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\libEGL.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libGLESv2.dll">
+    <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\libGLESv2.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libdispatch.dll">
+    <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\libdispatch.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="gen\**">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\Frameworks\*.dll">
+    <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\Frameworks\*.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\libxml2.dll">
@@ -155,19 +155,19 @@ exit /B %errlev%</Command>
     <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icuin57.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\Logging.dll">
+    <None Include="..\..\..\..\build\winobjc-x86-$(Configuration)\bin\Logging.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\WOCStdLib.dll">
+    <None Include="..\..\..\..\build\winobjc-x86-$(Configuration)\bin\WOCStdLib.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="..\..\..\..\build\winobjc-x86-Debug\bin\WinObjCRT.dll">
+    <None Include="..\..\..\..\build\winobjc-x86-$(Configuration)\bin\WinObjCRT.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libpthread.dll">
+    <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\libpthread.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="..\..\..\..\build\ipasim-x86-Debug\bin\libobjc.dll">
+    <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\libobjc.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="..\..\..\deps\WinObjC\Frameworks\UIKit.Xaml\prebuilt\UIKit.Xaml.dll">
