@@ -1,0 +1,6 @@
+[ver:1,total:600]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:395,1555524000:375,1555527600:20,m
+src/HeadersAnalyzer/CMakeLists.txt:90,1555524000:50,1555527600:40,m
+src/HeadersAnalyzer/iOSHeaders.mm:80,1555524000:80,r
+src/HeadersAnalyzer/analyze_ios_headers.cfg:20,1555524000:20,r
+include/ipasim/HAContext.hpp:15,1555524000:15,r
