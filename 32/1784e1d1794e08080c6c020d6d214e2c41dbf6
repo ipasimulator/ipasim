@@ -1,0 +1,9 @@
+[ver:1,total:1440]
+scripts/ipaSim-x86-Release.cmake:575,1555527600:575,r
+CMakeLists.txt:275,1555527600:275,m
+scripts/CommonVariables.cmake:230,1555527600:230,r
+scripts/lief-x86-Release.cmake:135,1555527600:135,r
+scripts/winobjc-x86-Release.cmake:120,1555527600:120,r
+cmake/ipasim-x86-Release/compile_commands.json:60,1555527600:60,r
+src/HeadersAnalyzer/CMakeLists.txt:30,1555527600:30,r
+scripts/Libffi-x86-Release.cmake:15,1555527600:15,r
