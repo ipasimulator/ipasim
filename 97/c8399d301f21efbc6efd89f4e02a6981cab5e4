@@ -1,0 +1,6 @@
+[ver:1,total:1200]
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:554,1555527600:174,1555534800:380,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:256,1555527600:156,1555534800:100,m
+src/crt/CMakeLists.txt:180,1555534800:180,r
+src/crt/stubs.cpp:150,1555527600:30,1555531200:120,r
+scripts/ipaSim-x86-Release.cmake:60,1555527600:60,r
