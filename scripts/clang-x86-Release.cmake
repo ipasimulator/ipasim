@@ -1,7 +1,7 @@
 list (APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/scripts")
 include (CommonVariables)
 
-file (MAKE_DIRECTORY "${CLANG_CMAKE_DIR}")
+file (MAKE_DIRECTORY "${RELEASE_CLANG_CMAKE_DIR}")
 execute_process (
     COMMAND "${CMAKE_COMMAND}" -G Ninja
         "-DLLVM_TARGETS_TO_BUILD=X86;ARM"
@@ -16,4 +16,4 @@ execute_process (
         "-DCMAKE_CXX_FLAGS=-m32"
         -DCMAKE_EXPORT_COMPILE_COMMANDS=On
         "${SOURCE_DIR}/deps/llvm"
-    WORKING_DIRECTORY "${CLANG_CMAKE_DIR}")
+    WORKING_DIRECTORY "${RELEASE_CLANG_CMAKE_DIR}")

@@ -6,4 +6,4 @@ include (CommonVariables)
 file (
     COPY "${ANGLE_DIR}/bin/UAP/Win32/libEGL.dll"
         "${ANGLE_DIR}/bin/UAP/Win32/libGLESv2.dll"
-    DESTINATION "${IPASIM_CMAKE_DIR}/bin")
+    DESTINATION "${CURRENT_IPASIM_CMAKE_DIR}/bin")

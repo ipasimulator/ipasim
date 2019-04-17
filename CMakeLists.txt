@@ -30,17 +30,21 @@ if (SUPERBUILD)
             DEPENDS "${cmakeDir}/build.ninja")
     endfunction (add_superbuild_target)
 
-    add_superbuild_target (clang-x86-Release "${CLANG_CMAKE_DIR}")
     add_superbuild_target (clang-x86-Debug "${DEBUG_CLANG_CMAKE_DIR}")
-    add_superbuild_target (ipaSim-x86-Debug "${IPASIM_CMAKE_DIR}")
-    add_superbuild_target (winobjc-x86-Debug "${WINOBJC_CMAKE_DIR}")
-    add_superbuild_target (lief-x86-Debug "${LIEF_CMAKE_DIR}")
-    add_superbuild_target (Libffi-x86-Debug "${LIBFFI_CMAKE_DIR}")
+    add_superbuild_target (clang-x86-Release "${RELEASE_CLANG_CMAKE_DIR}")
+    add_superbuild_target (ipaSim-x86-Debug "${DEBUG_IPASIM_CMAKE_DIR}")
+    add_superbuild_target (ipaSim-x86-Release "${RELEASE_IPASIM_CMAKE_DIR}")
+    add_superbuild_target (winobjc-x86-Debug "${DEBUG_WINOBJC_CMAKE_DIR}")
+    add_superbuild_target (winobjc-x86-Release "${RELEASE_WINOBJC_CMAKE_DIR}")
+    add_superbuild_target (lief-x86-Debug "${DEBUG_LIEF_CMAKE_DIR}")
+    add_superbuild_target (lief-x86-Release "${RELEASE_LIEF_CMAKE_DIR}")
+    add_superbuild_target (Libffi-x86-Debug "${DEBUG_LIBFFI_CMAKE_DIR}")
+    add_superbuild_target (Libffi-x86-Release "${RELEASE_LIBFFI_CMAKE_DIR}")
 
     add_custom_target (tblgens-x86-Release
         COMMENT "Tablegens"
         COMMAND ninja llvm-tblgen clang-tblgen
-        WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
+        WORKING_DIRECTORY "${RELEASE_CLANG_CMAKE_DIR}"
         USES_TERMINAL
         DEPENDS config-clang-x86-Release)
 
@@ -49,7 +53,7 @@ if (SUPERBUILD)
     add_custom_target (clang-x86-Release
         COMMENT "Clang"
         COMMAND ninja clang lld
-        WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
+        WORKING_DIRECTORY "${RELEASE_CLANG_CMAKE_DIR}"
         USES_TERMINAL
         DEPENDS config-clang-x86-Release)
 
@@ -65,26 +69,52 @@ if (SUPERBUILD)
         DEPENDS config-ipaSim-x86-Debug config-winobjc-x86-Debug
             clang-x86-Release)
 
+    add_custom_target (prep-ipaSim-x86-Release
+        COMMENT "Pepare ipaSim"
+        DEPENDS config-ipaSim-x86-Release config-winobjc-x86-Release
+            clang-x86-Release)
+
     add_custom_target (ipaSim-x86-Debug
         COMMENT "ipaSim"
         COMMAND ninja IpaSimApp
-        WORKING_DIRECTORY "${IPASIM_CMAKE_DIR}"
+        WORKING_DIRECTORY "${DEBUG_IPASIM_CMAKE_DIR}"
         USES_TERMINAL
         DEPENDS config-ipaSim-x86-Debug)
+
+    add_custom_target (ipaSim-x86-Release
+        COMMENT "ipaSim"
+        COMMAND ninja IpaSimApp
+        WORKING_DIRECTORY "${RELEASE_IPASIM_CMAKE_DIR}"
+        USES_TERMINAL
+        DEPENDS config-ipaSim-x86-Release)
 
     add_custom_target (lief-x86-Debug
         COMMENT "LIEF"
         COMMAND ninja LIB_LIEF_STATIC
-        WORKING_DIRECTORY "${LIEF_CMAKE_DIR}"
+        WORKING_DIRECTORY "${DEBUG_LIEF_CMAKE_DIR}"
         USES_TERMINAL
         DEPENDS config-lief-x86-Debug)
+
+    add_custom_target (lief-x86-Release
+        COMMENT "LIEF"
+        COMMAND ninja LIB_LIEF_STATIC
+        WORKING_DIRECTORY "${RELEASE_LIEF_CMAKE_DIR}"
+        USES_TERMINAL
+        DEPENDS config-lief-x86-Release)
 
     add_custom_target (Libffi-x86-Debug
         COMMENT "Libffi"
         COMMAND ninja ffi
-        WORKING_DIRECTORY "${LIBFFI_CMAKE_DIR}"
+        WORKING_DIRECTORY "${DEBUG_LIBFFI_CMAKE_DIR}"
         USES_TERMINAL
         DEPENDS config-Libffi-x86-Debug)
+
+    add_custom_target (Libffi-x86-Release
+        COMMENT "Libffi"
+        COMMAND ninja ffi
+        WORKING_DIRECTORY "${RELEASE_LIBFFI_CMAKE_DIR}"
+        USES_TERMINAL
+        DEPENDS config-Libffi-x86-Release)
 
 else (SUPERBUILD)
 
@@ -136,26 +166,27 @@ testing purposes only." OFF)
     update_commands (C)
     update_commands (CXX)
 
-    add_prep_target (prep-ipaSim-x86-Debug) # TODO: Don't hardcode this.
+    # TODO: Don't hardcode the architecture.
+    add_prep_target ("prep-ipaSim-x86-${CMAKE_BUILD_TYPE}")
 
-    add_custom_target (config-winobjc-x86-Debug
+    add_custom_target (config-winobjc
         COMMENT "Configure WinObjC"
-        COMMAND ninja config-winobjc-x86-Debug
+        COMMAND ninja "config-winobjc-x86-${CMAKE_BUILD_TYPE}"
         WORKING_DIRECTORY "${BINARY_DIR}"
         USES_TERMINAL)
     function (add_woc_lib name)
         add_custom_target ("woc-${name}-build"
-            BYPRODUCTS "${WINOBJC_CMAKE_DIR}/bin/${name}.dll"
-                "${WINOBJC_CMAKE_DIR}/bin/${name}.lib"
+            BYPRODUCTS "${CURRENT_WINOBJC_CMAKE_DIR}/bin/${name}.dll"
+                "${CURRENT_WINOBJC_CMAKE_DIR}/bin/${name}.lib"
             COMMENT "WinObjC: ${name}"
-            COMMAND ninja ${name}
-            WORKING_DIRECTORY "${WINOBJC_CMAKE_DIR}"
+            COMMAND ninja "${name}"
+            WORKING_DIRECTORY "${CURRENT_WINOBJC_CMAKE_DIR}"
             USES_TERMINAL
-            DEPENDS config-winobjc-x86-Debug)
+            DEPENDS config-winobjc)
         add_library ("woc-${name}" SHARED IMPORTED)
         set_target_properties ("woc-${name}" PROPERTIES
-            IMPORTED_LOCATION "${WINOBJC_CMAKE_DIR}/bin/${name}.dll"
-            IMPORTED_IMPLIB "${WINOBJC_CMAKE_DIR}/bin/${name}.lib")
+            IMPORTED_LOCATION "${CURRENT_WINOBJC_CMAKE_DIR}/bin/${name}.dll"
+            IMPORTED_IMPLIB "${CURRENT_WINOBJC_CMAKE_DIR}/bin/${name}.lib")
     endfunction (add_woc_lib)
     # TODO: Create these somehow automatically. See
     # https://cmake.org/pipermail/cmake/2010-September/039388.html
@@ -194,9 +225,15 @@ Universal Windows/x86/${name}.lib")
     add_prebuilt_lib (libxml2)
 
     add_library (cassowary STATIC IMPORTED)
-    set_target_properties (cassowary PROPERTIES
-        IMPORTED_LOCATION "${SOURCE_DIR}/deps/WinObjC/deps/prebuilt/\
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set_target_properties (cassowary PROPERTIES
+            IMPORTED_LOCATION "${SOURCE_DIR}/deps/WinObjC/deps/prebuilt/\
 Universal Windows/x86/cassowary-0.60-Debug.lib")
+    else ()
+        set_target_properties (cassowary PROPERTIES
+            IMPORTED_LOCATION "${SOURCE_DIR}/deps/WinObjC/deps/prebuilt/\
+Universal Windows/x86/cassowary-0.60.lib")
+    endif ()
 
     # NuGet package ANGLE.WindowsStore.
     add_library (EGL SHARED IMPORTED)

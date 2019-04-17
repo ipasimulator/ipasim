@@ -12,6 +12,6 @@ if ($env:BUILD_TABLEGENS_ONLY -eq "1") {
     ninja tblgens-x86-Release
 } else {
     # Build everything.
-    ninja ipaSim-x86-Debug
+    ninja ipaSim-x86-Debug ipaSim-x86-Release
 }
 exit $LASTEXITCODE

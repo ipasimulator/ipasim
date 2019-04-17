@@ -1,7 +1,7 @@
 list (APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/scripts")
 include (CommonVariables)
 
-file (MAKE_DIRECTORY "${DEBUG_IPASIM_CMAKE_DIR}")
+file (MAKE_DIRECTORY "${RELEASE_IPASIM_CMAKE_DIR}")
 execute_process (
     COMMAND "${CMAKE_COMMAND}" -G Ninja
         -DSUPERBUILD=Off
@@ -15,11 +15,8 @@ execute_process (
         "-DSOURCE_DIR=${SOURCE_DIR}"
         "-DBINARY_DIR=${BINARY_DIR}"
         -DCMAKE_EXPORT_COMPILE_COMMANDS=On
-        -DCMAKE_BUILD_TYPE=Debug
-        # Build 32 bit binaries with debugging symbols that Visual Studio
-        # understands. See also
-        # https://gitlab.kitware.com/cmake/cmake/issues/16259#note_158150.
-        "-DCMAKE_C_FLAGS=-m32 -gcodeview"
-        "-DCMAKE_CXX_FLAGS=-m32 -gcodeview"
+        -DCMAKE_BUILD_TYPE=Release
+        "-DCMAKE_C_FLAGS=-m32"
+        "-DCMAKE_CXX_FLAGS=-m32"
         "${SOURCE_DIR}"
-    WORKING_DIRECTORY "${DEBUG_IPASIM_CMAKE_DIR}")
+    WORKING_DIRECTORY "${RELEASE_IPASIM_CMAKE_DIR}")

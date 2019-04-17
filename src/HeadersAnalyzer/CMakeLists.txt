@@ -202,13 +202,13 @@ set (LLVM_LIBS
 set (ALL_CLANG_LIBS ${LLDB_LIBS} ${CLANG_LIBS} ${LLVM_LIBS})
 
 set (LLDB_INCLUDE_DIRS
-    "${DEBUG_CLANG_CMAKE_DIR}/tools/lldb/include"
+    "${CURRENT_CLANG_CMAKE_DIR}/tools/lldb/include"
     "${SOURCE_DIR}/deps/lldb/include")
 set (CLANG_INCLUDE_DIRS
-    "${DEBUG_CLANG_CMAKE_DIR}/tools/clang/include"
+    "${CURRENT_CLANG_CMAKE_DIR}/tools/clang/include"
     "${SOURCE_DIR}/deps/clang/include")
 set (LLVM_INCLUDE_DIRS
-    "${DEBUG_CLANG_CMAKE_DIR}/include"
+    "${CURRENT_CLANG_CMAKE_DIR}/include"
     "${SOURCE_DIR}/deps/llvm/include")
 
 set (ALL_CLANG_INCLUDE_DIRS ${LLDB_INCLUDE_DIRS} ${CLANG_INCLUDE_DIRS}
@@ -220,9 +220,9 @@ set (ALL_CLANG_INCLUDE_DIRS ${LLDB_INCLUDE_DIRS} ${CLANG_INCLUDE_DIRS}
 add_custom_target (clang-tablegen-targets
     COMMENT "Clang tablegen targets"
     COMMAND ninja clang-tablegen-targets
-    WORKING_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}"
+    WORKING_DIRECTORY "${CURRENT_CLANG_CMAKE_DIR}"
     USES_TERMINAL
-    DEPENDS config-clang-x86-Debug)
+    DEPENDS config-clang-x86)
 set (LLVM_TABLEGEN_TARGETS
     # From `add_public_tablegen_target` in `deps/llvm`
     intrinsics_gen
@@ -265,9 +265,9 @@ set (LLVM_TABLEGEN_TARGETS
 add_custom_target (llvm-tablegen-targets
     COMMENT "LLVM tablegen targets"
     COMMAND ninja ${LLVM_TABLEGEN_TARGETS}
-    WORKING_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}"
+    WORKING_DIRECTORY "${CURRENT_CLANG_CMAKE_DIR}"
     USES_TERMINAL
-    DEPENDS config-clang-x86-Debug)
+    DEPENDS config-clang-x86)
 
 # Create include directories as some of them might be filled with generated
 # headers at build time, but CMake would complain at configure time that those
@@ -279,10 +279,16 @@ function (add_clang_libs title names include_dirs tablegen_targets)
         # Add imported library `${name}.lib`.
         add_library ("${name}" STATIC IMPORTED)
         set_target_properties ("${name}" PROPERTIES
-            IMPORTED_LOCATION "${DEBUG_CLANG_CMAKE_DIR}/lib/${name}.lib")
-        target_compile_definitions ("${name}" INTERFACE _DEBUG _MT _DLL)
-        target_link_libraries ("${name}" INTERFACE
-            ucrtd vcruntimed msvcrtd msvcprtd)
+            IMPORTED_LOCATION "${CURRENT_CLANG_CMAKE_DIR}/lib/${name}.lib")
+        target_compile_definitions ("${name}" INTERFACE _MT _DLL)
+        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+            target_compile_definitions ("${name}" INTERFACE _DEBUG)
+            target_link_libraries ("${name}" INTERFACE
+                ucrtd vcruntimed msvcrtd msvcprtd)
+        else ()
+            target_link_libraries ("${name}" INTERFACE
+                ucrt vcruntime msvcrt msvcprt)
+        endif ()
         target_include_directories ("${name}" SYSTEM INTERFACE ${include_dirs})
         if (tablegen_targets)
             add_dependencies ("${name}" ${tablegen_targets})
@@ -298,20 +304,20 @@ add_clang_libs (LLVM "${LLVM_LIBS}" "${LLVM_INCLUDE_DIRS}"
 
 # Let CMake know how to generate those `.lib`s.
 set (libs ${ALL_CLANG_LIBS})
-list (TRANSFORM libs PREPEND "${DEBUG_CLANG_CMAKE_DIR}/lib/")
+list (TRANSFORM libs PREPEND "${CURRENT_CLANG_CMAKE_DIR}/lib/")
 list (TRANSFORM libs APPEND .lib)
-add_custom_target (config-clang-x86-Debug
+add_custom_target (config-clang-x86
     COMMENT "Configure Clang libs"
-    COMMAND ninja config-clang-x86-Debug
+    COMMAND ninja "config-clang-x86-${CMAKE_BUILD_TYPE}"
     WORKING_DIRECTORY "${BINARY_DIR}"
     USES_TERMINAL)
 add_custom_target (ClangLibs
     COMMENT "Generate Clang libs"
     BYPRODUCTS ${libs}
     COMMAND ninja ${ALL_CLANG_LIBS}
-    WORKING_DIRECTORY "${DEBUG_CLANG_CMAKE_DIR}"
+    WORKING_DIRECTORY "${CURRENT_CLANG_CMAKE_DIR}"
     USES_TERMINAL
-    DEPENDS config-clang-x86-Debug)
+    DEPENDS config-clang-x86)
 
 # Library TAPI. See `docs/tapi.md`.
 set (TAPI_SOURCES
@@ -371,18 +377,18 @@ set_source_files_properties (${srcs}
 ### Let CMake know how to generate `.inc` files.
 add_custom_command (
     OUTPUT include/tapi/Driver/DiagnosticTAPIKinds.inc
-    COMMAND "${CLANG_CMAKE_DIR}/bin/clang-tblgen.exe" "-o=${INC1}"
+    COMMAND "${RELEASE_CLANG_CMAKE_DIR}/bin/clang-tblgen.exe" "-o=${INC1}"
         -gen-clang-diags-defs
         "${SOURCE_DIR}/deps/tapi/include/tapi/Driver/DiagnosticTAPIKinds.td"
-    DEPENDS "${CLANG_CMAKE_DIR}/bin/clang-tblgen.exe"
+    DEPENDS "${RELEASE_CLANG_CMAKE_DIR}/bin/clang-tblgen.exe"
         "${SOURCE_DIR}/deps/tapi/include/tapi/Driver/DiagnosticTAPIKinds.td")
 #### TODO: This also depends on some headers (in `deps/llvm/include`)...
 add_custom_command (
     OUTPUT include/tapi/Driver/TAPIOptions.inc
-    COMMAND "${CLANG_CMAKE_DIR}/bin/llvm-tblgen.exe" "-o=${INC2}"
+    COMMAND "${RELEASE_CLANG_CMAKE_DIR}/bin/llvm-tblgen.exe" "-o=${INC2}"
         "-I=${SOURCE_DIR}/deps/llvm/include" -gen-opt-parser-defs
         "${SOURCE_DIR}/deps/tapi/include/tapi/Driver/TAPIOptions.td"
-    DEPENDS "${CLANG_CMAKE_DIR}/bin/llvm-tblgen.exe"
+    DEPENDS "${RELEASE_CLANG_CMAKE_DIR}/bin/llvm-tblgen.exe"
         "${SOURCE_DIR}/deps/tapi/include/tapi/Driver/TAPIOptions.td")
 
 ### Let CMake know how to generate tblgens.
@@ -393,16 +399,16 @@ add_custom_target (config-clang-x86-Release
     USES_TERMINAL)
 add_custom_target (gen-clang-tblgen
     COMMENT "Generate Clang tablegen"
-    BYPRODUCTS "${CLANG_CMAKE_DIR}/bin/clang-tblgen.exe"
+    BYPRODUCTS "${RELEASE_CLANG_CMAKE_DIR}/bin/clang-tblgen.exe"
     COMMAND ninja clang-tblgen
-    WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
+    WORKING_DIRECTORY "${RELEASE_CLANG_CMAKE_DIR}"
     USES_TERMINAL
     DEPENDS config-clang-x86-Release)
 add_custom_target (gen-llvm-tblgen
     COMMENT "Generate LLVM tablegen"
-    BYPRODUCTS "${CLANG_CMAKE_DIR}/bin/llvm-tblgen.exe"
+    BYPRODUCTS "${RELEASE_CLANG_CMAKE_DIR}/bin/llvm-tblgen.exe"
     COMMAND ninja llvm-tblgen
-    WORKING_DIRECTORY "${CLANG_CMAKE_DIR}"
+    WORKING_DIRECTORY "${RELEASE_CLANG_CMAKE_DIR}"
     USES_TERMINAL
     DEPENDS config-clang-x86-Release)
 
@@ -450,7 +456,7 @@ target_link_libraries (HeadersAnalyzer PRIVATE
 set (CG_OUTPUTS "${SOURCE_DIR}/src/HeadersAnalyzer/Debug/CG/exports.txt")
 add_custom_command (OUTPUT ${CG_OUTPUTS}
     COMMENT "Code-gen"
-    COMMAND "${IPASIM_CMAKE_DIR}/bin/HeadersAnalyzer.exe"
+    COMMAND "${CURRENT_IPASIM_CMAKE_DIR}/bin/HeadersAnalyzer.exe"
     WORKING_DIRECTORY "${SOURCE_DIR}"
     USES_TERMINAL
     DEPENDS HeadersAnalyzer Frameworks crtlib crtstubs)

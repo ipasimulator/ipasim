@@ -1,7 +1,7 @@
 list (APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/scripts")
 include (CommonVariables)
 
-file (MAKE_DIRECTORY "${DEBUG_LIEF_CMAKE_DIR}")
+file (MAKE_DIRECTORY "${RELEASE_LIEF_CMAKE_DIR}")
 execute_process (
     COMMAND "${CMAKE_COMMAND}" -G Ninja
         -DLIEF_PYTHON_API=off
@@ -14,8 +14,8 @@ execute_process (
         "-DCMAKE_AR=${LLVM_BIN_DIR}/llvm-ar.exe"
         -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY
         -DCMAKE_EXPORT_COMPILE_COMMANDS=On
-        -DCMAKE_BUILD_TYPE=Debug
-        "-DCMAKE_C_FLAGS=-DNOMINMAX -m32 -gcodeview"
-        "-DCMAKE_CXX_FLAGS=-DNOMINMAX -m32 -gcodeview"
+        -DCMAKE_BUILD_TYPE=Release
+        "-DCMAKE_C_FLAGS=-DNOMINMAX -m32"
+        "-DCMAKE_CXX_FLAGS=-DNOMINMAX -m32"
         "${SOURCE_DIR}/deps/LIEF"
-    WORKING_DIRECTORY "${DEBUG_LIEF_CMAKE_DIR}")
+    WORKING_DIRECTORY "${RELEASE_LIEF_CMAKE_DIR}")

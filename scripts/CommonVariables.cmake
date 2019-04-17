@@ -2,12 +2,24 @@
 
 set (LLVM_BIN_DIR "C:/Program Files/LLVM/bin")
 
-set (CLANG_CMAKE_DIR "${BINARY_DIR}/clang-x86-Release")
-set (DEBUG_CLANG_CMAKE_DIR "${BINARY_DIR}/clang-x86-Debug")
-set (IPASIM_CMAKE_DIR "${BINARY_DIR}/ipasim-x86-Debug")
-set (WINOBJC_CMAKE_DIR "${BINARY_DIR}/winobjc-x86-Debug")
-set (LIEF_CMAKE_DIR "${BINARY_DIR}/lief-x86-Debug")
-set (LIBFFI_CMAKE_DIR "${BINARY_DIR}/Libffi-x86-Debug")
+macro (dir_pairs name)
+    string (TOUPPER "${name}" upper_name)
+    set ("DEBUG_${upper_name}_CMAKE_DIR" "${BINARY_DIR}/${name}-x86-Debug")
+    set ("RELEASE_${upper_name}_CMAKE_DIR" "${BINARY_DIR}/${name}-x86-Release")
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set ("CURRENT_${upper_name}_CMAKE_DIR"
+            "${BINARY_DIR}/${name}-x86-Debug")
+    else ()
+        set ("CURRENT_${upper_name}_CMAKE_DIR"
+            "${BINARY_DIR}/${name}-x86-Release")
+    endif ()
+endmacro (dir_pairs)
+
+dir_pairs (clang)
+dir_pairs (ipasim)
+dir_pairs (winobjc)
+dir_pairs (lief)
+dir_pairs (Libffi)
 
 # First we set the compiler to the original Clang, because at least it exists.
 # We will change this after the project is configured (and compiler is tested).
@@ -18,8 +30,8 @@ set (LLD_LINK_EXE "${LLVM_BIN_DIR}/lld-link.exe")
 # These are constants and shouldn't be changed (unlike the previous two).
 set (ORIG_CLANG_EXE "${CLANG_EXE}")
 set (ORIG_LLD_LINK_EXE "${LLD_LINK_EXE}")
-set (BUILT_CLANG_EXE "${CLANG_CMAKE_DIR}/bin/clang.exe")
-set (BUILT_LLD_LINK_EXE "${CLANG_CMAKE_DIR}/bin/lld-link.exe")
+set (BUILT_CLANG_EXE "${RELEASE_CLANG_CMAKE_DIR}/bin/clang.exe")
+set (BUILT_LLD_LINK_EXE "${RELEASE_CLANG_CMAKE_DIR}/bin/lld-link.exe")
 set (BUILT_DEBUG_CLANG_EXE "${DEBUG_CLANG_CMAKE_DIR}/bin/clang.exe")
 set (BUILT_DEBUG_LLD_LINK_EXE "${DEBUG_CLANG_CMAKE_DIR}/bin/lld-link.exe")
 
@@ -201,10 +213,14 @@ set (WINOBJC_DEFS
     # we successfully built WinObjC using MSBuild, i.e., 10.0.14393.0).
     DISABLE_WINRT_DEPRECATION
     # From `ClangCompile.xml`.
-    # TODO: Change dynamically depending on `CMAKE_BUILD_TYPE`.
-    _DEBUG _MT _DLL
+    _MT _DLL
     # Unicode
     UNICODE _UNICODE)
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    list (APPEND WINOBJC_DEFS
+        # From `ClangCompile.xml`.
+        _DEBUG)
+endif ()
 
 # Shortcuts for compiler options (commented with their respective MSBuild
 # equivalents).
@@ -222,10 +238,17 @@ list (APPEND WINOBJC_LIBS
     # From `Islandwood.props`
     WindowsApp.lib # Because it is specified as Windows Store app, probably.
     # From `ClangCompile.xml`.
-    oldnames # For `--dependent-lib=oldnames`.
-    # For `--dependent-lib=msvcrtd` + <https://docs.microsoft.com/en-us/cpp/
-    # c-runtime-library/crt-library-features?view=vs-2017>.
-    ucrtd vcruntimed msvcrtd msvcprtd)
+    oldnames) # For `--dependent-lib=oldnames`.
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    list (APPEND WINOBJC_LIBS
+        # For `--dependent-lib=msvcrtd` + <https://docs.microsoft.com/en-us/cpp/
+        # c-runtime-library/crt-library-features?view=vs-2017>.
+        ucrtd vcruntimed msvcrtd msvcprtd)
+else ()
+    list (APPEND WINOBJC_LIBS
+        # See the branch above.
+        ucrt vcruntime msvcrt msvcprt)
+endif ()
 set (WOCFX_LIBS
     ${WINOBJC_LIBS}
     woc-Logging
