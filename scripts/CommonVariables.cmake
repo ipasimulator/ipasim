@@ -6,7 +6,7 @@ macro (dir_pairs name)
     string (TOUPPER "${name}" upper_name)
     set ("DEBUG_${upper_name}_CMAKE_DIR" "${BINARY_DIR}/${name}-x86-Debug")
     set ("RELEASE_${upper_name}_CMAKE_DIR" "${BINARY_DIR}/${name}-x86-Release")
-    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if ($<CONFIG:Debug>)
         set ("CURRENT_${upper_name}_CMAKE_DIR"
             "${BINARY_DIR}/${name}-x86-Debug")
     else ()
@@ -40,6 +40,14 @@ set (ANGLE_DIR "C:/packages/ANGLE.WindowsStore.2.1.13")
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+# See <https://docs.microsoft.com/en-us/cpp/c-runtime-library/
+# crt-library-features?view=vs-2017>.
+set (IPASIM_RUNTIME_LIBS
+    $<IF:$<CONFIG:Debug>,ucrtd,ucrt>
+    $<IF:$<CONFIG:Debug>,vcruntimed,vcruntime>
+    $<IF:$<CONFIG:Debug>,msvcrtd,msvcrt>
+    $<IF:$<CONFIG:Debug>,msvcprtd,msvcprt>)
 
 # See #13.
 set (CF_PUBLIC_HEADERS
@@ -213,14 +221,9 @@ set (WINOBJC_DEFS
     # we successfully built WinObjC using MSBuild, i.e., 10.0.14393.0).
     DISABLE_WINRT_DEPRECATION
     # From `ClangCompile.xml`.
-    _MT _DLL
+    _MT _DLL $<$<CONFIG:Debug>:_DEBUG>
     # Unicode
     UNICODE _UNICODE)
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    list (APPEND WINOBJC_DEFS
-        # From `ClangCompile.xml`.
-        _DEBUG)
-endif ()
 
 # Shortcuts for compiler options (commented with their respective MSBuild
 # equivalents).
@@ -238,17 +241,9 @@ list (APPEND WINOBJC_LIBS
     # From `Islandwood.props`
     WindowsApp.lib # Because it is specified as Windows Store app, probably.
     # From `ClangCompile.xml`.
-    oldnames) # For `--dependent-lib=oldnames`.
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    list (APPEND WINOBJC_LIBS
-        # For `--dependent-lib=msvcrtd` + <https://docs.microsoft.com/en-us/cpp/
-        # c-runtime-library/crt-library-features?view=vs-2017>.
-        ucrtd vcruntimed msvcrtd msvcprtd)
-else ()
-    list (APPEND WINOBJC_LIBS
-        # See the branch above.
-        ucrt vcruntime msvcrt msvcprt)
-endif ()
+    oldnames # For `--dependent-lib=oldnames`.
+    # For `--dependent-lib=msvcrtd`.
+    ${IPASIM_RUNTIME_LIBS})
 set (WOCFX_LIBS
     ${WINOBJC_LIBS}
     woc-Logging

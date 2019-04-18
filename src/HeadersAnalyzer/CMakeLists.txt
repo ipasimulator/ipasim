@@ -280,15 +280,9 @@ function (add_clang_libs title names include_dirs tablegen_targets)
         add_library ("${name}" STATIC IMPORTED)
         set_target_properties ("${name}" PROPERTIES
             IMPORTED_LOCATION "${CURRENT_CLANG_CMAKE_DIR}/lib/${name}.lib")
-        target_compile_definitions ("${name}" INTERFACE _MT _DLL)
-        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-            target_compile_definitions ("${name}" INTERFACE _DEBUG)
-            target_link_libraries ("${name}" INTERFACE
-                ucrtd vcruntimed msvcrtd msvcprtd)
-        else ()
-            target_link_libraries ("${name}" INTERFACE
-                ucrt vcruntime msvcrt msvcprt)
-        endif ()
+        target_compile_definitions ("${name}" INTERFACE
+            _MT _DLL $<$<CONFIG:Debug>:_DEBUG>)
+        target_link_libraries ("${name}" INTERFACE ${IPASIM_RUNTIME_LIBS})
         target_include_directories ("${name}" SYSTEM INTERFACE ${include_dirs})
         if (tablegen_targets)
             add_dependencies ("${name}" ${tablegen_targets})

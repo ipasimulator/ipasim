@@ -46,11 +46,7 @@ target_include_directories (LIEF SYSTEM INTERFACE ${LIEF_INCLUDE_DIRS})
 target_compile_options (LIEF INTERFACE
     "-include${CMAKE_CURRENT_SOURCE_DIR}/my_iso646.h")
 target_compile_definitions (LIEF INTERFACE NOMINMAX)
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_link_libraries (LIEF INTERFACE msvcrtd)
-else ()
-    target_link_libraries (LIEF INTERFACE msvcrt)
-endif ()
+target_link_libraries (LIEF INTERFACE $<IF:$<CONFIG:Debug>,msvcrtd,msvcrt>)
 add_dependencies (LIEF lief-x86)
 
 # Libffi
