@@ -45,7 +45,9 @@
 #include <CoreVideo/CoreVideo.h>
 #include <EventKit/EventKit.h>
 #include <EventKitUI/EventKitUI.h>
+#endif
 #include <Foundation/Foundation.h>
+#if !defined(IPASIM_CG_SAMPLE)
 #include <GameController/GameController.h>
 #include <GameKit/GameKit.h>
 #include <GamePlayKit/GamePlayKit.h>
@@ -67,9 +69,7 @@
 #include <OpenGLES/gltypes.h>
 #include <OpenGLES/ES2/gl.h>
 #include <OpenGLES/ES2/glext.h>
-#endif
 #include <QuartzCore/QuartzCore.h>
-#if !defined(IPASIM_CG_SAMPLE)
 #include <QuickLook/QuickLook.h>
 #include <SafariServices/SafariServices.h>
 #include <Security/Security.h>

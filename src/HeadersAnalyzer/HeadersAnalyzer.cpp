@@ -66,26 +66,21 @@ public:
     Log.info("discovering TBDs");
 
     TBDHandler TH(HAC);
-    if constexpr (Sample)
-      TH.handleFile("./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/"
-                    "Frameworks/QuartzCore.framework/QuartzCore.tbd");
-    else {
-      vector<string> Dirs{
-          "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
-          "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/TextInput/"};
-      for (const string &Dir : Dirs)
-        for (auto &File : directory_iterator(Dir))
-          TH.handleFile(File.path().string());
-      // Discover `.tbd` files inside frameworks.
-      string FrameworksDir =
-          "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/";
-      for (auto &File : directory_iterator(FrameworksDir))
-        if (File.status().type() == file_type::directory &&
-            !File.path().extension().compare(".framework"))
-          TH.handleFile(
-              (File.path() / File.path().filename().replace_extension(".tbd"))
-                  .string());
-    }
+    vector<string> Dirs{
+        "./deps/apple-headers/iPhoneOS11.1.sdk/usr/lib/",
+        "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/TextInput/"};
+    for (const string &Dir : Dirs)
+      for (auto &File : directory_iterator(Dir))
+        TH.handleFile(File.path().string());
+    // Discover `.tbd` files inside frameworks.
+    string FrameworksDir =
+        "./deps/apple-headers/iPhoneOS11.1.sdk/System/Library/Frameworks/";
+    for (auto &File : directory_iterator(FrameworksDir))
+      if (File.status().type() == file_type::directory &&
+          !File.path().extension().compare(".framework"))
+        TH.handleFile(
+            (File.path() / File.path().filename().replace_extension(".tbd"))
+                .string());
 
     // Fill `ExportEntry.Dylib` fields. This must not be done earlier since
     // `DylibPtr`s need to be stable.
@@ -101,14 +96,18 @@ public:
 
     // Note that groups must be added just once and together because references
     // to them are invalidated after that.
-    HAC.DLLGroups.push_back({BuildDir / "bin/Frameworks/"});
+    HAC.DLLGroups.push_back({"./deps/crt/"});
     if constexpr (!Sample) {
+      HAC.DLLGroups.push_back({BuildDir / "bin/Frameworks/"});
       HAC.DLLGroups.push_back({BuildDir / "bin/"});
       HAC.DLLGroups.push_back(
           {"./deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/"});
-      HAC.DLLGroups.push_back({"./deps/crt/"});
     }
     size_t I = 0;
+
+    // C runtime
+    HAC.DLLGroups[I++].DLLs.push_back(
+        DLLEntry(Debug ? "ucrtbased.dll" : "ucrtbase.dll"));
 
     if constexpr (!Sample) {
       // WinObjC DLLs (i.e., Windows versions of Apple's frameworks)
@@ -129,12 +128,6 @@ public:
 
       // Prebuilt `libdispatch.dll`
       HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("libdispatch.dll"));
-
-      // C runtime
-      HAC.DLLGroups[I++].DLLs.push_back(
-          DLLEntry(Debug ? "ucrtbased.dll" : "ucrtbase.dll"));
-    } else {
-      HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("QuartzCore.dll"));
     }
   }
   void parseAppleHeaders() {
@@ -546,9 +539,11 @@ public:
         {
           ClangHelper Clang(LLVM);
           // See #24.
-          if (DLL.Name == "ucrtbased.dll")
-            Clang.Args.add("../build/ipasim-x86-Debug/src/crt/CMakeFiles/"
-                           "crtstubs.dir/stubs.cpp.obj");
+          if (DLL.Name == (Debug ? "ucrtbased.dll" : "ucrtbase.dll"))
+            Clang.Args.add(
+                (BuildDir / "src/crt/CMakeFiles/crtstubs.dir/stubs.cpp.obj")
+                    .string()
+                    .c_str());
 
           Clang.Args.add("-I./include");
           Clang.Args.add(IndexFile.c_str());
