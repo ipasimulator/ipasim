@@ -7,6 +7,7 @@ call push_one.cmd ..\deps\apple-headers
 call push_one.cmd ..\deps\clang
 call push_one.cmd ..\deps\libclosure
 call push_one.cmd ..\deps\libdispatch
+call push_one.cmd ..\deps\Libffi
 call push_one.cmd ..\deps\LIEF
 call push_one.cmd ..\deps\lld
 call push_one.cmd ..\deps\lldb
