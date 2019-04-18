@@ -1,0 +1,7 @@
+[ver:1,total:280]
+include/ipasim/IpaSimulator/Config.hpp:145,1555596000:145,r
+src/IpaSimulator/IpaSimApp/.gitignore:60,1555596000:60,m
+src/IpaSimulator/SysTranslator.cpp:25,1555596000:25,r
+.gitattributes:20,1555596000:20,m
+src/IpaSimulator/IpaSimApp/IpaSimApp_TemporaryKey.pfx:20,1555596000:20,m
+src/IpaSimulator/IpaSimulator.cpp:10,1555596000:10,r
