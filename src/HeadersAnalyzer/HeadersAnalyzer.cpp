@@ -546,7 +546,8 @@ public:
 
           Clang.linkDLL(
               (GenDir / DLL.Name).replace_extension(".wrapper.dll").string(),
-              ObjectFile, path(DLLPath).replace_extension(".dll.a").string());
+              ObjectFile, path(DLLPath).replace_extension(".dll.a").string(),
+              Debug);
         }
 
         // Emit `.o` file.

@@ -43,7 +43,7 @@ unique_ptr<CodeGenModule> ClangHelper::createCodeGenModule() {
 }
 
 void ClangHelper::linkDLL(StringRef Output, StringRef ObjectFile,
-                          StringRef ImportLib) {
+                          StringRef ImportLib, bool Debug) {
   Args.add("-shared");
   Args.add("-o");
   Args.add(Output.data());
@@ -51,7 +51,10 @@ void ClangHelper::linkDLL(StringRef Output, StringRef ObjectFile,
   Args.add(ImportLib.data());
   // See #25.
   Args.add("-nostdlib");
-  Args.add("-Wl,-defaultlib:msvcrtd");
+  if (Debug)
+    Args.add("-Wl,-defaultlib:msvcrtd");
+  else
+    Args.add("-Wl,-defaultlib:msvcrt");
 
   executeArgs();
 }
