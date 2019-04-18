@@ -1,0 +1,10 @@
+[ver:1,total:780]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:147,1555588800:147,m
+src/HeadersAnalyzer/ClangHelper.cpp:137,1555588800:137,m
+include/ipasim/ClangHelper.hpp:119,1555588800:119,m
+src/HeadersAnalyzer/CMakeLists.txt:110,1555588800:110,r
+src/HeadersAnalyzer/LLVMHelper.cpp:75,1555588800:75,m
+include/ipasim/LLVMHelper.hpp:66,1555588800:66,m
+src/HeadersAnalyzer/LLDHelper.cpp:63,1555588800:63,m
+include/ipasim/LLDHelper.hpp:48,1555588800:48,m
+src/HeadersAnalyzer/LLDBHelper.cpp:15,1555588800:15,r
