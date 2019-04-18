@@ -1,7 +1,7 @@
 add_library (crtstubs OBJECT stubs.cpp)
 add_prep_dep (crtstubs)
 
-if ($<CONFIG:Debug>)
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     set (D_POSTFIX "d")
 else ()
     set (D_POSTFIX "")

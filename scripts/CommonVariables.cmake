@@ -6,7 +6,7 @@ macro (dir_pairs name)
     string (TOUPPER "${name}" upper_name)
     set ("DEBUG_${upper_name}_CMAKE_DIR" "${BINARY_DIR}/${name}-x86-Debug")
     set ("RELEASE_${upper_name}_CMAKE_DIR" "${BINARY_DIR}/${name}-x86-Release")
-    if ($<CONFIG:Debug>)
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         set ("CURRENT_${upper_name}_CMAKE_DIR"
             "${BINARY_DIR}/${name}-x86-Debug")
     else ()
