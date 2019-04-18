@@ -450,6 +450,7 @@ set (CG_OUTPUTS "${SOURCE_DIR}/src/HeadersAnalyzer/Debug/CG/exports.txt")
 add_custom_command (OUTPUT ${CG_OUTPUTS}
     COMMENT "Code-gen"
     COMMAND "${CURRENT_IPASIM_CMAKE_DIR}/bin/HeadersAnalyzer.exe"
+        $<$<CONFIG:Debug>:-d>
         "${CURRENT_IPASIM_CMAKE_DIR}"
     WORKING_DIRECTORY "${SOURCE_DIR}"
     USES_TERMINAL

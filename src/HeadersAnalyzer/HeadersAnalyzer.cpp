@@ -59,7 +59,8 @@ namespace {
 // assembly-implemented functions.
 class HeadersAnalyzer {
 public:
-  HeadersAnalyzer(path BuildDir) : BuildDir(move(BuildDir)), LLVM(LLVMInit) {}
+  HeadersAnalyzer(path BuildDir, bool Debug)
+      : BuildDir(move(BuildDir)), Debug(Debug), LLVM(LLVMInit) {}
 
   void discoverTBDs() {
     Log.info("discovering TBDs");
@@ -130,7 +131,8 @@ public:
       HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("libdispatch.dll"));
 
       // C runtime
-      HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("ucrtbased.dll"));
+      HAC.DLLGroups[I++].DLLs.push_back(
+          DLLEntry(Debug ? "ucrtbased.dll" : "ucrtbase.dll"));
     } else {
       HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("QuartzCore.dll"));
     }
@@ -792,6 +794,7 @@ private:
   LLVMInitializer LLVMInit;
   LLVMHelper LLVM;
   path BuildDir, OutputDir, GenDir;
+  bool Debug;
 
   // Some common types.
   llvm::Type *VoidTy = llvm::Type::getVoidTy(LLVM.Ctx);
@@ -862,14 +865,14 @@ private:
 
 int main(int ArgC, char **ArgV) {
   // Parse arguments.
-  if (ArgC != 2) {
-    Log.error() << "usage: " << ArgV[0] << " path-to-build-directory"
+  if (ArgC != 2 && (ArgC != 3 || strcmp(ArgV[1], "-d"))) {
+    Log.error() << "usage: " << ArgV[0] << " [-d] path-to-build-directory"
                 << Log.end();
     return 2;
   }
 
   try {
-    HeadersAnalyzer HA(ArgV[1]);
+    HeadersAnalyzer HA(ArgV[ArgC - 1], /* Debug */ ArgC == 3);
     HA.discoverTBDs();
     HA.discoverDLLs();
     HA.parseAppleHeaders();
