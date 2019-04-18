@@ -1,0 +1,6 @@
+[ver:1,total:1080]
+scripts/CommonVariables.cmake:666,1555570800:666,m
+src/IpaSimulator/CMakeLists.txt:195,1555570800:195,m
+src/HeadersAnalyzer/CMakeLists.txt:99,1555570800:99,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:60,1555570800:60,r
+deps/crt/README.md:60,1555570800:60,r
