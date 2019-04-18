@@ -1,8 +1,25 @@
 # C runtime DLLs
 
-`ucrtbased.dll` was copied from `/src/IpaSimulator/Debug/IpaSimApp/AppX/`
-(after building `IpaSimApp` in Visual Studio). `ucrtbased.pdb` was copied from
-Visual Studio's symbol cache (after enabling Microsoft Symbol Servers).
+## Prerequisites
+
+Make sure you have installed
+[Debugging Tools for Windows](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools).
+Also make sure that `symchk.exe` from
+`C:\Program Files (x86)\Windows Kits\10\Debuggers\x86` is in your `PATH`.
+
+## Getting DLLs and PDBs
+
+`ucrtbase.dll` and `ucrtbased.dll` were copied from `C:\Windows\System32\`.
+Their symbol files (`.pdb`s) were retrieved with `symchk`:
+
+```cmd
+symchk .\ucrtbase.dll /s SRV*%CD%\syms*https://msdl.microsoft.com/download/symbols
+symchk .\ucrtbased.dll /s SRV*%CD%\syms*https://msdl.microsoft.com/download/symbols
+```
+
+And copied from folder `./syms/` to `./`.
+
+## Getting LIBs
 
 `ucrtd.lib` is located in
 `C:/Program Files (x86)/Windows Kits/10/Lib/10.0.17134.0/ucrt/x86/`. But it

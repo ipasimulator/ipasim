@@ -1,3 +1,4 @@
-!ucrtbased.pdb
-ucrtbased.dll.a
-ucrtbased.dll.exp
+!ucrtbase*.pdb
+ucrtbase*.dll.a
+ucrtbase*.dll.exp
+/syms/

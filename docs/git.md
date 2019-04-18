@@ -21,6 +21,7 @@ And usually when there is more than one sentence, only the first is on the first
 - [sam] - Samples (`/samples/`).
 - [rtoc] - `RTObjCInterop` (`/src/RTObjCInterop/`).
 - [build] - General build files (e.g., Docker and CMake files).
+- [crt] - CRT library goodies (`/deps/crt/` and `/src/crt/`).
 
 ## Forking repositories
 
