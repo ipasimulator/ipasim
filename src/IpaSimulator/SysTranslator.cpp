@@ -173,8 +173,8 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
       // If there's no corresponding wrapper, maybe this is a simple Objective-C
       // method and we can translate it dynamically.
       if (ObjCMethod M = AI.Lib->findMethod(Addr)) {
-        Log.info() << "dynamically handling method " << M << " ("
-                   << Dyld.dumpAddr(Addr, AI) << ")" << Log.end();
+        Log.info() << "dynamically handling method "
+                   << Dyld.dumpAddr(Addr, AI, M) << Log.end();
 
         // Handle return value.
         TypeDecoder TD(M.getType());
@@ -368,8 +368,8 @@ void *SysTranslator::translate(void *Addr) {
       // so that's what we do here.
       // TODO: Generate wrappers for callbacks, too (see README of
       // `HeadersAnalyzer` for more details).
-      Log.info() << "dynamically handling callback " << M << " ("
-                 << Dyld.dumpAddr(AddrVal, AI) << ")" << Log.end();
+      Log.info() << "dynamically handling callback "
+                 << Dyld.dumpAddr(AddrVal, AI, M) << Log.end();
 
       // First, handle the return value.
       TypeDecoder TD(M.getType());

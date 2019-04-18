@@ -50,6 +50,8 @@ public:
   AddrInfo inspect(uint64_t Addr);
   DebugStream::Handler dumpAddr(uint64_t Addr);
   DebugStream::Handler dumpAddr(uint64_t Addr, const AddrInfo &AI);
+  DebugStream::Handler dumpAddr(uint64_t Addr, const AddrInfo &AI,
+                                ObjCMethod M);
   uint64_t getKernelAddr() { return KernelAddr; }
   static constexpr uint64_t alignToPageSize(uint64_t Addr) {
     return Addr & (-PageSize);

@@ -365,25 +365,39 @@ AddrInfo DynamicLoader::lookup(uint64_t Addr) {
 // `src/objc/dladdr.mm`.
 AddrInfo DynamicLoader::inspect(uint64_t Addr) { return lookup(Addr); }
 
-DebugStream::Handler DynamicLoader::dumpAddr(uint64_t Addr,
-                                             const AddrInfo &AI) {
-  return [Addr, &AI](DebugStream &S) {
-    if (!AI.Lib) {
-      S << "0x" << to_hex_string(Addr);
-    } else {
-      uint64_t RVA = Addr - AI.Lib->StartAddress;
-      S << *AI.LibPath << "+0x" << to_hex_string(RVA);
+DebugStream::Handler DynamicLoader::dumpAddr(uint64_t Addr) {
+  return [this, Addr](DebugStream &S) {
+    if (Addr == KernelAddr)
+      S << "kernel!0x" << to_hex_string(Addr);
+    else {
+      AddrInfo AI(lookup(Addr));
+      S << dumpAddr(Addr, AI);
     }
   };
 }
 
-DebugStream::Handler DynamicLoader::dumpAddr(uint64_t Addr) {
-  return [this, Addr](DebugStream &S) {
-    if (Addr == KernelAddr) {
-      S << "kernel!0x" << to_hex_string(Addr);
-    } else {
-      AddrInfo AI(lookup(Addr));
-      dumpAddr(Addr, AI)(S);
-    }
+static DebugStream::Handler dumpAddrImpl(uint64_t Addr, const AddrInfo &AI) {
+  return [Addr, &AI](DebugStream &S) {
+    uint64_t RVA = Addr - AI.Lib->StartAddress;
+    S << *AI.LibPath << "+0x" << to_hex_string(RVA);
+  };
+}
+
+DebugStream::Handler DynamicLoader::dumpAddr(uint64_t Addr,
+                                             const AddrInfo &AI) {
+  return [this, Addr, &AI](DebugStream &S) {
+    if (!AI.Lib)
+      S << "0x" << to_hex_string(Addr);
+    else if (ObjCMethod M = AI.Lib->findMethod(Addr))
+      S << dumpAddr(Addr, AI, M);
+    else
+      S << dumpAddrImpl(Addr, AI);
+  };
+}
+
+DebugStream::Handler DynamicLoader::dumpAddr(uint64_t Addr, const AddrInfo &AI,
+                                             ObjCMethod M) {
+  return [Addr, &AI, M](DebugStream &S) {
+    S << M << "!" << dumpAddrImpl(Addr, AI);
   };
 }
