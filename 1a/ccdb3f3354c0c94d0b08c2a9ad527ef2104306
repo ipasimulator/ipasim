@@ -1,0 +1,4 @@
+[ver:1,total:865]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:770,1555578000:740,1555581600:30,m
+src/HeadersAnalyzer/iOSHeaders.mm:75,1555581600:75,m
+src/HeadersAnalyzer/CMakeLists.txt:20,1555578000:20,r
