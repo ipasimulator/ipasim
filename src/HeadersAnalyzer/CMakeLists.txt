@@ -463,9 +463,10 @@ add_custom_target (CodeGen
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_custom_target (prep-CodeGenRelease
         COMMENT "Prepare Code-gen"
-        COMMAND ninja prep-CodeGen
+        COMMAND ninja HeadersAnalyzer
         WORKING_DIRECTORY "${RELEASE_IPASIM_CMAKE_DIR}"
-        USES_TERMINAL)
+        USES_TERMINAL
+        DEPENDS Frameworks crtlib crtstubs)
     add_custom_target (CodeGenRelease
         COMMENT "Code-gen"
         COMMAND "${RELEASE_IPASIM_CMAKE_DIR}/bin/HeadersAnalyzer.exe"
