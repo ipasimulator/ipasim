@@ -179,6 +179,9 @@ exit /B %errlev%</Command>
     <None Include="..\..\..\deps\WinObjC\Frameworks\CoreFoundation\CharacterSets\**">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\deps\crt\ucrtbase.dll">
+      <DeploymentContent Condition="'$(Configuration)'=='Release'">true</DeploymentContent>
+    </None>
     <None Include="UIKit.Xaml\**">
       <DeploymentContent>true</DeploymentContent>
     </None>

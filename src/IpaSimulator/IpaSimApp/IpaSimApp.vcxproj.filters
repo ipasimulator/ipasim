@@ -75,6 +75,7 @@
     <None Include="..\..\..\deps\WinObjC\Frameworks\CoreFoundation\CharacterSets\**">
       <Filter>bin</Filter>
     </None>
+    <None Include="..\..\..\deps\crt\ucrtbase.dll" />
     <None Include="UIKit.Xaml\**">
       <Filter>bin</Filter>
     </None>
