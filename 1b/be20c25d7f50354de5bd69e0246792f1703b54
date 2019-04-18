@@ -1,0 +1,5 @@
+[ver:1,total:540]
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:225,1555585200:180,1555588800:45,r
+deps/crt/README.md:195,1555585200:180,1555588800:15,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:75,1555585200:60,1555588800:15,r
+src/HeadersAnalyzer/CMakeLists.txt:45,1555588800:45,r
