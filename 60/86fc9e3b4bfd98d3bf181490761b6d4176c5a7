@@ -1,0 +1,6 @@
+[ver:1,total:1175]
+src/IpaSimulator/DynamicLoader.cpp:520,1555603200:520,m
+src/IpaSimulator/CMakeLists.txt:245,1555596000:80,1555599600:15,1555603200:150,r
+src/IpaSimulator/SysTranslator.cpp:180,1555603200:180,m
+include/ipasim/DynamicLoader.hpp:170,1555603200:170,m
+src/IpaSimulator/LoadedLibrary.cpp:60,1555603200:60,r
