@@ -92,8 +92,8 @@
   <ItemDefinitionGroup>
     <PreBuildEvent>
       <Command>robocopy ..\..\..\..\build\ipasim-x86-$(Configuration)\gen\ $(ProjectDir)gen\ * /MIR /NP /NFL /NDL
-robocopy "..\..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\UIKit.Xaml"\ $(ProjectDir)UIKit.Xaml\ * /MIR /NP /NFL /NDL
-robocopy "..\..\..\deps\WinObjC\build\Win32\Debug\Universal Windows\Social.Xaml"\ $(ProjectDir)Social.Xaml\ * /MIR /NP /NFL /NDL
+robocopy "..\..\..\deps\WinObjC\build\Win32\$(Configuration)\Universal Windows\UIKit.Xaml"\ $(ProjectDir)UIKit.Xaml\ * /MIR /NP /NFL /NDL
+robocopy "..\..\..\deps\WinObjC\build\Win32\$(Configuration)\Universal Windows\Social.Xaml"\ $(ProjectDir)Social.Xaml\ * /MIR /NP /NFL /NDL
 rem See &lt;https://weblogs.sqlteam.com/robv/2010/02/17/61106/&gt;.
 set /A errlev="%ERRORLEVEL% &amp; 24"
 exit /B %errlev%</Command>
@@ -170,10 +170,10 @@ exit /B %errlev%</Command>
     <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\libobjc.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="..\..\..\deps\WinObjC\Frameworks\UIKit.Xaml\prebuilt\UIKit.Xaml.dll">
+    <None Include="..\..\..\deps\WinObjC\Frameworks\UIKit.Xaml\prebuilt\$(Configuration)\UIKit.Xaml.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
-    <None Include="..\..\..\deps\WinObjC\Frameworks\Social.Xaml\prebuilt\Social.Xaml.dll">
+    <None Include="..\..\..\deps\WinObjC\Frameworks\Social.Xaml\prebuilt\$(Configuration)\Social.Xaml.dll">
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="..\..\..\deps\WinObjC\Frameworks\CoreFoundation\CharacterSets\**">

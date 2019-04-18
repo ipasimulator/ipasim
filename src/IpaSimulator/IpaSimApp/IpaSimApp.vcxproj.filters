@@ -70,8 +70,8 @@
     <None Include="..\..\..\..\build\winobjc-x86-$(Configuration)\bin\WinObjCRT.dll" />
     <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\libpthread.dll" />
     <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\libobjc.dll" />
-    <None Include="..\..\..\deps\WinObjC\Frameworks\UIKit.Xaml\prebuilt\UIKit.Xaml.dll" />
-    <None Include="..\..\..\deps\WinObjC\Frameworks\Social.Xaml\prebuilt\Social.Xaml.dll" />
+    <None Include="..\..\..\deps\WinObjC\Frameworks\UIKit.Xaml\prebuilt\$(Configuration)\UIKit.Xaml.dll" />
+    <None Include="..\..\..\deps\WinObjC\Frameworks\Social.Xaml\prebuilt\$(Configuration)\Social.Xaml.dll" />
     <None Include="..\..\..\deps\WinObjC\Frameworks\CoreFoundation\CharacterSets\**">
       <Filter>bin</Filter>
     </None>
