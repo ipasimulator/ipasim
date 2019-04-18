@@ -446,8 +446,8 @@ target_link_libraries (HeadersAnalyzer PRIVATE
     -Wl,/nodefaultlib:libcmt)
 
 # TODO: Add real outputs and inputs.
-add_custom_target (prep-CodeGen DEPENDS
-    HeadersAnalyzer Frameworks crtlib crtstubs)
+add_custom_target (prep-CodeGen
+    DEPENDS HeadersAnalyzer Frameworks crtlib crtstubs)
 set (CG_OUTPUTS "${SOURCE_DIR}/src/HeadersAnalyzer/Debug/CG/exports.txt")
 add_custom_command (OUTPUT ${CG_OUTPUTS}
     COMMENT "Code-gen"
