@@ -487,6 +487,7 @@ size_t TypeDecoder::getNextTypeSizeImpl() {
     return 0;
   case 'c': // char
   case '@': // id
+  case '#': // Class
   case ':': // SEL
   case 'i': // int
   case 'I': // unsigned int
