@@ -8,12 +8,13 @@
 
 #include <CodeGen/CodeGenModule.h>
 #include <clang/Frontend/CompilerInstance.h>
+#include <filesystem>
 
 namespace ipasim {
 
 class ClangHelper {
 public:
-  ClangHelper(LLVMHelper &LLVM);
+  ClangHelper(const std::filesystem::path &BuildDir, LLVMHelper &LLVM);
 
   clang::CompilerInstance CI;
   StringVector Args;

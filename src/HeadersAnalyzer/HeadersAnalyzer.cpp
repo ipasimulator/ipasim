@@ -150,7 +150,7 @@ public:
 
     using namespace llvm::pdb;
     LLDBHelper LLDB;
-    ClangHelper Clang(LLVM);
+    ClangHelper Clang(BuildDir, LLVM);
 
     // Create `clang::CodeGen::CodeGenModule` needed in our `TypeComparer`.
     Clang.Args.add("-target");
@@ -529,11 +529,11 @@ public:
         // Emit `.obj` file.
         string ObjectFile(
             (OutputDir / DLL.Name).replace_extension(".obj").string());
-        IR.emitObj(ObjectFile);
+        IR.emitObj(BuildDir, ObjectFile);
 
         // Create the wrapper DLL.
         {
-          ClangHelper Clang(LLVM);
+          ClangHelper Clang(BuildDir, LLVM);
           // See #24.
           if (DLL.Name == (Debug ? "ucrtbased.dll" : "ucrtbase.dll"))
             Clang.Args.add(
@@ -552,15 +552,18 @@ public:
         // Emit `.o` file.
         string DylibObjectFile(
             (OutputDir / DLL.Name).replace_extension(".o").string());
-        DylibIR.emitObj(DylibObjectFile);
+        DylibIR.emitObj(BuildDir, DylibObjectFile);
 
         // Create the stub Dylib.
-        LLDHelper(LLVM).linkDylib(
-            (OutputDir / ("lib" + DLL.Name))
-                .replace_extension(".dll.dylib")
-                .string(),
-            DylibObjectFile,
-            path("/" + DLL.Name).replace_extension(".wrapper.dll").string());
+        {
+          LLDHelper LLD(BuildDir, LLVM);
+          LLD.linkDylib(
+              (OutputDir / ("lib" + DLL.Name))
+                  .replace_extension(".dll.dylib")
+                  .string(),
+              DylibObjectFile,
+              path("/" + DLL.Name).replace_extension(".wrapper.dll").string());
+        }
       }
     }
   }
@@ -730,13 +733,13 @@ public:
 
       // Emit `.o` file.
       string ObjectFile((OutputDir / (LibNo + ".o")).string());
-      IR.emitObj(ObjectFile);
+      IR.emitObj(BuildDir, ObjectFile);
 
       // We add `./` to the library name to convert it to a relative path.
       path DylibPath(GenDir / ("./" + Lib.Name));
 
       // Initialize LLD args to create the Dylib.
-      LLDHelper LLD(LLVM);
+      LLDHelper LLD(BuildDir, LLVM);
       LLD.addDylibArgs(DylibPath.string(), ObjectFile, Lib.Name);
       LLD.Args.add(("-L" + OutputDir.string()).c_str());
 
@@ -828,7 +831,7 @@ private:
     Exp->setType(Type);
   }
   void compileAppleHeaders() {
-    ClangHelper Clang(LLVM);
+    ClangHelper Clang(BuildDir, LLVM);
     Clang.Args.loadConfigFile("./src/HeadersAnalyzer/analyze_ios_headers.cfg");
     if constexpr (Sample)
       Clang.Args.add("-DIPASIM_CG_SAMPLE");

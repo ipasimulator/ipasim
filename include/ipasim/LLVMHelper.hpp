@@ -5,6 +5,7 @@
 
 #include "ipasim/HAContext.hpp"
 
+#include <filesystem>
 #include <llvm/ADT/SmallVector.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LLVMContext.h>
@@ -101,7 +102,7 @@ public:
                           llvm::ArrayRef<llvm::Value *> Args,
                           const llvm::Twine &Name);
   void verifyFunction(llvm::Function *Func);
-  void emitObj(llvm::StringRef Path);
+  void emitObj(const std::filesystem::path &BuildDir, llvm::StringRef Path);
   uint64_t getSize(llvm::Type *T) {
     return Module.getDataLayout().getTypeAllocSize(T);
   }

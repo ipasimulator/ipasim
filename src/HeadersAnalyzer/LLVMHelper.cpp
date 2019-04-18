@@ -193,7 +193,7 @@ void IRHelper::verifyFunction(Function *Func) {
 
 // Compiles the module. Inspired by LLVM tutorial:
 // https://llvm.org/docs/tutorial/LangImpl08.html.
-void IRHelper::emitObj(StringRef Path) {
+void IRHelper::emitObj(const path &BuildDir, StringRef Path) {
   // Generate LLVM IR.
   string IRPath(Path.str() + ".ll");
   auto IROutput(createOutputFile(IRPath));
@@ -204,7 +204,7 @@ void IRHelper::emitObj(StringRef Path) {
   // Emit object file.
   // TODO: Doing this via `PassManager` and `addPassesToEmitFile` didn't work
   // well (for, e.g., `UIApplicationMain`).
-  ClangHelper Clang(LLVM);
+  ClangHelper Clang(BuildDir, LLVM);
   Clang.Args.add("-target");
   Clang.Args.add(Module.getTargetTriple().c_str());
   Clang.Args.add("-c");

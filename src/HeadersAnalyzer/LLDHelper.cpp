@@ -12,11 +12,14 @@
 using namespace ipasim;
 using namespace llvm;
 using namespace std;
+using namespace std::filesystem;
 
-LLDHelper::LLDHelper(LLVMHelper &LLVM) : Args(LLVM.Saver) {
+LLDHelper::LLDHelper(const path &BuildDir, LLVMHelper &LLVM)
+    : Args(LLVM.Saver) {
   // First argument is expected to be an executable name.
   // TODO: See #26.
-  Args.add("../build/clang-x86-Release/bin/ld64.lld.exe");
+  Args.add(
+      (BuildDir / "../clang-x86-Release/bin/ld64.lld.exe").string().c_str());
 }
 
 // Inspired by what `ClangHelper::linkDylib` invokes.

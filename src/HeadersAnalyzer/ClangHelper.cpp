@@ -12,13 +12,15 @@ using namespace clang::CodeGen;
 using namespace clang::driver;
 using namespace ipasim;
 using namespace std;
+using namespace std::filesystem;
 using namespace llvm;
 
-ClangHelper::ClangHelper(LLVMHelper &LLVM) : LLVM(LLVM), Args(LLVM.Saver) {
+ClangHelper::ClangHelper(const path &BuildDir, LLVMHelper &LLVM)
+    : LLVM(LLVM), Args(LLVM.Saver) {
   CI.createDiagnostics();
   // First argument is expected to be an executable name.
   // TODO: See #26.
-  Args.add("../build/clang-x86-Release/bin/clang.exe");
+  Args.add((BuildDir / "../clang-x86-Release/bin/clang.exe").string().c_str());
   if constexpr (VerboseClang)
     Args.add("-v");
 }

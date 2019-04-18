@@ -5,11 +5,13 @@
 
 #include "ipasim/LLVMHelper.hpp"
 
+#include <filesystem>
+
 namespace ipasim {
 
 class LLDHelper {
 public:
-  LLDHelper(LLVMHelper &LLVM);
+  LLDHelper(const std::filesystem::path &BuildDir, LLVMHelper &LLVM);
 
   StringVector Args;
 
