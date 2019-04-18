@@ -172,11 +172,12 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
     if (Entry == Idx->Map.end()) {
       // If there's no corresponding wrapper, maybe this is a simple Objective-C
       // method and we can translate it dynamically.
-      if (const char *T = AI.Lib->getMethodType(Addr)) {
-        Log.info() << "dynamically handling method of type " << T << Log.end();
+      if (ObjCMethod M = AI.Lib->findMethod(Addr)) {
+        Log.info() << "dynamically handling method " << M << " ("
+                   << Dyld.dumpAddr(Addr, AI) << ")" << Log.end();
 
         // Handle return value.
-        TypeDecoder TD(T);
+        TypeDecoder TD(M.getType());
         bool Returns;
         switch (TD.getNextTypeSize()) {
         case 0:
@@ -361,16 +362,17 @@ void *SysTranslator::translate(void *Addr) {
   if (auto *Dylib = dynamic_cast<LoadedDylib *>(AI.Lib)) {
     // The address points to Dylib.
 
-    if (const char *T = Dylib->getMethodType(AddrVal)) {
+    if (ObjCMethod M = Dylib->findMethod(AddrVal)) {
       // We have found metadata of the callback method. Now, for simple methods,
       // it's actually quite simple to translate i386 -> ARM calls dynamically,
       // so that's what we do here.
       // TODO: Generate wrappers for callbacks, too (see README of
       // `HeadersAnalyzer` for more details).
-      Log.info() << "dynamically handling callback of type " << T << Log.end();
+      Log.info() << "dynamically handling callback " << M << " ("
+                 << Dyld.dumpAddr(AddrVal, AI) << ")" << Log.end();
 
       // First, handle the return value.
-      TypeDecoder TD(T);
+      TypeDecoder TD(M.getType());
       auto *Tr = new Trampoline;
       switch (TD.getNextTypeSize()) {
       case 0:

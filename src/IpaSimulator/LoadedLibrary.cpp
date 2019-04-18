@@ -180,82 +180,85 @@ struct category_t {
 
 } // namespace
 
-static const char *findMethod(method_list_t *Methods, uint64_t Addr) {
+const char *ObjCMethod::getName() {
+  return reinterpret_cast<method_t *>(MethodData)->name;
+}
+const char *ObjCMethod::getType() {
+  return reinterpret_cast<method_t *>(MethodData)->types;
+}
+const char *ObjCClass::getName() {
+  return reinterpret_cast<objc_class *>(Data)->getInfo()->name;
+}
+
+DebugStream &ipasim::operator<<(DebugStream &Str, ObjCMethod M) {
+  if (ObjCClass C = M.getClass())
+    return Str << "[" << C.getName() << " " << M.getName()
+               << "]:" << M.getType();
+  return Str << M.getName() << ":" << M.getType();
+}
+
+static method_t *findMethodImpl(method_list_t *Methods, uint64_t Addr) {
   if (!Methods)
     return nullptr;
   for (size_t J = 0; J != Methods->count; ++J) {
     method_t &Method = Methods->methods[J];
     if (reinterpret_cast<uint64_t>(Method.imp) == Addr)
-      return Method.types;
+      return &Method;
   }
   return nullptr;
 }
 
-static const char *findMethod(objc_class *Class, uint64_t Addr) {
+static method_t *findMethodImpl(objc_class *Class, uint64_t Addr) {
   // TODO: Isn't this first part redundant for realized classes?
-  if (const char *T = findMethod(Class->getInfo()->baseMethodList, Addr))
-    return T;
+  if (method_t *M = findMethodImpl(Class->getInfo()->baseMethodList, Addr))
+    return M;
   if (Class->isRealized())
     for (auto *L = Class->data()->methods.beginLists(),
               *End = Class->data()->methods.endLists();
          L != End; ++L)
-      if (const char *T = findMethod(*L, Addr))
-        return T;
+      if (method_t *M = findMethodImpl(*L, Addr))
+        return M;
   return nullptr;
 }
 
-const char *LoadedLibrary::getClassOfMethod(const char *Section,
-                                            uint64_t Addr) {
+ObjCMethod LoadedLibrary::findMethod(const char *Section, uint64_t Addr) {
   size_t Count;
   if (auto *Classes = getMachO().getSectionData<objc_class *>(
           MachO::DataSegment, Section, &Count))
     for (size_t I = 0; I != Count; ++I) {
       // Enumerate methods of every class and its meta-class.
       objc_class *Class = Classes[I];
-      if (const char *T = findMethod(Class, Addr))
-        return Class->getInfo()->name;
-      if (const char *T = findMethod(Class->isa, Addr))
-        return Class->isa->getInfo()->name;
+      if (method_t *M = findMethodImpl(Class, Addr))
+        return ObjCMethod(Class, M);
+      if (method_t *M = findMethodImpl(Class->isa, Addr))
+        return ObjCMethod(Class->isa, M);
     }
-  return nullptr;
+  return ObjCMethod();
 }
 
-const char *LoadedLibrary::getClassOfMethod(uint64_t Addr) {
+ObjCMethod LoadedLibrary::findMethod(uint64_t Addr) {
   // Enumerate classes in the image.
-  if (const char *R = getClassOfMethod("__objc_classlist", Addr))
-    return R;
+  if (ObjCMethod M = findMethod("__objc_classlist", Addr))
+    return M;
 
   // Try also non-lazy classes.
-  return getClassOfMethod("__objc_nlclslist", Addr);
-}
-
-const char *LoadedLibrary::getMethodType(uint64_t Addr) {
-  // Enumerate classes in the image.
-  size_t Count;
-  if (auto *Classes = getMachO().getSectionData<objc_class *>(
-          MachO::DataSegment, "__objc_classlist", &Count))
-    for (size_t I = 0; I != Count; ++I) {
-      // Enumerate methods of every class and its meta-class.
-      objc_class *Class = Classes[I];
-      if (const char *T = findMethod(Class, Addr))
-        return T;
-      if (const char *T = findMethod(Class->isa, Addr))
-        return T;
-    }
+  if (ObjCMethod M = findMethod("__objc_nlclslist", Addr))
+    return M;
 
   // Try also categories.
+  size_t Count;
   if (auto *Categories = getMachO().getSectionData<category_t *>(
           MachO::DataSegment, "__objc_catlist", &Count))
     for (size_t I = 0; I != Count; ++I) {
       // Enumerate methods of every category.
       category_t *Category = Categories[I];
-      if (const char *T = findMethod(Category->classMethods, Addr))
-        return T;
-      if (const char *T = findMethod(Category->instanceMethods, Addr))
-        return T;
+      if (method_t *M = findMethodImpl(Category->classMethods, Addr))
+        return ObjCMethod(M);
+      if (method_t *M = findMethodImpl(Category->instanceMethods, Addr))
+        return ObjCMethod(M);
     }
 
-  return nullptr;
+  return ObjCMethod();
 }
 
 bool LoadedLibrary::isInRange(uint64_t Addr) {

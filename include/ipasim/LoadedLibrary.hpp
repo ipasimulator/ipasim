@@ -3,6 +3,8 @@
 #ifndef IPASIM_LOADED_LIBRARY_HPP
 #define IPASIM_LOADED_LIBRARY_HPP
 
+#include "Logger.hpp"
+
 #include <LIEF/LIEF.hpp>
 #include <Windows.h>
 #include <cassert>
@@ -34,6 +36,38 @@ private:
   const void *Hdr;
 };
 
+class ObjCClass {
+public:
+  ObjCClass(void *Data) : Data(Data) {}
+
+  const char *getName();
+
+  operator bool() { return Data; }
+
+private:
+  void *Data;
+};
+
+class ObjCMethod {
+public:
+  ObjCMethod() : ClassData(nullptr), MethodData(nullptr) {}
+  ObjCMethod(void *MethodData) : MethodData(MethodData) {}
+  ObjCMethod(void *ClassData, void *MethodData)
+      : ClassData(ClassData), MethodData(MethodData) {}
+
+  ObjCClass getClass() { return ObjCClass(ClassData); }
+  const char *getName();
+  const char *getType();
+
+  operator bool() { return MethodData; }
+
+private:
+  void *ClassData;
+  void *MethodData;
+};
+
+DebugStream &operator<<(DebugStream &Str, ObjCMethod M);
+
 class DynamicLoader;
 
 class LoadedLibrary {
@@ -49,13 +83,12 @@ public:
   virtual bool hasUnderscorePrefix() = 0;
   bool isInRange(uint64_t Addr);
   void checkInRange(uint64_t Addr);
-  const char *getMethodType(uint64_t Addr);
-  const char *getClassOfMethod(uint64_t Addr);
+  ObjCMethod findMethod(uint64_t Addr);
   virtual bool hasMachO() = 0;
   virtual MachO getMachO() = 0;
 
 private:
-  const char *getClassOfMethod(const char *Section, uint64_t Addr);
+  ObjCMethod findMethod(const char *Section, uint64_t Addr);
 };
 
 class LoadedDylib : public LoadedLibrary {
