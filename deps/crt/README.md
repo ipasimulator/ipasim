@@ -9,7 +9,7 @@ Also make sure that `symchk.exe` from
 
 ## Getting DLLs and PDBs
 
-`ucrtbase.dll` was copied from `C:\Windows\System32\`. `ucrtbased.dll` was
+`ucrtbase.dll` was copied from `C:\Windows\SysWOW64\`. `ucrtbased.dll` was
 copied from
 `C:\Program Files (x86)\Microsoft SDKs\Windows Kits\10\ExtensionSDKs\Microsoft.UniversalCRT.Debug\10.0.17134.0\Redist\Debug\x86`.
 Their symbol files (`.pdb`s) were retrieved with `symchk`:
