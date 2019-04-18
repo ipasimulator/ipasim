@@ -1,0 +1,7 @@
+[ver:1,total:3035]
+scripts/crt.cmd:1558,1555581600:1184,1555585200:374,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1056,1555581600:382,1555585200:674,m
+src/crt/CMakeLists.txt:339,1555581600:339,r
+include/ipasim/HeadersAnalyzer/Config.hpp:47,1555578000:20,1555581600:15,1555585200:12,r
+src/crt/stubs.cpp:20,1555585200:20,r
+deps/crt/ucrtbased.def:15,1555581600:15,d
