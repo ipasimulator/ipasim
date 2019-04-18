@@ -2,3 +2,12 @@
 src/crt/CMakeLists.txt:164,1555574400:164,m
 scripts/crt.cmd:92,1555574400:92,m
 docs/git.md:30,1555574400:30,m
+
+[ver:1,total:1080]
+deps/crt/README.md:635,1555574400:635,m
+deps/crt/.gitignore:135,1555574400:135,m
+src/crt/CMakeLists.txt:115,1555574400:115,m
+deps/crt/ucrtbased.dll:60,1555574400:60,m
+docs/git.md:60,1555574400:60,m
+scripts/crt.cmd:60,1555574400:60,r
+src/crt/stubs.cpp:15,1555574400:15,r
