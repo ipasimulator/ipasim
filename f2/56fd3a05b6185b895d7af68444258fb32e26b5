@@ -1,2 +1,17 @@
 [ver:1,total:1020]
 include/ipasim/Logger.hpp:1020,1555660800:1020,m
+
+[ver:1,total:2394]
+include/ipasim/Logger.hpp:618,1555657200:20,1555660800:598,m
+include/ipasim/MachO.hpp:575,1555657200:249,1555660800:326,m
+src/IpaSimulator/LoadedLibrary.cpp:198,1555657200:117,1555660800:81,m
+cmake/ipasim-x86-Debug/cg/exports.txt:190,1555657200:190,r
+src/IpaSimulator/SysTranslator.cpp:186,1555660800:186,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:180,1555657200:180,r
+include/ipasim/LoadedLibrary.hpp:169,1555657200:139,1555660800:30,m
+src/MachO.cpp:133,1555657200:97,1555660800:36,m
+cmake/ipasim-x86-Release/cg/exports.txt:65,1555657200:65,r
+src/IpaSimulator/DynamicLoader.cpp:36,1555660800:36,m
+src/IpaSimulator/CMakeLists.txt:21,1555660800:21,m
+include/ipasim/DynamicLoader.hpp:15,1555657200:15,r
+src/MachOInitializer.cpp:8,1555657200:8,r
