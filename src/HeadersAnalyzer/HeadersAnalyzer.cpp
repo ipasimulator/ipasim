@@ -36,6 +36,7 @@
 #include <llvm/IR/Mangler.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/ValueSymbolTable.h>
+#include <llvm/ObjCMetadata/ObjCMachOBinary.h>
 #include <llvm/Object/COFF.h>
 #include <llvm/Object/ObjectFile.h>
 #include <llvm/Target/TargetMachine.h>
@@ -200,6 +201,58 @@ public:
           // Note that there can be aliases, so the current `ExportRVA` can
           // already be present in `Exports`, but that's OK.
           Exports.insert(ExportRVA);
+        }
+
+        // Release PDBs don't contain Objective-C methods, so we find them
+        // manually in the metadata.
+        std::set<uint32_t> ObjCMethods;
+        while (!Debug) {
+          const llvm::object::coff_section *MhdrSection;
+          if (error_code Error = COFF->getSection(".mhdr", MhdrSection)) {
+            Log.error(Error.message());
+            break;
+          }
+          uint32_t Offset = MhdrSection->PointerToRawData;
+          auto MB(llvm::MemoryBuffer::getFileSlice(
+              DLLPathStr, COFF->getMemoryBufferRef().getBufferSize(), Offset));
+          if (error_code Error = MB.getError()) {
+            Log.error(Error.message());
+            break;
+          }
+          auto MachO(llvm::object::ObjectFile::createMachOObjectFile(**MB));
+          if (!MachO) {
+            Log.error(toString(MachO.takeError()));
+            break;
+          }
+          llvm::MachOMetadata Meta(MachO->get());
+          auto Classes = Meta.classes();
+          if (!Classes) {
+            Log.error(toString(Classes.takeError()));
+            break;
+          }
+          for (llvm::ObjCClassRef ClassRef : *Classes) {
+            auto Class = ClassRef.getObjCClass();
+            if (!Class) {
+              Log.error(toString(Class.takeError()));
+              continue;
+            }
+            auto Methods = Class->instanceMethods();
+            if (!Methods) {
+              Log.error(toString(Class.takeError()));
+              continue;
+            }
+            for (llvm::ObjCMethod &Method : *Methods) {
+              auto Imp = Meta.getResolvedValueFromAddress32(
+                  Method.getRawContent().getValue() + 8);
+              if (!Imp) {
+                Log.error(toString(Imp.takeError()));
+                continue;
+              }
+              ObjCMethods.insert(*Imp);
+            }
+          }
+          // TODO: Discover more methods.
+          break;
         }
 
         // Analyze functions.
