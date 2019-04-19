@@ -1,2 +1,9 @@
 [ver:1,total:180]
 src/HeadersAnalyzer/HeadersAnalyzer.cpp:180,1555671600:180,m
+
+[ver:1,total:4340]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:3880,1555660800:40,1555664400:620,1555668000:1320,1555671600:1900,m
+src/MachO.cpp:200,1555660800:140,1555664400:60,r
+src/HeadersAnalyzer/LLDBHelper.cpp:180,1555664400:180,r
+include/ipasim/Logger.hpp:60,1555660800:60,r
+include/ipasim/LLDBHelper.hpp:20,1555664400:20,r
