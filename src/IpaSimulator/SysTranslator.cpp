@@ -172,7 +172,7 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
     if (Entry == Idx->Map.end()) {
       // If there's no corresponding wrapper, maybe this is a simple Objective-C
       // method and we can translate it dynamically.
-      if (ObjCMethod M = AI.Lib->findMethod(Addr)) {
+      if (ObjCMethod M = AI.Lib->getMachO().findMethod(Addr)) {
         Log.info() << "dynamically handling method "
                    << Dyld.dumpAddr(Addr, AI, M) << Log.end();
 
@@ -362,7 +362,7 @@ void *SysTranslator::translate(void *Addr) {
   if (auto *Dylib = dynamic_cast<LoadedDylib *>(AI.Lib)) {
     // The address points to Dylib.
 
-    if (ObjCMethod M = Dylib->findMethod(AddrVal)) {
+    if (ObjCMethod M = Dylib->getMachO().findMethod(AddrVal)) {
       // We have found metadata of the callback method. Now, for simple methods,
       // it's actually quite simple to translate i386 -> ARM calls dynamically,
       // so that's what we do here.

@@ -82,7 +82,24 @@ public:
 
 private:
   DerivedTy &d() { return *static_cast<DerivedTy *>(this); }
+
+  static constexpr bool IsIpasimStream = true;
+  friend struct is_stream;
 };
+
+// SFINAE magic
+struct is_stream {
+  struct a {};
+  struct b : a {};
+
+  template <typename> static constexpr bool getValue(a) { return false; }
+  template <typename StreamTy, bool Result = StreamTy::IsIpasimStream>
+  static constexpr bool getValue(b) {
+    return Result;
+  }
+};
+template <typename StreamTy>
+constexpr bool is_stream_v = is_stream::getValue<StreamTy>(is_stream::b());
 
 class DebugStream : public Stream<DebugStream> {
 public:

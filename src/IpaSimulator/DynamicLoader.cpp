@@ -388,7 +388,7 @@ DebugStream::Handler DynamicLoader::dumpAddr(uint64_t Addr,
   return [this, Addr, &AI](DebugStream &S) {
     if (!AI.Lib)
       S << "0x" << to_hex_string(Addr);
-    else if (ObjCMethod M = AI.Lib->findMethod(Addr))
+    else if (ObjCMethod M = AI.Lib->getMachO().findMethod(Addr))
       S << dumpAddr(Addr, AI, M);
     else
       S << dumpAddrImpl(Addr, AI);

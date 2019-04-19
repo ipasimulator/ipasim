@@ -3,70 +3,14 @@
 #ifndef IPASIM_LOADED_LIBRARY_HPP
 #define IPASIM_LOADED_LIBRARY_HPP
 
-#include "Logger.hpp"
+#include "ipasim/Logger.hpp"
+#include "ipasim/MachO.hpp"
 
 #include <LIEF/LIEF.hpp>
 #include <Windows.h>
 #include <cassert>
 
 namespace ipasim {
-
-class MachO {
-public:
-  MachO(const void *Hdr) : Hdr(Hdr) {}
-
-  static constexpr const char *DataSegment = "__DATA";
-
-  template <typename T>
-  const T *getSectionData(const char *SegName, const char *SectName,
-                          size_t *Count = nullptr) {
-    if (!Count)
-      return reinterpret_cast<const T *>(getSection(SegName, SectName));
-
-    uint64_t Size;
-    auto *Result =
-        reinterpret_cast<const T *>(getSection(SegName, SectName, &Size));
-    *Count = Size / sizeof(T);
-    return Result;
-  }
-  uint64_t getSection(const char *SegName, const char *SectName,
-                      uint64_t *Size = nullptr);
-
-private:
-  const void *Hdr;
-};
-
-class ObjCClass {
-public:
-  ObjCClass(void *Data) : Data(Data) {}
-
-  const char *getName();
-
-  operator bool() { return Data; }
-
-private:
-  void *Data;
-};
-
-class ObjCMethod {
-public:
-  ObjCMethod() : ClassData(nullptr), MethodData(nullptr) {}
-  ObjCMethod(void *MethodData) : MethodData(MethodData) {}
-  ObjCMethod(void *ClassData, void *MethodData)
-      : ClassData(ClassData), MethodData(MethodData) {}
-
-  ObjCClass getClass() { return ObjCClass(ClassData); }
-  const char *getName();
-  const char *getType();
-
-  operator bool() { return MethodData; }
-
-private:
-  void *ClassData;
-  void *MethodData;
-};
-
-DebugStream &operator<<(DebugStream &Str, ObjCMethod M);
 
 class DynamicLoader;
 
@@ -83,12 +27,8 @@ public:
   virtual bool hasUnderscorePrefix() = 0;
   bool isInRange(uint64_t Addr);
   void checkInRange(uint64_t Addr);
-  ObjCMethod findMethod(uint64_t Addr);
   virtual bool hasMachO() = 0;
   virtual MachO getMachO() = 0;
-
-private:
-  ObjCMethod findMethod(const char *Section, uint64_t Addr);
 };
 
 class LoadedDylib : public LoadedLibrary {
