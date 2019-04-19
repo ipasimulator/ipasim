@@ -1,0 +1,5 @@
+[ver:1,total:840]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:300,1555606800:240,1555657200:60,m
+src/IpaSimulator/SysTranslator.cpp:180,1555603200:180,r
+src/HeadersAnalyzer/CMakeLists.txt:180,1555606800:180,r
+cmake/ipasim-x86-Release/cg/exports.txt:180,1555606800:180,r
