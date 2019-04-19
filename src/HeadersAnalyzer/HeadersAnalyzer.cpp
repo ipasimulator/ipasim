@@ -96,18 +96,17 @@ public:
 
     // Note that groups must be added just once and together because references
     // to them are invalidated after that.
-    HAC.DLLGroups.push_back({"./deps/crt/"});
+    HAC.DLLGroups.push_back({BuildDir / "bin/"});
     if constexpr (!Sample) {
       HAC.DLLGroups.push_back({BuildDir / "bin/Frameworks/"});
-      HAC.DLLGroups.push_back({BuildDir / "bin/"});
       HAC.DLLGroups.push_back(
           {"./deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/"});
+      HAC.DLLGroups.push_back({"./deps/crt/"});
     }
     size_t I = 0;
 
-    // C runtime
-    HAC.DLLGroups[I++].DLLs.push_back(
-        DLLEntry(Debug ? "ucrtbased.dll" : "ucrtbase.dll"));
+    // Our Objective-C runtime
+    HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("libobjc.dll"));
 
     if constexpr (!Sample) {
       // WinObjC DLLs (i.e., Windows versions of Apple's frameworks)
@@ -123,11 +122,12 @@ public:
         }
       }
 
-      // Our Objective-C runtime
-      HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("libobjc.dll"));
-
       // Prebuilt `libdispatch.dll`
       HAC.DLLGroups[I++].DLLs.push_back(DLLEntry("libdispatch.dll"));
+
+      // C runtime
+      HAC.DLLGroups[I++].DLLs.push_back(
+          DLLEntry(Debug ? "ucrtbased.dll" : "ucrtbase.dll"));
     }
   }
   void parseAppleHeaders() {
