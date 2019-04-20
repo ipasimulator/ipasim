@@ -30,6 +30,8 @@ private:
 
   void discoverMethods();
   template <typename ListTy> void findMethods(llvm::Expected<ListTy> &&List);
+  template <typename ElementTy>
+  void registerOptionalMethods(const ElementTy &Element);
   void registerMethods(llvm::Expected<llvm::ObjCMethodList> &&Methods);
 };
 

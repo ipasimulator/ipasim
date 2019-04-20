@@ -45,7 +45,7 @@ void ObjCMethodScout::discoverMethods() {
 }
 
 template <typename ListTy>
-void ObjCMethodScout::findMethods(llvm::Expected<ListTy> &&List) {
+void ObjCMethodScout::findMethods(Expected<ListTy> &&List) {
   if (!List) {
     Log.error(toString(List.takeError()));
     return;
@@ -58,7 +58,17 @@ void ObjCMethodScout::findMethods(llvm::Expected<ListTy> &&List) {
     }
     registerMethods(Element->instanceMethods());
     registerMethods(Element->classMethods());
+    registerOptionalMethods(*Element);
   }
+}
+
+template <typename ElementTy>
+void ObjCMethodScout::registerOptionalMethods(const ElementTy &) {}
+template <>
+void ObjCMethodScout::registerOptionalMethods<ObjCProtocol>(
+    const ObjCProtocol &Protocol) {
+  registerMethods(Protocol.optionalInstanceMethods());
+  registerMethods(Protocol.optionalClassMethods());
 }
 
 void ObjCMethodScout::registerMethods(Expected<ObjCMethodList> &&Methods) {
