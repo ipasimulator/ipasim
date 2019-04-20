@@ -64,6 +64,9 @@ public:
       : BuildDir(move(BuildDir)), Debug(Debug), LLVM(LLVMInit) {}
 
   void discoverTBDs() {
+    if constexpr (Sample)
+      return;
+
     Log.info("discovering TBDs");
 
     TBDHandler TH(HAC);
@@ -227,6 +230,7 @@ public:
             break;
           }
           llvm::MachOMetadata Meta(MachO->get());
+          Meta.forceObjC2(true);
           auto Classes = Meta.classes();
           if (!Classes) {
             Log.error(toString(Classes.takeError()));
@@ -240,7 +244,7 @@ public:
             }
             auto Methods = Class->instanceMethods();
             if (!Methods) {
-              Log.error(toString(Class.takeError()));
+              Log.error(toString(Methods.takeError()));
               continue;
             }
             for (llvm::ObjCMethod &Method : *Methods) {

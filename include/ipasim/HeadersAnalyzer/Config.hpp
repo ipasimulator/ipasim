@@ -13,7 +13,7 @@ constexpr ipasim::LibType ErrorUnimplementedFunctions = ipasim::LibType::None;
 constexpr ipasim::LibType SumUnimplementedFunctions = ipasim::LibType::Both;
 constexpr bool VerboseClang = false;
 constexpr bool IgnoreErrors = false;
-constexpr bool Sample = false;
+constexpr bool Sample = true;
 // TODO: Fix `TypeComparer` and then turn this on.
 constexpr bool CompareTypes = false;
 
