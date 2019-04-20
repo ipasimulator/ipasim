@@ -3,8 +3,8 @@ set (SOURCE_FILES
     Emulator.cpp
     IpaSimulator.cpp
     LoadedLibrary.cpp
-    SysTranslator.cpp
-    ../MachO.cpp)
+    MachO.cpp
+    SysTranslator.cpp)
 
 add_library (IpaSimLibrary SHARED ${SOURCE_FILES})
 add_prep_dep (IpaSimLibrary)
