@@ -83,6 +83,7 @@ void ObjCMethodScout::registerMethods(Expected<ObjCMethodList> &&Methods) {
       Log.error(toString(Imp.takeError()));
       continue;
     }
-    RVAs.insert(*Imp - COFF->getImageBase());
+    if (*Imp)
+      RVAs.insert(*Imp - COFF->getImageBase());
   }
 }
