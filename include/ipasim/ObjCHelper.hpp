@@ -29,6 +29,7 @@ private:
         Meta(this->MachO.get()) {}
 
   void discoverMethods();
+  template <typename ListTy> void findMethods(llvm::Expected<ListTy> &&List);
   void registerMethods(llvm::Expected<llvm::ObjCMethodList> &&Methods);
 };
 

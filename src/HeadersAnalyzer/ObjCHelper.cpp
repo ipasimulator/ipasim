@@ -39,20 +39,26 @@ set<uint32_t> ObjCMethodScout::discoverMethods(const string &DLLPath,
 
 void ObjCMethodScout::discoverMethods() {
   Meta.forceObjC2(true);
-  auto Classes = Meta.classes();
-  if (!Classes) {
-    Log.error(toString(Classes.takeError()));
+  findMethods(Meta.classes());
+  findMethods(Meta.categories());
+  findMethods(Meta.protocols());
+}
+
+template <typename ListTy>
+void ObjCMethodScout::findMethods(llvm::Expected<ListTy> &&List) {
+  if (!List) {
+    Log.error(toString(List.takeError()));
     return;
   }
-  for (ObjCClassRef ClassRef : *Classes) {
-    auto Class = ClassRef.getObjCClass();
-    if (!Class) {
-      Log.error(toString(Class.takeError()));
+  for (auto Ref : *List) {
+    auto Element = *Ref;
+    if (!Element) {
+      Log.error(toString(Element.takeError()));
       continue;
     }
-    registerMethods(Class->instanceMethods());
+    registerMethods(Element->instanceMethods());
+    registerMethods(Element->classMethods());
   }
-  // TODO: Discover more methods.
 }
 
 void ObjCMethodScout::registerMethods(Expected<ObjCMethodList> &&Methods) {
