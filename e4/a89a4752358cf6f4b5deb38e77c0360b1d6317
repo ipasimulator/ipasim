@@ -1,0 +1,4 @@
+[ver:1,total:240]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:120,1555783200:120,r
+src/HeadersAnalyzer/ObjCHelper.cpp:90,1555783200:90,m
+include/ipasim/ObjCHelper.hpp:30,1555783200:30,r
