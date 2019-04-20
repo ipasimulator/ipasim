@@ -214,12 +214,14 @@ public:
           }
           uint32_t Offset = MhdrSection->PointerToRawData;
           auto MB(llvm::MemoryBuffer::getFileSlice(
-              DLLPathStr, COFF->getMemoryBufferRef().getBufferSize(), Offset));
+              DLLPathStr, COFF->getMemoryBufferRef().getBufferSize() - Offset,
+              Offset));
           if (error_code Error = MB.getError()) {
             Log.error(Error.message());
             break;
           }
-          auto MachO(llvm::object::ObjectFile::createMachOObjectFile(**MB));
+          auto MachO(llvm::object::ObjectFile::createMachOObjectFile(
+              **MB, /* MachOPoser */ true));
           if (!MachO) {
             Log.error(toString(MachO.takeError()));
             break;
