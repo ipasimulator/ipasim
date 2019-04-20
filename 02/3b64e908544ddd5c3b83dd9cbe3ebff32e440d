@@ -1,0 +1,4 @@
+[ver:1,total:1226]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:600,1555765200:480,1555768800:120,m
+include/ipasim/HeadersAnalyzer/Config.hpp:386,1555657200:360,1555660800:6,1555754400:20,m
+src/HeadersAnalyzer/iOSHeaders.mm:240,1555765200:180,1555768800:60,m
