@@ -209,57 +209,8 @@ public:
         // Release PDBs don't contain Objective-C methods, so we find them
         // manually in the metadata.
         std::set<uint32_t> ObjCMethods;
-        while (!Debug) {
-          const llvm::object::coff_section *MhdrSection;
-          if (error_code Error = COFF->getSection(".mhdr", MhdrSection)) {
-            Log.error(Error.message());
-            break;
-          }
-          uint32_t Offset = MhdrSection->PointerToRawData;
-          auto MB(llvm::MemoryBuffer::getFileSlice(
-              DLLPathStr, COFF->getMemoryBufferRef().getBufferSize() - Offset,
-              Offset));
-          if (error_code Error = MB.getError()) {
-            Log.error(Error.message());
-            break;
-          }
-          auto MachO(llvm::object::ObjectFile::createMachOObjectFile(
-              **MB, /* MachOPoser */ true));
-          if (!MachO) {
-            Log.error(toString(MachO.takeError()));
-            break;
-          }
-          llvm::MachOMetadata Meta(MachO->get());
-          Meta.forceObjC2(true);
-          auto Classes = Meta.classes();
-          if (!Classes) {
-            Log.error(toString(Classes.takeError()));
-            break;
-          }
-          for (llvm::ObjCClassRef ClassRef : *Classes) {
-            auto Class = ClassRef.getObjCClass();
-            if (!Class) {
-              Log.error(toString(Class.takeError()));
-              continue;
-            }
-            auto Methods = Class->instanceMethods();
-            if (!Methods) {
-              Log.error(toString(Methods.takeError()));
-              continue;
-            }
-            for (llvm::ObjCMethod &Method : *Methods) {
-              auto Imp = Meta.getResolvedValueFromAddress32(
-                  Method.getRawContent().getValue() + 8);
-              if (!Imp) {
-                Log.error(toString(Imp.takeError()));
-                continue;
-              }
-              ObjCMethods.insert(*Imp);
-            }
-          }
-          // TODO: Discover more methods.
-          break;
-        }
+        if (!Debug)
+          discoverObjCMethods(DLLPathStr, COFF, ObjCMethods);
 
         // Analyze functions.
         auto Analyzer = [&, DLL = ref(DLL), GroupIdx = GroupIdx,
@@ -912,6 +863,57 @@ private:
   void createAlias(const ExportEntry &Exp, llvm::Function *Func) {
     llvm::StringRef RVAStr = LLVM.Saver.save(to_string(Exp.RVA));
     llvm::GlobalAlias::create(Twine("\01$__ipaSim_wraps_") + RVAStr, Func);
+  }
+  void discoverObjCMethods(const string &DLLPath,
+                           llvm::object::COFFObjectFile *COFF,
+                           set<uint32_t> &RVAs) {
+    const llvm::object::coff_section *MhdrSection;
+    if (error_code Error = COFF->getSection(".mhdr", MhdrSection)) {
+      Log.error(Error.message());
+      return;
+    }
+    uint32_t Offset = MhdrSection->PointerToRawData;
+    auto MB(llvm::MemoryBuffer::getFileSlice(
+        DLLPath, COFF->getMemoryBufferRef().getBufferSize() - Offset, Offset));
+    if (error_code Error = MB.getError()) {
+      Log.error(Error.message());
+      return;
+    }
+    auto MachO(llvm::object::ObjectFile::createMachOObjectFile(
+        **MB, /* MachOPoser */ true));
+    if (!MachO) {
+      Log.error(toString(MachO.takeError()));
+      return;
+    }
+    llvm::MachOMetadata Meta(MachO->get());
+    Meta.forceObjC2(true);
+    auto Classes = Meta.classes();
+    if (!Classes) {
+      Log.error(toString(Classes.takeError()));
+      return;
+    }
+    for (llvm::ObjCClassRef ClassRef : *Classes) {
+      auto Class = ClassRef.getObjCClass();
+      if (!Class) {
+        Log.error(toString(Class.takeError()));
+        continue;
+      }
+      auto Methods = Class->instanceMethods();
+      if (!Methods) {
+        Log.error(toString(Methods.takeError()));
+        continue;
+      }
+      for (llvm::ObjCMethod &Method : *Methods) {
+        auto Imp = Meta.getResolvedValueFromAddress32(
+            Method.getRawContent().getValue() + 8);
+        if (!Imp) {
+          Log.error(toString(Imp.takeError()));
+          continue;
+        }
+        RVAs.insert(*Imp - COFF->getImageBase());
+      }
+    }
+    // TODO: Discover more methods.
   }
 };
 
