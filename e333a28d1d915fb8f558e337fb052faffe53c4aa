@@ -1,0 +1,11 @@
+[ver:1,total:2580]
+include/ipasim/ObjCHelper.hpp:1073,1555772400:336,1555779600:147,1555783200:590,m
+src/HeadersAnalyzer/ObjCHelper.cpp:1024,1555772400:54,1555779600:292,1555783200:678,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:304,1555772400:120,1555779600:100,1555783200:84,m
+src/IpaSimulator/MachO.cpp:60,1555772400:60,r
+include/ipasim/LLVMHelper.hpp:50,1555772400:30,1555783200:20,r
+src/HeadersAnalyzer/CMakeLists.txt:23,1555779600:15,1555783200:8,m
+include/ipasim/HAContext.hpp:17,1555779600:17,r
+src/HeadersAnalyzer/HAContext.cpp:15,1555779600:15,r
+src/IpaSimulator/IpaSimulator.cpp:7,1555779600:7,r
+src/HeadersAnalyzer/ErrorReporting.cpp:7,1555779600:7,r
