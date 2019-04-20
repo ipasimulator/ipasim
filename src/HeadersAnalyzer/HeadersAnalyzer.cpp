@@ -6,6 +6,7 @@
 #include "ipasim/LLDBHelper.hpp"
 #include "ipasim/LLDHelper.hpp"
 #include "ipasim/LLVMHelper.hpp"
+#include "ipasim/ObjCHelper.hpp"
 #include "ipasim/TapiHelper.hpp"
 
 #include <CodeGen/CodeGenModule.h>
@@ -36,7 +37,6 @@
 #include <llvm/IR/Mangler.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/ValueSymbolTable.h>
-#include <llvm/ObjCMetadata/ObjCMachOBinary.h>
 #include <llvm/Object/COFF.h>
 #include <llvm/Object/ObjectFile.h>
 #include <llvm/Target/TargetMachine.h>
@@ -193,7 +193,7 @@ public:
         }
 
         // Discover exports.
-        std::set<uint32_t> Exports;
+        set<uint32_t> Exports;
         for (auto &Export : COFF->export_directories()) {
           uint32_t ExportRVA;
           if (error_code Error = Export.getExportRVA(ExportRVA)) {
@@ -208,9 +208,8 @@ public:
 
         // Release PDBs don't contain Objective-C methods, so we find them
         // manually in the metadata.
-        std::set<uint32_t> ObjCMethods;
-        if (!Debug)
-          discoverObjCMethods(DLLPathStr, COFF, ObjCMethods);
+        set<uint32_t> ObjCMethods(
+            ObjCMethodScout::discoverMethods(DLLPathStr, COFF));
 
         // Analyze functions.
         auto Analyzer = [&, DLL = ref(DLL), GroupIdx = GroupIdx,
@@ -863,57 +862,6 @@ private:
   void createAlias(const ExportEntry &Exp, llvm::Function *Func) {
     llvm::StringRef RVAStr = LLVM.Saver.save(to_string(Exp.RVA));
     llvm::GlobalAlias::create(Twine("\01$__ipaSim_wraps_") + RVAStr, Func);
-  }
-  void discoverObjCMethods(const string &DLLPath,
-                           llvm::object::COFFObjectFile *COFF,
-                           set<uint32_t> &RVAs) {
-    const llvm::object::coff_section *MhdrSection;
-    if (error_code Error = COFF->getSection(".mhdr", MhdrSection)) {
-      Log.error(Error.message());
-      return;
-    }
-    uint32_t Offset = MhdrSection->PointerToRawData;
-    auto MB(llvm::MemoryBuffer::getFileSlice(
-        DLLPath, COFF->getMemoryBufferRef().getBufferSize() - Offset, Offset));
-    if (error_code Error = MB.getError()) {
-      Log.error(Error.message());
-      return;
-    }
-    auto MachO(llvm::object::ObjectFile::createMachOObjectFile(
-        **MB, /* MachOPoser */ true));
-    if (!MachO) {
-      Log.error(toString(MachO.takeError()));
-      return;
-    }
-    llvm::MachOMetadata Meta(MachO->get());
-    Meta.forceObjC2(true);
-    auto Classes = Meta.classes();
-    if (!Classes) {
-      Log.error(toString(Classes.takeError()));
-      return;
-    }
-    for (llvm::ObjCClassRef ClassRef : *Classes) {
-      auto Class = ClassRef.getObjCClass();
-      if (!Class) {
-        Log.error(toString(Class.takeError()));
-        continue;
-      }
-      auto Methods = Class->instanceMethods();
-      if (!Methods) {
-        Log.error(toString(Methods.takeError()));
-        continue;
-      }
-      for (llvm::ObjCMethod &Method : *Methods) {
-        auto Imp = Meta.getResolvedValueFromAddress32(
-            Method.getRawContent().getValue() + 8);
-        if (!Imp) {
-          Log.error(toString(Imp.takeError()));
-          continue;
-        }
-        RVAs.insert(*Imp - COFF->getImageBase());
-      }
-    }
-    // TODO: Discover more methods.
   }
 };
 

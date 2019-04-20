@@ -421,6 +421,7 @@ set (SOURCE_FILES
     LLDBHelper.cpp
     LLDHelper.cpp
     LLVMHelper.cpp
+    ObjCHelper.cpp
     TapiHelper.cpp)
 
 add_executable (HeadersAnalyzer ${SOURCE_FILES})
