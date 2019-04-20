@@ -20,7 +20,7 @@ uint64_t MachO::getSection(const char *SegName, const char *SectName,
   auto HdrAddr = reinterpret_cast<uint64_t>(Hdr);
   auto *Header = reinterpret_cast<const mach_header *>(Hdr);
   auto *Cmd = reinterpret_cast<const load_command *>(Header + 1);
-  for (size_t I = 0; I != Header->ncmds; ++I) {
+  for (size_t I = 0, IEnd = Header->ncmds; I != IEnd; ++I) {
     if (Cmd->cmd == LC_SEGMENT) {
       auto *Seg = reinterpret_cast<const segment_command *>(Cmd);
 
@@ -35,9 +35,9 @@ uint64_t MachO::getSection(const char *SegName, const char *SectName,
 
       // Enumerate segment's sections.
       if (!HasAddr && !strncmp(Seg->segname, SegName, sizeof(Seg->segname))) {
-        auto *Sect = reinterpret_cast<const section *>(bytes(Cmd) +
-                                                       sizeof(segment_command));
-        for (auto *EndSect = Sect + Seg->nsects; Sect != EndSect; ++Sect)
+        for (auto *Sect = reinterpret_cast<const section *>(Cmd + 1),
+                  *EndSect = Sect + Seg->nsects;
+             Sect != EndSect; ++Sect)
           if (!strncmp(Sect->sectname, SectName, sizeof(Sect->sectname)) &&
               !strncmp(Sect->segname, SegName, sizeof(Sect->segname))) {
             // We have found it.
