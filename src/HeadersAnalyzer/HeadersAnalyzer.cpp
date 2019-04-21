@@ -56,8 +56,9 @@ namespace {
 // assembly-implemented functions.
 class HeadersAnalyzer {
 public:
-  HeadersAnalyzer(path BuildDir, bool Debug)
-      : BuildDir(move(BuildDir)), Debug(Debug), LLVM(LLVMInit) {}
+  HeadersAnalyzer(path BuildDir, bool Debug) : Debug(Debug), LLVM(LLVMInit) {
+    DC.BuildDir = move(BuildDir);
+  }
 
   void discoverTBDs() {
     Log.info("discovering TBDs");
@@ -93,9 +94,9 @@ public:
 
     // Note that groups must be added just once and together because references
     // to them are invalidated after that.
-    HAC.DLLGroups.push_back({BuildDir / "bin/"});
+    HAC.DLLGroups.push_back({DC.BuildDir / "bin/"});
     if constexpr (!Sample) {
-      HAC.DLLGroups.push_back({BuildDir / "bin/Frameworks/"});
+      HAC.DLLGroups.push_back({DC.BuildDir / "bin/Frameworks/"});
       HAC.DLLGroups.push_back(
           {"./deps/WinObjC/tools/deps/prebuilt/Universal Windows/x86/"});
       HAC.DLLGroups.push_back({"./deps/crt/"});
@@ -146,7 +147,7 @@ public:
     Log.info("loading DLLs");
 
     LLDBHelper LLDB;
-    ClangHelper Clang(BuildDir, LLVM);
+    ClangHelper Clang(DC.BuildDir, LLVM);
 
     // Create `clang::CodeGen::CodeGenModule` needed in our `TypeComparer`.
     Clang.Args.add("-target");
@@ -163,15 +164,14 @@ public:
     DLLHelper::forEach(HAC, LLVM, &DLLHelper::load, LLDB, Clang, CGM.get());
   }
   void createDirs() {
-    OutputDir = createOutputDir((BuildDir / "cg/").string().c_str());
-    GenDir = createOutputDir((BuildDir / "gen/").string().c_str());
+    DC.OutputDir = createOutputDir((DC.BuildDir / "cg/").string().c_str());
+    DC.GenDir = createOutputDir((DC.BuildDir / "gen/").string().c_str());
   }
   void generateDLLs() {
     Log.info("generating DLLs");
 
     // Generate DLL wrappers and also stub Dylibs for them.
-    DLLHelper::forEach(HAC, LLVM, &DLLHelper::generate, OutputDir, GenDir,
-                       BuildDir, Debug);
+    DLLHelper::forEach(HAC, LLVM, &DLLHelper::generate, DC, Debug);
   }
   void generateDylibs() {
     Log.info("generating Dylibs");
@@ -339,16 +339,16 @@ public:
       }
 
       // Emit `.o` file.
-      string ObjectFile((OutputDir / (LibNo + ".o")).string());
-      IR.emitObj(BuildDir, ObjectFile);
+      string ObjectFile((DC.OutputDir / (LibNo + ".o")).string());
+      IR.emitObj(DC.BuildDir, ObjectFile);
 
       // We add `./` to the library name to convert it to a relative path.
-      path DylibPath(GenDir / ("./" + Lib.Name));
+      path DylibPath(DC.GenDir / ("./" + Lib.Name));
 
       // Initialize LLD args to create the Dylib.
-      LLDHelper LLD(BuildDir, LLVM);
+      LLDHelper LLD(DC.BuildDir, LLVM);
       LLD.addDylibArgs(DylibPath.string(), ObjectFile, Lib.Name);
-      LLD.Args.add(("-L" + OutputDir.string()).c_str());
+      LLD.Args.add(("-L" + DC.OutputDir.string()).c_str());
 
       // Add DLLs to link.
       {
@@ -384,7 +384,7 @@ public:
                     << Unimplemented << ")" << Log.end();
   }
   void writeReport() {
-    if (auto OS = createOutputFile((OutputDir / "exports.txt").string()))
+    if (auto OS = createOutputFile((DC.OutputDir / "exports.txt").string()))
       for (const ExportEntry &Exp : HAC.iOSExps)
         if (Exp.Status == ExportStatus::FoundInDLL)
           *OS << Exp.Name << '\n';
@@ -394,7 +394,7 @@ private:
   HAContext HAC;
   LLVMInitializer LLVMInit;
   LLVMHelper LLVM;
-  path BuildDir, OutputDir, GenDir;
+  DirContext DC;
   bool Debug;
 
   void analyzeAppleFunction(const llvm::Function &Func) {
@@ -428,7 +428,7 @@ private:
     Exp->setType(Type);
   }
   void compileAppleHeaders() {
-    ClangHelper Clang(BuildDir, LLVM);
+    ClangHelper Clang(DC.BuildDir, LLVM);
     Clang.Args.loadConfigFile("./src/HeadersAnalyzer/analyze_ios_headers.cfg");
     if constexpr (Sample)
       Clang.Args.add("-DIPASIM_CG_SAMPLE");

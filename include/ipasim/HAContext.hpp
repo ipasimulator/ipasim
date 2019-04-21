@@ -169,6 +169,12 @@ public:
   };
 };
 
+struct DirContext {
+  std::filesystem::path OutputDir;
+  std::filesystem::path GenDir;
+  std::filesystem::path BuildDir;
+};
+
 // =============================================================================
 // Iterators
 // =============================================================================

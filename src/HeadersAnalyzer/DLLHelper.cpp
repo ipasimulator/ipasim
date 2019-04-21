@@ -110,8 +110,7 @@ void DLLHelper::load(LLDBHelper &LLDB, ClangHelper &Clang, CodeGenModule *CGM) {
     Analyzer(Func, /* IgnoreDuplicates */ true);
 }
 
-void DLLHelper::generate(const path &OutputDir, const path &GenDir,
-                         const path &BuildDir, bool Debug) {
+void DLLHelper::generate(const DirContext &DC, bool Debug) {
   IRHelper IR(LLVM, DLL.Name, DLLPath.string(), IRHelper::Windows32);
   IRHelper DylibIR(LLVM, DLL.Name, DLLPath.string(), IRHelper::Apple);
 
@@ -257,7 +256,8 @@ void DLLHelper::generate(const path &OutputDir, const path &GenDir,
   }
 
   // Generate `WrapperIndex`.
-  string IndexFile((OutputDir / DLL.Name).replace_extension(".cpp").string());
+  string IndexFile(
+      (DC.OutputDir / DLL.Name).replace_extension(".cpp").string());
   {
     ofstream OS;
     OS.open(IndexFile, ios_base::out | ios_base::trunc);
@@ -294,16 +294,17 @@ void DLLHelper::generate(const path &OutputDir, const path &GenDir,
   }
 
   // Emit `.obj` file.
-  string ObjectFile((OutputDir / DLL.Name).replace_extension(".obj").string());
-  IR.emitObj(BuildDir, ObjectFile);
+  string ObjectFile(
+      (DC.OutputDir / DLL.Name).replace_extension(".obj").string());
+  IR.emitObj(DC.BuildDir, ObjectFile);
 
   // Create the wrapper DLL.
   {
-    ClangHelper Clang(BuildDir, LLVM);
+    ClangHelper Clang(DC.BuildDir, LLVM);
     // See #24.
     if (DLL.Name == (Debug ? "ucrtbased.dll" : "ucrtbase.dll"))
       Clang.Args.add(
-          (BuildDir / "src/crt/CMakeFiles/crtstubs.dir/stubs.cpp.obj")
+          (DC.BuildDir / "src/crt/CMakeFiles/crtstubs.dir/stubs.cpp.obj")
               .string()
               .c_str());
 
@@ -311,20 +312,20 @@ void DLLHelper::generate(const path &OutputDir, const path &GenDir,
     Clang.Args.add(IndexFile.c_str());
 
     Clang.linkDLL(
-        (GenDir / DLL.Name).replace_extension(".wrapper.dll").string(),
+        (DC.GenDir / DLL.Name).replace_extension(".wrapper.dll").string(),
         ObjectFile, path(DLLPath).replace_extension(".dll.a").string(), Debug);
   }
 
   // Emit `.o` file.
   string DylibObjectFile(
-      (OutputDir / DLL.Name).replace_extension(".o").string());
-  DylibIR.emitObj(BuildDir, DylibObjectFile);
+      (DC.OutputDir / DLL.Name).replace_extension(".o").string());
+  DylibIR.emitObj(DC.BuildDir, DylibObjectFile);
 
   // Create the stub Dylib.
   {
-    LLDHelper LLD(BuildDir, LLVM);
+    LLDHelper LLD(DC.BuildDir, LLVM);
     LLD.linkDylib(
-        (OutputDir / ("lib" + DLL.Name))
+        (DC.OutputDir / ("lib" + DLL.Name))
             .replace_extension(".dll.dylib")
             .string(),
         DylibObjectFile,
