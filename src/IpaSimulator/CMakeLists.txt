@@ -88,4 +88,4 @@ target_link_libraries (IpaSimLibrary PRIVATE WindowsApp.lib unicorn LIEF ffi)
 
 # TODO: Actually build AppX with this target.
 add_custom_target (IpaSimApp)
-add_dependencies (IpaSimApp IpaSimLibrary CodeGen Frameworks)
+add_dependencies (IpaSimApp IpaSimLibrary CodeGenRelease Frameworks)

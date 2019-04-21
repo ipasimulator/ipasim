@@ -478,6 +478,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         WORKING_DIRECTORY "${SOURCE_DIR}"
         USES_TERMINAL
         DEPENDS prep-CodeGenRelease)
+else ()
+    add_custom_target (CodeGenRelease DEPENDS CodeGen)
 endif ()
 
 # TODO: Clear the output directory `gen` before emitting binaries.
