@@ -1,0 +1,5 @@
+[ver:1,total:240]
+src/IpaSimulator/CMakeLists.txt:120,1555833600:120,m
+src/HeadersAnalyzer/CMakeLists.txt:60,1555833600:60,m
+include/ipasim/HeadersAnalyzer/Config.hpp:30,1555833600:30,r
+CMakeLists.txt:30,1555833600:30,r
