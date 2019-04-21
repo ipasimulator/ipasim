@@ -87,4 +87,12 @@ OBJC_EXPORT void _objc_msgNil_stret(void /* id self, SEL op, ... */);
 OBJC_EXPORT void _objc_msgNil_fpret(void /* id self, SEL op, ... */);
 OBJC_EXPORT void objc_msgLookupSuper(void);
 OBJC_EXPORT void objc_msgLookupSuper_stret(void);
+
+// These are also not available in any header.
+
+// From `deps/WinObjC/deps/3rdparty/libdispatch/src/benchmark.c`
+extern "C" {
+uint64_t dispatch_benchmark(size_t count, void (^block)(void));
+uint64_t dispatch_benchmark_f(size_t count, void *ctxt, void (*func)(void *));
+}
 #endif
