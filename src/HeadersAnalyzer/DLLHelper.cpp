@@ -294,7 +294,8 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
     // Fill the index.
     for (const ExportEntry &Exp : deref(DLL.Exports))
       if (Exp.Dylib)
-        OS << "MAP(" << Exp.RVA << ", " << Dylibs[Exp.Dylib] << ");\n";
+        OS << "MAP(0x" << std::hex << Exp.RVA << ", " << Dylibs[Exp.Dylib]
+           << ");\n";
 
     OS << "END\n";
     OS.flush();
