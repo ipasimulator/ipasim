@@ -8,12 +8,16 @@
 
 #include <cstdint>
 
+#ifndef IPASIM_DEBUG
+#define IPASIM_DEBUG 0
+#endif
+
 constexpr ipasim::LibType WarnUninterestingFunctions = ipasim::LibType::None;
 constexpr ipasim::LibType ErrorUnimplementedFunctions = ipasim::LibType::None;
 constexpr ipasim::LibType SumUnimplementedFunctions = ipasim::LibType::Both;
 constexpr bool VerboseClang = false;
 constexpr bool IgnoreErrors = false;
-constexpr bool Sample = true;
+constexpr bool Sample = IPASIM_DEBUG && true;
 // TODO: Fix `TypeComparer` and then turn this on.
 constexpr bool CompareTypes = false;
 

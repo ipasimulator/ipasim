@@ -430,7 +430,9 @@ add_prep_dep (HeadersAnalyzer) # TODO: Use original Clang for CodeGen.
 
 target_compile_options (HeadersAnalyzer PRIVATE -std=c++17)
 
-target_compile_definitions (HeadersAnalyzer PRIVATE IPASIM_NO_WINDOWS_ERRORS)
+target_compile_definitions (HeadersAnalyzer PRIVATE
+    IPASIM_NO_WINDOWS_ERRORS
+    $<$<CONFIG:Debug>:IPASIM_DEBUG=1>)
 
 target_include_directories (HeadersAnalyzer PRIVATE
     "${SOURCE_DIR}/include"
