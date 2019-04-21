@@ -1,3 +1,7 @@
 [ver:1,total:410]
 src/HeadersAnalyzer/HeadersAnalyzer.cpp:390,1555884000:390,m
 cmake/ipasim-x86-Debug/cg/libdispatch.cpp:20,1555880400:20,r
+
+[ver:1,total:240]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:220,1555880400:220,m
+include/ipasim/HAContext.hpp:20,1555880400:20,r
