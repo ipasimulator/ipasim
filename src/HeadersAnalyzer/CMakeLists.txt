@@ -450,36 +450,32 @@ target_link_libraries (HeadersAnalyzer PRIVATE
     -Wl,/nodefaultlib:libcmt)
 
 # TODO: Add real outputs and inputs.
-add_custom_target (prep-CodeGen
-    DEPENDS HeadersAnalyzer Frameworks crtlib crtstubs)
-set (CG_OUTPUTS "${SOURCE_DIR}/src/HeadersAnalyzer/Debug/CG/exports.txt")
-add_custom_command (OUTPUT ${CG_OUTPUTS}
-    COMMENT "Code-gen"
-    COMMAND "${CURRENT_IPASIM_CMAKE_DIR}/bin/HeadersAnalyzer.exe"
-        $<$<CONFIG:Debug>:-d>
-        "${CURRENT_IPASIM_CMAKE_DIR}"
-    WORKING_DIRECTORY "${SOURCE_DIR}"
-    USES_TERMINAL
-    DEPENDS prep-CodeGen)
-add_custom_target (CodeGen
-    DEPENDS ${CG_OUTPUTS})
-
+set (CG_OUTPUTS "${CURRENT_IPASIM_CMAKE_DIR}/cg/exports.txt")
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_custom_target (prep-CodeGenRelease
+    add_custom_target (prep-CodeGen
         COMMENT "Prepare Code-gen"
         COMMAND ninja HeadersAnalyzer
         WORKING_DIRECTORY "${RELEASE_IPASIM_CMAKE_DIR}"
         USES_TERMINAL
         DEPENDS Frameworks crtlib crtstubs)
-    add_custom_target (CodeGenRelease
+    add_custom_command (OUTPUT ${CG_OUTPUTS}
         COMMENT "Code-gen"
         COMMAND "${RELEASE_IPASIM_CMAKE_DIR}/bin/HeadersAnalyzer.exe"
-            -d "${DEBUG_IPASIM_CMAKE_DIR}"
+            -d "${CURRENT_IPASIM_CMAKE_DIR}"
         WORKING_DIRECTORY "${SOURCE_DIR}"
         USES_TERMINAL
-        DEPENDS prep-CodeGenRelease)
+        DEPENDS prep-CodeGen)
 else ()
-    add_custom_target (CodeGenRelease DEPENDS CodeGen)
+    add_custom_target (prep-CodeGen
+        DEPENDS HeadersAnalyzer Frameworks crtlib crtstubs)
+    add_custom_command (OUTPUT ${CG_OUTPUTS}
+        COMMENT "Code-gen"
+        COMMAND "${CURRENT_IPASIM_CMAKE_DIR}/bin/HeadersAnalyzer.exe"
+            "${CURRENT_IPASIM_CMAKE_DIR}"
+        WORKING_DIRECTORY "${SOURCE_DIR}"
+        USES_TERMINAL
+        DEPENDS prep-CodeGen)
 endif ()
+add_custom_target (CodeGen DEPENDS ${CG_OUTPUTS})
 
 # TODO: Clear the output directory `gen` before emitting binaries.
