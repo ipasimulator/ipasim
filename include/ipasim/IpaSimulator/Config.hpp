@@ -5,15 +5,29 @@
 
 #include "ipasim/Common.hpp"
 
+#if !defined(IPASIM_PRINT_ALL)
+#define IPASIM_PRINT_ALL 0
+#endif
+
 #if !defined(IPASIM_PRINT_INSTRUCTIONS)
-#define IPASIM_PRINT_INSTRUCTIONS 0
+#define IPASIM_PRINT_INSTRUCTIONS IPASIM_PRINT_ALL
 #endif
 constexpr bool PrintInstructions = IPASIM_PRINT_INSTRUCTIONS;
 
 #if !defined(IPASIM_PRINT_MEMORY_WRITES)
-#define IPASIM_PRINT_MEMORY_WRITES 0
+#define IPASIM_PRINT_MEMORY_WRITES IPASIM_PRINT_ALL
 #endif
 constexpr bool PrintMemoryWrites = IPASIM_PRINT_MEMORY_WRITES;
+
+#if !defined(IPASIM_PRINT_PROT_MEM_FETCHES)
+#define IPASIM_PRINT_PROT_MEM_FETCHES IPASIM_PRINT_ALL
+#endif
+constexpr bool PrintProtMemFetches = IPASIM_PRINT_PROT_MEM_FETCHES;
+
+#if !defined(IPASIM_PRINT_RETURNS)
+#define IPASIM_PRINT_RETURNS IPASIM_PRINT_ALL
+#endif
+constexpr bool PrintReturns = IPASIM_PRINT_RETURNS;
 
 // !defined(IPASIM_IPA_SIMULATOR_CONFIG_HPP)
 #endif

@@ -113,8 +113,9 @@ void SysTranslator::returnToKernel() {
 
 void SysTranslator::returnToEmulation() {
   // Log details about the return.
-  Log.info() << "returning to " << Dyld.dumpAddr(Emu.readReg(UC_ARM_REG_LR))
-             << Log.end();
+  if constexpr (PrintReturns)
+    Log.info() << "returning to " << Dyld.dumpAddr(Emu.readReg(UC_ARM_REG_LR))
+               << Log.end();
 
   assert(!Running);
   Restart = true;
@@ -241,10 +242,12 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   }
 
   // Log details.
-  Log.info() << "fetch prot. mem. at " << Dyld.dumpAddr(Addr, AI);
-  if (!Wrapper)
-    Log.infs() << " (not a wrapper)";
-  Log.infs() << Log.end();
+  if constexpr (PrintProtMemFetches) {
+    Log.info() << "fetch prot. mem. at " << Dyld.dumpAddr(Addr, AI);
+    if (!Wrapper)
+      Log.infs() << " (not a wrapper)";
+    Log.infs() << Log.end();
+  }
 
   // If the target is not a wrapper, we simply jump to it, no need to translate
   // anything.
