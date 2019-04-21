@@ -75,6 +75,7 @@ add_custom_command (
         "${CURRENT_IPASIM_CMAKE_DIR}/bin/libGLESv2.dll"
     COMMAND "${CMAKE_COMMAND}" "-DSOURCE_DIR=${SOURCE_DIR}"
         "-DBINARY_DIR=${BINARY_DIR}"
+        "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
         -P "${SOURCE_DIR}/scripts/CopyANGLE.cmake"
     COMMENT "Copy ANGLE binaries"
     DEPENDS "${SOURCE_DIR}/scripts/CopyANGLE.cmake"
