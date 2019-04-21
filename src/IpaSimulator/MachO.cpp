@@ -35,7 +35,7 @@ uint64_t MachO::getSection(const char *SegName, const char *SectName,
 
       // Enumerate segment's sections.
       if (!HasAddr && !strncmp(Seg->segname, SegName, sizeof(Seg->segname))) {
-        for (auto *Sect = reinterpret_cast<const section *>(Cmd + 1),
+        for (auto *Sect = reinterpret_cast<const section *>(Seg + 1),
                   *EndSect = Sect + Seg->nsects;
              Sect != EndSect; ++Sect)
           if (!strncmp(Sect->sectname, SectName, sizeof(Sect->sectname)) &&
