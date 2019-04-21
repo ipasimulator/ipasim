@@ -56,22 +56,33 @@ void ObjCMethodScout::findMethods(Expected<ListTy> &&List) {
       Log.error(toString(Element.takeError()));
       continue;
     }
-    registerMethods(Element->instanceMethods());
-    registerMethods(Element->classMethods());
-    registerOptionalMethods(*Element);
+
+    auto Name = Element->getName();
+    if (!Name) {
+      Log.error(toString(Name.takeError()));
+      continue;
+    }
+
+    registerMethods(*Name, Element->instanceMethods(), /* Static */ false);
+    registerMethods(*Name, Element->classMethods(), /* Static */ true);
+    registerOptionalMethods(*Name, *Element);
   }
 }
 
 template <typename ElementTy>
-void ObjCMethodScout::registerOptionalMethods(const ElementTy &) {}
+void ObjCMethodScout::registerOptionalMethods(StringRef, const ElementTy &) {}
 template <>
 void ObjCMethodScout::registerOptionalMethods<ObjCProtocol>(
-    const ObjCProtocol &Protocol) {
-  registerMethods(Protocol.optionalInstanceMethods());
-  registerMethods(Protocol.optionalClassMethods());
+    StringRef ProtocolName, const ObjCProtocol &Protocol) {
+  registerMethods(ProtocolName, Protocol.optionalInstanceMethods(),
+                  /* Static */ false);
+  registerMethods(ProtocolName, Protocol.optionalClassMethods(),
+                  /* Static */ true);
 }
 
-void ObjCMethodScout::registerMethods(Expected<ObjCMethodList> &&Methods) {
+void ObjCMethodScout::registerMethods(StringRef ElementName,
+                                      Expected<ObjCMethodList> &&Methods,
+                                      bool Static) {
   if (!Methods) {
     Log.error(toString(Methods.takeError()));
     return;
@@ -95,6 +106,7 @@ void ObjCMethodScout::registerMethods(Expected<ObjCMethodList> &&Methods) {
     }
 
     uint32_t RVA = *Imp - COFF->getImageBase();
-    Results.insert({RVA, Name->str()});
+    Results.insert({RVA, (Static ? "+[" : "-[") + ElementName.str() + " " +
+                             Name->str() + "]"});
   }
 }

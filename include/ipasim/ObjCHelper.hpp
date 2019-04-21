@@ -39,8 +39,11 @@ private:
   void discoverMethods();
   template <typename ListTy> void findMethods(llvm::Expected<ListTy> &&List);
   template <typename ElementTy>
-  void registerOptionalMethods(const ElementTy &Element);
-  void registerMethods(llvm::Expected<llvm::ObjCMethodList> &&Methods);
+  void registerOptionalMethods(llvm::StringRef ElementName,
+                               const ElementTy &Element);
+  void registerMethods(llvm::StringRef ElementName,
+                       llvm::Expected<llvm::ObjCMethodList> &&Methods,
+                       bool Static);
 };
 
 } // namespace ipasim

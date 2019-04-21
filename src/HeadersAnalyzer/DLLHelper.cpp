@@ -108,6 +108,14 @@ void DLLHelper::load(LLDBHelper &LLDB, ClangHelper &Clang, CodeGenModule *CGM) {
   // manually in the metadata.
   set<ObjCMethod> ObjCMethods(
       ObjCMethodScout::discoverMethods(DLLPathStr, COFF));
+  for (const ObjCMethod &Method : ObjCMethods) {
+    ExportPtr Exp;
+    if (!analyzeWindowsFunction(Method.Name, Method.RVA,
+                                /* IgnoreDuplicates */ true, Exp))
+      continue;
+
+    // TODO: Compare signatures.
+  }
 }
 
 void DLLHelper::generate(const DirContext &DC, bool Debug) {
