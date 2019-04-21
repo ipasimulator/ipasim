@@ -415,6 +415,7 @@ set_target_properties (dia PROPERTIES
 # HeadersAnalyzer
 set (SOURCE_FILES
     ClangHelper.cpp
+    DLLHelper.cpp
     ErrorReporting.cpp
     HAContext.cpp
     HeadersAnalyzer.cpp

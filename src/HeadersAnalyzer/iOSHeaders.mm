@@ -45,7 +45,9 @@
 #include <CoreVideo/CoreVideo.h>
 #include <EventKit/EventKit.h>
 #include <EventKitUI/EventKitUI.h>
+#endif
 #include <Foundation/Foundation.h>
+#if !defined(IPASIM_CG_SAMPLE)
 #include <GameController/GameController.h>
 #include <GameKit/GameKit.h>
 #include <GamePlayKit/GamePlayKit.h>

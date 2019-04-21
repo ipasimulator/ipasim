@@ -1,6 +1,7 @@
 // HeadersAnalyzer.cpp
 
 #include "ipasim/ClangHelper.hpp"
+#include "ipasim/DLLHelper.hpp"
 #include "ipasim/HAContext.hpp"
 #include "ipasim/HeadersAnalyzer/Config.hpp"
 #include "ipasim/LLDBHelper.hpp"
@@ -30,15 +31,11 @@
 #include <lldb/Symbol/ClangASTContext.h>
 #include <lldb/Symbol/ClangUtil.h>
 #include <lldb/Symbol/Type.h>
-#include <llvm/DebugInfo/PDB/PDBSymbolFunc.h>
-#include <llvm/DebugInfo/PDB/PDBSymbolPublicSymbol.h>
 #include <llvm/IR/DebugInfo.h>
 #include <llvm/IR/IntrinsicInst.h>
 #include <llvm/IR/Mangler.h>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/ValueSymbolTable.h>
-#include <llvm/Object/COFF.h>
-#include <llvm/Object/ObjectFile.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Transforms/Utils/FunctionComparator.h>
 #include <vector>
@@ -64,9 +61,6 @@ public:
       : BuildDir(move(BuildDir)), Debug(Debug), LLVM(LLVMInit) {}
 
   void discoverTBDs() {
-    if constexpr (Sample)
-      return;
-
     Log.info("discovering TBDs");
 
     TBDHandler TH(HAC);
@@ -152,7 +146,6 @@ public:
   void loadDLLs() {
     Log.info("loading DLLs");
 
-    using namespace llvm::pdb;
     LLDBHelper LLDB;
     ClangHelper Clang(BuildDir, LLVM);
 
@@ -168,171 +161,7 @@ public:
     auto CGM(Clang.createCodeGenModule());
 
     // Load DLLs and PDBs.
-    for (auto [GroupIdx, DLLGroup] : withIndices(HAC.DLLGroups)) {
-      for (auto [DLLIdx, DLL] : withIndices(DLLGroup.DLLs)) {
-        path DLLPath(DLLGroup.Dir / DLL.Name);
-        path PDBPath(DLLPath);
-        PDBPath.replace_extension(".pdb");
-
-        string DLLPathStr(DLLPath.string());
-        LLDB.load(DLLPathStr.c_str(), PDBPath.string().c_str());
-        TypeComparer TC(*CGM, LLVM.getModule(), LLDB.getSymbolFile());
-
-        // Load DLL.
-        auto DLLFile(llvm::object::ObjectFile::createObjectFile(DLLPathStr));
-        if (!DLLFile) {
-          Log.error() << toString(DLLFile.takeError()) << " (" << DLLPathStr
-                      << ")" << Log.end();
-          continue;
-        }
-        auto COFF =
-            dyn_cast<llvm::object::COFFObjectFile>(DLLFile->getBinary());
-        if (!COFF) {
-          Log.error() << "expected COFF (" << DLLPathStr << ")" << Log.end();
-          continue;
-        }
-
-        // Discover exports.
-        set<uint32_t> Exports;
-        for (auto &Export : COFF->export_directories()) {
-          uint32_t ExportRVA;
-          if (error_code Error = Export.getExportRVA(ExportRVA)) {
-            Log.error() << "cannot get RVA of an export symbol (" << DLLPathStr
-                        << "): " << Error.message() << Log.end();
-            continue;
-          }
-          // Note that there can be aliases, so the current `ExportRVA` can
-          // already be present in `Exports`, but that's OK.
-          Exports.insert(ExportRVA);
-        }
-
-        // Release PDBs don't contain Objective-C methods, so we find them
-        // manually in the metadata.
-        set<uint32_t> ObjCMethods(
-            ObjCMethodScout::discoverMethods(DLLPathStr, COFF));
-
-        // Analyze functions.
-        auto Analyzer = [&, DLL = ref(DLL), GroupIdx = GroupIdx,
-                         DLLIdx = DLLIdx](auto &&Func, bool IgnoreDuplicates =
-                                                           false) mutable {
-          string Name(Func.getName());
-          uint32_t RVA = Func.getRelativeVirtualAddress();
-
-          // If undecorated name has underscore at the beginning, use that
-          // instead.
-          string UN(Func.getUndecoratedName());
-          if (!UN.empty() && Name != UN && UN[0] == '_' &&
-              !UN.compare(1, Name.length(), Name))
-            Name = move(UN);
-
-          // We are only interested in exported symbols or Objective-C methods.
-          if (!HAC.isClassMethod(Name) && Exports.find(RVA) == Exports.end())
-            return;
-
-          // Find the corresponding export info from TBD files.
-          ExportPtr Exp;
-          if (!HAC.isInterestingForWindows(Name, Exp, RVA, IgnoreDuplicates))
-            return;
-          bool DataSymbol = Exp->Status == ExportStatus::NotFound;
-
-          // Update status accordingly.
-          Exp->Status = ExportStatus::FoundInDLL;
-          Exp->RVA = RVA;
-          DLL.get().Exports.push_back(Exp);
-          Exp->DLLGroup = GroupIdx;
-          Exp->DLL = DLLIdx;
-
-          // Save symbol that will serve as a reference for computing addresses
-          // of Objective-C methods.
-          if (!DLL.get().ReferenceSymbol && !Exp->ObjCMethod)
-            DLL.get().ReferenceSymbol = Exp;
-
-          // If this is not a function, we can skip the rest of analysis.
-          if (DataSymbol)
-            return;
-
-          auto FlagsSetter = [&]() {
-            // If it's a normal messenger, it has two parameters (`id` and
-            // `SEL`, both actually `void *`). If it's a `stret` messenger, it
-            // has one more parameter at the front (a `void *` for struct
-            // return).
-            Exp->Stret = endsWith(Exp->Name, HAContext::StretPostfix);
-            // Also recognize `Super` functions.
-            if (Exp->Name.find("Super2") != string::npos)
-              Exp->Super2 = true;
-            else if (Exp->Name.find("Super") != string::npos)
-              Exp->Super = true;
-          };
-
-          // Find Objective-C messengers. Note that they used to be variadic,
-          // but that's deprecated and so we cannot rely on that.
-          if (startsWith(Exp->Name, HAContext::MsgSendPrefix)) {
-            Exp->Messenger = true;
-            FlagsSetter();
-
-            // Don't verify their types.
-            return;
-          }
-
-          // Also, change type of the lookup functions. In Apple headers, they
-          // are declared as `void -> void`, but we need them to have the few
-          // first arguments they base their lookup on, so that we transfer them
-          // correctly.
-          if (startsWith(Exp->Name, HAContext::MsgLookupPrefix)) {
-            FlagsSetter();
-            Exp->setType(LookupTy);
-
-            // Don't verify their types.
-            return;
-          }
-
-          // Skip type verification of vararg functions. It doesn't work well -
-          // at least for `_NSLog`. There is a weird bug that happens randomly -
-          // sometimes everything works fine, sometimes there is an assertion
-          // failure `Assertion failed: isValidArgumentType(Params[i]) && "Not a
-          // valid type for function argument!", file ..\..\lib\IR\Type.cpp,
-          // line 288`.
-          // TODO: Investigate and fix this bug.
-          if (Exp->getDylibType()->isVarArg())
-            return;
-
-          // Verify that the function has the same signature as the iOS one.
-          if constexpr (CompareTypes) {
-            // TODO: #28 is not considered here.
-            if (!TC.areEquivalent(Exp->getDylibType(), Func))
-              Log.error() << "functions' signatures are not equivalent ("
-                          << Exp->Name << ")" << Log.end();
-          } else if constexpr (is_same_v<decltype(Func),
-                                         llvm::pdb::PDBSymbolFunc &>) {
-            if (!Func.getSignature()) {
-              Log.error() << "function doesn't have a signature (" << Exp->Name
-                          << ")" << Log.end();
-              return;
-            }
-
-            // Check at least number of arguments.
-            size_t DylibCount = Exp->getDylibType()->getNumParams();
-            size_t DLLCount = Func.getSignature()->getCount();
-
-            // TODO: Also check that `Func`'s return type is NOT void.
-            if (DylibCount == DLLCount + 1 &&
-                Exp->getDylibType()->getReturnType()->isVoidTy())
-              // See #28.
-              Exp->DylibStretOnly = true;
-            else if (DylibCount != DLLCount)
-              Log.error() << "function '" << Exp->Name
-                          << "' has different number of arguments in iOS "
-                             "headers and in DLL ("
-                          << to_string(DylibCount) << " v. "
-                          << to_string(DLLCount) << ")" << Log.end();
-          }
-        };
-        for (auto &Func : LLDB.enumerate<PDBSymbolFunc>())
-          Analyzer(Func);
-        for (auto &Func : LLDB.enumerate<PDBSymbolPublicSymbol>())
-          Analyzer(Func, /* IgnoreDuplicates */ true);
-      }
-    }
+    DLLHelper::forEach(HAC, LLVM, &DLLHelper::load, LLDB, Clang, CGM.get());
   }
   void createDirs() {
     OutputDir = createOutputDir((BuildDir / "cg/").string().c_str());
@@ -455,7 +284,7 @@ public:
                 llvm::Type::getInt32Ty(LLVM.Ctx),
                 Exp.RVA - DLL.ReferenceSymbol->RVA);
             llvm::Value *RefPtr =
-                IR.Builder.CreateBitCast(RefSymbol, VoidPtrTy);
+                IR.Builder.CreateBitCast(RefSymbol, LLVM.VoidPtrTy);
             llvm::Value *ComputedPtr = IR.Builder.CreateInBoundsGEP(
                 llvm::Type::getInt8Ty(LLVM.Ctx), RefPtr, Addr);
             llvm::Value *FP = IR.Builder.CreateBitCast(
@@ -621,7 +450,7 @@ public:
           // `eeae6dc2`), but it's only for `x86_64` right now.
 
           // Declare the messenger.
-          llvm::Function *MessengerFunc = IR.declareFunc(SendTy, Exp.Name);
+          llvm::Function *MessengerFunc = IR.declareFunc(LLVM.SendTy, Exp.Name);
           createAlias(Exp, MessengerFunc);
 
           // And define it, too.
@@ -643,7 +472,8 @@ public:
           }
 
           // Declare the lookup function.
-          llvm::Function *LookupFunc = IR.declareFunc(LookupTy, LookupName);
+          llvm::Function *LookupFunc =
+              IR.declareFunc(LLVM.LookupTy, LookupName);
 
           // Collect arguments.
           vector<llvm::Value *> Args;
@@ -663,7 +493,7 @@ public:
             llvm::Value *Receiver =
                 IR.Builder.CreateLoad(ReceiverP, "receiver");
             Args[Exp.Stret ? 1 : 0] =
-                IR.Builder.CreateIntToPtr(Receiver, VoidPtrTy);
+                IR.Builder.CreateIntToPtr(Receiver, LLVM.VoidPtrTy);
           }
           llvm::CallInst *Call = IR.Builder.CreateCall(
               MessengerFunc->getFunctionType(), IMP, Args);
@@ -723,7 +553,7 @@ public:
         }
 
         // Call the DLL wrapper function.
-        llvm::Value *VP = IR.Builder.CreateBitCast(SP, VoidPtrTy, "vp");
+        llvm::Value *VP = IR.Builder.CreateBitCast(SP, LLVM.VoidPtrTy, "vp");
         IR.Builder.CreateCall(Wrapper, {VP});
 
         // Return.
@@ -799,16 +629,6 @@ private:
   LLVMHelper LLVM;
   path BuildDir, OutputDir, GenDir;
   bool Debug;
-
-  // Some common types.
-  llvm::Type *VoidTy = llvm::Type::getVoidTy(LLVM.Ctx);
-  llvm::Type *VoidPtrTy = llvm::Type::getInt8PtrTy(LLVM.Ctx);
-  llvm::FunctionType *SendTy = llvm::FunctionType::get(
-      VoidTy, {VoidPtrTy, VoidPtrTy, VoidPtrTy, VoidPtrTy},
-      /* isVarArg */ false);
-  llvm::FunctionType *LookupTy = llvm::FunctionType::get(
-      SendTy->getPointerTo(), {VoidPtrTy, VoidPtrTy, VoidPtrTy, VoidPtrTy},
-      /* isVarArg */ false);
 
   void analyzeAppleFunction(const llvm::Function &Func) {
     // We use mangled names to uniquely identify functions.

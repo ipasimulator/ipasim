@@ -62,6 +62,16 @@ public:
   llvm::LLVMContext Ctx;
   llvm::StringSaver Saver;
 
+  // Some common types.
+  llvm::Type *VoidTy = llvm::Type::getVoidTy(Ctx);
+  llvm::Type *VoidPtrTy = llvm::Type::getInt8PtrTy(Ctx);
+  llvm::FunctionType *SendTy = llvm::FunctionType::get(
+      VoidTy, {VoidPtrTy, VoidPtrTy, VoidPtrTy, VoidPtrTy},
+      /* isVarArg */ false);
+  llvm::FunctionType *LookupTy = llvm::FunctionType::get(
+      SendTy->getPointerTo(), {VoidPtrTy, VoidPtrTy, VoidPtrTy, VoidPtrTy},
+      /* isVarArg */ false);
+
   llvm::Module *getModule() { return Module.get(); }
   void setModule(std::unique_ptr<llvm::Module> &&Module) {
     this->Module = move(Module);
