@@ -1,0 +1,13 @@
+[ver:1,total:4080]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:1514,1555783200:390,1555786800:330,1555794000:180,1555826400:606,1555830000:8,m
+include/ipasim/DLLHelper.hpp:1252,1555826400:1181,1555830000:71,m
+src/HeadersAnalyzer/DLLHelper.cpp:792,1555826400:595,1555830000:197,m
+src/HeadersAnalyzer/iOSHeaders.mm:158,1555783200:150,1555830000:8,m
+src/HeadersAnalyzer/HAContext.cpp:90,1555786800:75,1555826400:15,r
+cmake/ipasim-x86-Release/cg/exports.txt:60,1555786800:60,r
+include/ipasim/HAContext.hpp:56,1555786800:15,1555826400:41,r
+include/ipasim/Emulator.hpp:50,1555826400:50,r
+src/HeadersAnalyzer/CMakeLists.txt:38,1555826400:30,1555830000:8,m
+include/ipasim/LLVMHelper.hpp:38,1555826400:30,1555830000:8,m
+src/HeadersAnalyzer/LLVMHelper.cpp:20,1555826400:20,r
+include/ipasim/ClangHelper.hpp:12,1555826400:12,r
