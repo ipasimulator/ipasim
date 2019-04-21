@@ -1,0 +1,6 @@
+[ver:1,total:360]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:170,1555830000:170,m
+src/HeadersAnalyzer/DLLHelper.cpp:75,1555830000:75,m
+include/ipasim/HAContext.hpp:65,1555830000:65,m
+include/ipasim/DLLHelper.hpp:30,1555830000:30,m
+src/HeadersAnalyzer/HAContext.cpp:20,1555830000:20,r
