@@ -25,6 +25,9 @@ public:
 
   void load(LLDBHelper &LLDB, ClangHelper &Clang,
             clang::CodeGen::CodeGenModule *CGM);
+  void generate(const std::filesystem::path &OutputDir,
+                const std::filesystem::path &GenDir,
+                const std::filesystem::path &BuildDir, bool Debug);
   bool analyzeWindowsFunction(const std::string &Name, uint32_t RVA,
                               bool IgnoreDuplicates, ExportPtr &Exp);
   template <typename... ArgTys, typename FTy = void(ArgTys...)>
