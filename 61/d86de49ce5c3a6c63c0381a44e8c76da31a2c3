@@ -1,0 +1,5 @@
+[ver:1,total:480]
+src/HeadersAnalyzer/DLLHelper.cpp:235,1555830000:235,m
+include/ipasim/DLLHelper.hpp:135,1555830000:135,m
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:95,1555830000:95,m
+include/ipasim/LLVMHelper.hpp:15,1555830000:15,r
