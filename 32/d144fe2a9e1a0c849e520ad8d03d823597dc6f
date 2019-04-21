@@ -1,0 +1,6 @@
+[ver:1,total:540]
+src/HeadersAnalyzer/CMakeLists.txt:350,1555844400:350,m
+CMakeLists.txt:90,1555844400:90,r
+scripts/CommonVariables.cmake:45,1555844400:45,r
+src/IpaSimulator/CMakeLists.txt:40,1555844400:40,m
+src/IpaSimulator/MachO.cpp:15,1555844400:15,r
