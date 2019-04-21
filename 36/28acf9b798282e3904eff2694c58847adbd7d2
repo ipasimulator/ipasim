@@ -1,0 +1,9 @@
+[ver:1,total:420]
+scripts/CopyANGLE.cmake:142,1555844400:142,r
+CMakeLists.txt:110,1555844400:110,r
+src/IpaSimulator/CMakeLists.txt:82,1555844400:82,m
+src/HeadersAnalyzer/CMakeLists.txt:30,1555844400:30,r
+scripts/clang-x86-Debug.cmake:20,1555844400:20,r
+scripts/ConvAsmObj.cmake:12,1555844400:12,r
+scripts/CommonVariables.cmake:12,1555844400:12,r
+scripts/CopyWocHeaders.cmake:12,1555844400:12,r
