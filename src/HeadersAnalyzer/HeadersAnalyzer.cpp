@@ -387,7 +387,9 @@ public:
     if (auto OS = createOutputFile((DC.OutputDir / "exports.txt").string()))
       for (const ExportEntry &Exp : HAC.iOSExps)
         if (Exp.Status == ExportStatus::FoundInDLL)
-          *OS << Exp.Name << '\n';
+          *OS << Exp.Name << " (" << (Exp.getDylibType() ? "function" : "data")
+              << " in " << HAC.DLLGroups[Exp.DLLGroup].DLLs[Exp.DLL].Name
+              << " at 0x" << llvm::format_hex(Exp.RVA, 8) << ")\n";
   }
 
 private:
