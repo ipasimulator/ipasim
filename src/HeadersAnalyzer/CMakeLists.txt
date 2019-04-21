@@ -464,7 +464,8 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug")
             -d "${CURRENT_IPASIM_CMAKE_DIR}"
         WORKING_DIRECTORY "${SOURCE_DIR}"
         USES_TERMINAL
-        DEPENDS prep-CodeGen)
+        DEPENDS prep-CodeGen
+            "${RELEASE_IPASIM_CMAKE_DIR}/bin/HeadersAnalyzer.exe")
 else ()
     add_custom_target (prep-CodeGen
         DEPENDS HeadersAnalyzer Frameworks crtlib crtstubs)
