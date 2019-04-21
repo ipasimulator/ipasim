@@ -90,7 +90,12 @@ void SysTranslator::execute(uint64_t Addr) {
     if (Restart) {
       // If restarting, continue where we left off.
       Restart = false;
-      Addr = Emu.readReg(UC_ARM_REG_LR);
+      if (RestartFromLRs) {
+        RestartFromLRs = false;
+        Addr = LRs.top();
+        LRs.pop();
+      } else
+        Addr = Emu.readReg(UC_ARM_REG_LR);
     } else
       break;
   }
@@ -244,7 +249,13 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   // If the target is not a wrapper, we simply jump to it, no need to translate
   // anything.
   if (!Wrapper) {
-    Emu.writeReg(UC_ARM_REG_PC, Addr);
+    // Note that doing just `Emu.writeReg(UC_ARM_REG_PC, Addr);` instead of all
+    // this didn't work in Release mode for some reason.
+    Emu.stop();
+    Running = false;
+    Restart = true;
+    RestartFromLRs = true;
+    LRs.push(Addr);
     return true;
   }
 
