@@ -53,10 +53,6 @@ void DLLHelper::load(LLDBHelper &LLDB, ClangHelper &Clang, CodeGenModule *CGM) {
     Exports.insert(ExportRVA);
   }
 
-  // Release PDBs don't contain Objective-C methods, so we find them
-  // manually in the metadata.
-  set<uint32_t> ObjCMethods(ObjCMethodScout::discoverMethods(DLLPathStr, COFF));
-
   // Analyze functions.
   auto Analyzer = [this](auto &&Func, bool IgnoreDuplicates = false) mutable {
     string Name(Func.getName());
@@ -107,6 +103,11 @@ void DLLHelper::load(LLDBHelper &LLDB, ClangHelper &Clang, CodeGenModule *CGM) {
     Analyzer(Func);
   for (auto &Func : LLDB.enumerate<PDBSymbolPublicSymbol>())
     Analyzer(Func, /* IgnoreDuplicates */ true);
+
+  // Release PDBs don't contain Objective-C methods, so we find them
+  // manually in the metadata.
+  set<ObjCMethod> ObjCMethods(
+      ObjCMethodScout::discoverMethods(DLLPathStr, COFF));
 }
 
 void DLLHelper::generate(const DirContext &DC, bool Debug) {

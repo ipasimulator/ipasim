@@ -10,13 +10,21 @@
 
 namespace ipasim {
 
+struct ObjCMethod {
+  uint32_t RVA;
+  std::string Name;
+
+  bool operator<(const ObjCMethod &Other) const { return RVA < Other.RVA; }
+};
+
 class ObjCMethodScout {
 public:
-  static std::set<uint32_t> discoverMethods(const std::string &DLLPath,
-                                            llvm::object::COFFObjectFile *COFF);
+  static std::set<ObjCMethod>
+  discoverMethods(const std::string &DLLPath,
+                  llvm::object::COFFObjectFile *COFF);
 
 private:
-  std::set<uint32_t> RVAs;
+  std::set<ObjCMethod> Results;
   llvm::object::COFFObjectFile *COFF;
   std::unique_ptr<llvm::MemoryBuffer> MB;
   std::unique_ptr<llvm::object::MachOObjectFile> MachO;
