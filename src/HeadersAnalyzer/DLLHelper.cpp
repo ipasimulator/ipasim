@@ -79,8 +79,7 @@ void DLLHelper::load(LLDBHelper &LLDB, ClangHelper &Clang, CodeGenModule *CGM) {
       if (!TC.areEquivalent(Exp->getDylibType(), Func))
         Log.error() << "functions' signatures are not equivalent (" << Exp->Name
                     << ")" << Log.end();
-    } else if constexpr (is_same_v<decltype(Func),
-                                   llvm::pdb::PDBSymbolFunc &>) {
+    } else if constexpr (is_same_v<decltype(Func), PDBSymbolFunc &>) {
       if (!Func.getSignature()) {
         Log.error() << "function doesn't have a signature (" << Exp->Name << ")"
                     << Log.end();
@@ -123,11 +122,11 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
            "Inconsistency in endianness.");
 
   // Declare reference symbol.
-  llvm::GlobalValue *RefSymbol =
-      !DLL.ReferenceSymbol ? nullptr
-                           : IR.declare<LibType::DLL>(*DLL.ReferenceSymbol);
+  GlobalValue *RefSymbol = !DLL.ReferenceSymbol
+                               ? nullptr
+                               : IR.declare<LibType::DLL>(*DLL.ReferenceSymbol);
   if (RefSymbol)
-    RefSymbol->setDLLStorageClass(llvm::GlobalValue::DLLImportStorageClass);
+    RefSymbol->setDLLStorageClass(GlobalValue::DLLImportStorageClass);
 
   // Generate function wrappers.
   for (const ExportEntry &Exp : deref(DLL.Exports)) {
@@ -140,17 +139,16 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
       continue;
 
     // Declarations.
-    llvm::Function *Func =
+    Function *Func =
         Exp.ObjCMethod ? nullptr : IR.declareFunc<LibType::DLL>(Exp);
-    llvm::Function *Wrapper =
-        IR.declareFunc<LibType::DLL>(Exp, /* Wrapper */ true);
-    llvm::Function *Stub =
+    Function *Wrapper = IR.declareFunc<LibType::DLL>(Exp, /* Wrapper */ true);
+    Function *Stub =
         DylibIR.declareFunc<LibType::Dylib>(Exp, /* Wrapper */ true);
 
     // Export the wrapper and import the original function.
-    Wrapper->setDLLStorageClass(llvm::Function::DLLExportStorageClass);
+    Wrapper->setDLLStorageClass(Function::DLLExportStorageClass);
     if (Func)
-      Func->setDLLStorageClass(llvm::Function::DLLImportStorageClass);
+      Func->setDLLStorageClass(Function::DLLImportStorageClass);
 
     // Generate the Dylib stub.
     DylibIR.defineFunc(Stub);
@@ -167,9 +165,9 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
       continue;
     }
 
-    llvm::StructType *Struct;
-    llvm::Value *SP;
-    vector<llvm::Value *> Args;
+    StructType *Struct;
+    Value *SP;
+    vector<Value *> Args;
     if (Exp.isTrivial()) {
       // Trivial functions (`void -> void`) have no arguments, so no
       // struct pointer nor type exist - we set them to `nullptr` to check
@@ -191,17 +189,17 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
         string ArgNo = to_string(ArgIdx);
 
         // Load argument from the structure.
-        llvm::Value *APP = IR.Builder.CreateStructGEP(Struct, SP, ArgIdx,
-                                                      Twine("app") + ArgNo);
-        llvm::Value *AP = IR.Builder.CreateLoad(APP, Twine("ap") + ArgNo);
-        llvm::Value *A = IR.Builder.CreateLoad(AP, Twine("a") + ArgNo);
+        Value *APP = IR.Builder.CreateStructGEP(Struct, SP, ArgIdx,
+                                                Twine("app") + ArgNo);
+        Value *AP = IR.Builder.CreateLoad(APP, Twine("ap") + ArgNo);
+        Value *A = IR.Builder.CreateLoad(AP, Twine("a") + ArgNo);
 
         // Save the argument.
         Args.push_back(A);
       }
     }
 
-    llvm::Value *R;
+    Value *R;
     if (Exp.ObjCMethod) {
       // Objective-C methods are not exported, so we call them by
       // computing their address using their RVA.
@@ -213,12 +211,12 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
       }
 
       // Add RVA to the reference symbol's address.
-      llvm::Value *Addr = llvm::ConstantInt::getSigned(
-          llvm::Type::getInt32Ty(LLVM.Ctx), Exp.RVA - DLL.ReferenceSymbol->RVA);
-      llvm::Value *RefPtr = IR.Builder.CreateBitCast(RefSymbol, LLVM.VoidPtrTy);
-      llvm::Value *ComputedPtr = IR.Builder.CreateInBoundsGEP(
-          llvm::Type::getInt8Ty(LLVM.Ctx), RefPtr, Addr);
-      llvm::Value *FP = IR.Builder.CreateBitCast(
+      Value *Addr = ConstantInt::getSigned(Type::getInt32Ty(LLVM.Ctx),
+                                           Exp.RVA - DLL.ReferenceSymbol->RVA);
+      Value *RefPtr = IR.Builder.CreateBitCast(RefSymbol, LLVM.VoidPtrTy);
+      Value *ComputedPtr =
+          IR.Builder.CreateInBoundsGEP(Type::getInt8Ty(LLVM.Ctx), RefPtr, Addr);
+      Value *FP = IR.Builder.CreateBitCast(
           ComputedPtr, Exp.getDLLType()->getPointerTo(), "fp");
 
       // Call the original DLL function.
@@ -230,20 +228,20 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
       // See #28.
       if (Exp.DylibStretOnly) {
         // Store the return value.
-        llvm::Value *RS = IR.Builder.CreateAlloca(R->getType());
+        Value *RS = IR.Builder.CreateAlloca(R->getType());
         IR.Builder.CreateStore(R, RS);
 
         // Load stret argument from the structure.
-        llvm::Value *SRPP = IR.Builder.CreateStructGEP(Struct, SP, 0, "srpp");
-        llvm::Value *SRP = IR.Builder.CreateLoad(SRPP, "srp");
-        llvm::Value *SR = IR.Builder.CreateLoad(SRP, "sr");
+        Value *SRPP = IR.Builder.CreateStructGEP(Struct, SP, 0, "srpp");
+        Value *SRP = IR.Builder.CreateLoad(SRPP, "srp");
+        Value *SR = IR.Builder.CreateLoad(SRP, "sr");
 
         // Copy structure's content.
         // TODO: Don't hardcode the alignments here.
         IR.Builder.CreateMemCpy(SR, 4, RS, 4, IR.getSize(R->getType()));
       } else { // !Exp.DylibStretOnly
         // Get pointer to the return value inside the union.
-        llvm::Value *RP = IR.Builder.CreateStructGEP(
+        Value *RP = IR.Builder.CreateStructGEP(
             Struct, SP, Exp.getDLLType()->getNumParams(), "rp");
 
         // Save return value back into the structure.
