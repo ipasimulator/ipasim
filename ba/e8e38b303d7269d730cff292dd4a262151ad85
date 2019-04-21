@@ -1,0 +1,5 @@
+[ver:1,total:360]
+cmake/ipasim-x86-Release/cg/exports.txt:180,1555884000:180,r
+src/HeadersAnalyzer/iOSHeaders.mm:110,1555884000:110,m
+src/HeadersAnalyzer/DLLHelper.cpp:40,1555884000:40,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:30,1555884000:30,r
