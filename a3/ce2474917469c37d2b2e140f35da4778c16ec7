@@ -1,0 +1,3 @@
+[ver:1,total:180]
+include/ipasim/HeadersAnalyzer/Config.hpp:95,1555833600:95,m
+src/HeadersAnalyzer/CMakeLists.txt:85,1555833600:85,m
