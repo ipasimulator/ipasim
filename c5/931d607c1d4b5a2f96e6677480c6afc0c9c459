@@ -1,2 +1,13 @@
 [ver:1,total:180]
 src/HeadersAnalyzer/DLLHelper.cpp:180,1555880400:180,m
+
+[ver:1,total:1440]
+cmake/ipasim-x86-Release/cg/exports.txt:540,1555880400:540,r
+samples/SampleApp/SampleApp/ViewController.m:210,1555866000:180,1555869600:30,r
+samples/SampleApp/SampleApp.xcodeproj/project.pbxproj:180,1555866000:180,r
+docs/issues/28.md:180,1555869600:180,r
+cmake/ipasim-x86-Debug/cg/libdispatch.cpp:180,1555880400:180,r
+samples/SampleApp/SampleApp/AppDelegate.m:60,1555866000:60,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:30,1555880400:30,r
+samples/issue28.mm:30,1555869600:30,r
+src/HeadersAnalyzer/DLLHelper.cpp:30,1555880400:30,m
