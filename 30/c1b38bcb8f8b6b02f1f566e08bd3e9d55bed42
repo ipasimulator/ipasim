@@ -1,0 +1,6 @@
+[ver:1,total:840]
+src/HeadersAnalyzer/DLLHelper.cpp:409,1555830000:409,m
+src/HeadersAnalyzer/ObjCHelper.cpp:335,1555830000:335,m
+include/ipasim/ObjCHelper.hpp:58,1555830000:58,m
+cmake/ipasim-x86-Debug/cg/exports.txt:30,1555830000:30,r
+cmake/ipasim-x86-Release/cg/exports.txt:8,1555830000:8,r
