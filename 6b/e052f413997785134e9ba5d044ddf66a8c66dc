@@ -1,0 +1,8 @@
+[ver:1,total:1500]
+src/IpaSimulator/SysTranslator.cpp:695,1555844400:375,1555848000:320,m
+src/IpaSimulator/CMakeLists.txt:425,1555844400:405,1555848000:20,r
+include/ipasim/SysTranslator.hpp:140,1555848000:140,m
+include/ipasim/IpaSimulator/Config.hpp:135,1555844400:135,r
+src/IpaSimulator/DynamicLoader.cpp:75,1555844400:75,r
+include/ipasim/Emulator.hpp:15,1555844400:15,r
+include/ipasim/HeadersAnalyzer/Config.hpp:15,1555844400:15,r
