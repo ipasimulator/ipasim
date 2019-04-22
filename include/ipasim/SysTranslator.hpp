@@ -70,22 +70,22 @@ private:
     else
       call<N, N, false>(Addr);
   }
-  template <size_t N, size_t C, bool Returns, typename... ArgTypes>
-  void call(uint32_t Addr, ArgTypes... Params) {
+  template <size_t N, size_t C, bool Returns, typename... ArgTys>
+  void call(uint32_t Addr, ArgTys... Params) {
     if constexpr (N > 0)
-      call<N - 1, C, Returns, ArgTypes..., uint32_t>(Addr, Params...,
-                                                     Args[C - N]);
+      call<N - 1, C, Returns, ArgTys..., uint32_t>(Addr, Params...,
+                                                   Args[C - N]);
     else
-      call<Returns, ArgTypes...>(Addr, Params...);
+      call<Returns, ArgTys...>(Addr, Params...);
   }
-  template <bool Returns, typename... ArgTypes>
-  void call(uint32_t Addr, ArgTypes... Params) {
+  template <bool Returns, typename... ArgTys>
+  void call(uint32_t Addr, ArgTys... Params) {
     if constexpr (Returns) {
       uint32_t RetVal =
-          reinterpret_cast<uint32_t (*)(ArgTypes...)>(Addr)(Params...);
+          reinterpret_cast<uint32_t (*)(ArgTys...)>(Addr)(Params...);
       Emu.writeReg(UC_ARM_REG_R0, RetVal);
     } else
-      reinterpret_cast<void (*)(ArgTypes...)>(Addr)(Params...);
+      reinterpret_cast<void (*)(ArgTys...)>(Addr)(Params...);
   }
 
   Emulator &Emu;
@@ -99,20 +99,20 @@ public:
   DynamicBackCaller(DynamicLoader &Dyld, Emulator &Emu, SysTranslator &Sys)
       : Dyld(Dyld), Emu(Emu), Sys(Sys) {}
 
-  template <typename... ArgTypes> void callBack(void *FP, ArgTypes... Args) {
+  template <typename... ArgTys> void callBack(void *FP, ArgTys... Args) {
     uint64_t Addr = reinterpret_cast<uint64_t>(FP);
     LibraryInfo LI(Dyld.lookup(Addr));
     if (!LI.Lib || LI.Lib->isDLL()) {
       // Target load method is not inside any emulated Dylib, so it must be
       // native executable code and we can simply call it.
-      reinterpret_cast<void (*)(ArgTypes...)>(FP)(Args...);
+      reinterpret_cast<void (*)(ArgTys...)>(FP)(Args...);
     } else {
       // Target load method is inside some emulated library.
       pushArgs<UC_ARM_REG_R0>(Args...);
       Sys.execute(Addr);
     }
   }
-  template <typename... ArgTypes> void *callBackR(void *FP, ArgTypes... Args) {
+  template <typename... ArgTys> void *callBackR(void *FP, ArgTys... Args) {
     callBack(FP, Args...);
 
     // Fetch return value.
@@ -121,8 +121,8 @@ public:
 
 private:
   template <uc_arm_reg RegId> void pushArgs() {}
-  template <uc_arm_reg RegId, typename... ArgTypes>
-  void pushArgs(void *Arg, ArgTypes... Args) {
+  template <uc_arm_reg RegId, typename... ArgTys>
+  void pushArgs(void *Arg, ArgTys... Args) {
     using namespace ipasim;
 
     static_assert(UC_ARM_REG_R0 <= RegId && RegId <= UC_ARM_REG_R3,
