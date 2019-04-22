@@ -358,90 +358,111 @@ void SysTranslator::handleTrampolineStatic(ffi_cif *, void *Ret, void **Args,
   IpaSim.Sys.handleTrampoline(Ret, Args, Data);
 }
 
-// If `Addr` points to emulated code, returns address of wrapper that should be
-// called instead. Otherwise, returns `Addr` unchanged.
-void *SysTranslator::translate(void *Addr) {
-  uint64_t AddrVal = reinterpret_cast<uint64_t>(Addr);
-  AddrInfo AI(Dyld.lookup(AddrVal));
-  if (auto *Dylib = dynamic_cast<LoadedDylib *>(AI.Lib)) {
-    // The address points to Dylib.
+// If `FP` points to emulated code, returns address of wrapper that should be
+// called instead. Otherwise, returns `FP` unchanged.
+void *SysTranslator::translate(void *FP) {
+  uint64_t Addr = reinterpret_cast<uint64_t>(FP);
+  AddrInfo AI(Dyld.lookup(Addr));
 
-    if (ObjCMethod M = Dylib->getMachO().findMethod(AddrVal)) {
-      // We have found metadata of the callback method. Now, for simple methods,
-      // it's actually quite simple to translate i386 -> ARM calls dynamically,
-      // so that's what we do here.
-      // TODO: Generate wrappers for callbacks, too (see README of
-      // `HeadersAnalyzer` for more details).
-      if constexpr (PrintEmuInfo)
-        Log.info() << "dynamically handling callback "
-                   << Dyld.dumpAddr(AddrVal, AI, M) << Log.end();
+  auto *Dylib = dynamic_cast<LoadedDylib *>(AI.Lib);
+  if (!Dylib)
+    return FP;
 
-      // First, handle the return value.
-      TypeDecoder TD(M.getType());
-      auto *Tr = new Trampoline;
-      switch (TD.getNextTypeSize()) {
-      case 0:
-        Tr->Returns = false;
-        break;
-      case 4:
-        Tr->Returns = true;
-        break;
-      default:
-        Log.error("unsupported return type of callback");
-        return nullptr;
-      }
-
-      // Next, process function arguments.
-      Tr->ArgC = 0;
-      while (TD.hasNext()) {
-        switch (TD.getNextTypeSize()) {
-        case TypeDecoder::InvalidSize:
-          return nullptr;
-        case 4: {
-          if (Tr->ArgC > 3) {
-            Log.error("callback has too many arguments");
-            return nullptr;
-          }
-          ++Tr->ArgC;
-          break;
-        }
-        default:
-          Log.error("unsupported callback argument type");
-          return nullptr;
-        }
-      }
-
-      // Now, create trampoline.
-      Tr->Addr = AddrVal;
-      void *Ptr;
-      // TODO: `Closure` nor `Tr` are never deallocated.
-      auto *Closure = reinterpret_cast<ffi_closure *>(
-          ffi_closure_alloc(sizeof(ffi_closure), &Ptr));
-      if (!Closure) {
-        Log.error("couldn't allocate closure");
-        return nullptr;
-      }
-      static ffi_type *ArgTypes[4] = {&ffi_type_uint32, &ffi_type_uint32,
-                                      &ffi_type_uint32, &ffi_type_uint32};
-      if (ffi_prep_cif(&Tr->CIF, FFI_MS_CDECL, Tr->ArgC,
-                       Tr->Returns ? &ffi_type_uint32 : &ffi_type_void,
-                       ArgTypes) != FFI_OK) {
-        Log.error("couldn't prepare CIF");
-        return nullptr;
-      }
-      if (ffi_prep_closure_loc(Closure, &Tr->CIF, handleTrampolineStatic, Tr,
-                               Ptr) != FFI_OK) {
-        Log.error("couldn't prepare closure");
-        return nullptr;
-      }
-      return Ptr;
-    }
-
+  ObjCMethod M = Dylib->getMachO().findMethod(Addr);
+  if (!M) {
     Log.error("callback not found");
     return nullptr;
   }
 
-  return Addr;
+  // We have found metadata of the callback method. Now, for simple methods,
+  // it's actually quite simple to translate i386 -> ARM calls dynamically,
+  // so that's what we do here.
+  // TODO: Generate wrappers for callbacks, too (see README of
+  // `HeadersAnalyzer` for more details).
+  if constexpr (PrintEmuInfo)
+    Log.info() << "dynamically handling callback " << Dyld.dumpAddr(Addr, AI, M)
+               << Log.end();
+
+  // First, handle the return value.
+  TypeDecoder TD(M.getType());
+  bool Returns;
+  switch (TD.getNextTypeSize()) {
+  case 0:
+    Returns = false;
+    break;
+  case 4:
+    Returns = true;
+    break;
+  default:
+    Log.error("unsupported return type of callback");
+    return nullptr;
+  }
+
+  // Next, process function arguments.
+  size_t ArgC = 0;
+  while (TD.hasNext()) {
+    switch (TD.getNextTypeSize()) {
+    case TypeDecoder::InvalidSize:
+      return nullptr;
+    case 4: {
+      if (ArgC > 3) {
+        Log.error("callback has too many arguments");
+        return nullptr;
+      }
+      ++ArgC;
+      break;
+    }
+    default:
+      Log.error("unsupported callback argument type");
+      return nullptr;
+    }
+  }
+
+  // Now, create trampoline.
+  return createTrampoline(FP, ArgC, Returns);
+}
+
+void *SysTranslator::translate(void *FP, size_t ArgC, bool Returns) {
+  uint64_t Addr = reinterpret_cast<uint64_t>(FP);
+  AddrInfo AI(IpaSim.Dyld.lookup(Addr));
+
+  auto *Dylib = dynamic_cast<LoadedDylib *>(AI.Lib);
+  if (!Dylib)
+    return FP;
+
+  return createTrampoline(FP, ArgC, Returns);
+}
+
+void *SysTranslator::createTrampoline(void *FP, size_t ArgC, bool Returns) {
+  assert(ArgC <= 4);
+
+  auto *Tr = new Trampoline;
+  Tr->Returns = Returns;
+  Tr->ArgC = ArgC;
+  Tr->Addr = reinterpret_cast<uint64_t>(FP);
+
+  void *Ptr;
+  // TODO: `Closure` nor `Tr` are never deallocated.
+  auto *Closure = reinterpret_cast<ffi_closure *>(
+      ffi_closure_alloc(sizeof(ffi_closure), &Ptr));
+  if (!Closure) {
+    Log.error("couldn't allocate closure");
+    return nullptr;
+  }
+  static ffi_type *ArgTypes[4] = {&ffi_type_uint32, &ffi_type_uint32,
+                                  &ffi_type_uint32, &ffi_type_uint32};
+  if (ffi_prep_cif(&Tr->CIF, FFI_MS_CDECL, Tr->ArgC,
+                   Tr->Returns ? &ffi_type_uint32 : &ffi_type_void,
+                   ArgTypes) != FFI_OK) {
+    Log.error("couldn't prepare CIF");
+    return nullptr;
+  }
+  if (ffi_prep_closure_loc(Closure, &Tr->CIF, handleTrampolineStatic, Tr,
+                           Ptr) != FFI_OK) {
+    Log.error("couldn't prepare closure");
+    return nullptr;
+  }
+  return Ptr;
 }
 
 // =============================================================================

@@ -19,6 +19,7 @@ public:
   void execute(LoadedLibrary *Lib);
   void execute(uint64_t Addr);
   void *translate(void *Addr);
+  void *translate(void *Addr, size_t ArgC, bool Returns = false);
   template <typename... Args>
   void call(const std::string &Lib, const std::string &Func,
             Args &&... Params) {
@@ -27,8 +28,8 @@ public:
     auto *Ptr = reinterpret_cast<void (*)(Args...)>(Addr);
     Ptr(std::forward<Args>(Params)...);
   }
-  template <typename... ArgTypes> void callBack(void *FP, ArgTypes... Args);
-  template <typename... ArgTypes> void *callBackR(void *FP, ArgTypes... Args);
+  template <typename... ArgTys> void callBack(void *FP, ArgTys... Args);
+  template <typename... ArgTys> void *callBackR(void *FP, ArgTys... Args);
 
 private:
   bool handleFetchProtMem(uc_mem_type Type, uint64_t Addr, int Size,
@@ -37,6 +38,7 @@ private:
   bool handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size, int64_t Value);
   bool handleMemUnmapped(uc_mem_type Type, uint64_t Addr, int Size,
                          int64_t Value);
+  void *createTrampoline(void *Addr, size_t ArgC, bool Returns);
   void handleTrampoline(void *Ret, void **Args, void *Data);
   static void handleTrampolineStatic(ffi_cif *, void *Ret, void **Args,
                                      void *Data);
@@ -147,14 +149,13 @@ private:
   size_t getNextTypeSizeImpl();
 };
 
-template <typename... ArgTypes>
-inline void SysTranslator::callBack(void *FP, ArgTypes... Args) {
-  DynamicBackCaller(Dyld, Emu, *this).callBack<ArgTypes...>(FP, Args...);
+template <typename... ArgTys>
+inline void SysTranslator::callBack(void *FP, ArgTys... Args) {
+  DynamicBackCaller(Dyld, Emu, *this).callBack<ArgTys...>(FP, Args...);
 }
-template <typename... ArgTypes>
-inline void *SysTranslator::callBackR(void *FP, ArgTypes... Args) {
-  return DynamicBackCaller(Dyld, Emu, *this)
-      .callBackR<ArgTypes...>(FP, Args...);
+template <typename... ArgTys>
+inline void *SysTranslator::callBackR(void *FP, ArgTys... Args) {
+  return DynamicBackCaller(Dyld, Emu, *this).callBackR<ArgTys...>(FP, Args...);
 }
 
 } // namespace ipasim

@@ -48,6 +48,9 @@ IPASIM_API void ipaSim_translate4(uint32_t *Addr) {
   Addr[1] = reinterpret_cast<uint32_t>(
       IpaSim.Sys.translate(reinterpret_cast<void *>(Addr[1])));
 }
+IPASIM_API void *ipaSim_translateC(void *Addr, size_t ArgC) {
+  return IpaSim.Sys.translate(Addr, ArgC);
+}
 IPASIM_API const char *ipaSim_processPath() {
   return IpaSim.MainBinary.c_str();
 }
