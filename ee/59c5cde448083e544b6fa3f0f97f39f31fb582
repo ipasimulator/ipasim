@@ -1,0 +1,4 @@
+[ver:1,total:420]
+src/IpaSimulator/SysTranslator.cpp:150,1555956000:150,m
+src/IpaSimulator/DynamicLoader.cpp:145,1555956000:145,m
+include/ipasim/LoadedLibrary.hpp:125,1555956000:125,m
