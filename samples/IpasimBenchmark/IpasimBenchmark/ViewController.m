@@ -8,6 +8,8 @@
 
 #import "ViewController.h"
 
+#import <objc/runtime.h>
+
 @interface ViewController ()
 
 @property (strong, nonatomic) UILabel *status;
@@ -52,17 +54,27 @@ static void staticNoop(void *ctx) {}
 - (void)onStart {
     [self log:@"Started."];
 
-    [self benchmark:@"-[NSObject hash]" count:10000 block:^{
+    const size_t count = 20000;
+    
+    [self benchmark:@"-[NSObject hash]" count:count block:^{
         [self hash];
     }];
 
-    [self benchmark:@"-[ViewController noop] (block)" count:10000 block:^{
+    [self benchmark:@"-[ViewController noop] (block)" count:count block:^{
         [self noop];
     }];
 
-    [self benchmark:@"-[ViewController noop] (func)" count:10000 ctx:(__bridge void *)(self) func:funcNoop];
+    [self benchmark:@"-[ViewController noop] (func)" count:count ctx:(__bridge void *)(self) func:funcNoop];
 
-    [self benchmark:@"staticNoop" count:10000 ctx:NULL func:staticNoop];
+    [self benchmark:@"staticNoop" count:count ctx:NULL func:staticNoop];
+    
+    [self benchmark:@"objc_getClass (block)" count:count block:^{
+        objc_getClass("ViewController");
+    }];
+    
+    [self benchmark:@"objc_getClass (func)" count:count ctx:"ViewController" func:(void(*)(void *))objc_getClass];
+    
+    [self benchmark:@"object_isClass" count:count ctx:NULL func:(void(*)(void *))object_isClass];
 }
 
 - (void)viewDidLoad {
