@@ -13,10 +13,16 @@
 @property (strong, nonatomic) UILabel *status;
 @property (strong, nonatomic) UIButton *start;
 
+- (id)noop;
+
 @end
 
-// Benchmarking function from `libdispatch`
+// Benchmarking functions from `libdispatch`
 extern uint64_t dispatch_benchmark(size_t count, void (^block)(void));
+extern uint64_t dispatch_benchmark_f(size_t count, void *ctxt, void (*func)(void *));
+
+static void funcNoop(void *self) { [(__bridge ViewController *)self noop]; }
+static void staticNoop(void *ctx) {}
 
 @implementation ViewController
 
@@ -25,9 +31,18 @@ extern uint64_t dispatch_benchmark(size_t count, void (^block)(void));
     self.status.text = [self.status.text stringByAppendingString:message];
 }
 
+- (void)log:(NSString *)title time:(uint64_t)time {
+    [self log:[title stringByAppendingString:[@": " stringByAppendingString:@(time).stringValue]]];
+}
+
 - (void)benchmark:(NSString *)title count:(size_t)count block:(void(^)(void))block {
     uint64_t time = dispatch_benchmark(count, block);
-    [self log:[title stringByAppendingString:[@": " stringByAppendingString:@(time).stringValue]]];
+    [self log:title time:time];
+}
+
+- (void)benchmark:(NSString *)title count:(size_t)count ctx:(void *)ctx func:(void(*)(void *))func {
+    uint64_t time = dispatch_benchmark_f(count, ctx, func);
+    [self log:title time:time];
 }
 
 - (id)noop {
@@ -41,9 +56,13 @@ extern uint64_t dispatch_benchmark(size_t count, void (^block)(void));
         [self hash];
     }];
 
-    [self benchmark:@"-[ViewController noop]" count:10000 block:^{
+    [self benchmark:@"-[ViewController noop] (block)" count:10000 block:^{
         [self noop];
     }];
+
+    [self benchmark:@"-[ViewController noop] (func)" count:10000 ctx:(__bridge void *)(self) func:funcNoop];
+
+    [self benchmark:@"staticNoop" count:10000 ctx:NULL func:staticNoop];
 }
 
 - (void)viewDidLoad {
