@@ -67,7 +67,8 @@ void SysTranslator::execute(LoadedLibrary *Lib) {
 }
 
 void SysTranslator::execute(uint64_t Addr) {
-  Log.info() << "starting emulation at " << Dyld.dumpAddr(Addr) << Log.end();
+  if constexpr (PrintEmuInfo)
+    Log.info() << "starting emulation at " << Dyld.dumpAddr(Addr) << Log.end();
 
   // Save LR.
   LRs.push(Emu.readReg(UC_ARM_REG_LR));
@@ -102,6 +103,10 @@ void SysTranslator::execute(uint64_t Addr) {
 }
 
 void SysTranslator::returnToKernel() {
+  if constexpr (PrintEmuInfo)
+    Log.info() << "executing kernel at 0x"
+               << to_hex_string(Dyld.getKernelAddr()) << Log.end();
+
   // Restore LR.
   Emu.writeReg(UC_ARM_REG_LR, LRs.top());
   LRs.pop();
@@ -112,8 +117,7 @@ void SysTranslator::returnToKernel() {
 }
 
 void SysTranslator::returnToEmulation() {
-  // Log details about the return.
-  if constexpr (PrintReturns)
+  if constexpr (PrintEmuInfo)
     Log.info() << "returning to " << Dyld.dumpAddr(Emu.readReg(UC_ARM_REG_LR))
                << Log.end();
 
@@ -143,8 +147,6 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   if (!AI.Lib) {
     // Handle return to kernel.
     if (Addr == Dyld.getKernelAddr()) {
-      Log.info() << "executing kernel at 0x" << to_hex_string(Addr)
-                 << " (as protected)" << Log.end();
       returnToKernel();
       return true;
     }
@@ -179,8 +181,9 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
       // If there's no corresponding wrapper, maybe this is a simple Objective-C
       // method and we can translate it dynamically.
       if (ObjCMethod M = AI.Lib->getMachO().findMethod(Addr)) {
-        Log.info() << "dynamically handling method "
-                   << Dyld.dumpAddr(Addr, AI, M) << Log.end();
+        if constexpr (PrintEmuInfo)
+          Log.info() << "dynamically handling method "
+                     << Dyld.dumpAddr(Addr, AI, M) << Log.end();
 
         // Handle return value.
         TypeDecoder TD(M.getType());
@@ -242,7 +245,7 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   }
 
   // Log details.
-  if constexpr (PrintProtMemFetches) {
+  if constexpr (PrintEmuInfo) {
     Log.info() << "fetch prot. mem. at " << Dyld.dumpAddr(Addr, AI);
     if (!Wrapper)
       Log.infs() << " (not a wrapper)";
@@ -283,8 +286,6 @@ void SysTranslator::handleCode(uint64_t Addr, uint32_t Size) {
     // TODO: This shouldn't happen since kernel is non-executable but it does.
     // It's the same bug as described below.
     if (Addr == Dyld.getKernelAddr()) {
-      Log.info() << "executing kernel at 0x" << to_hex_string(Addr)
-                 << Log.end();
       returnToKernel();
       return;
     }
@@ -331,8 +332,9 @@ bool SysTranslator::handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size,
 // dependent DLL and we should load it as a whole.
 bool SysTranslator::handleMemUnmapped(uc_mem_type Type, uint64_t Addr, int Size,
                                       int64_t Value) {
-  Log.info() << "unmapped memory manipulation at " << Dyld.dumpAddr(Addr)
-             << " (" << Size << ")" << Log.end();
+  if constexpr (PrintEmuInfo)
+    Log.info() << "unmapped memory manipulation at " << Dyld.dumpAddr(Addr)
+               << " (" << Size << ")" << Log.end();
 
   // Map the memory, so that emulation can continue.
   Addr = DynamicLoader::alignToPageSize(Addr);
@@ -344,11 +346,14 @@ bool SysTranslator::handleMemUnmapped(uc_mem_type Type, uint64_t Addr, int Size,
 
 void SysTranslator::handleTrampoline(void *Ret, void **Args, void *Data) {
   auto *Tr = reinterpret_cast<Trampoline *>(Data);
-  Log.info() << "handling trampoline (arguments: " << Tr->ArgC;
-  if (Tr->Returns)
-    Log.infs() << ", returns)" << Log.end();
-  else
-    Log.infs() << ", void)" << Log.end();
+
+  if constexpr (PrintEmuInfo) {
+    Log.info() << "handling trampoline (arguments: " << Tr->ArgC;
+    if (Tr->Returns)
+      Log.infs() << ", returns)" << Log.end();
+    else
+      Log.infs() << ", void)" << Log.end();
+  }
 
   // Pass arguments.
   uc_arm_reg RegId = UC_ARM_REG_R0;
@@ -382,8 +387,9 @@ void *SysTranslator::translate(void *Addr) {
       // so that's what we do here.
       // TODO: Generate wrappers for callbacks, too (see README of
       // `HeadersAnalyzer` for more details).
-      Log.info() << "dynamically handling callback "
-                 << Dyld.dumpAddr(AddrVal, AI, M) << Log.end();
+      if constexpr (PrintEmuInfo)
+        Log.info() << "dynamically handling callback "
+                   << Dyld.dumpAddr(AddrVal, AI, M) << Log.end();
 
       // First, handle the return value.
       TypeDecoder TD(M.getType());
