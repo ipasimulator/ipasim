@@ -160,97 +160,7 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
     Log.error("unmapped address fetched");
     return false;
   }
-
-  // If the target is not a wrapper DLL, we must find and call the corresponding
-  // wrapper instead.
   bool Wrapper = AI.Lib->IsWrapperDLL;
-  if (!Wrapper) {
-    filesystem::path WrapperPath(filesystem::path("gen") /
-                                 filesystem::path(*AI.LibPath)
-                                     .filename()
-                                     .replace_extension(".wrapper.dll"));
-    LoadedLibrary *WrapperLib = Dyld.load(WrapperPath.string());
-    if (!WrapperLib)
-      return false;
-
-    // Load `WrapperIndex`.
-    uint64_t IdxAddr =
-        WrapperLib->findSymbol(Dyld, "?Idx@@3UWrapperIndex@ipasim@@A");
-    auto *Idx = reinterpret_cast<WrapperIndex *>(IdxAddr);
-
-    // TODO: Add real base address instead of hardcoded 0x1000.
-    uint64_t RVA = Addr - AI.Lib->StartAddress + 0x1000;
-
-    // Find Dylib with the corresponding wrapper.
-    auto Entry = Idx->Map.find(RVA);
-    if (Entry == Idx->Map.end()) {
-      // If there's no corresponding wrapper, maybe this is a simple Objective-C
-      // method and we can translate it dynamically.
-      if (ObjCMethod M = AI.Lib->getMachO().findMethod(Addr)) {
-        if constexpr (PrintEmuInfo)
-          Log.info() << "dynamically handling method "
-                     << Dyld.dumpAddr(Addr, AI, M) << Log.end();
-
-        // Handle return value.
-        TypeDecoder TD(M.getType());
-        bool Returns;
-        switch (TD.getNextTypeSize()) {
-        case 0:
-          Returns = false;
-          break;
-        case 4:
-          Returns = true;
-          break;
-        default:
-          Log.error("unsupported return type");
-          return false;
-        }
-
-        // Process function arguments.
-        auto DC = make_unique<DynamicCaller>(Emu);
-        while (TD.hasNext()) {
-          size_t Size = TD.getNextTypeSize();
-          if (Size == TypeDecoder::InvalidSize)
-            return false;
-          DC->loadArg(Size);
-        }
-
-        continueOutsideEmulation([=, DCP = DC.release()]() {
-          unique_ptr<DynamicCaller> DC(DCP);
-
-          // Call the function.
-          if (!DC->call(Returns, Addr))
-            return;
-
-          returnToEmulation();
-        });
-
-        Emu.ignoreNextError();
-        return false;
-      }
-
-      Log.error() << "cannot find RVA 0x" << to_hex_string(RVA)
-                  << " in WrapperIndex of " << WrapperPath.string()
-                  << Log.end();
-      return false;
-    }
-    const string &Dylib = Idx->Dylibs[Entry->second];
-    LoadedLibrary *WrapperDylib = Dyld.load(Dylib);
-    if (!WrapperDylib)
-      return false;
-
-    // Find the correct wrapper using its alias.
-    Addr = WrapperDylib->findSymbol(Dyld, "$__ipaSim_wraps_" + to_string(RVA));
-    if (!Addr) {
-      Log.error() << "cannot find wrapper for 0x" << to_hex_string(RVA)
-                  << " in " << *AI.LibPath << Log.end();
-      return false;
-    }
-
-    AI = Dyld.lookup(Addr);
-    assert(AI.Lib &&
-           "Symbol found in library wasn't found there in reverse lookup.");
-  }
 
   // Log details.
   if constexpr (PrintEmuInfo) {
@@ -260,9 +170,64 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
     Log.infs() << Log.end();
   }
 
-  // If the target is not a wrapper, we simply jump to it, no need to translate
-  // anything.
-  if (!Wrapper) {
+  if (Wrapper) {
+    // Read register R0 containing address of our structure with function
+    // arguments and return value.
+    uint32_t R0 = Emu.readReg(UC_ARM_REG_R0);
+
+    continueOutsideEmulation([=]() {
+      // Call the target function.
+      auto *Func = reinterpret_cast<void (*)(uint32_t)>(Addr);
+      Func(R0);
+
+      returnToEmulation();
+    });
+
+    Emu.ignoreNextError();
+    return false;
+  }
+
+  // If the target is not a wrapper DLL, we must find and call the corresponding
+  // wrapper instead.
+  filesystem::path WrapperPath(filesystem::path("gen") /
+                               filesystem::path(*AI.LibPath)
+                                   .filename()
+                                   .replace_extension(".wrapper.dll"));
+  LoadedLibrary *WrapperLib = Dyld.load(WrapperPath.string());
+  if (!WrapperLib) {
+    Log.error() << "cannot find wrapper DLL " << WrapperPath << Log.end();
+    return false;
+  }
+
+  // Load `WrapperIndex`.
+  uint64_t IdxAddr =
+      WrapperLib->findSymbol(Dyld, "?Idx@@3UWrapperIndex@ipasim@@A");
+  auto *Idx = reinterpret_cast<WrapperIndex *>(IdxAddr);
+
+  // TODO: Add real base address instead of hardcoded 0x1000.
+  uint64_t RVA = Addr - AI.Lib->StartAddress + 0x1000;
+
+  // Find Dylib with the corresponding wrapper.
+  auto Entry = Idx->Map.find(RVA);
+  if (Entry != Idx->Map.end()) {
+    const string &Dylib = Idx->Dylibs[Entry->second];
+    LoadedLibrary *WrapperDylib = Dyld.load(Dylib);
+    if (!WrapperDylib) {
+      Log.error() << "cannot load wrapper Dylib " << Dylib << Log.end();
+      return false;
+    }
+
+    // Find the correct wrapper using its alias.
+    Addr = WrapperDylib->findSymbol(Dyld, "$__ipaSim_wraps_" + to_string(RVA));
+    if (!Addr) {
+      Log.error() << "cannot find wrapper for 0x" << to_hex_string(RVA)
+                  << " in " << *AI.LibPath << Log.end();
+      return false;
+    }
+
+    if constexpr (PrintEmuInfo)
+      Log.info() << "found wrapper at " << Dyld.dumpAddr(Addr) << Log.end();
+
     // Note that doing just `Emu.writeReg(UC_ARM_REG_PC, Addr);` instead of all
     // this didn't work in Release mode for some reason.
     Emu.stop();
@@ -275,14 +240,50 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
     return false;
   }
 
-  // Read register R0 containing address of our structure with function
-  // arguments and return value.
-  uint32_t R0 = Emu.readReg(UC_ARM_REG_R0);
+  // If there's no corresponding wrapper, maybe this is a simple Objective-C
+  // method and we can translate it dynamically.
+  ObjCMethod M = AI.Lib->getMachO().findMethod(Addr);
+  if (!M) {
+    Log.error() << "cannot find Objective-C method for "
+                << Dyld.dumpAddr(Addr, AI) << Log.end();
+    return false;
+  }
 
-  continueOutsideEmulation([=]() {
-    // Call the target function.
-    auto *Func = reinterpret_cast<void (*)(uint32_t)>(Addr);
-    Func(R0);
+  if constexpr (PrintEmuInfo)
+    Log.info() << "dynamically handling method " << Dyld.dumpAddr(Addr, AI, M)
+               << Log.end();
+
+  // Handle return value.
+  TypeDecoder TD(M.getType());
+  bool Returns;
+  switch (TD.getNextTypeSize()) {
+  case 0:
+    Returns = false;
+    break;
+  case 4:
+    Returns = true;
+    break;
+  default:
+    Log.error() << "unsupported return type of " << Dyld.dumpAddr(Addr, AI, M)
+                << Log.end();
+    return false;
+  }
+
+  // Process function arguments.
+  auto DC = make_unique<DynamicCaller>(Emu);
+  while (TD.hasNext()) {
+    size_t Size = TD.getNextTypeSize();
+    if (Size == TypeDecoder::InvalidSize)
+      return false;
+    DC->loadArg(Size);
+  }
+
+  continueOutsideEmulation([=, DCP = DC.release()]() {
+    unique_ptr<DynamicCaller> DC(DCP);
+
+    // Call the function.
+    if (!DC->call(Returns, Addr))
+      return;
 
     returnToEmulation();
   });
