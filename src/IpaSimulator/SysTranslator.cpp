@@ -157,10 +157,16 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   // Check that the target address is in some loaded library.
   AddrInfo AI(Dyld.lookup(Addr));
   if (!AI.Lib) {
-    Log.error("unmapped address fetched");
+    Log.error() << "non-library address fetched (" << Dyld.dumpAddr(Addr) << ")"
+                << Log.end();
     return false;
   }
-  bool Wrapper = AI.Lib->IsWrapper && AI.Lib->isDLL();
+  if (AI.Lib->isDylib()) {
+    Log.error() << "protected memory fetched in Dylib (" << Dyld.dumpAddr(Addr)
+                << ")" << Log.end();
+    return false;
+  }
+  bool Wrapper = AI.Lib->IsWrapper;
 
   // Log details.
   if constexpr (PrintEmuInfo) {
@@ -189,10 +195,10 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
 
   // If the target is not a wrapper DLL, we must find and call the corresponding
   // wrapper instead.
-  filesystem::path WrapperPath(filesystem::path("gen") /
-                               filesystem::path(*AI.LibPath)
-                                   .filename()
-                                   .replace_extension(".wrapper.dll"));
+  filesystem::path DLLPath(*AI.LibPath);
+  filesystem::path WrapperPath(
+      filesystem::path("gen") /
+      DLLPath.filename().replace_extension(".wrapper.dll"));
   LoadedLibrary *WrapperLib = Dyld.load(WrapperPath.string());
   if (!WrapperLib) {
     Log.error() << "cannot find wrapper DLL " << WrapperPath << Log.end();
@@ -218,7 +224,9 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
     }
 
     // Find the correct wrapper using its alias.
-    Addr = WrapperDylib->findSymbol(Dyld, "$__ipaSim_wraps_" + to_string(RVA));
+    Addr = WrapperDylib->findSymbol(Dyld, "$__ipaSim_wraps_" +
+                                              DLLPath.stem().string() + "_" +
+                                              to_string(RVA));
     if (!Addr) {
       Log.error() << "cannot find wrapper for 0x" << to_hex_string(RVA)
                   << " in " << *AI.LibPath << Log.end();

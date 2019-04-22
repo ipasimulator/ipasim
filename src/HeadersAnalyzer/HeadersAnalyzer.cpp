@@ -446,11 +446,12 @@ private:
     // Compile to LLVM IR.
     Clang.executeCodeGenAction<EmitLLVMOnlyAction>();
   }
-  // TODO: Cannot it happen that RVAs from multiple DLLs wrapped by the same
-  // Dylib will collide?
   void createAlias(const ExportEntry &Exp, llvm::Function *Func) {
     llvm::StringRef RVAStr = LLVM.Saver.save(to_string(Exp.RVA));
-    llvm::GlobalAlias::create(Twine("\01$__ipaSim_wraps_") + RVAStr, Func);
+    llvm::StringRef DLLName = LLVM.Saver.save(
+        path(HAC.DLLGroups[Exp.DLLGroup].DLLs[Exp.DLL].Name).stem().string());
+    llvm::GlobalAlias::create(
+        Twine("\01$__ipaSim_wraps_") + DLLName + "_" + RVAStr, Func);
   }
 };
 
