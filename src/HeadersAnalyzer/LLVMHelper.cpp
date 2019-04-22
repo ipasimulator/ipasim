@@ -161,7 +161,12 @@ StructType *IRHelper::createParamStruct(const ExportEntry &Exp) {
 
   // Create a structure that we use to store the function's arguments and return
   // value. It contains space for the return value and addresses of arguments.
-  return StructType::create(ParamPointers, "struct");
+  // Structure alignment is different on different platforms, that's why we
+  // create a *packed* structure.
+  // TODO: Maybe align it manually.
+  // TODO: Also ensure that WinObjC's and other DLLs' structures are aligned as
+  // they would be on iOS.
+  return StructType::create(ParamPointers, "struct", /* isPacked */ true);
 }
 
 Value *IRHelper::createCall(Function *Func, ArrayRef<Value *> Args,
