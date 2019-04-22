@@ -15,6 +15,9 @@
 
 @end
 
+// Benchmarking function from `libdispatch`
+extern uint64_t dispatch_benchmark(size_t count, void (^block)(void));
+
 @implementation ViewController
 
 - (void)log:(NSString *)message {
@@ -22,21 +25,30 @@
     self.status.text = [self.status.text stringByAppendingString:message];
 }
 
+- (void)benchmark:(NSString *)title count:(size_t)count block:(void(^)(void))block {
+    uint64_t time = dispatch_benchmark(count, block);
+    [self log:[title stringByAppendingString:[@": " stringByAppendingString:@(time).stringValue]]];
+}
+
+- (id)noop {
+    return self;
+}
+
 - (void)onStart {
     [self log:@"Started."];
 
-    // Benchmarking function from `libdispatch`
-    extern uint64_t dispatch_benchmark(size_t count, void (^block)(void));
-
-    uint64_t time = dispatch_benchmark(10000, ^{
+    [self benchmark:@"-[NSObject hash]" count:10000 block:^{
         [self hash];
-    });
-    [self log:[@"-[NSObject hash]: " stringByAppendingString:@(time).stringValue]];
+    }];
+
+    [self benchmark:@"-[ViewController noop]" count:10000 block:^{
+        [self noop];
+    }];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
     CGRect bounds = self.view.bounds;
 
     self.status = [[UILabel alloc] initWithFrame:bounds];
@@ -59,7 +71,7 @@
 
 - (void)viewWillLayoutSubviews {
     [super viewWillLayoutSubviews];
-    
+
     CGRect bounds = self.view.bounds;
     CGFloat padding = 30.0f;
     CGFloat height = 50.0f;
