@@ -1,0 +1,4 @@
+[ver:1,total:975]
+samples/IpasimBenchmark/IpasimBenchmark/ViewController.m:735,1555923600:660,1555927200:15,1555930800:60,m
+src/HeadersAnalyzer/CMakeLists.txt:210,1555927200:210,r
+cmake/ipasim-x86-Release/cg/libdispatch.obj.ll:30,1555927200:30,r
