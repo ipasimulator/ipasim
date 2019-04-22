@@ -1,0 +1,7 @@
+[ver:1,total:1245]
+cmake/ipasim-x86-Release/cg/libdispatch.obj.ll:404,1555923600:54,1555927200:350,r
+src/HeadersAnalyzer/LLVMHelper.cpp:340,1555927200:340,m
+src/HeadersAnalyzer/CMakeLists.txt:260,1555927200:260,r
+cmake/ipasim-x86-Release/cg/libdispatch.o.ll:162,1555923600:162,r
+src/HeadersAnalyzer/iOSHeaders.mm:59,1555923600:24,1555927200:35,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:20,1555927200:20,r
