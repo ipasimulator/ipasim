@@ -1,2 +1,6 @@
 [ver:1,total:60]
 samples/IpasimBenchmark/IpasimBenchmark/ViewController.m:60,1555923600:60,m
+
+[ver:1,total:240]
+include/ipasim/Emulator.hpp:180,1555916400:180,r
+samples/IpasimBenchmark/IpasimBenchmark/ViewController.m:60,1555923600:60,m
