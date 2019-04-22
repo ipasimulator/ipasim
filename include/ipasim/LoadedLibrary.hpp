@@ -16,12 +16,14 @@ class DynamicLoader;
 
 class LoadedLibrary {
 public:
-  LoadedLibrary() : StartAddress(0), Size(0), IsWrapperDLL(false) {}
+  LoadedLibrary() : StartAddress(0), Size(0), IsWrapper(false) {}
   virtual ~LoadedLibrary() = default;
 
   uint64_t StartAddress, Size;
-  bool IsWrapperDLL;
+  bool IsWrapper;
 
+  virtual bool isDylib() = 0;
+  bool isDLL() { return !isDylib(); }
   // TODO: Check that the found symbol is inside range [StartAddress, +Size].
   virtual uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) = 0;
   virtual bool hasUnderscorePrefix() = 0;
@@ -37,6 +39,8 @@ public:
 
   LoadedDylib(std::unique_ptr<LIEF::MachO::FatBinary> &&Fat)
       : Fat(move(Fat)), Bin(Fat->at(0)), Header(0) {}
+
+  bool isDylib() override { return true; }
   uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) override;
   bool hasUnderscorePrefix() override { return true; }
   bool hasMachO() override { return true; }
@@ -56,6 +60,7 @@ public:
   HMODULE Ptr;
   bool MachOPoser;
 
+  bool isDylib() override { return false; }
   uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) override;
   bool hasUnderscorePrefix() override { return false; }
   bool hasMachO() override { return MachOPoser; }

@@ -66,10 +66,9 @@ LoadedLibrary *DynamicLoader::load(const string &Path) {
     return nullptr;
   }
 
-  // Recognize wrapper DLLs.
+  // Recognize wrapper libraries.
   if (L)
-    L->IsWrapperDLL = BP.Relative && startsWith(BP.Path, "gen\\") &&
-                      endsWith(BP.Path, ".wrapper.dll");
+    L->IsWrapper = BP.Relative && startsWith(BP.Path, "gen\\");
 
   return L;
 }

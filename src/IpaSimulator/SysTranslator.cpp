@@ -160,7 +160,7 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
     Log.error("unmapped address fetched");
     return false;
   }
-  bool Wrapper = AI.Lib->IsWrapperDLL;
+  bool Wrapper = AI.Lib->IsWrapper && AI.Lib->isDLL();
 
   // Log details.
   if constexpr (PrintEmuInfo) {
@@ -427,8 +427,7 @@ void *SysTranslator::translate(void *FP, size_t ArgC, bool Returns) {
   uint64_t Addr = reinterpret_cast<uint64_t>(FP);
   AddrInfo AI(IpaSim.Dyld.lookup(Addr));
 
-  auto *Dylib = dynamic_cast<LoadedDylib *>(AI.Lib);
-  if (!Dylib)
+  if (AI.Lib && AI.Lib->isDLL())
     return FP;
 
   return createTrampoline(FP, ArgC, Returns);
