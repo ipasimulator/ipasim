@@ -1,0 +1,5 @@
+[ver:1,total:420]
+src/IpaSimulator/SysTranslator.cpp:180,1555945200:180,r
+samples/IpasimBenchmark/IpasimBenchmark/ViewController.m:120,1555945200:120,m
+include/ipasim/DynamicLoader.hpp:60,1555945200:60,r
+include/ipasim/SysTranslator.hpp:60,1555945200:60,r
