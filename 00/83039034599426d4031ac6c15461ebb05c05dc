@@ -1,0 +1,4 @@
+[ver:1,total:2880]
+src/IpaSimulator/SysTranslator.cpp:1239,1555934400:180,1555941600:1059,m
+include/ipasim/SysTranslator.hpp:934,1555941600:904,1555945200:30,m
+src/IpaSimulator/IpaSimulator.cpp:707,1555938000:180,1555941600:497,1555945200:30,m
