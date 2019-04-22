@@ -43,8 +43,9 @@ void SysTranslator::execute(LoadedLibrary *Lib) {
   // This hook handles calls across platform boundaries (iOS -> Windows). It
   // works thanks to mapping Windows DLLs as non-executable.
   Emu.hook(UC_HOOK_MEM_FETCH_PROT, &SysTranslator::handleFetchProtMem, this);
-  // This hook logs execution for debugging purposes.
-  Emu.hook(UC_HOOK_CODE, &SysTranslator::handleCode, this);
+  if constexpr (PrintInstructions)
+    // This hook logs execution for debugging purposes.
+    Emu.hook(UC_HOOK_CODE, &SysTranslator::handleCode, this);
   if constexpr (PrintMemoryWrites)
     // This hook logs all memory writes.
     Emu.hook(UC_HOOK_MEM_WRITE, &SysTranslator::handleMemWrite, this);
@@ -140,17 +141,22 @@ void SysTranslator::continueOutsideEmulation(function<void()> &&Cont) {
   Running = false;
 }
 
+// Note that we never return `true` from this handler, so that protected memory
+// stays protected in Unicorn. If we returned `true`, Unicorn would fetch the
+// memory, and it would get into the cache, effectively becoming unprotected.
 bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
                                        int Size, int64_t Value) {
+  // Handle return to kernel.
+  if (Addr == Dyld.getKernelAddr()) {
+    returnToKernel();
+
+    Emu.ignoreNextError();
+    return false;
+  }
+
   // Check that the target address is in some loaded library.
   AddrInfo AI(Dyld.lookup(Addr));
   if (!AI.Lib) {
-    // Handle return to kernel.
-    if (Addr == Dyld.getKernelAddr()) {
-      returnToKernel();
-      return true;
-    }
-
     Log.error("unmapped address fetched");
     return false;
   }
@@ -218,7 +224,9 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
 
           returnToEmulation();
         });
-        return true;
+
+        Emu.ignoreNextError();
+        return false;
       }
 
       Log.error() << "cannot find RVA 0x" << to_hex_string(RVA)
@@ -262,7 +270,9 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
     Restart = true;
     RestartFromLRs = true;
     LRs.push(Addr);
-    return true;
+
+    Emu.ignoreNextError();
+    return false;
   }
 
   // Read register R0 containing address of our structure with function
@@ -276,48 +286,23 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
 
     returnToEmulation();
   });
-  return true;
+
+  Emu.ignoreNextError();
+  return false;
 }
 
 void SysTranslator::handleCode(uint64_t Addr, uint32_t Size) {
-  AddrInfo AI(Dyld.lookup(Addr));
-  if (!AI.Lib) {
-    // Handle return to kernel.
-    // TODO: This shouldn't happen since kernel is non-executable but it does.
-    // It's the same bug as described below.
-    if (Addr == Dyld.getKernelAddr()) {
-      returnToKernel();
-      return;
-    }
-
-    Log.error("unmapped address executed");
-    return;
-  }
-
-  // There is a bug that sometimes protected memory accesses are not caught by
-  // Unicorn Engine.
-  // TODO: Fix that bug, maybe.
-  // See also <https://github.com/unicorn-engine/unicorn/issues/888>.
-  if (!dynamic_cast<LoadedDylib *>(Dyld.load(*AI.LibPath))) {
-    // TODO: Stop execution if this returns false.
-    handleFetchProtMem(UC_MEM_FETCH_PROT, Addr, Size, 0);
-    return;
-  }
-
-  if constexpr (PrintInstructions) {
-    auto *R13 = reinterpret_cast<uint32_t *>(Emu.readReg(UC_ARM_REG_R13));
-    Log.info() << "executing at " << Dyld.dumpAddr(Addr, AI) << " [R0 = 0x"
-               << to_hex_string(Emu.readReg(UC_ARM_REG_R0)) << ", R1 = 0x"
-               << to_hex_string(Emu.readReg(UC_ARM_REG_R1)) << ", R7 = 0x"
-               << to_hex_string(Emu.readReg(UC_ARM_REG_R7)) << ", R12 = 0x"
-               << to_hex_string(Emu.readReg(UC_ARM_REG_R12)) << ", R13 = 0x"
-               << to_hex_string(Emu.readReg(UC_ARM_REG_R13)) << ", [R13] = 0x"
-               << to_hex_string(R13[0]) << ", [R13+4] = 0x"
-               << to_hex_string(R13[1]) << ", [R13+8] = 0x"
-               << to_hex_string(R13[2]) << ", R14 = 0x"
-               << to_hex_string(Emu.readReg(UC_ARM_REG_R14)) << "]"
-               << Log.end();
-  }
+  auto *R13 = reinterpret_cast<uint32_t *>(Emu.readReg(UC_ARM_REG_R13));
+  Log.info() << "executing at " << Dyld.dumpAddr(Addr) << " [R0 = 0x"
+             << to_hex_string(Emu.readReg(UC_ARM_REG_R0)) << ", R1 = 0x"
+             << to_hex_string(Emu.readReg(UC_ARM_REG_R1)) << ", R7 = 0x"
+             << to_hex_string(Emu.readReg(UC_ARM_REG_R7)) << ", R12 = 0x"
+             << to_hex_string(Emu.readReg(UC_ARM_REG_R12)) << ", R13 = 0x"
+             << to_hex_string(Emu.readReg(UC_ARM_REG_R13)) << ", [R13] = 0x"
+             << to_hex_string(R13[0]) << ", [R13+4] = 0x"
+             << to_hex_string(R13[1]) << ", [R13+8] = 0x"
+             << to_hex_string(R13[2]) << ", R14 = 0x"
+             << to_hex_string(Emu.readReg(UC_ARM_REG_R14)) << "]" << Log.end();
 }
 
 bool SysTranslator::handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size,

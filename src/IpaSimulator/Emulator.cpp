@@ -38,6 +38,11 @@ void Emulator::hook(uc_hook_type Type, void *Handler, void *Instance) {
   callUC(uc_hook_add(UC, &Hook, Type, Handler, Instance, 1, 0));
 }
 
+void Emulator::ignoreNextError() {
+  assert(!IgnoreError && "Only one next error can be ignored.");
+  IgnoreError = true;
+}
+
 uc_engine *Emulator::initUC() {
   uc_engine *UC;
   callUCStatic(uc_open(UC_ARCH_ARM, UC_MODE_ARM, &UC));
@@ -50,8 +55,12 @@ void Emulator::callUCStatic(uc_err Err) {
 }
 
 void Emulator::callUC(uc_err Err) {
-  if (Err != UC_ERR_OK)
-    Log.error() << "unicorn failed with " << Err << " at "
-                << Dyld.dumpAddr(readReg(UC_ARM_REG_PC))
-                << Log.fatalEnd("Unicorn error.");
+  if (Err != UC_ERR_OK) {
+    if (IgnoreError)
+      IgnoreError = false;
+    else
+      Log.error() << "unicorn failed with " << Err << " at "
+                  << Dyld.dumpAddr(readReg(UC_ARM_REG_PC))
+                  << Log.fatalEnd("Unicorn error.");
+  }
 }

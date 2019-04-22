@@ -33,9 +33,13 @@ struct FunctionHelper<T, RetTy(ArgTys...)> {
 
 class Emulator {
 public:
-  Emulator(DynamicLoader &Dyld) : UC(initUC()), Dyld(Dyld) {}
+  Emulator(DynamicLoader &Dyld)
+      : UC(initUC()), Dyld(Dyld), IgnoreError(false) {}
   Emulator(const Emulator &) = delete;
-  Emulator(Emulator &&E) : UC(nullptr), Dyld(E.Dyld) { std::swap(UC, E.UC); }
+  Emulator(Emulator &&E)
+      : UC(nullptr), Dyld(E.Dyld), IgnoreError(E.IgnoreError) {
+    std::swap(UC, E.UC);
+  }
   ~Emulator();
 
   uint32_t readReg(uc_arm_reg RegId);
@@ -53,10 +57,12 @@ public:
     using Helper = hooks::FunctionHelper<T, F>;
     hook(Type, Helper::hook, new typename Helper::DataTy{Instance, Handler});
   }
+  void ignoreNextError();
 
 private:
   uc_engine *UC;
   DynamicLoader &Dyld;
+  bool IgnoreError;
 
   static uc_engine *initUC();
   static void callUCStatic(uc_err Err);
