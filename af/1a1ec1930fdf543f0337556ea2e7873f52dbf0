@@ -1,0 +1,6 @@
+[ver:1,total:720]
+cmake/ipasim-x86-Release/cg/exports.txt:360,1555930800:360,r
+include/ipasim/SysTranslator.hpp:180,1555934400:180,r
+src/IpaSimulator/SysTranslator.cpp:90,1555934400:90,r
+src/HeadersAnalyzer/CMakeLists.txt:60,1555930800:60,r
+samples/IpasimBenchmark/IpasimBenchmark/ViewController.m:30,1555934400:30,m
