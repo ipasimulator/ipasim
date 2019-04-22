@@ -51,6 +51,13 @@ static void staticNoop(void *ctx) {}
     return self;
 }
 
+- (size_t)noSyscalls {
+    size_t result = 1;
+    for (size_t i = 120; i != 0; --i)
+        result *= i;
+    return result;
+}
+
 - (void)onStart {
     [self log:@"Started."];
 
@@ -75,6 +82,14 @@ static void staticNoop(void *ctx) {}
     [self benchmark:@"objc_getClass (func)" count:count ctx:"ViewController" func:(void(*)(void *))objc_getClass];
     
     [self benchmark:@"object_isClass" count:count ctx:NULL func:(void(*)(void *))object_isClass];
+
+    [self benchmark:@"-[ViewController viewWillLayoutSubviews]" count:count block:^{
+        [self viewWillLayoutSubviews];
+    }];
+
+    [self benchmark:@"-[ViewController noSyscalls]" count:count block:^{
+        [self noSyscalls];
+    }];
 }
 
 - (void)viewDidLoad {
