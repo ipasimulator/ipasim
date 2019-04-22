@@ -210,8 +210,7 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
       WrapperLib->findSymbol(Dyld, "?Idx@@3UWrapperIndex@ipasim@@A");
   auto *Idx = reinterpret_cast<WrapperIndex *>(IdxAddr);
 
-  // TODO: Add real base address instead of hardcoded 0x1000.
-  uint64_t RVA = Addr - LI.Lib->StartAddress + 0x1000;
+  uint64_t RVA = Addr - LI.Lib->StartAddress + DLLBase;
 
   // Find Dylib with the corresponding wrapper.
   auto Entry = Idx->Map.find(RVA);
@@ -224,9 +223,8 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
     }
 
     // Find the correct wrapper using its alias.
-    Addr = WrapperDylib->findSymbol(Dyld, "$__ipaSim_wraps_" +
-                                              DLLPath.stem().string() + "_" +
-                                              to_string(RVA));
+    Addr = WrapperDylib->findSymbol(
+        Dyld, WrapsPrefix.S + DLLPath.stem().string() + "_" + to_string(RVA));
     if (!Addr) {
       Log.error() << "cannot find wrapper for 0x" << to_hex_string(RVA)
                   << " in " << *LI.LibPath << Log.end();
@@ -444,12 +442,39 @@ void *SysTranslator::translate(void *FP, size_t ArgC, bool Returns) {
 
     // `FP` is a Dylib wrapper. We can skip it, we just need to find what it
     // wraps.
-    if (LI.Lib->IsWrapper) {
-      Log.info() << *LI.LibPath << " is a wrapper" << Log.end();
-      for (Symbol &Symbol : Dylib->lookup(Addr)) {
-        Log.info() << "found symbol " << Symbol.name() << Log.end();
-      }
-    }
+    if (LI.Lib->IsWrapper)
+      for (Symbol &Symbol : Dylib->lookup(Addr))
+        if (startsWith(Symbol.name(), WrapsPrefix)) {
+          // Parse the special name.
+          const char *Postfix = Symbol.name().c_str() + WrapsPrefix.Len;
+          const char *Underscore = strchr(Postfix, '_');
+          if (!Underscore) {
+            Log.error() << "invalid special symbol " << Symbol.name()
+                        << Log.end();
+            continue;
+          }
+          uint64_t RVA = atol(Underscore + 1);
+          string DLLName = string(Postfix, Underscore - Postfix) + ".dll";
+
+          // Load the wrapped library.
+          LoadedLibrary *Lib = Dyld.load(DLLName);
+          if (!Lib) {
+            Log.error() << "couldn't load DLL for symbol " << Symbol.name()
+                        << Log.end();
+            continue;
+          }
+          if (RVA >= Lib->Size) {
+            Log.error() << "RVA out of bounds for symbol " << Symbol.name()
+                        << Log.end();
+            continue;
+          }
+
+          Addr = Lib->StartAddress + RVA - DLLBase;
+          if constexpr (PrintEmuInfo)
+            Log.info() << "skipped wrapper for symbol " << Symbol.name() << " ("
+                       << Dyld.dumpAddr(Addr) << ")" << Log.end();
+          return reinterpret_cast<void *>(Addr);
+        }
   }
 
   return createTrampoline(FP, ArgC, Returns);

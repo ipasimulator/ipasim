@@ -46,6 +46,8 @@ private:
   void returnToEmulation();
   void continueOutsideEmulation(std::function<void()> &&Cont);
 
+  static constexpr ConstexprString WrapsPrefix = "$__ipaSim_wraps_";
+  static constexpr uint64_t DLLBase = 0x1000; // TODO: Don't hardcode this.
   DynamicLoader &Dyld;
   Emulator &Emu;
   std::stack<uint32_t> LRs; // stack of return addresses
