@@ -436,6 +436,7 @@ void *SysTranslator::translate(void *FP, size_t ArgC, bool Returns) {
 void *SysTranslator::createTrampoline(void *FP, size_t ArgC, bool Returns) {
   assert(ArgC <= 4);
 
+  // TODO: Don't create different trampolines for the same `FP`.
   auto *Tr = new Trampoline;
   Tr->Returns = Returns;
   Tr->ArgC = ArgC;
