@@ -7,6 +7,27 @@
 using namespace ipasim;
 using namespace std;
 
+DylibSymbolIterator DylibSymbolIterator::begin() {
+  return DylibSymbolIterator(RVA, Symbols.begin()).next();
+}
+
+DylibSymbolIterator &DylibSymbolIterator::next() {
+  while (Symbols != Symbols.end() && Symbols->value() != RVA)
+    ++Symbols;
+  return *this;
+}
+
+DylibSymbolIterator &DylibSymbolIterator::operator++() {
+  ++Symbols;
+  return next();
+}
+
+bool DylibSymbolIterator::operator!=(const DylibSymbolIterator &Other) {
+  return Symbols != Other.Symbols;
+}
+
+LIEF::MachO::Symbol &DylibSymbolIterator::operator*() { return *Symbols; }
+
 bool LoadedLibrary::isInRange(uint64_t Addr) {
   return StartAddress <= Addr && Addr < StartAddress + Size;
 }
@@ -48,4 +69,9 @@ uint64_t LoadedDylib::findSymbol(DynamicLoader &DL, const string &Name) {
 
 uint64_t LoadedDll::findSymbol(DynamicLoader &DL, const string &Name) {
   return (uint64_t)GetProcAddress(Ptr, Name.c_str());
+}
+
+DylibSymbolIterator LoadedDylib::lookup(uint64_t Addr) {
+  uint64_t RVA = Addr - StartAddress;
+  return DylibSymbolIterator(RVA, Bin.exported_symbols());
 }

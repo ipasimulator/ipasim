@@ -155,22 +155,22 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   }
 
   // Check that the target address is in some loaded library.
-  AddrInfo AI(Dyld.lookup(Addr));
-  if (!AI.Lib) {
+  LibraryInfo LI(Dyld.lookup(Addr));
+  if (!LI.Lib) {
     Log.error() << "non-library address fetched (" << Dyld.dumpAddr(Addr) << ")"
                 << Log.end();
     return false;
   }
-  if (AI.Lib->isDylib()) {
+  if (LI.Lib->isDylib()) {
     Log.error() << "protected memory fetched in Dylib (" << Dyld.dumpAddr(Addr)
                 << ")" << Log.end();
     return false;
   }
-  bool Wrapper = AI.Lib->IsWrapper;
+  bool Wrapper = LI.Lib->IsWrapper;
 
   // Log details.
   if constexpr (PrintEmuInfo) {
-    Log.info() << "fetch prot. mem. at " << Dyld.dumpAddr(Addr, AI);
+    Log.info() << "fetch prot. mem. at " << Dyld.dumpAddr(Addr, LI);
     if (!Wrapper)
       Log.infs() << " (not a wrapper)";
     Log.infs() << Log.end();
@@ -195,7 +195,7 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
 
   // If the target is not a wrapper DLL, we must find and call the corresponding
   // wrapper instead.
-  filesystem::path DLLPath(*AI.LibPath);
+  filesystem::path DLLPath(*LI.LibPath);
   filesystem::path WrapperPath(
       filesystem::path("gen") /
       DLLPath.filename().replace_extension(".wrapper.dll"));
@@ -211,7 +211,7 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
   auto *Idx = reinterpret_cast<WrapperIndex *>(IdxAddr);
 
   // TODO: Add real base address instead of hardcoded 0x1000.
-  uint64_t RVA = Addr - AI.Lib->StartAddress + 0x1000;
+  uint64_t RVA = Addr - LI.Lib->StartAddress + 0x1000;
 
   // Find Dylib with the corresponding wrapper.
   auto Entry = Idx->Map.find(RVA);
@@ -229,7 +229,7 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
                                               to_string(RVA));
     if (!Addr) {
       Log.error() << "cannot find wrapper for 0x" << to_hex_string(RVA)
-                  << " in " << *AI.LibPath << Log.end();
+                  << " in " << *LI.LibPath << Log.end();
       return false;
     }
 
@@ -250,15 +250,15 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
 
   // If there's no corresponding wrapper, maybe this is a simple Objective-C
   // method and we can translate it dynamically.
-  ObjCMethod M = AI.Lib->getMachO().findMethod(Addr);
+  ObjCMethod M = LI.Lib->getMachO().findMethod(Addr);
   if (!M) {
     Log.error() << "cannot find Objective-C method for "
-                << Dyld.dumpAddr(Addr, AI) << Log.end();
+                << Dyld.dumpAddr(Addr, LI) << Log.end();
     return false;
   }
 
   if constexpr (PrintEmuInfo)
-    Log.info() << "dynamically handling method " << Dyld.dumpAddr(Addr, AI, M)
+    Log.info() << "dynamically handling method " << Dyld.dumpAddr(Addr, LI, M)
                << Log.end();
 
   // Handle return value.
@@ -272,7 +272,7 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
     Returns = true;
     break;
   default:
-    Log.error() << "unsupported return type of " << Dyld.dumpAddr(Addr, AI, M)
+    Log.error() << "unsupported return type of " << Dyld.dumpAddr(Addr, LI, M)
                 << Log.end();
     return false;
   }
@@ -371,9 +371,9 @@ void SysTranslator::handleTrampolineStatic(ffi_cif *, void *Ret, void **Args,
 // called instead. Otherwise, returns `FP` unchanged.
 void *SysTranslator::translate(void *FP) {
   uint64_t Addr = reinterpret_cast<uint64_t>(FP);
-  AddrInfo AI(Dyld.lookup(Addr));
+  LibraryInfo LI(Dyld.lookup(Addr));
 
-  auto *Dylib = dynamic_cast<LoadedDylib *>(AI.Lib);
+  auto *Dylib = dynamic_cast<LoadedDylib *>(LI.Lib);
   if (!Dylib)
     return FP;
 
@@ -389,7 +389,7 @@ void *SysTranslator::translate(void *FP) {
   // TODO: Generate wrappers for callbacks, too (see README of
   // `HeadersAnalyzer` for more details).
   if constexpr (PrintEmuInfo)
-    Log.info() << "dynamically handling callback " << Dyld.dumpAddr(Addr, AI, M)
+    Log.info() << "dynamically handling callback " << Dyld.dumpAddr(Addr, LI, M)
                << Log.end();
 
   // First, handle the return value.
@@ -432,11 +432,25 @@ void *SysTranslator::translate(void *FP) {
 }
 
 void *SysTranslator::translate(void *FP, size_t ArgC, bool Returns) {
-  uint64_t Addr = reinterpret_cast<uint64_t>(FP);
-  AddrInfo AI(IpaSim.Dyld.lookup(Addr));
+  using namespace LIEF::MachO;
 
-  if (AI.Lib && AI.Lib->isDLL())
-    return FP;
+  uint64_t Addr = reinterpret_cast<uint64_t>(FP);
+  LibraryInfo LI(IpaSim.Dyld.lookup(Addr));
+
+  if (LI.Lib) {
+    auto *Dylib = dynamic_cast<LoadedDylib *>(LI.Lib);
+    if (!Dylib)
+      return FP;
+
+    // `FP` is a Dylib wrapper. We can skip it, we just need to find what it
+    // wraps.
+    if (LI.Lib->IsWrapper) {
+      Log.info() << *LI.LibPath << " is a wrapper" << Log.end();
+      for (Symbol &Symbol : Dylib->lookup(Addr)) {
+        Log.info() << "found symbol " << Symbol.name() << Log.end();
+      }
+    }
+  }
 
   return createTrampoline(FP, ArgC, Returns);
 }

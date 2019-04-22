@@ -24,10 +24,9 @@ struct BinaryPath {
   bool isFileValid() const;
 };
 
-struct AddrInfo {
+struct LibraryInfo {
   const std::string *LibPath;
   LoadedLibrary *Lib;
-  std::string SymbolName;
 };
 
 using _dyld_objc_notify_mapped = void (*)(unsigned count,
@@ -44,13 +43,10 @@ public:
   void registerHandler(_dyld_objc_notify_mapped Mapped,
                        _dyld_objc_notify_init Init,
                        _dyld_objc_notify_unmapped Unmapped);
-  // Finds only library, no symbol information is inspected. To do that, call
-  // `inspect`.
-  AddrInfo lookup(uint64_t Addr);
-  AddrInfo inspect(uint64_t Addr);
+  LibraryInfo lookup(uint64_t Addr);
   DebugStream::Handler dumpAddr(uint64_t Addr);
-  DebugStream::Handler dumpAddr(uint64_t Addr, const AddrInfo &AI);
-  DebugStream::Handler dumpAddr(uint64_t Addr, const AddrInfo &AI,
+  DebugStream::Handler dumpAddr(uint64_t Addr, const LibraryInfo &LI);
+  DebugStream::Handler dumpAddr(uint64_t Addr, const LibraryInfo &LI,
                                 ObjCMethod M);
   uint64_t getKernelAddr() { return KernelAddr; }
   static constexpr uint64_t alignToPageSize(uint64_t Addr) {

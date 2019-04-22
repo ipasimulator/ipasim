@@ -99,8 +99,8 @@ public:
 
   template <typename... ArgTypes> void callBack(void *FP, ArgTypes... Args) {
     uint64_t Addr = reinterpret_cast<uint64_t>(FP);
-    AddrInfo AI(Dyld.lookup(Addr));
-    if (!dynamic_cast<LoadedDylib *>(AI.Lib)) {
+    LibraryInfo LI(Dyld.lookup(Addr));
+    if (!LI.Lib || LI.Lib->isDLL()) {
       // Target load method is not inside any emulated Dylib, so it must be
       // native executable code and we can simply call it.
       reinterpret_cast<void (*)(ArgTypes...)>(FP)(Args...);

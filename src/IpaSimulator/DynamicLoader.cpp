@@ -351,56 +351,52 @@ LoadedLibrary *DynamicLoader::loadPE(const string &Path) {
   return LLP;
 }
 
-AddrInfo DynamicLoader::lookup(uint64_t Addr) {
-  for (auto &LI : LLs) {
-    LoadedLibrary *LL = LI.second.get();
+LibraryInfo DynamicLoader::lookup(uint64_t Addr) {
+  for (auto &Pair : LLs) {
+    LoadedLibrary *LL = Pair.second.get();
     if (LL->isInRange(Addr))
-      return {&LI.first, LL, string()};
+      return {&Pair.first, LL};
   }
-  return {nullptr, nullptr, string()};
+  return {nullptr, nullptr};
 }
-
-// TODO: Find symbol name and also use this function to implement
-// `src/objc/dladdr.mm`.
-AddrInfo DynamicLoader::inspect(uint64_t Addr) { return lookup(Addr); }
 
 DebugStream::Handler DynamicLoader::dumpAddr(uint64_t Addr) {
   return [this, Addr](DebugStream &S) {
     if (Addr == KernelAddr)
       S << "kernel!0x" << to_hex_string(Addr);
     else {
-      AddrInfo AI(lookup(Addr));
-      S << dumpAddr(Addr, AI);
+      LibraryInfo LI(lookup(Addr));
+      S << dumpAddr(Addr, LI);
     }
   };
 }
 
-static DebugStream::Handler dumpAddrImpl(uint64_t Addr, const AddrInfo &AI) {
-  return [Addr, &AI](DebugStream &S) {
-    uint64_t RVA = Addr - AI.Lib->StartAddress;
-    S << *AI.LibPath << "+0x" << to_hex_string(RVA);
+static DebugStream::Handler dumpAddrImpl(uint64_t Addr, const LibraryInfo &LI) {
+  return [Addr, &LI](DebugStream &S) {
+    uint64_t RVA = Addr - LI.Lib->StartAddress;
+    S << *LI.LibPath << "+0x" << to_hex_string(RVA);
   };
 }
 
 DebugStream::Handler DynamicLoader::dumpAddr(uint64_t Addr,
-                                             const AddrInfo &AI) {
-  return [this, Addr, &AI](DebugStream &S) {
-    if (!AI.Lib) {
+                                             const LibraryInfo &LI) {
+  return [this, Addr, &LI](DebugStream &S) {
+    if (!LI.Lib) {
       S << "0x" << to_hex_string(Addr);
       return;
     }
-    if (AI.Lib->hasMachO())
-      if (ObjCMethod M = AI.Lib->getMachO().findMethod(Addr)) {
-        S << dumpAddr(Addr, AI, M);
+    if (LI.Lib->hasMachO())
+      if (ObjCMethod M = LI.Lib->getMachO().findMethod(Addr)) {
+        S << dumpAddr(Addr, LI, M);
         return;
       }
-    S << dumpAddrImpl(Addr, AI);
+    S << dumpAddrImpl(Addr, LI);
   };
 }
 
-DebugStream::Handler DynamicLoader::dumpAddr(uint64_t Addr, const AddrInfo &AI,
-                                             ObjCMethod M) {
-  return [Addr, &AI, M](DebugStream &S) {
-    S << M << "!" << dumpAddrImpl(Addr, AI);
+DebugStream::Handler
+DynamicLoader::dumpAddr(uint64_t Addr, const LibraryInfo &LI, ObjCMethod M) {
+  return [Addr, &LI, M](DebugStream &S) {
+    S << M << "!" << dumpAddrImpl(Addr, LI);
   };
 }

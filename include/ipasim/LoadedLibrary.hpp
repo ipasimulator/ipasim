@@ -3,6 +3,7 @@
 #ifndef IPASIM_LOADED_LIBRARY_HPP
 #define IPASIM_LOADED_LIBRARY_HPP
 
+#include "ipasim/Common.hpp"
 #include "ipasim/Logger.hpp"
 #include "ipasim/MachO.hpp"
 
@@ -13,6 +14,23 @@
 namespace ipasim {
 
 class DynamicLoader;
+
+class DylibSymbolIterator {
+public:
+  DylibSymbolIterator(uint64_t RVA, LIEF::MachO::it_exported_symbols Symbols)
+      : RVA(RVA), Symbols(std::move(Symbols)) {}
+
+  DylibSymbolIterator begin();
+  DylibSymbolIterator end() { return DylibSymbolIterator(RVA, Symbols.end()); }
+  DylibSymbolIterator &next();
+  DylibSymbolIterator IPASIM_PREFIX(++);
+  bool operator!=(const DylibSymbolIterator &Other);
+  LIEF::MachO::Symbol &operator*();
+
+private:
+  uint64_t RVA;
+  LIEF::MachO::it_exported_symbols Symbols;
+};
 
 class LoadedLibrary {
 public:
@@ -42,6 +60,8 @@ public:
 
   bool isDylib() override { return true; }
   uint64_t findSymbol(DynamicLoader &DL, const std::string &Name) override;
+  // TODO: Use this function to implement `src/objc/dladdr.mm`.
+  DylibSymbolIterator lookup(uint64_t Addr);
   bool hasUnderscorePrefix() override { return true; }
   bool hasMachO() override { return true; }
   MachO getMachO() override {
