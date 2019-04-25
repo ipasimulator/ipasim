@@ -50,26 +50,26 @@
   <ItemGroup>
     <None Include="IpaSimApp_TemporaryKey.pfx" />
     <None Include="packages.config" />
-    <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\libunicorn.dll" />
-    <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\libIpaSimLibrary.dll" />
-    <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\libEGL.dll" />
-    <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\libGLESv2.dll" />
-    <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\libdispatch.dll" />
+    <None Include="..\..\..\cmake\ipasim-x86-$(Configuration)\bin\libunicorn.dll" />
+    <None Include="..\..\..\cmake\ipasim-x86-$(Configuration)\bin\libIpaSimLibrary.dll" />
+    <None Include="..\..\..\cmake\ipasim-x86-$(Configuration)\bin\libEGL.dll" />
+    <None Include="..\..\..\cmake\ipasim-x86-$(Configuration)\bin\libGLESv2.dll" />
+    <None Include="..\..\..\cmake\ipasim-x86-$(Configuration)\bin\libdispatch.dll" />
     <None Include="gen\**">
       <Filter>bin</Filter>
     </None>
-    <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\Frameworks\*.dll">
+    <None Include="..\..\..\cmake\ipasim-x86-$(Configuration)\bin\Frameworks\*.dll">
       <Filter>bin</Filter>
     </None>
     <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\libxml2.dll" />
     <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icuuc57.dll" />
     <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icudt57.dll" />
     <None Include="..\..\..\deps\WinObjC\deps\prebuilt\Universal Windows\x86\icuin57.dll" />
-    <None Include="..\..\..\..\build\winobjc-x86-$(Configuration)\bin\Logging.dll" />
-    <None Include="..\..\..\..\build\winobjc-x86-$(Configuration)\bin\WOCStdLib.dll" />
-    <None Include="..\..\..\..\build\winobjc-x86-$(Configuration)\bin\WinObjCRT.dll" />
-    <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\libpthread.dll" />
-    <None Include="..\..\..\..\build\ipasim-x86-$(Configuration)\bin\libobjc.dll" />
+    <None Include="..\..\..\cmake\winobjc-x86-$(Configuration)\bin\Logging.dll" />
+    <None Include="..\..\..\cmake\winobjc-x86-$(Configuration)\bin\WOCStdLib.dll" />
+    <None Include="..\..\..\cmake\winobjc-x86-$(Configuration)\bin\WinObjCRT.dll" />
+    <None Include="..\..\..\cmake\ipasim-x86-$(Configuration)\bin\libpthread.dll" />
+    <None Include="..\..\..\cmake\ipasim-x86-$(Configuration)\bin\libobjc.dll" />
     <None Include="..\..\..\deps\WinObjC\Frameworks\UIKit.Xaml\prebuilt\$(Configuration)\UIKit.Xaml.dll" />
     <None Include="..\..\..\deps\WinObjC\Frameworks\Social.Xaml\prebuilt\$(Configuration)\Social.Xaml.dll" />
     <None Include="..\..\..\deps\WinObjC\Frameworks\CoreFoundation\CharacterSets\**">
