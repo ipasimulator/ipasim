@@ -1,0 +1,13 @@
+[ver:1,total:120]
+docs/porting.md:15,1556488800:15,r
+docs/objc.md:15,1556488800:15,r
+docs/tapi.md:15,1556488800:15,r
+docs/winobjc.md:15,1556488800:15,r
+.gitmodules:11,1556488800:11,r
+.gitignore:7,1556488800:7,r
+.gitattributes:7,1556488800:7,r
+.clang-format:7,1556488800:7,r
+.azure-ci.yml:7,1556488800:7,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:7,1556488800:7,r
+.dockerignore:7,1556488800:7,r
+.editorconfig:7,1556488800:7,r
