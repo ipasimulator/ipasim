@@ -1,0 +1,10 @@
+[ver:1,total:1140]
+cmake/ipasim-x86-Release/cg/report.csv:440,1556470800:260,1556478000:180,r
+src/HeadersAnalyzer/DLLHelper.cpp:410,1556470800:410,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:170,1556470800:170,r
+samples/HelloWorld/HelloWorld/main.m:67,1556481600:67,m
+samples/HelloWorld/HelloWorld/ViewController.m:17,1556481600:17,m
+samples/HelloWorld/HelloWorld/ViewController.h:15,1556481600:15,m
+samples/HelloWorld/HelloWorld.xcodeproj/project.pbxproj:7,1556481600:7,m
+samples/HelloWorld/HelloWorld/AppDelegate.h:7,1556481600:7,m
+samples/HelloWorld/HelloWorld/Info.plist:7,1556481600:7,m
