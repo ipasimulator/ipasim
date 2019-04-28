@@ -1,0 +1,15 @@
+[ver:1,total:5820]
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:3462,1556269200:300,1556272800:60,1556283600:340,1556287200:600,1556290800:850,1556294400:210,1556298000:540,1556308800:502,1556470800:60,m
+src/HeadersAnalyzer/DLLHelper.cpp:862,1556287200:90,1556290800:150,1556294400:230,1556298000:180,1556308800:192,1556470800:20,m
+include/ipasim/HAContext.hpp:672,1556287200:90,1556290800:40,1556294400:40,1556298000:180,1556308800:302,1556470800:20,m
+src/HeadersAnalyzer/iOSHeaders.mm:252,1556298000:240,1556308800:12,r
+samples/issue28.mm:180,1556269200:180,r
+samples/CMakeLists.txt:135,1556269200:135,r
+src/HeadersAnalyzer/CMakeLists.txt:72,1556290800:40,1556308800:12,1556470800:20,m
+src/HeadersAnalyzer/HAContext.cpp:60,1556269200:60,r
+samples/export-class/main.mm:30,1556269200:30,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:30,1556269200:30,r
+src/HeadersAnalyzer/ErrorReporting.cpp:20,1556283600:20,r
+samples/export-class/CMakeLists.txt:15,1556269200:15,r
+samples/export-class/testclass.mm:15,1556269200:15,r
+samples/export-class/testclass.h:15,1556269200:15,r
