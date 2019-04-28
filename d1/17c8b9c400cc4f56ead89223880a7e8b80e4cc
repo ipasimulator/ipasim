@@ -1,0 +1,10 @@
+[ver:1,total:1080]
+samples/IpasimBenchmark/IpasimBenchmark/ViewController.m:732,1556481600:180,1556485200:360,1556488800:192,r
+samples/IpasimBenchmark/IpasimBenchmark/AppDelegate.m:140,1556481600:140,r
+readme.txt:90,1556488800:90,r
+src/IpaSimulator/AppPackages/IpaSimApp/IpaSimApp_1.0.0.0_Win32_Test/Add-AppDevPackage.resources/Add-AppDevPackage.psd1:42,1556488800:42,r
+cmake/ipasim-x86-Release/cg/report.csv:20,1556481600:20,r
+samples/IpasimBenchmark/IpasimBenchmark/main.m:20,1556481600:20,r
+Dockerfile:12,1556488800:12,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:12,1556488800:12,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:12,1556488800:12,m
