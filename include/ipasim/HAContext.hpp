@@ -87,7 +87,8 @@ struct ExportEntry {
       : Name(move(Name)), Status(ExportStatus::NotFound), RVA(0),
         DylibType(nullptr), DLLType(nullptr), ObjCMethod(false),
         Messenger(false), Stret(false), Super(false), Super2(false),
-        DylibStretOnly(false) {}
+        DylibStretOnly(false), UnhandledMessenger(false),
+        UnhandledVararg(false) {}
 
   std::string Name;
   mutable ExportStatus Status;
@@ -98,6 +99,8 @@ struct ExportEntry {
   mutable bool Super : 1;
   mutable bool Super2 : 1;
   mutable bool DylibStretOnly : 1; // See #28.
+  mutable bool UnhandledMessenger : 1;
+  mutable bool UnhandledVararg : 1;
   mutable GroupPtr DLLGroup;
   mutable DLLPtr DLL;
   mutable DylibPtr Dylib; // first Dylib that implements this function
@@ -210,7 +213,7 @@ auto mapIterator(T &&Container, FTy &&Func) {
 // Dereferences iterated values.
 template <typename T> auto deref(T &&Container) {
   return mapIterator(std::forward<T>(Container),
-                     [](auto Value) { return *Value; });
+                     [](auto &&Value) { return *Value; });
 }
 
 template <typename ItTy>

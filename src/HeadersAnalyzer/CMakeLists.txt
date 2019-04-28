@@ -450,7 +450,8 @@ target_link_libraries (HeadersAnalyzer PRIVATE
     -Wl,/nodefaultlib:libcmt)
 
 # TODO: Add real outputs and inputs.
-set (CG_OUTPUTS "${CURRENT_IPASIM_CMAKE_DIR}/cg/exports.txt")
+set (CG_OUTPUTS "${CURRENT_IPASIM_CMAKE_DIR}/cg/exports.txt"
+    "${CURRENT_IPASIM_CMAKE_DIR}/cg/report.csv")
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_custom_target (prep-CodeGen
         COMMENT "Prepare Code-gen"

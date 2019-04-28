@@ -138,21 +138,21 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
     RefSymbol->setDLLStorageClass(GlobalValue::DLLImportStorageClass);
 
   // Generate function wrappers.
-  for (const ExportEntry &Exp : deref(DLL.Exports)) {
-    assert(Exp.Status == ExportStatus::FoundInDLL &&
+  for (ExportPtr Exp : DLL.Exports) {
+    assert(Exp->Status == ExportStatus::FoundInDLL &&
            "Unexpected status of `ExportEntry`.");
 
     // Don't generate wrappers for Objective-C messengers. We handle those
     // specially. Also don't generate wrappers for data.
-    if (!Exp.getDLLType() || Exp.Messenger)
+    if (!Exp->getDLLType() || Exp->Messenger)
       continue;
 
     // Declarations.
     Function *Func =
-        Exp.ObjCMethod ? nullptr : IR.declareFunc<LibType::DLL>(Exp);
-    Function *Wrapper = IR.declareFunc<LibType::DLL>(Exp, /* Wrapper */ true);
+        Exp->ObjCMethod ? nullptr : IR.declareFunc<LibType::DLL>(*Exp);
+    Function *Wrapper = IR.declareFunc<LibType::DLL>(*Exp, /* Wrapper */ true);
     Function *Stub =
-        DylibIR.declareFunc<LibType::Dylib>(Exp, /* Wrapper */ true);
+        DylibIR.declareFunc<LibType::Dylib>(*Exp, /* Wrapper */ true);
 
     // Export the wrapper and import the original function.
     Wrapper->setDLLStorageClass(Function::DLLExportStorageClass);
@@ -167,8 +167,9 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
 
     // TODO: Handle variadic functions specially. For now, we simply don't
     // call them.
-    if (Exp.getDLLType()->isVarArg()) {
-      Log.error() << "unhandled variadic function (" << Exp.Name << ")"
+    if (Exp->getDLLType()->isVarArg()) {
+      Exp->UnhandledVararg = true;
+      Log.error() << "unhandled variadic function (" << Exp->Name << ")"
                   << Log.end();
       IR.Builder.CreateRetVoid();
       continue;
@@ -177,7 +178,7 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
     StructType *Struct;
     Value *SP;
     vector<Value *> Args;
-    if (Exp.isTrivial()) {
+    if (Exp->isTrivial()) {
       // Trivial functions (`void -> void`) have no arguments, so no
       // struct pointer nor type exist - we set them to `nullptr` to check
       // that we don't use them anywhere in the following code.
@@ -185,14 +186,14 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
       SP = nullptr;
     } else {
       // The struct pointer is the first argument.
-      Struct = IR.createParamStruct(Exp);
+      Struct = IR.createParamStruct(*Exp);
       SP = IR.Builder.CreateBitCast(Wrapper->args().begin(),
                                     Struct->getPointerTo(), "sp");
 
       // Process arguments.
-      Args.reserve(Exp.getDLLType()->getNumParams());
-      for (auto [ArgIdx, ArgTy] : withIndices(Exp.getDLLType()->params())) {
-        if (Exp.DylibStretOnly)
+      Args.reserve(Exp->getDLLType()->getNumParams());
+      for (auto [ArgIdx, ArgTy] : withIndices(Exp->getDLLType()->params())) {
+        if (Exp->DylibStretOnly)
           ++ArgIdx;
 
         string ArgNo = to_string(ArgIdx);
@@ -209,7 +210,7 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
     }
 
     Value *R;
-    if (Exp.ObjCMethod) {
+    if (Exp->ObjCMethod) {
       // Objective-C methods are not exported, so we call them by
       // computing their address using their RVA.
       if (!DLL.ReferenceSymbol) {
@@ -221,21 +222,21 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
 
       // Add RVA to the reference symbol's address.
       Value *Addr = ConstantInt::getSigned(Type::getInt32Ty(LLVM.Ctx),
-                                           Exp.RVA - DLL.ReferenceSymbol->RVA);
+                                           Exp->RVA - DLL.ReferenceSymbol->RVA);
       Value *RefPtr = IR.Builder.CreateBitCast(RefSymbol, LLVM.VoidPtrTy);
       Value *ComputedPtr =
           IR.Builder.CreateInBoundsGEP(Type::getInt8Ty(LLVM.Ctx), RefPtr, Addr);
       Value *FP = IR.Builder.CreateBitCast(
-          ComputedPtr, Exp.getDLLType()->getPointerTo(), "fp");
+          ComputedPtr, Exp->getDLLType()->getPointerTo(), "fp");
 
       // Call the original DLL function.
-      R = IR.createCall(Exp.getDLLType(), FP, Args, "r");
+      R = IR.createCall(Exp->getDLLType(), FP, Args, "r");
     } else
       R = IR.createCall(Func, Args, "r");
 
     if (R) {
       // See #28.
-      if (Exp.DylibStretOnly) {
+      if (Exp->DylibStretOnly) {
         // Store the return value.
         Value *RS = IR.Builder.CreateAlloca(R->getType());
         IR.Builder.CreateStore(R, RS);
@@ -248,10 +249,10 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
         // Copy structure's content.
         // TODO: Don't hardcode the alignments here.
         IR.Builder.CreateMemCpy(SR, 4, RS, 4, IR.getSize(R->getType()));
-      } else { // !Exp.DylibStretOnly
+      } else { // !Exp->DylibStretOnly
         // Get pointer to the return value inside the union.
         Value *RP = IR.Builder.CreateStructGEP(
-            Struct, SP, Exp.getDLLType()->getNumParams(), "rp");
+            Struct, SP, Exp->getDLLType()->getNumParams(), "rp");
 
         // Save return value back into the structure.
         IR.Builder.CreateStore(R, RP);

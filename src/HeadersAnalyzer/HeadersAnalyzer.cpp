@@ -184,28 +184,28 @@ public:
 
       // Generate function wrappers.
       // TODO: Shouldn't we use aligned instructions?
-      for (const ExportEntry &Exp : deref(Lib.Exports)) {
+      for (ExportPtr Exp : Lib.Exports) {
 
         // Ignore functions that haven't been found in any DLL.
-        if (Exp.Status != ExportStatus::FoundInDLL) {
+        if (Exp->Status != ExportStatus::FoundInDLL) {
           if constexpr (ErrorUnimplementedFunctions & LibType::DLL)
-            if (Exp.Status == ExportStatus::Found)
+            if (Exp->Status == ExportStatus::Found)
               Log.error() << "function found in Dylib wasn't found in any DLL ("
-                          << Exp.Name << ")" << Log.end();
+                          << Exp->Name << ")" << Log.end();
           if constexpr (SumUnimplementedFunctions & LibType::DLL)
-            if (Exp.Status == ExportStatus::Found)
+            if (Exp->Status == ExportStatus::Found)
               ++Unimplemented;
           continue;
         }
 
         // Re-export data symbols. See #23.
-        if (!Exp.getDylibType()) {
-          Lib.ReExports.insert({Exp.DLLGroup, Exp.DLL});
+        if (!Exp->getDylibType()) {
+          Lib.ReExports.insert({Exp->DLLGroup, Exp->DLL});
           continue;
         }
 
         // Handle Objective-C messengers specially.
-        if (Exp.Messenger) {
+        if (Exp->Messenger) {
           // Now here comes the trick. We actually declare the `msgSend`
           // function to have four parameters. `msgLookup` is declared to return
           // a four-parameter function. We then call `msgLookup` inside of
@@ -217,21 +217,23 @@ public:
           // `eeae6dc2`), but it's only for `x86_64` right now.
 
           // Declare the messenger.
-          llvm::Function *MessengerFunc = IR.declareFunc(LLVM.SendTy, Exp.Name);
-          createAlias(Exp, MessengerFunc);
+          llvm::Function *MessengerFunc =
+              IR.declareFunc(LLVM.SendTy, Exp->Name);
+          createAlias(*Exp, MessengerFunc);
 
           // And define it, too.
           FunctionGuard MessengerGuard(IR, MessengerFunc);
 
           // Construct name of the corresponding lookup function.
           Twine LookupName(Twine(HAContext::MsgLookupPrefix.S) +
-                           (Exp.Name.c_str() + HAContext::MsgSendPrefix.Len));
+                           (Exp->Name.c_str() + HAContext::MsgSendPrefix.Len));
 
           // If the corresponding lookup function doesn't exist, don't call it
           // (so that we don't have unresolved references in the resulting
           // binary).
           if (HAC.iOSExps.find(ExportEntry(LookupName.str())) ==
               HAC.iOSExps.end()) {
+            Exp->UnhandledMessenger = true;
             Log.error() << "lookup function not found (" << LookupName << ")"
                         << Log.end();
             IR.Builder.CreateUnreachable();
@@ -251,15 +253,15 @@ public:
           // Call the lookup function and jump to its result.
           llvm::Value *IMP = IR.Builder.CreateCall(LookupFunc, Args, "imp");
           // Also replace `super` with `super->receiver` if necessary.
-          if (Exp.Super || Exp.Super2) {
-            llvm::Value *Super = Args[Exp.Stret ? 1 : 0];
+          if (Exp->Super || Exp->Super2) {
+            llvm::Value *Super = Args[Exp->Stret ? 1 : 0];
             llvm::Value *SuperP = IR.Builder.CreateBitCast(
                 Super, llvm::Type::getInt32PtrTy(LLVM.Ctx), "superP");
             llvm::Value *ReceiverP = IR.Builder.CreateConstInBoundsGEP1_32(
                 llvm::Type::getInt32Ty(LLVM.Ctx), SuperP, 0, "receiverP");
             llvm::Value *Receiver =
                 IR.Builder.CreateLoad(ReceiverP, "receiver");
-            Args[Exp.Stret ? 1 : 0] =
+            Args[Exp->Stret ? 1 : 0] =
                 IR.Builder.CreateIntToPtr(Receiver, LLVM.VoidPtrTy);
           }
           llvm::CallInst *Call = IR.Builder.CreateCall(
@@ -271,15 +273,15 @@ public:
         }
 
         // Declarations.
-        llvm::Function *Func = IR.declareFunc<LibType::Dylib>(Exp);
+        llvm::Function *Func = IR.declareFunc<LibType::Dylib>(*Exp);
         llvm::Function *Wrapper =
-            IR.declareFunc<LibType::Dylib>(Exp, /* Wrapper */ true);
-        createAlias(Exp, Func);
+            IR.declareFunc<LibType::Dylib>(*Exp, /* Wrapper */ true);
+        createAlias(*Exp, Func);
 
         FunctionGuard FuncGuard(IR, Func);
 
         // Handle trivial `void -> void` functions specially.
-        if (Exp.isTrivial()) {
+        if (Exp->isTrivial()) {
           IR.Builder.CreateCall(Wrapper);
           IR.Builder.CreateRetVoid();
           continue;
@@ -302,7 +304,7 @@ public:
         }
 
         // Allocate the struct.
-        llvm::StructType *Struct = IR.createParamStruct(Exp);
+        llvm::StructType *Struct = IR.createParamStruct(*Exp);
         llvm::Value *SP = IR.Builder.CreateAlloca(Struct, nullptr, "sp");
 
         // Load arguments.
@@ -324,7 +326,7 @@ public:
         IR.Builder.CreateCall(Wrapper, {VP});
 
         // Return.
-        llvm::Type *RetTy = Exp.getDylibType()->getReturnType();
+        llvm::Type *RetTy = Exp->getDylibType()->getReturnType();
         if (!RetTy->isVoidTy()) {
 
           // Get pointer to the return value inside the struct.
@@ -383,13 +385,35 @@ public:
         Log.error() << "functions found in Dylibs weren't found in any DLL ("
                     << Unimplemented << ")" << Log.end();
   }
+  void writeExports() {
+    auto ExportsOS = createOutputFile((DC.OutputDir / "exports.txt").string());
+    if (!ExportsOS)
+      return;
+
+    for (const ExportEntry &Exp : HAC.iOSExps)
+      if (Exp.Status == ExportStatus::FoundInDLL)
+        *ExportsOS << Exp.Name << " ("
+                   << (Exp.getDylibType() ? "function" : "data") << " in "
+                   << HAC.DLLGroups[Exp.DLLGroup].DLLs[Exp.DLL].Name << " at "
+                   << llvm::format_hex(Exp.RVA, 8) << ")\n";
+  }
   void writeReport() {
-    if (auto OS = createOutputFile((DC.OutputDir / "exports.txt").string()))
-      for (const ExportEntry &Exp : HAC.iOSExps)
-        if (Exp.Status == ExportStatus::FoundInDLL)
-          *OS << Exp.Name << " (" << (Exp.getDylibType() ? "function" : "data")
-              << " in " << HAC.DLLGroups[Exp.DLLGroup].DLLs[Exp.DLL].Name
-              << " at 0x" << llvm::format_hex(Exp.RVA, 8) << ")\n";
+    auto ReportOS = createOutputFile((DC.OutputDir / "report.csv").string());
+    if (!ReportOS)
+      return;
+
+    *ReportOS << "name,status,func,dll,rva,un_vararg,un_msg\n";
+    for (const ExportEntry &Exp : HAC.iOSExps) {
+      *ReportOS << Exp.Name << "," << static_cast<uint32_t>(Exp.Status) << ","
+                << (Exp.getDylibType() ? "1," : "0,");
+      if (Exp.Status == ExportStatus::FoundInDLL)
+        *ReportOS << HAC.DLLGroups[Exp.DLLGroup].DLLs[Exp.DLL].Name << ","
+                  << llvm::format_hex(Exp.RVA, 8) << ",";
+      else
+        *ReportOS << ",,";
+      *ReportOS << (Exp.UnhandledVararg ? "1," : "0,")
+                << (Exp.UnhandledMessenger ? "1\n" : "0\n");
+    }
   }
 
 private:
@@ -474,6 +498,7 @@ int main(int ArgC, char **ArgV) {
     HA.createDirs();
     HA.generateDLLs();
     HA.generateDylibs();
+    HA.writeExports();
     HA.writeReport();
     Log.info("completed, exiting");
 
