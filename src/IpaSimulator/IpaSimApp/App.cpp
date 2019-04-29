@@ -90,6 +90,9 @@ static IAsyncAction startCore(LaunchActivatedEventArgs LaunchArgs) {
     co_return;
   }
 
+  // Display binary's name in the title.
+  ApplicationView::GetForCurrentView().Title(to_hstring(BinaryName));
+
   // Copy the folder into app's data.
   // TODO: Without this, files inside the folder cannot be opened by standard
   // C++ means (e.g., `fstream`). But maybe we could workaround that.
