@@ -4,3 +4,13 @@ src/IpaSimulator/IpaSimulator.cpp:180,1556550000:180,r
 src/IpaSimulator/IpaSimApp/MainPage.cpp:116,1556550000:56,1556553600:60,m
 src/IpaSimulator/IpaSimApp/MainPage.h:34,1556550000:34,m
 src/IpaSimulator/SysTranslator.cpp:30,1556550000:30,r
+
+[ver:1,total:240]
+src/IpaSimulator/IpaSimApp/App.cpp:77,1556550000:77,m
+src/IpaSimulator/DynamicLoader.cpp:60,1556550000:60,r
+src/IpaSimulator/IpaSimApp/MainPage.cpp:25,1556550000:25,m
+src/IpaSimulator/IpaSimApp/pch.cpp:25,1556550000:25,r
+src/IpaSimulator/IpaSimApp/App.h:17,1556550000:17,m
+src/IpaSimulator/IpaSimApp/MainPage.h:17,1556550000:17,m
+src/IpaSimulator/IpaSimApp/readme.txt:10,1556550000:10,r
+src/IpaSimulator/IpaSimApp/pch.h:9,1556550000:9,r
