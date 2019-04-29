@@ -13,7 +13,7 @@
 [submodule "deps/WinObjC"]
 	path = deps/WinObjC
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/WinObjC
-	branch = port
+	branch = thesis
 [submodule "deps/llvm"]
 	path = deps/llvm
 	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/llvm
