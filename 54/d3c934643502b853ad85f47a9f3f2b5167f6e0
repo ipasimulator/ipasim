@@ -1,0 +1,6 @@
+[ver:1,total:660]
+src/IpaSimulator/IpaSimApp/App.cpp:300,1556550000:300,m
+src/IpaSimulator/IpaSimulator.cpp:180,1556550000:180,r
+src/IpaSimulator/IpaSimApp/MainPage.cpp:116,1556550000:56,1556553600:60,m
+src/IpaSimulator/IpaSimApp/MainPage.h:34,1556550000:34,m
+src/IpaSimulator/SysTranslator.cpp:30,1556550000:30,r
