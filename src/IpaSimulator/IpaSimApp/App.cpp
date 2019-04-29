@@ -12,11 +12,14 @@ using namespace std;
 using namespace winrt;
 using namespace Windows::ApplicationModel;
 using namespace Windows::ApplicationModel::Activation;
+using namespace Windows::ApplicationModel::Core;
 using namespace Windows::Foundation;
 using namespace Windows::Storage;
 using namespace Windows::Storage::AccessCache;
 using namespace Windows::Storage::Pickers;
+using namespace Windows::UI::Core;
 using namespace Windows::UI::Popups;
+using namespace Windows::UI::ViewManagement;
 using namespace Windows::UI::Xaml;
 using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::UI::Xaml::Navigation;
@@ -60,8 +63,8 @@ static IAsyncOperation<StorageFolder> copyFolder(StorageFolder Source,
   co_return Dest;
 }
 
-// TODO: Move this into `IpaSimLibrary` when possible.
-static IAsyncAction start(LaunchActivatedEventArgs LaunchArgs) {
+// TODO: Move these into `IpaSimLibrary` when possible.
+static IAsyncAction startCore(LaunchActivatedEventArgs LaunchArgs) {
   // Ask user for folder containing the binary.
   FolderPicker FP;
   FP.FileTypeFilter().Append(L"*");
@@ -113,6 +116,37 @@ static IAsyncAction start(LaunchActivatedEventArgs LaunchArgs) {
     MessageDialog MD(L"A fatal error occured.");
     co_await MD.ShowAsync();
   }
+}
+static IAsyncAction start(LaunchActivatedEventArgs LaunchArgs) {
+  // Only start the emulation if it hasn't already been started, i.e., no
+  // secondary view was created.
+  auto Views = CoreApplication::Views();
+  if (Views.Size() == 2)
+    return;
+
+  CoreDispatcher MainDispatcher =
+      CoreApplication::GetCurrentView().Dispatcher();
+
+  // Create a new window.
+  CoreApplicationView View = CoreApplication::CreateNewView();
+  co_await resume_foreground(View.Dispatcher());
+
+  // Show the "Loading..." screen.
+  Frame F;
+  F.Navigate(xaml_typename<IpaSimApp::MainPage>(), nullptr);
+  Window::Current().Content(F);
+  Window::Current().Activate();
+
+  int32_t ViewId = ApplicationView::GetForCurrentView().Id();
+
+  // Activate the new window.
+  co_await resume_foreground(MainDispatcher);
+  if (!co_await ApplicationViewSwitcher::TryShowAsStandaloneAsync(ViewId)) {
+    // TODO: Log an error.
+    return;
+  }
+
+  co_await startCore(LaunchArgs);
 }
 
 /// <summary>
@@ -169,7 +203,6 @@ void App::OnLaunched(LaunchActivatedEventArgs const &e) {
     }
   }
 
-  // TODO: Where is the right place to do this?
   start(e);
 }
 

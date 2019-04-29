@@ -7,7 +7,7 @@ using namespace Windows::UI::Xaml;
 
 namespace winrt::IpaSimApp::implementation {
 
-MainPage::MainPage() { InitializeComponent(); }
+MainPage::MainPage() : loaded_(false) { InitializeComponent(); }
 
 bool MainPage::Loaded() { return loaded_; }
 
