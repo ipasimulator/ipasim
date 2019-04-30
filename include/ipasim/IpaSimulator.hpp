@@ -7,6 +7,7 @@
 #include "ipasim/Emulator.hpp"
 #include "ipasim/Logger.hpp"
 #include "ipasim/SysTranslator.hpp"
+#include "ipasim/TextBlockStream.hpp"
 
 #include <string>
 #include <unicorn/unicorn.h>
@@ -24,7 +25,7 @@ public:
 };
 
 extern IpaSimulator IpaSim;
-extern DebugLogger Log;
+extern Logger<LogStream> Log;
 
 } // namespace ipasim
 

@@ -7,6 +7,7 @@
 #include "ipasim/Emulator.hpp"
 #include "ipasim/LoadedLibrary.hpp"
 #include "ipasim/Logger.hpp"
+#include "ipasim/TextBlockStream.hpp"
 
 #include <functional>
 #include <map>
@@ -44,10 +45,10 @@ public:
                        _dyld_objc_notify_init Init,
                        _dyld_objc_notify_unmapped Unmapped);
   LibraryInfo lookup(uint64_t Addr);
-  DebugStream::Handler dumpAddr(uint64_t Addr);
-  DebugStream::Handler dumpAddr(uint64_t Addr, const LibraryInfo &LI);
-  DebugStream::Handler dumpAddr(uint64_t Addr, const LibraryInfo &LI,
-                                ObjCMethod M);
+  LogStream::Handler dumpAddr(uint64_t Addr);
+  LogStream::Handler dumpAddr(uint64_t Addr, const LibraryInfo &LI);
+  LogStream::Handler dumpAddr(uint64_t Addr, const LibraryInfo &LI,
+                              ObjCMethod M);
   uint64_t getKernelAddr() { return KernelAddr; }
   static constexpr uint64_t alignToPageSize(uint64_t Addr) {
     return Addr & (-PageSize);

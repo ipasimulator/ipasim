@@ -8,6 +8,7 @@
 #include "ipasim/LoadedLibrary.hpp"
 
 #include <ffi.h>
+#include <stack>
 
 namespace ipasim {
 

@@ -17,7 +17,8 @@ using namespace Windows::ApplicationModel::Activation;
 IpaSimulator::IpaSimulator() : Emu(Dyld), Dyld(Emu), Sys(Dyld, Emu) {}
 
 IpaSimulator ipasim::IpaSim;
-DebugLogger ipasim::Log;
+Logger<LogStream> ipasim::Log =
+    Logger<TextBlockStream>(TextBlockStream(false), TextBlockStream(true));
 
 #define IPASIM_API extern "C" __declspec(dllexport)
 
