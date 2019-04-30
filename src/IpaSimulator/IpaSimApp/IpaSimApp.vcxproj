@@ -65,9 +65,15 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)pch.pch</PrecompiledHeaderOutputFile>
       <WarningLevel>Level4</WarningLevel>
-      <AdditionalOptions>%(AdditionalOptions) /bigobj</AdditionalOptions>
-      <DisableSpecificWarnings>4453;28204</DisableSpecificWarnings>
+      <AdditionalOptions>%(AdditionalOptions) /bigobj /experimental:external /external:anglebrackets /external:W0 /external:templates-</AdditionalOptions>
+      <DisableSpecificWarnings>4453;28204;4146</DisableSpecificWarnings>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\deps\unicorn\include;..\..\..\deps\LIEF\include;..\..\..\deps\LIEF\api\c\include;..\..\..\cmake\lief-x86-$(Configuration)\include;..\..\..\deps\Libffi\build\include;$(ProjectDir);$(GeneratedFilesDir);$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ForcedIncludeFiles>..\my_iso646.h</ForcedIncludeFiles>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies Condition="'$(Platform)'=='Win32'">..\..\..\cmake\ipasim-x86-$(Configuration)\bin\libIpaSimLibrary.dll.a;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
     <ClCompile>

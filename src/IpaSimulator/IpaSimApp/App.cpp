@@ -8,6 +8,9 @@
 #include "App.h"
 #include "MainPage.h"
 
+#include <ipasim/IpaSimulator.hpp>
+
+using namespace ipasim;
 using namespace std;
 using namespace winrt;
 using namespace Windows::ApplicationModel;
@@ -45,10 +48,6 @@ App::App() {
         }
       });
 #endif
-}
-
-static bool endsWith(const std::string &S, const std::string &Suffix) {
-  return !S.compare(S.length() - Suffix.length(), Suffix.length(), Suffix);
 }
 
 static IAsyncOperation<StorageFolder> copyFolder(StorageFolder Source,
@@ -101,14 +100,8 @@ static IAsyncAction startCore(LaunchActivatedEventArgs LaunchArgs) {
                                ApplicationData::Current().LocalCacheFolder());
   Bin = co_await Folder.GetFileAsync(Bin.Name());
 
-  // Execute the main logic which is stored inside `IpaSimLibrary`.
-  // TODO: Link this instead of loading it dynamically.
-  HMODULE lib = check_pointer(LoadPackagedLibrary(L"libIpaSimLibrary.dll", 0));
-  FARPROC startFunc = check_pointer(GetProcAddress(lib, "ipaSim_start"));
-  bool Result =
-      ((bool (*)(const hstring &, const LaunchActivatedEventArgs &))startFunc)(
-          Bin.Path(), LaunchArgs);
-  check_bool(FreeLibrary(lib));
+  // Execute the main logic inside `IpaSimLibrary`.
+  bool Result = IpaSim.start(Bin.Path(), LaunchArgs);
 
   // Change status from "Loading..." to "Done.".
   if (auto F = Window::Current().Content().try_as<Frame>())

@@ -11,7 +11,7 @@ namespace ipasim {
 
 class TextBlockStream : public Stream<TextBlockStream> {
 public:
-  TextBlockStream(bool Error) : Error(Error) {}
+  TextBlockStream(bool Error) : Error(Error), TB(nullptr) {}
 
   void init(const winrt::Windows::UI::Xaml::Controls::TextBlock &TB) {
     this->TB = TB;
