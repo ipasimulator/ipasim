@@ -252,6 +252,5 @@ Universal Windows/x86/${name}.lib")
     add_subdirectory (deps/WinObjC/deps/3rdparty/cassowary-0.60)
     add_subdirectory (deps/WinObjC/deps/3rdparty/libdispatch)
     add_subdirectory (deps/WinObjC/Frameworks)
-    add_subdirectory (samples)
 
 endif (SUPERBUILD)
