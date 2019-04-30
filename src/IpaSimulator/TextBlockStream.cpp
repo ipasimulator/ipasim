@@ -20,7 +20,7 @@ TextBlockStream &TextBlockStream::write(const hstring &S) {
     Run R;
     R.Text(S);
     if (Error)
-      R.Foreground(SolidColorBrush(Colors::DarkRed()));
+      R.Foreground(SolidColorBrush(Colors::Red()));
     TB.Inlines().Append(R);
   });
   return *this;
