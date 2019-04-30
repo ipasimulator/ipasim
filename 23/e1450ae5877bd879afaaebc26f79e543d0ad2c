@@ -1,0 +1,5 @@
+[ver:1,total:360]
+src/IpaSimulator/IpaSimulator.cpp:195,1556632800:195,m
+include/ipasim/IpaSimulator.hpp:120,1556632800:120,m
+src/IpaSimulator/TextBlockStream.cpp:30,1556632800:30,r
+src/IpaSimulator/IpaSimApp/App.cpp:15,1556632800:15,m
