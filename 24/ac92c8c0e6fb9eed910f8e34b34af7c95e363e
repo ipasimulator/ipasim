@@ -1,0 +1,4 @@
+[ver:1,total:150]
+src/IpaSimulator/IpaSimApp/LogPage.cpp:75,1556618400:75,m
+src/IpaSimulator/IpaSimApp/LogPage.h:45,1556618400:45,m
+include/ipasim/DynamicLoader.hpp:30,1556618400:30,r
