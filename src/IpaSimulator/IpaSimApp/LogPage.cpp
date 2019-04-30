@@ -12,6 +12,4 @@ namespace winrt::IpaSimApp::implementation {
 
 LogPage::LogPage() { InitializeComponent(); }
 
-void LogPage::Log(const hstring &) {}
-
 } // namespace winrt::IpaSimApp::implementation

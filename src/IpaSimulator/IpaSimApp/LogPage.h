@@ -6,8 +6,6 @@ namespace winrt::IpaSimApp::implementation {
 
 struct LogPage : LogPageT<LogPage> {
   LogPage();
-
-  void Log(const winrt::hstring &Message);
 };
 
 } // namespace winrt::IpaSimApp::implementation
