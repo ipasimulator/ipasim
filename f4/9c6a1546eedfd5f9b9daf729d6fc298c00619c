@@ -1,0 +1,10 @@
+[ver:1,total:4560]
+include/ipasim/IpaSimulator.hpp:1303,1556625600:836,1556629200:467,m
+include/ipasim/TextBlockStream.hpp:1129,1556625600:821,1556629200:308,m
+include/ipasim/Logger.hpp:798,1556622000:60,1556625600:732,1556629200:6,m
+src/IpaSimulator/TextBlockStream.cpp:620,1556625600:478,1556629200:142,m
+src/IpaSimulator/IpaSimulator.cpp:319,1556625600:119,1556629200:200,m
+include/ipasim/Common.hpp:289,1556625600:164,1556629200:125,m
+include/ipasim/Emulator.hpp:90,1556625600:90,r
+src/IpaSimulator/IpaSimApp/App.cpp:6,1556629200:6,m
+src/IpaSimulator/IpaSimApp/LogPage.cpp:6,1556629200:6,m
