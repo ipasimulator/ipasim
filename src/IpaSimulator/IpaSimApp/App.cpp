@@ -10,7 +10,6 @@
 
 #include <ipasim/IpaSimulator.hpp>
 
-using namespace ipasim;
 using namespace std;
 using namespace winrt;
 using namespace Windows::ApplicationModel;
@@ -78,7 +77,7 @@ static IAsyncAction startCore(LaunchActivatedEventArgs LaunchArgs) {
 
   // Find binary in the folder.
   string FolderName(to_string(Folder.Name()));
-  if (!endsWith(FolderName, ".app")) {
+  if (!ipasim::endsWith(FolderName, ".app")) {
     OutputDebugStringA("Error: wrong folder selected.");
     co_return;
   }
@@ -101,7 +100,7 @@ static IAsyncAction startCore(LaunchActivatedEventArgs LaunchArgs) {
   Bin = co_await Folder.GetFileAsync(Bin.Name());
 
   // Execute the main logic inside `IpaSimLibrary`.
-  bool Result = IpaSim.start(Bin.Path(), LaunchArgs);
+  bool Result = ipasim::start(Bin.Path(), LaunchArgs);
 
   // Change status from "Loading..." to "Done.".
   if (auto F = Window::Current().Content().try_as<Frame>())

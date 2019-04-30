@@ -10,11 +10,13 @@ using namespace ipasim;
 using namespace winrt;
 using namespace Windows::UI;
 using namespace Windows::UI::Core;
+using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::UI::Xaml::Documents;
 using namespace Windows::UI::Xaml::Media;
 
 TextBlockStream &TextBlockStream::write(const hstring &S) {
-  TB.Dispatcher().RunAsync(CoreDispatcherPriority::Normal, [this, S]() {
+  TextBlock TB(TBP.get());
+  TB.Dispatcher().RunAsync(CoreDispatcherPriority::Normal, [this, S, TB]() {
     Run R;
     R.Text(S);
     if (Error)

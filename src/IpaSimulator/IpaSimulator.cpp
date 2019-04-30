@@ -15,30 +15,32 @@ using namespace Windows::ApplicationModel::Activation;
 // TODO: This Emu-Dyld circular reference is not very cool.
 IpaSimulator::IpaSimulator() : Emu(Dyld), Dyld(Emu), Sys(Dyld, Emu) {}
 
-bool IpaSimulator::start(const hstring &Path,
-                         const LaunchActivatedEventArgs &LaunchArgs) {
+bool ipasim::start(const hstring &Path,
+                   const LaunchActivatedEventArgs &LaunchArgs) {
   try {
     // Load the binary.
-    MainBinary = to_string(Path);
-    LoadedLibrary *App = Dyld.load(MainBinary);
+    IpaSim.MainBinary = to_string(Path);
+    LoadedLibrary *App = IpaSim.Dyld.load(IpaSim.MainBinary);
     if (!App)
       return false;
 
     // Execute it.
-    Sys.execute(App);
+    IpaSim.Sys.execute(App);
 
     // Call `UIApplicationLaunched`. `get_abi` converts C++/WinRT object to its
     // C++/CX equivalent.
-    Sys.call("UIKit.dll", "UIApplicationLaunched", get_abi(LaunchArgs));
+    IpaSim.Sys.call("UIKit.dll", "UIApplicationLaunched", get_abi(LaunchArgs));
   } catch (const FatalError &) {
     return false;
   }
   return true;
 }
+TextBlockProvider &ipasim::logText() { return IpaSim.LogText; }
 
 IpaSimulator ipasim::IpaSim;
-Logger<LogStream> ipasim::Log =
-    Logger<TextBlockStream>(TextBlockStream(false), TextBlockStream(true));
+Logger<LogStream> ipasim::Log = Logger<LogStream>(
+    LogStream(DebugStream(), TextBlockStream(false, IpaSim.LogText)),
+    LogStream(DebugStream(), TextBlockStream(true, IpaSim.LogText)));
 
 IPASIM_API void *ipaSim_translate(void *Addr) {
   return IpaSim.Sys.translate(Addr);

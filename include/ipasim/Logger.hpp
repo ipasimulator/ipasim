@@ -7,6 +7,7 @@
 #include <iostream>
 #include <ostream>
 #include <string>
+#include <tuple>
 
 #if !defined(IPASIM_NO_WINDOWS_ERRORS)
 // From <winnt.h>
@@ -132,6 +133,34 @@ public:
 private:
   std::ostream &Str;
   std::wostream &WStr;
+};
+
+template <typename... StreamTys>
+class AggregateStream : public Stream<AggregateStream<StreamTys...>> {
+public:
+  static_assert(sizeof...(StreamTys) > 0, "At least one stream is required.");
+
+  template <typename... ArgTys>
+  AggregateStream(ArgTys &&... Streams)
+      : Streams(std::forward<ArgTys>(Streams)...) {}
+
+  AggregateStream &write(const char *S) {
+    write<0, char>(S);
+    return *this;
+  }
+  AggregateStream &write(const wchar_t *S) {
+    write<0, wchar_t>(S);
+    return *this;
+  }
+
+private:
+  std::tuple<StreamTys...> Streams;
+
+  template <size_t I, typename C> void write(const C *S) {
+    std::get<I>(Streams).write(S);
+    if constexpr (I + 1 < sizeof...(StreamTys))
+      write<I + 1, C>(S);
+  }
 };
 
 template <typename StreamTy> class Logger {

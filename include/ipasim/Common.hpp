@@ -6,11 +6,18 @@
 #include <cstdint>
 #include <string>
 
-namespace ipasim {
+#if defined(IpaSimLibrary_EXPORTS)
+#define IPASIM_EXPORT __declspec(dllexport)
+#else
+#define IPASIM_EXPORT __declspec(dllimport)
+#endif
+#define IPASIM_API extern "C" IPASIM_EXPORT
 
 // Prefix and postfix operators
 #define IPASIM_PREFIX(op) &operator op()
 #define IPASIM_POSTFIX(op) operator op(int)
+
+namespace ipasim {
 
 // =============================================================================
 // Enums

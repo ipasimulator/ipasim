@@ -7,7 +7,6 @@
 
 #include "ipasim/IpaSimulator.hpp"
 
-using namespace ipasim;
 using namespace winrt;
 using namespace Windows::UI::Xaml;
 
@@ -15,8 +14,7 @@ namespace winrt::IpaSimApp::implementation {
 
 LogPage::LogPage() {
   InitializeComponent();
-  Log.infs().init(logText());
-  Log.errs().init(logText());
+  ipasim::logText().init(logText());
 }
 
 } // namespace winrt::IpaSimApp::implementation

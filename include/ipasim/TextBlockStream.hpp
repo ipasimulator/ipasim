@@ -9,24 +9,35 @@
 
 namespace ipasim {
 
-class TextBlockStream : public Stream<TextBlockStream> {
+class TextBlockProvider {
 public:
-  TextBlockStream(bool Error) : Error(Error), TB(nullptr) {}
+  TextBlockProvider() : TB(nullptr) {}
 
-  void init(const winrt::Windows::UI::Xaml::Controls::TextBlock &TextBlock) {
+  void init(winrt::Windows::UI::Xaml::Controls::TextBlock TextBlock) {
     TB = TextBlock;
   }
+  winrt::Windows::UI::Xaml::Controls::TextBlock get() { return TB; }
+
+private:
+  winrt::Windows::UI::Xaml::Controls::TextBlock TB;
+};
+
+class TextBlockStream : public Stream<TextBlockStream> {
+public:
+  TextBlockStream(bool Error, TextBlockProvider &TBP)
+      : Error(Error), TBP(TBP) {}
+
   TextBlockStream &write(const char *S) { return write(winrt::to_hstring(S)); }
   TextBlockStream &write(const wchar_t *S) { return write(winrt::hstring(S)); }
 
 private:
   bool Error;
-  winrt::Windows::UI::Xaml::Controls::TextBlock TB;
+  TextBlockProvider &TBP;
 
   TextBlockStream &write(const winrt::hstring &S);
 };
 
-using LogStream = TextBlockStream;
+using LogStream = AggregateStream<DebugStream, TextBlockStream>;
 
 } // namespace ipasim
 
