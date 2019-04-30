@@ -4,7 +4,8 @@ set (SOURCE_FILES
     IpaSimulator.cpp
     LoadedLibrary.cpp
     MachO.cpp
-    SysTranslator.cpp)
+    SysTranslator.cpp
+    TextBlockStream.cpp)
 
 add_library (IpaSimLibrary SHARED ${SOURCE_FILES})
 add_prep_dep (IpaSimLibrary)

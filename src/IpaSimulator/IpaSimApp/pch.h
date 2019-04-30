@@ -4,11 +4,14 @@
 #include <unknwn.h>
 #include <windows.h>
 #include <winrt/Windows.ApplicationModel.Activation.h>
+#include <winrt/Windows.ApplicationModel.Core.h>
 #include <winrt/Windows.Foundation.h>
 #include <winrt/Windows.Storage.AccessCache.h>
 #include <winrt/Windows.Storage.Pickers.h>
 #include <winrt/Windows.Storage.h>
+#include <winrt/Windows.UI.Core.h>
 #include <winrt/Windows.UI.Popups.h>
+#include <winrt/Windows.UI.ViewManagement.h>
 #include <winrt/Windows.UI.Xaml.Controls.Primitives.h>
 #include <winrt/Windows.UI.Xaml.Controls.h>
 #include <winrt/Windows.UI.Xaml.Data.h>

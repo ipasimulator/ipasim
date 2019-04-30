@@ -1,25 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="MainPage.xaml" />
-  </ItemGroup>
-  <ItemGroup>
     <Midl Include="App.idl" />
     <Midl Include="MainPage.idl" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="pch.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="MainPage.cpp" />
-    <ClCompile Include="$(GeneratedFilesDir)module.g.cpp" />
+    <ClCompile Include="$(GeneratedFilesDir)module.g.cpp">
+      <Filter>Content</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Content</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="pch.h" />
     <ClInclude Include="App.h" />
     <ClInclude Include="MainPage.h" />
+    <ClInclude Include="pch.h">
+      <Filter>Content</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\Wide310x150Logo.scale-200.png">
@@ -45,11 +45,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <AppxManifest Include="Package.appxmanifest" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="IpaSimApp_TemporaryKey.pfx" />
-    <None Include="packages.config" />
     <None Include="..\..\..\cmake\ipasim-x86-$(Configuration)\bin\libunicorn.dll" />
     <None Include="..\..\..\cmake\ipasim-x86-$(Configuration)\bin\libIpaSimLibrary.dll" />
     <None Include="..\..\..\cmake\ipasim-x86-$(Configuration)\bin\libEGL.dll" />
@@ -82,6 +77,12 @@
     <None Include="Social.Xaml\**">
       <Filter>bin</Filter>
     </None>
+    <None Include="IpaSimApp_TemporaryKey.pfx">
+      <Filter>Content</Filter>
+    </None>
+    <None Include="packages.config">
+      <Filter>Content</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Assets">
@@ -91,8 +92,31 @@
       <UniqueIdentifier>{690030eb-7fdc-4292-b586-4866e630b9b2}</UniqueIdentifier>
       <Extensions>dll;lib;exp;dylib</Extensions>
     </Filter>
+    <Filter Include="Content">
+      <UniqueIdentifier>{5c03dc11-3fdf-42aa-8119-81ddc4715b27}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="readme.txt" />
+    <ApplicationDefinition Include="App.xaml">
+      <Filter>Content</Filter>
+    </ApplicationDefinition>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="MainPage.xaml">
+      <Filter>Content</Filter>
+    </Page>
+    <Page Include="LogPage.xaml">
+      <Filter>Content</Filter>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <AppxManifest Include="Package.appxmanifest">
+      <Filter>Content</Filter>
+    </AppxManifest>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="readme.txt">
+      <Filter>Content</Filter>
+    </Text>
   </ItemGroup>
 </Project>

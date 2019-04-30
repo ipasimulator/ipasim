@@ -6,7 +6,6 @@
 #include "ipasim/LoadedLibrary.hpp"
 
 #include <string>
-#include <winrt/Windows.ApplicationModel.Activation.h>
 
 using namespace ipasim;
 using namespace std;
@@ -16,13 +15,8 @@ using namespace Windows::ApplicationModel::Activation;
 // TODO: This Emu-Dyld circular reference is not very cool.
 IpaSimulator::IpaSimulator() : Emu(Dyld), Dyld(Emu), Sys(Dyld, Emu) {}
 
-IpaSimulator ipasim::IpaSim;
-DebugLogger ipasim::Log;
-
-#define IPASIM_API extern "C" __declspec(dllexport)
-
-IPASIM_API bool ipaSim_start(const hstring &Path,
-                             const LaunchActivatedEventArgs &LaunchArgs) {
+bool ipasim::start(const hstring &Path,
+                   const LaunchActivatedEventArgs &LaunchArgs) {
   try {
     // Load the binary.
     IpaSim.MainBinary = to_string(Path);
@@ -41,6 +35,14 @@ IPASIM_API bool ipaSim_start(const hstring &Path,
   }
   return true;
 }
+TextBlockProvider &ipasim::logText() { return IpaSim.LogText; }
+void ipasim::error(const char *Message) { Log.error(Message); }
+
+IpaSimulator ipasim::IpaSim;
+Logger<LogStream> ipasim::Log = Logger<LogStream>(
+    LogStream(DebugStream(), TextBlockStream(false, IpaSim.LogText)),
+    LogStream(DebugStream(), TextBlockStream(true, IpaSim.LogText)));
+
 IPASIM_API void *ipaSim_translate(void *Addr) {
   return IpaSim.Sys.translate(Addr);
 }

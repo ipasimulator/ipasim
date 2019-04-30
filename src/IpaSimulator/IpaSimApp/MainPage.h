@@ -6,23 +6,22 @@
 
 #include "MainPage.g.h"
 
-namespace winrt::IpaSimApp::implementation
-{
-    struct MainPage : MainPageT<MainPage>
-    {
-        MainPage();
+namespace winrt::IpaSimApp::implementation {
 
-        bool Loaded();
-        void Loaded(bool value);
+struct MainPage : MainPageT<MainPage> {
+  MainPage();
 
-    private:
-        bool loaded_;
-    };
-}
+  bool Loaded();
+  void Loaded(bool value);
 
-namespace winrt::IpaSimApp::factory_implementation
-{
-    struct MainPage : MainPageT<MainPage, implementation::MainPage>
-    {
-    };
-}
+private:
+  bool loaded_;
+};
+
+} // namespace winrt::IpaSimApp::implementation
+
+namespace winrt::IpaSimApp::factory_implementation {
+
+struct MainPage : MainPageT<MainPage, implementation::MainPage> {};
+
+} // namespace winrt::IpaSimApp::factory_implementation

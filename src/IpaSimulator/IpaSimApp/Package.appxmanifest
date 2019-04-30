@@ -6,8 +6,8 @@
     Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="0ee863f9-dcc5-4d3b-9c2a-457bcfafc07e" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
   <Properties>
-    <DisplayName>IpaSimApp</DisplayName>
-    <PublisherDisplayName>jjone</PublisherDisplayName>
+    <DisplayName>ipaSim</DisplayName>
+    <PublisherDisplayName>Jan Joneš</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
   <Dependencies>
@@ -18,7 +18,7 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="IpaSimApp.App">
-      <uap:VisualElements DisplayName="IpaSimApp" Description="Project for a single page C++/WinRT Universal Windows Platform (UWP) app with no predefined layout"
+      <uap:VisualElements DisplayName="ipaSim" Description="Project for a single page C++/WinRT Universal Windows Platform (UWP) app with no predefined layout"
         Square150x150Logo="Assets\Square150x150Logo.png" Square44x44Logo="Assets\Square44x44Logo.png" BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png">
         </uap:DefaultTile>

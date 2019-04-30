@@ -360,8 +360,8 @@ LibraryInfo DynamicLoader::lookup(uint64_t Addr) {
   return {nullptr, nullptr};
 }
 
-DebugStream::Handler DynamicLoader::dumpAddr(uint64_t Addr) {
-  return [this, Addr](DebugStream &S) {
+LogStream::Handler DynamicLoader::dumpAddr(uint64_t Addr) {
+  return [this, Addr](LogStream &S) {
     if (Addr == KernelAddr)
       S << "kernel!0x" << to_hex_string(Addr);
     else {
@@ -371,16 +371,16 @@ DebugStream::Handler DynamicLoader::dumpAddr(uint64_t Addr) {
   };
 }
 
-static DebugStream::Handler dumpAddrImpl(uint64_t Addr, const LibraryInfo &LI) {
-  return [Addr, &LI](DebugStream &S) {
+static LogStream::Handler dumpAddrImpl(uint64_t Addr, const LibraryInfo &LI) {
+  return [Addr, &LI](LogStream &S) {
     uint64_t RVA = Addr - LI.Lib->StartAddress;
     S << *LI.LibPath << "+0x" << to_hex_string(RVA);
   };
 }
 
-DebugStream::Handler DynamicLoader::dumpAddr(uint64_t Addr,
-                                             const LibraryInfo &LI) {
-  return [this, Addr, &LI](DebugStream &S) {
+LogStream::Handler DynamicLoader::dumpAddr(uint64_t Addr,
+                                           const LibraryInfo &LI) {
+  return [this, Addr, &LI](LogStream &S) {
     if (!LI.Lib) {
       S << "0x" << to_hex_string(Addr);
       return;
@@ -394,9 +394,8 @@ DebugStream::Handler DynamicLoader::dumpAddr(uint64_t Addr,
   };
 }
 
-DebugStream::Handler
-DynamicLoader::dumpAddr(uint64_t Addr, const LibraryInfo &LI, ObjCMethod M) {
-  return [Addr, &LI, M](DebugStream &S) {
-    S << M << "!" << dumpAddrImpl(Addr, LI);
-  };
+LogStream::Handler DynamicLoader::dumpAddr(uint64_t Addr, const LibraryInfo &LI,
+                                           ObjCMethod M) {
+  return
+      [Addr, &LI, M](LogStream &S) { S << M << "!" << dumpAddrImpl(Addr, LI); };
 }
