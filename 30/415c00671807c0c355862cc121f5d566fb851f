@@ -1,0 +1,4 @@
+[ver:1,total:180]
+include/ipasim/TextBlockStream.hpp:120,1556629200:120,r
+src/IpaSimulator/IpaSimApp/LogPage.xaml:30,1556629200:30,m
+src/IpaSimulator/TextBlockStream.cpp:30,1556629200:30,m
