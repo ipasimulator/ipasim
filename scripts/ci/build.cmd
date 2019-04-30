@@ -60,9 +60,13 @@ docker commit ipasimulator_ipasim_1^
 docker tag janjones/ipasim:artifacts-%BUILD_BUILDNUMBER%^
  janjones/ipasim:artifacts
 docker push janjones/ipasim:%BUILD_BUILDNUMBER%
-docker push janjones/ipasim:latest
 docker push janjones/ipasim:artifacts-%BUILD_BUILDNUMBER%
-docker push janjones/ipasim:artifacts
+
+rem Don't push tags `latest` and `artifacts` for unsuccessful builds.
+if %EXIT_ERRORLEVEL% EQU 0 (
+    docker push janjones/ipasim:latest
+    docker push janjones/ipasim:artifacts
+)
 
 rem Shutdown.
 if [%SHUTDOWN_WHEN_COMPLETE%]==[1] shutdown /p
