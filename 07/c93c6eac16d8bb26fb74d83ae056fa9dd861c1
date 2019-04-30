@@ -1,0 +1,7 @@
+[ver:1,total:1320]
+src/IpaSimulator/TextBlockStream.cpp:655,1556622000:655,m
+include/ipasim/TextBlockStream.hpp:278,1556622000:278,m
+include/ipasim/IpaSimulator.hpp:188,1556622000:188,m
+include/ipasim/Logger.hpp:180,1556622000:180,r
+src/IpaSimulator/IpaSimApp/LogPage.cpp:11,1556622000:11,m
+include/ipasim/SysTranslator.hpp:8,1556622000:8,m
