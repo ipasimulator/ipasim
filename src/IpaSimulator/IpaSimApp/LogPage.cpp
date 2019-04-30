@@ -5,11 +5,18 @@
 #include "LogPage.g.cpp"
 #endif
 
+#include "ipasim/IpaSimulator.hpp"
+
+using namespace ipasim;
 using namespace winrt;
 using namespace Windows::UI::Xaml;
 
 namespace winrt::IpaSimApp::implementation {
 
-LogPage::LogPage() { InitializeComponent(); }
+LogPage::LogPage() {
+  InitializeComponent();
+  Log.infs().init(logText());
+  Log.errs().init(logText());
+}
 
 } // namespace winrt::IpaSimApp::implementation

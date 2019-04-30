@@ -13,8 +13,8 @@ class TextBlockStream : public Stream<TextBlockStream> {
 public:
   TextBlockStream(bool Error) : Error(Error), TB(nullptr) {}
 
-  void init(const winrt::Windows::UI::Xaml::Controls::TextBlock &TB) {
-    this->TB = TB;
+  void init(const winrt::Windows::UI::Xaml::Controls::TextBlock &TextBlock) {
+    TB = TextBlock;
   }
   TextBlockStream &write(const char *S) { return write(winrt::to_hstring(S)); }
   TextBlockStream &write(const wchar_t *S) { return write(winrt::hstring(S)); }

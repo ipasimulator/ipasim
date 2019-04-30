@@ -144,7 +144,7 @@ public:
   size_t getNextTypeSize();
   bool hasNext() { return *T; }
 
-  static const size_t InvalidSize = -1;
+  static const size_t InvalidSize = static_cast<size_t>(-1);
 
 private:
   const char *T;

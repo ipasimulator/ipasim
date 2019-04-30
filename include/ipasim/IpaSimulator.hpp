@@ -37,7 +37,7 @@ public:
 };
 
 IPASIM_EXPORT extern IpaSimulator IpaSim;
-extern Logger<LogStream> Log;
+IPASIM_EXPORT extern Logger<LogStream> Log;
 
 } // namespace ipasim
 
