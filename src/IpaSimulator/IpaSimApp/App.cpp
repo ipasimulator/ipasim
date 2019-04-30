@@ -68,7 +68,7 @@ static IAsyncAction startCore(LaunchActivatedEventArgs LaunchArgs) {
   FP.FileTypeFilter().Append(L"*");
   StorageFolder Folder(co_await FP.PickSingleFolderAsync());
   if (!Folder) {
-    OutputDebugStringA("Error: no folder selected.");
+    ipasim::error("no folder selected");
     co_return;
   }
   // TODO: This is not used right now.
@@ -78,13 +78,13 @@ static IAsyncAction startCore(LaunchActivatedEventArgs LaunchArgs) {
   // Find binary in the folder.
   string FolderName(to_string(Folder.Name()));
   if (!ipasim::endsWith(FolderName, ".app")) {
-    OutputDebugStringA("Error: wrong folder selected.");
+    ipasim::error("wrong folder selected");
     co_return;
   }
   string BinaryName(FolderName.substr(0, FolderName.length() - 4));
   IStorageItem Bin(co_await Folder.TryGetItemAsync(to_hstring(BinaryName)));
   if (!Bin) {
-    OutputDebugStringA("Error: cannot find binary.");
+    ipasim::error("cannot find binary");
     co_return;
   }
 
@@ -114,7 +114,7 @@ static IAsyncAction startCore(LaunchActivatedEventArgs LaunchArgs) {
 }
 static IAsyncAction start(LaunchActivatedEventArgs LaunchArgs) {
   // Only start the emulation if it hasn't already been started, i.e., no
-  // secondary view was created.
+  // secondary view exists.
   auto Views = CoreApplication::Views();
   if (Views.Size() == 2)
     return;
@@ -137,7 +137,7 @@ static IAsyncAction start(LaunchActivatedEventArgs LaunchArgs) {
   // Activate the new window.
   co_await resume_foreground(MainDispatcher);
   if (!co_await ApplicationViewSwitcher::TryShowAsStandaloneAsync(ViewId)) {
-    // TODO: Log an error.
+    ipasim::error("cannot create second window");
     return;
   }
 

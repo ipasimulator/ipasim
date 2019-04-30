@@ -36,6 +36,7 @@ bool ipasim::start(const hstring &Path,
   return true;
 }
 TextBlockProvider &ipasim::logText() { return IpaSim.LogText; }
+void ipasim::error(const char *Message) { Log.error(Message); }
 
 IpaSimulator ipasim::IpaSim;
 Logger<LogStream> ipasim::Log = Logger<LogStream>(

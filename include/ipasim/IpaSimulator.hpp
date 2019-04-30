@@ -32,6 +32,9 @@ IPASIM_EXPORT bool start(
     const winrt::Windows::ApplicationModel::Activation::LaunchActivatedEventArgs
         &LaunchArgs);
 IPASIM_EXPORT TextBlockProvider &logText();
+// TODO: This is just a workaround, because MSVC cannot compile `Log.error`
+// calls.
+IPASIM_EXPORT void error(const char *Message);
 
 extern IpaSimulator IpaSim;
 extern Logger<LogStream> Log;
