@@ -105,6 +105,9 @@
     <Page Include="MainPage.xaml">
       <Filter>Content</Filter>
     </Page>
+    <Page Include="LogPage.xaml">
+      <Filter>Content</Filter>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">

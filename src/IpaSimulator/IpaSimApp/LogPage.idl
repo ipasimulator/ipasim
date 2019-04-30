@@ -1,0 +1,8 @@
+namespace IpaSimApp
+{
+    [default_interface]
+    runtimeclass LogPage : Windows.UI.Xaml.Controls.Page
+    {
+        LogPage();
+    }
+}
