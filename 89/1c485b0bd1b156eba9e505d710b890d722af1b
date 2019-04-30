@@ -1,0 +1,11 @@
+[ver:1,total:3000]
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:962,1556618400:812,1556622000:150,m
+include/ipasim/IpaSimulator.hpp:928,1556618400:181,1556622000:747,m
+src/IpaSimulator/CMakeLists.txt:358,1556618400:188,1556622000:170,r
+include/ipasim/TextBlockStream.hpp:312,1556618400:120,1556622000:192,m
+src/IpaSimulator/IpaSimulator.cpp:206,1556618400:169,1556622000:37,m
+include/ipasim/Emulator.hpp:140,1556618400:140,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:42,1556618400:30,1556622000:12,r
+src/HeadersAnalyzer/CMakeLists.txt:20,1556618400:20,r
+CMakeLists.txt:20,1556618400:20,r
+src/IpaSimulator/IpaSimApp/App.cpp:12,1556622000:12,m
