@@ -173,7 +173,7 @@ void App::OnLaunched(LaunchActivatedEventArgs const &e) {
       // final launch steps after the restore is complete
     }
 
-    if (e.PrelaunchActivated() == false) {
+    if (!e.PrelaunchActivated()) {
       if (rootFrame.Content() == nullptr) {
         // When the navigation stack isn't restored navigate to the first page,
         // configuring the new page by passing required information as a
@@ -189,7 +189,7 @@ void App::OnLaunched(LaunchActivatedEventArgs const &e) {
       ApplicationView::GetForCurrentView().Title(L"Log");
     }
   } else {
-    if (e.PrelaunchActivated() == false) {
+    if (!e.PrelaunchActivated()) {
       if (rootFrame.Content() == nullptr) {
         // When the navigation stack isn't restored navigate to the first page,
         // configuring the new page by passing required information as a
@@ -202,7 +202,8 @@ void App::OnLaunched(LaunchActivatedEventArgs const &e) {
     }
   }
 
-  start(e);
+  if (!e.PrelaunchActivated())
+    start(e);
 }
 
 /// <summary>
