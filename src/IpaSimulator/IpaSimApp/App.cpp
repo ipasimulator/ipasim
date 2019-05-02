@@ -28,6 +28,8 @@ using namespace Windows::UI::Xaml::Navigation;
 using namespace IpaSimApp;
 using namespace IpaSimApp::implementation;
 
+constexpr bool ShowLogWindow = false;
+
 /// <summary>
 /// Initializes the singleton application object.  This is the first line of
 /// authored code executed, and as such is the logical equivalent of main() or
@@ -113,36 +115,38 @@ static IAsyncAction startCore(LaunchActivatedEventArgs LaunchArgs) {
   }
 }
 static IAsyncAction start(LaunchActivatedEventArgs LaunchArgs) {
-  // Only start the emulation if it hasn't already been started, i.e., no
-  // secondary view exists.
-  auto Views = CoreApplication::Views();
-  if (Views.Size() == 2)
-    return;
+  if constexpr (ShowLogWindow) {
+    // Only start the emulation if it hasn't already been started, i.e., no
+    // secondary view exists.
+    auto Views = CoreApplication::Views();
+    if (Views.Size() == 2)
+      return;
 
-  CoreDispatcher MainDispatcher =
-      CoreApplication::GetCurrentView().Dispatcher();
+    CoreDispatcher MainDispatcher =
+        CoreApplication::GetCurrentView().Dispatcher();
 
-  // Create a new window.
-  CoreApplicationView View = CoreApplication::CreateNewView();
-  co_await resume_foreground(View.Dispatcher());
+    // Create a new window.
+    CoreApplicationView View = CoreApplication::CreateNewView();
+    co_await resume_foreground(View.Dispatcher());
 
-  // Show the "Loading..." screen.
-  Frame F;
-  F.Navigate(xaml_typename<IpaSimApp::MainPage>(), nullptr);
-  Window::Current().Content(F);
-  Window::Current().Activate();
+    // Show the "Loading..." screen.
+    Frame F;
+    F.Navigate(xaml_typename<IpaSimApp::MainPage>(), nullptr);
+    Window::Current().Content(F);
+    Window::Current().Activate();
 
-  int32_t ViewId = ApplicationView::GetForCurrentView().Id();
+    int32_t ViewId = ApplicationView::GetForCurrentView().Id();
 
-  // Activate the new window.
-  co_await resume_foreground(MainDispatcher);
-  if (!co_await ApplicationViewSwitcher::TryShowAsStandaloneAsync(ViewId)) {
-    ipasim::error("cannot create second window");
-    return;
+    // Activate the new window.
+    co_await resume_foreground(MainDispatcher);
+    if (!co_await ApplicationViewSwitcher::TryShowAsStandaloneAsync(ViewId)) {
+      ipasim::error("cannot create second window");
+      return;
+    }
+
+    // Start the emulation in the new window.
+    co_await resume_foreground(View.Dispatcher());
   }
-
-  // Start the emulation in the new window.
-  co_await resume_foreground(View.Dispatcher());
   co_await startCore(LaunchArgs);
 }
 
@@ -186,7 +190,8 @@ void App::OnLaunched(LaunchActivatedEventArgs const &e) {
       // Ensure the current window is active
       Window::Current().Activate();
       // Show "Log" in the title.
-      ApplicationView::GetForCurrentView().Title(L"Log");
+      if constexpr (ShowLogWindow)
+        ApplicationView::GetForCurrentView().Title(L"Log");
     }
   } else {
     if (!e.PrelaunchActivated()) {
