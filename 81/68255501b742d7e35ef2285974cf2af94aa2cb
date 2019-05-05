@@ -1,0 +1,8 @@
+[ver:1,total:802]
+CMakeLists.txt:260,1556830800:180,1557090000:80,r
+src/IpaSimulator/IpaSimApp/App.cpp:210,1556812800:180,1557093600:30,m
+docs/english.md:180,1556971200:180,r
+include/ipasim/IpaSimulator/Config.hpp:120,1557090000:120,r
+scripts/winobjc-x86-Debug.cmake:24,1557090000:24,r
+scripts/lief-x86-Debug.cmake:4,1557090000:4,r
+scripts/winobjc-x86-Release.cmake:4,1557090000:4,r
