@@ -28,7 +28,11 @@ using namespace Windows::UI::Xaml::Navigation;
 using namespace IpaSimApp;
 using namespace IpaSimApp::implementation;
 
-constexpr bool ShowLogWindow = false;
+#if defined(_DEBUG)
+#define NDEBUG 0
+#endif
+
+constexpr bool ShowLogWindow = NDEBUG;
 
 /// <summary>
 /// Initializes the singleton application object.  This is the first line of
