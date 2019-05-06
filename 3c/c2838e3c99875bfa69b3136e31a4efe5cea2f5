@@ -1,0 +1,5 @@
+[ver:1,total:1080]
+src/IpaSimulator/MachO.cpp:525,1557176400:165,1557180000:360,m
+include/ipasim/MachO.hpp:345,1557176400:135,1557180000:210,m
+src/IpaSimulator/SysTranslator.cpp:180,1557176400:180,r
+include/ipasim/LoadedLibrary.hpp:30,1557180000:30,r
