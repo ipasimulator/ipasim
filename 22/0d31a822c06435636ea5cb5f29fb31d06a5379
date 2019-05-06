@@ -1,0 +1,6 @@
+[ver:1,total:1010]
+src/IpaSimulator/CMakeLists.txt:855,1557090000:620,1557093600:90,1557144000:145,r
+src/HeadersAnalyzer/CMakeLists.txt:105,1557144000:105,m
+include/ipasim/Logger.hpp:20,1557144000:20,r
+src/IpaSimulator/SysTranslator.cpp:20,1557144000:20,r
+include/ipasim/IpaSimulator/Config.hpp:10,1557144000:10,r
