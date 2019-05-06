@@ -189,6 +189,12 @@ const char *ObjCClass::getName() {
     return reinterpret_cast<category_t *>(Data)->name;
   return reinterpret_cast<objc_class *>(Data)->getInfo()->name;
 }
+ObjCClass ObjCClass::getCategoryClass() {
+  if (Category)
+    return ObjCClass(/* Category */ false,
+                     reinterpret_cast<category_t *>(Data)->cls);
+  return ObjCClass();
+}
 
 static method_t *findMethodImpl(method_list_t *Methods, uint64_t Addr) {
   if (!Methods)

@@ -12,9 +12,12 @@ namespace ipasim {
 
 class ObjCClass {
 public:
+  ObjCClass() : Category(false), Data(nullptr) {}
   ObjCClass(bool Category, void *Data) : Category(Category), Data(Data) {}
 
   const char *getName();
+  // Returns empty class if this instance doesn't represent a category.
+  ObjCClass getCategoryClass();
 
   operator bool() { return Data; }
 
@@ -45,10 +48,16 @@ private:
 template <typename StreamTy>
 std::enable_if_t<is_stream_v<StreamTy>, StreamTy> &operator<<(StreamTy &Str,
                                                               ObjCMethod M) {
-  if (ObjCClass C = M.getClass())
-    return Str << "[" << C.getName() << " " << M.getName()
-               << "]:" << M.getType();
-  return Str << M.getName() << ":" << M.getType();
+  if (ObjCClass C = M.getClass()) {
+    Str << "[";
+    if (ObjCClass Cls = C.getCategoryClass())
+      Str << Cls.getName() << "(" << C.getName() << ")";
+    else
+      Str << C.getName();
+    Str << " " << M.getName() << "]:" << M.getType();
+  } else
+    Str << M.getName() << ":" << M.getType();
+  return Str;
 }
 
 class MachO {
