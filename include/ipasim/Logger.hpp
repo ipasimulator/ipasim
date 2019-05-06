@@ -62,6 +62,10 @@ IPASIM_CODE_VALIDATOR(has_ostream_op,
                       decltype(std::declval<std::ostream &>()
                                << std::declval<T>()),
                       std::ostream &);
+IPASIM_CODE_VALIDATOR(has_wostream_op,
+                      decltype(std::declval<std::wostream &>()
+                               << std::declval<T>()),
+                      std::wostream &);
 
 // SFINAE magic
 template <typename FromTy, typename... ToTys> struct is_invocable_any;
@@ -128,16 +132,22 @@ public:
   operator<<(const T &Any) {
     return d() << std::to_string(Any).c_str();
   }
-  // This `operator<<` is enabled only if `to_string(T)` doesn't exist. We use
-  // this as the last resort since it uses our `Buf` which writes strings
+  // These `operator<<`s are enabled only if `to_string(T)` doesn't exist. We
+  // use this as the last resort since it uses our `Buf` which writes strings
   // character after character (i.e., slowly).
-  // TODO: What about `wchar_t`?
   template <typename T>
   std::enable_if_t<others_failed_v<T> && !has_to_string_v<T> &&
                        has_ostream_op_v<T>,
                    DerivedTy &>
   operator<<(const T &Any) {
     return output<T, char>(Any);
+  }
+  template <typename T>
+  std::enable_if_t<others_failed_v<T> && !has_to_string_v<T> &&
+                       !has_ostream_op_v<T> && has_wostream_op_v<T>,
+                   DerivedTy &>
+  operator<<(const T &Any) {
+    return output<T, wchar_t>(Any);
   }
 
 protected:
