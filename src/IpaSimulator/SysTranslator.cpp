@@ -8,6 +8,7 @@
 #include "ipasim/WrapperIndex.hpp"
 
 #include <filesystem>
+#include <thread>
 
 using namespace ipasim;
 using namespace std;
@@ -69,7 +70,8 @@ void SysTranslator::execute(LoadedLibrary *Lib) {
 
 void SysTranslator::execute(uint64_t Addr) {
   if constexpr (PrintEmuInfo)
-    Log.info() << "starting emulation at " << Dyld.dumpAddr(Addr) << Log.end();
+    Log.info() << "starting emulation at " << Dyld.dumpAddr(Addr)
+               << " in thread " << this_thread::get_id() << Log.end();
 
   // Save LR.
   LRs.push(Emu.readReg(UC_ARM_REG_LR));
