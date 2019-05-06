@@ -1,0 +1,6 @@
+[ver:1,total:600]
+src/IpaSimulator/IpaSimulator.cpp:240,1557158400:120,1557162000:120,r
+scripts/ci/build.cmd:180,1557154800:180,r
+.gitmodules:140,1557154800:140,r
+readme.txt:20,1557154800:20,r
+CMakeLists.txt:20,1557154800:20,r
