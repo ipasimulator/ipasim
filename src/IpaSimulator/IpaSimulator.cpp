@@ -43,15 +43,13 @@ Logger<LogStream> ipasim::Log = Logger<LogStream>(
     LogStream(DebugStream(), TextBlockStream(false, IpaSim.LogText)),
     LogStream(DebugStream(), TextBlockStream(true, IpaSim.LogText)));
 
-IPASIM_API void *ipaSim_translate(void *Addr) {
-  return IpaSim.Sys.translate(Addr);
-}
+IPASIM_API void *ipaSim_translate(void *FP) { return IpaSim.Sys.translate(FP); }
 IPASIM_API void ipaSim_translate4(uint32_t *Addr) {
   Addr[1] = reinterpret_cast<uint32_t>(
       IpaSim.Sys.translate(reinterpret_cast<void *>(Addr[1])));
 }
-IPASIM_API void *ipaSim_translateC(void *Addr, size_t ArgC) {
-  return IpaSim.Sys.translate(Addr, ArgC);
+IPASIM_API void *ipaSim_translateC(void *FP, size_t ArgC) {
+  return IpaSim.Sys.translate(FP, ArgC);
 }
 IPASIM_API const char *ipaSim_processPath() {
   return IpaSim.MainBinary.c_str();
