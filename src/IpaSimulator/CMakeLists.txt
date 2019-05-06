@@ -27,7 +27,8 @@ target_compile_definitions (IpaSimLibrary PRIVATE
     # Don't include `winsock.h`, it interferes with Unicorn's `winsock2.h`. See
     # <https://stackoverflow.com/a/1372836>.
     _WINSOCKAPI_
-    $<$<CONFIG:Debug>:IPASIM_PRINT_EMU_INFO>)
+    $<$<CONFIG:Debug>:IPASIM_PRINT_EMU_INFO>
+    IPASIM_DISABLE_FATAL_ERRORS)
 
 # LIEF
 add_custom_target (lief-x86

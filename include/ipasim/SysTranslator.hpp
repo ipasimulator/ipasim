@@ -25,7 +25,16 @@ public:
   void call(const std::string &Lib, const std::string &Func,
             Args &&... Params) {
     LoadedLibrary *L = Dyld.load(Lib);
+    if (!L)
+      return;
+
     uint64_t Addr = L->findSymbol(Dyld, Func);
+    if (!Addr) {
+      Log.error() << "cannot find function " << Func << " in " << Lib
+                  << Log.end();
+      return;
+    }
+
     auto *Ptr = reinterpret_cast<void (*)(Args...)>(Addr);
     Ptr(std::forward<Args>(Params)...);
   }

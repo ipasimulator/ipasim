@@ -26,20 +26,24 @@ __declspec(dllimport) __stdcall void OutputDebugStringW(const wchar_t *);
 
 namespace ipasim {
 
+#if !defined(IPASIM_DISABLE_FATAL_ERRORS)
 class FatalError : public std::runtime_error {
 public:
   FatalError(const char *Message) : runtime_error(Message) {}
 };
+#endif
 
 struct StreamToken {};
 struct EndToken : StreamToken {};
 struct WinErrorToken : StreamToken {};
 struct AppendWinErrorToken : StreamToken {};
+#if !defined(IPASIM_DISABLE_FATAL_ERRORS)
 struct FatalEndToken : StreamToken {
   FatalEndToken(const char *Message) : Message(Message) {}
 
   const char *Message;
 };
+#endif
 
 // SFINAE magic
 #define IPASIM_CODE_VALIDATOR(name, code, rettype)                             \
@@ -108,10 +112,12 @@ public:
   DerivedTy &operator<<(AppendWinErrorToken) {
     return d() << EndToken() << WinErrorToken() << "\n";
   }
+#if !defined(IPASIM_DISABLE_FATAL_ERRORS)
   IPASIM_NORETURN DerivedTy &operator<<(FatalEndToken T) {
     d() << EndToken();
     throw FatalError(T.Message);
   }
+#endif
   DerivedTy &operator<<(const Handler &Handler) {
     Handler(d());
     return d();
@@ -262,8 +268,10 @@ public:
   EndToken end() { return EndToken(); }
   WinErrorToken winError() { return WinErrorToken(); }
   AppendWinErrorToken appendWinError() { return AppendWinErrorToken(); }
+#if !defined(IPASIM_DISABLE_FATAL_ERRORS)
   FatalEndToken fatalEnd(const char *Message) { return FatalEndToken(Message); }
   FatalEndToken fatalEnd() { return FatalEndToken("Fatal error occurred."); }
+#endif
 
 private:
   StreamTy O, E;
