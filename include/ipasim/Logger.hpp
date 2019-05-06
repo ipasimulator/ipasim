@@ -58,6 +58,25 @@ struct has_to_string {
 template <typename T>
 constexpr bool has_to_string_v = has_to_string::getValue<T>(has_to_string::b());
 
+struct has_ostream_op {
+  struct a {};
+  struct b : a {};
+
+  template <typename> static constexpr bool getValue(a) { return false; }
+  template <typename T>
+  static constexpr std::enable_if_t<
+      std::is_same_v<decltype(std::declval<std::ostream &>()
+                              << std::declval<T>()),
+                     std::ostream &>,
+      bool>
+  getValue(b) {
+    return true;
+  }
+};
+template <typename T>
+constexpr bool
+    has_ostream_op_v = has_ostream_op::getValue<T>(has_ostream_op::b());
+
 // SFINAE magic
 template <typename FromTy, typename... ToTys> struct is_invocable_any;
 template <typename FromTy, typename ToTy, typename... ToTys>
@@ -128,7 +147,9 @@ public:
   // character after character (i.e., slowly).
   // TODO: What about `wchar_t`?
   template <typename T>
-  std::enable_if_t<others_failed_v<T> && !has_to_string_v<T>, DerivedTy &>
+  std::enable_if_t<others_failed_v<T> && !has_to_string_v<T> &&
+                       has_ostream_op_v<T>,
+                   DerivedTy &>
   operator<<(const T &Any) {
     return output<T, char>(Any);
   }
