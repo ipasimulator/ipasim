@@ -51,7 +51,7 @@ uc_engine *Emulator::initUC() {
 
 void Emulator::callUCStatic(uc_err Err) {
   if (Err != UC_ERR_OK)
-    Log.error() << "unicorn failed with " << Err << Log.end();
+    Log.error() << "unicorn failed: " << uc_strerror(Err) << Log.end();
 }
 
 void Emulator::callUC(uc_err Err) {
@@ -59,7 +59,8 @@ void Emulator::callUC(uc_err Err) {
     if (IgnoreError)
       IgnoreError = false;
     else
-      Log.error() << "unicorn failed with " << Err << " at "
-                  << Dyld.dumpAddr(readReg(UC_ARM_REG_PC)) << Log.end();
+      Log.error() << "unicorn failed at "
+                  << Dyld.dumpAddr(readReg(UC_ARM_REG_PC)) << ": "
+                  << uc_strerror(Err) << Log.end();
   }
 }
