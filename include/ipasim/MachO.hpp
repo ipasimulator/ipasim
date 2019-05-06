@@ -12,13 +12,14 @@ namespace ipasim {
 
 class ObjCClass {
 public:
-  ObjCClass(void *Data) : Data(Data) {}
+  ObjCClass(bool Category, void *Data) : Category(Category), Data(Data) {}
 
   const char *getName();
 
   operator bool() { return Data; }
 
 private:
+  bool Category;
   void *Data;
 };
 
@@ -26,16 +27,17 @@ class ObjCMethod {
 public:
   ObjCMethod() : ClassData(nullptr), MethodData(nullptr) {}
   ObjCMethod(void *MethodData) : MethodData(MethodData) {}
-  ObjCMethod(void *ClassData, void *MethodData)
-      : ClassData(ClassData), MethodData(MethodData) {}
+  ObjCMethod(bool Category, void *ClassData, void *MethodData)
+      : Category(Category), ClassData(ClassData), MethodData(MethodData) {}
 
-  ObjCClass getClass() { return ObjCClass(ClassData); }
+  ObjCClass getClass() { return ObjCClass(Category, ClassData); }
   const char *getName();
   const char *getType();
 
   operator bool() { return MethodData; }
 
 private:
+  bool Category;
   void *ClassData;
   void *MethodData;
 };
