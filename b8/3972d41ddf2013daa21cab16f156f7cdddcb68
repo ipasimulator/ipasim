@@ -1,0 +1,8 @@
+[ver:1,total:960]
+include/ipasim/SysTranslator.hpp:360,1557147600:360,m
+include/ipasim/HeadersAnalyzer/Config.hpp:180,1557144000:180,r
+cmake/ipasim-x86-Debug/cg/exports.txt:180,1557147600:180,r
+src/HeadersAnalyzer/HeadersAnalyzer.cpp:90,1557144000:90,r
+src/HeadersAnalyzer/CMakeLists.txt:90,1557144000:90,r
+cmake/ipasim-x86-Debug/cg/libdispatch.cpp:30,1557147600:30,r
+src/IpaSimulator/SysTranslator.cpp:30,1557147600:30,r
