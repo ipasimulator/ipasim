@@ -42,40 +42,26 @@ struct FatalEndToken : StreamToken {
 };
 
 // SFINAE magic
-struct has_to_string {
-  struct a {};
-  struct b : a {};
+#define IPASIM_CODE_VALIDATOR(name, code, rettype)                             \
+  struct name {                                                                \
+    struct a {};                                                               \
+    struct b : a {};                                                           \
+                                                                               \
+    template <typename> static constexpr bool getValue(a) { return false; }    \
+    template <typename T>                                                      \
+    static constexpr std::enable_if_t<std::is_same_v<code, rettype>, bool>     \
+    getValue(b) {                                                              \
+      return true;                                                             \
+    }                                                                          \
+  };                                                                           \
+  template <typename T> constexpr bool name##_v = name::getValue<T>(name::b())
 
-  template <typename> static constexpr bool getValue(a) { return false; }
-  template <typename T>
-  static constexpr std::enable_if_t<
-      std::is_same_v<decltype(std::to_string(std::declval<T>())), std::string>,
-      bool>
-  getValue(b) {
-    return true;
-  }
-};
-template <typename T>
-constexpr bool has_to_string_v = has_to_string::getValue<T>(has_to_string::b());
-
-struct has_ostream_op {
-  struct a {};
-  struct b : a {};
-
-  template <typename> static constexpr bool getValue(a) { return false; }
-  template <typename T>
-  static constexpr std::enable_if_t<
-      std::is_same_v<decltype(std::declval<std::ostream &>()
-                              << std::declval<T>()),
-                     std::ostream &>,
-      bool>
-  getValue(b) {
-    return true;
-  }
-};
-template <typename T>
-constexpr bool
-    has_ostream_op_v = has_ostream_op::getValue<T>(has_ostream_op::b());
+IPASIM_CODE_VALIDATOR(has_to_string,
+                      decltype(std::to_string(std::declval<T>())), std::string);
+IPASIM_CODE_VALIDATOR(has_ostream_op,
+                      decltype(std::declval<std::ostream &>()
+                               << std::declval<T>()),
+                      std::ostream &);
 
 // SFINAE magic
 template <typename FromTy, typename... ToTys> struct is_invocable_any;
