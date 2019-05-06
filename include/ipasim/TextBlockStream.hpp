@@ -27,14 +27,14 @@ public:
   TextBlockStream(bool Error, TextBlockProvider &TBP)
       : Error(Error), TBP(TBP) {}
 
-  TextBlockStream &write(const char *S) { return write(winrt::to_hstring(S)); }
-  TextBlockStream &write(const wchar_t *S) { return write(winrt::hstring(S)); }
+  void write(const char *S) { write(winrt::to_hstring(S)); }
+  void write(const wchar_t *S) { write(winrt::hstring(S)); }
 
 private:
   bool Error;
   TextBlockProvider &TBP;
 
-  TextBlockStream &write(const winrt::hstring &S);
+  void write(const winrt::hstring &S);
 };
 
 using LogStream = AggregateStream<DebugStream, TextBlockStream>;
