@@ -1,0 +1,6 @@
+[ver:1,total:1906]
+src/HeadersAnalyzer/ObjCHelper.cpp:668,1557180000:72,1557183600:596,m
+include/ipasim/ObjCHelper.hpp:516,1557180000:12,1557183600:504,m
+src/HeadersAnalyzer/iOSHeaders.mm:352,1557180000:324,1557183600:28,r
+src/objc/stubs.mm:310,1557180000:222,1557183600:88,r
+src/HeadersAnalyzer/DLLHelper.cpp:60,1557183600:60,r
