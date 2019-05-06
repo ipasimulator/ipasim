@@ -8,6 +8,7 @@
 #include <ostream>
 #include <string>
 #include <tuple>
+#include <type_traits>
 
 #if !defined(IPASIM_NO_WINDOWS_ERRORS)
 // From <winnt.h>
@@ -30,15 +31,43 @@ public:
   FatalError(const char *Message) : runtime_error(Message) {}
 };
 
-class EndToken {};
-class WinErrorToken {};
-class AppendWinErrorToken {};
-class FatalEndToken {
-public:
+struct StreamToken {};
+struct EndToken : StreamToken {};
+struct WinErrorToken : StreamToken {};
+struct AppendWinErrorToken : StreamToken {};
+struct FatalEndToken : StreamToken {
   FatalEndToken(const char *Message) : Message(Message) {}
 
   const char *Message;
 };
+
+// SFINAE magic
+struct has_to_string {
+  struct a {};
+  struct b : a {};
+
+  template <typename> static constexpr bool getValue(a) { return false; }
+  template <typename T>
+  static constexpr std::enable_if_t<
+      std::is_same_v<decltype(std::to_string(std::declval<T>())), std::string>,
+      bool>
+  getValue(b) {
+    return true;
+  }
+};
+template <typename T>
+constexpr bool has_to_string_v = has_to_string::getValue<T>(has_to_string::b());
+
+// SFINAE magic
+template <typename FromTy, typename... ToTys> struct is_invocable_any;
+template <typename FromTy, typename ToTy, typename... ToTys>
+struct is_invocable_any<FromTy, ToTy, ToTys...>
+    : std::bool_constant<std::is_invocable_v<void(ToTy), FromTy> ||
+                         is_invocable_any<FromTy, ToTys...>::value> {};
+template <typename FromTy>
+struct is_invocable_any<FromTy> : std::bool_constant<false> {};
+template <typename FromTy, typename... ToTys>
+constexpr bool is_invocable_any_v = is_invocable_any<FromTy, ToTys...>::value;
 
 template <typename DerivedTy> class Stream {
 public:
@@ -46,8 +75,14 @@ public:
 
   // Note that all `operator<<`s must be here and none inside `DerivedTy`,
   // because otherwise only those in `DerivedTy` would be searched.
-  DerivedTy &operator<<(const char *S) { return d().write(S); }
-  DerivedTy &operator<<(const wchar_t *S) { return d().write(S); }
+  DerivedTy &operator<<(const char *S) {
+    d().write(S);
+    return d();
+  }
+  DerivedTy &operator<<(const wchar_t *S) {
+    d().write(S);
+    return d();
+  }
   DerivedTy &operator<<(const std::string &S) { return d() << S.c_str(); }
   DerivedTy &operator<<(const std::wstring &S) { return d() << S.c_str(); }
   DerivedTy &operator<<(EndToken) { return d() << ".\n"; }
@@ -69,20 +104,61 @@ public:
     d() << EndToken();
     throw FatalError(T.Message);
   }
-  template <typename T>
-  std::enable_if_t<
-      std::is_same_v<decltype(std::to_string(std::declval<T>())), std::string>,
-      DerivedTy &>
-  operator<<(const T &Any) {
-    return d() << std::to_string(Any).c_str();
-  }
   DerivedTy &operator<<(const Handler &Handler) {
     Handler(d());
     return d();
   }
 
+  // The following `operator<<`s can take any `T`, so they are enabled only if
+  // other overloads of `operator<<` cannot be used, i.e., `T` cannot be
+  // converted to any type they take as their argument.
+  template <typename T>
+  static constexpr bool others_failed_v =
+      !is_invocable_any_v<T, const char *, const wchar_t *, const std::string &,
+                          const std::wstring &, StreamToken, const Handler &>;
+
+  // This `operator<<` is enabled only if `to_string(T)` exists.
+  template <typename T>
+  std::enable_if_t<others_failed_v<T> && has_to_string_v<T>, DerivedTy &>
+  operator<<(const T &Any) {
+    return d() << std::to_string(Any).c_str();
+  }
+  // This `operator<<` is enabled only if `to_string(T)` doesn't exist. We use
+  // this as the last resort since it uses our `Buf` which writes strings
+  // character after character (i.e., slowly).
+  // TODO: What about `wchar_t`?
+  template <typename T>
+  std::enable_if_t<others_failed_v<T> && !has_to_string_v<T>, DerivedTy &>
+  operator<<(const T &Any) {
+    return output<T, char>(Any);
+  }
+
+protected:
+  template <typename CharTy> class Buf : public std::basic_streambuf<CharTy> {
+  public:
+    Buf(Stream &S) : S(S) {}
+
+  protected:
+    using int_type = typename std::basic_streambuf<CharTy>::int_type;
+
+    int_type overflow(int_type C) override {
+      CharTy C0[] = {static_cast<CharTy>(C), 0};
+      S << C0;
+      return 0;
+    }
+
+  private:
+    Stream &S;
+  };
+
 private:
   DerivedTy &d() { return *static_cast<DerivedTy *>(this); }
+  template <typename T, typename CharTy> DerivedTy &output(const T &Any) {
+    Buf<CharTy> Buf(*this);
+    std::ostream OS(&Buf);
+    OS << Any;
+    return d();
+  }
 
   static constexpr bool IsIpasimStream = true;
   friend struct is_stream;
@@ -104,28 +180,16 @@ constexpr bool is_stream_v = is_stream::getValue<StreamTy>(is_stream::b());
 
 class DebugStream : public Stream<DebugStream> {
 public:
-  DebugStream &write(const char *S) {
-    OutputDebugStringA(S);
-    return *this;
-  }
-  DebugStream &write(const wchar_t *S) {
-    OutputDebugStringW(S);
-    return *this;
-  }
+  void write(const char *S) { OutputDebugStringA(S); }
+  void write(const wchar_t *S) { OutputDebugStringW(S); }
 };
 
 class StdStream : public Stream<StdStream> {
 public:
   StdStream(std::ostream &Str, std::wostream &WStr) : Str(Str), WStr(WStr) {}
 
-  StdStream &write(const char *S) {
-    Str << S;
-    return *this;
-  }
-  StdStream &write(const wchar_t *S) {
-    WStr << S;
-    return *this;
-  }
+  void write(const char *S) { Str << S; }
+  void write(const wchar_t *S) { WStr << S; }
 
   static StdStream out() { return StdStream(std::cout, std::wcout); }
   static StdStream err() { return StdStream(std::cerr, std::wcerr); }
@@ -144,14 +208,8 @@ public:
   AggregateStream(ArgTys &&... Streams)
       : Streams(std::forward<ArgTys>(Streams)...) {}
 
-  AggregateStream &write(const char *S) {
-    write<0, char>(S);
-    return *this;
-  }
-  AggregateStream &write(const wchar_t *S) {
-    write<0, wchar_t>(S);
-    return *this;
-  }
+  void write(const char *S) { write<0, char>(S); }
+  void write(const wchar_t *S) { write<0, wchar_t>(S); }
 
 private:
   std::tuple<StreamTys...> Streams;

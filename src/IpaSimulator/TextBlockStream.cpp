@@ -14,7 +14,7 @@ using namespace Windows::UI::Xaml::Controls;
 using namespace Windows::UI::Xaml::Documents;
 using namespace Windows::UI::Xaml::Media;
 
-TextBlockStream &TextBlockStream::write(const hstring &S) {
+void TextBlockStream::write(const hstring &S) {
   TextBlock TB(TBP.get());
   TB.Dispatcher().RunAsync(CoreDispatcherPriority::Normal, [this, S, TB]() {
     Run R;
@@ -23,5 +23,4 @@ TextBlockStream &TextBlockStream::write(const hstring &S) {
       R.Foreground(SolidColorBrush(Colors::Red()));
     TB.Inlines().Append(R);
   });
-  return *this;
 }
