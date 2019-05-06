@@ -1,0 +1,5 @@
+[ver:1,total:180]
+src/objc/stubs.mm:90,1557183600:90,r
+src/HeadersAnalyzer/ObjCHelper.cpp:40,1557183600:40,m
+src/HeadersAnalyzer/iOSHeaders.mm:30,1557183600:30,r
+.git/COMMIT_EDITMSG:20,1557183600:20,r
