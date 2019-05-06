@@ -100,24 +100,23 @@ public:
   DynamicBackCaller(DynamicLoader &Dyld, Emulator &Emu, SysTranslator &Sys)
       : Dyld(Dyld), Emu(Emu), Sys(Sys) {}
 
-  template <typename... ArgTys> void callBack(void *FP, ArgTys... Args) {
+  template <typename RetTy, typename... ArgTys>
+  RetTy callBack(void *FP, ArgTys... Args) {
     uint64_t Addr = reinterpret_cast<uint64_t>(FP);
     LibraryInfo LI(Dyld.lookup(Addr));
     if (!LI.Lib || LI.Lib->isDLL()) {
       // Target load method is not inside any emulated Dylib, so it must be
       // native executable code and we can simply call it.
-      reinterpret_cast<void (*)(ArgTys...)>(FP)(Args...);
+      return reinterpret_cast<RetTy (*)(ArgTys...)>(FP)(Args...);
     } else {
       // Target load method is inside some emulated library.
       pushArgs<UC_ARM_REG_R0>(Args...);
       Sys.execute(Addr);
-    }
-  }
-  template <typename... ArgTys> void *callBackR(void *FP, ArgTys... Args) {
-    callBack(FP, Args...);
 
-    // Fetch return value.
-    return reinterpret_cast<void *>(Emu.readReg(UC_ARM_REG_R0));
+      // Fetch return value.
+      if constexpr (!std::is_same_v<RetTy, void>)
+        return reinterpret_cast<RetTy>(Emu.readReg(UC_ARM_REG_R0));
+    }
   }
 
 private:
@@ -154,11 +153,12 @@ private:
 
 template <typename... ArgTys>
 inline void SysTranslator::callBack(void *FP, ArgTys... Args) {
-  DynamicBackCaller(Dyld, Emu, *this).callBack<ArgTys...>(FP, Args...);
+  DynamicBackCaller(Dyld, Emu, *this).callBack<void, ArgTys...>(FP, Args...);
 }
 template <typename... ArgTys>
 inline void *SysTranslator::callBackR(void *FP, ArgTys... Args) {
-  return DynamicBackCaller(Dyld, Emu, *this).callBackR<ArgTys...>(FP, Args...);
+  return DynamicBackCaller(Dyld, Emu, *this)
+      .callBack<void *, ArgTys...>(FP, Args...);
 }
 
 } // namespace ipasim
