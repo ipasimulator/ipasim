@@ -81,9 +81,7 @@ void SysTranslator::execute(uint64_t Addr) {
 
   // Start execution.
   for (;;) {
-    Running = true;
     Emu.start(Addr);
-    assert(!Running && "Flag `Running` was not updated correctly.");
 
     if (Continue) {
       Continue = false;
@@ -116,7 +114,6 @@ void SysTranslator::returnToKernel() {
 
   // Stop execution.
   Emu.stop();
-  Running = false;
 }
 
 void SysTranslator::returnToEmulation() {
@@ -124,7 +121,6 @@ void SysTranslator::returnToEmulation() {
     Log.info() << "returning to " << Dyld.dumpAddr(Emu.readReg(UC_ARM_REG_LR))
                << Log.end();
 
-  assert(!Running);
   Restart = true;
 }
 
@@ -140,7 +136,6 @@ void SysTranslator::continueOutsideEmulation(function<void()> &&Cont) {
   Continuation = move(Cont);
 
   Emu.stop();
-  Running = false;
 }
 
 // Note that we never return `true` from this handler, so that protected memory
@@ -239,7 +234,6 @@ bool SysTranslator::handleFetchProtMem(uc_mem_type Type, uint64_t Addr,
     // Note that doing just `Emu.writeReg(UC_ARM_REG_PC, Addr);` instead of all
     // this didn't work in Release mode for some reason.
     Emu.stop();
-    Running = false;
     Restart = true;
     RestartFromLRs = true;
     LRs.push(Addr);
