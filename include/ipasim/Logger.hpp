@@ -49,22 +49,21 @@ struct FatalEndToken : StreamToken {
                                                                                \
     template <typename> static constexpr bool getValue(a) { return false; }    \
     template <typename T>                                                      \
-    static constexpr std::enable_if_t<std::is_same_v<code, rettype>, bool>     \
+    static constexpr std::enable_if_t<std::is_same_v<decltype(code), rettype>, \
+                                      bool>                                    \
     getValue(b) {                                                              \
       return true;                                                             \
     }                                                                          \
   };                                                                           \
   template <typename T> constexpr bool name##_v = name::getValue<T>(name::b())
 
-IPASIM_CODE_VALIDATOR(has_to_string,
-                      decltype(std::to_string(std::declval<T>())), std::string);
+IPASIM_CODE_VALIDATOR(has_to_string, std::to_string(std::declval<T>()),
+                      std::string);
 IPASIM_CODE_VALIDATOR(has_ostream_op,
-                      decltype(std::declval<std::ostream &>()
-                               << std::declval<T>()),
+                      std::declval<std::ostream &>() << std::declval<T>(),
                       std::ostream &);
 IPASIM_CODE_VALIDATOR(has_wostream_op,
-                      decltype(std::declval<std::wostream &>()
-                               << std::declval<T>()),
+                      std::declval<std::wostream &>() << std::declval<T>(),
                       std::wostream &);
 
 // SFINAE magic
