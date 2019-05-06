@@ -1,0 +1,13 @@
+[ver:1,total:1800]
+include/ipasim/SysTranslator.hpp:540,1557169200:165,1557172800:375,m
+src/IpaSimulator/Emulator.cpp:360,1557165600:180,1557172800:180,m
+include/ipasim/Logger.hpp:271,1557169200:30,1557172800:241,m
+src/IpaSimulator/IpaSimulator.cpp:265,1557169200:90,1557172800:175,m
+src/IpaSimulator/SysTranslator.cpp:150,1557172800:150,r
+src/IpaSimulator/IpaSimApp/App.cpp:75,1557169200:15,1557172800:60,m
+src/IpaSimulator/CMakeLists.txt:40,1557172800:40,m
+include/ipasim/LoadedLibrary.hpp:30,1557172800:30,r
+src/IpaSimulator/LoadedLibrary.cpp:28,1557172800:28,r
+include/ipasim/IpaSimulator.hpp:27,1557172800:27,m
+src/IpaSimulator/MachO.cpp:7,1557172800:7,r
+include/ipasim/Emulator.hpp:7,1557172800:7,r
