@@ -19,8 +19,8 @@ public:
         RestartFromLRs(false) {}
   void execute(LoadedLibrary *Lib);
   void execute(uint64_t Addr);
-  void *translate(void *Addr);
-  void *translate(void *Addr, size_t ArgC, bool Returns = false);
+  void *translate(void *FP);
+  void *translate(void *FP, size_t ArgC, bool Returns = false);
   template <typename... Args>
   void call(const std::string &Lib, const std::string &Func,
             Args &&... Params) {
