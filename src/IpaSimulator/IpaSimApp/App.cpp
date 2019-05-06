@@ -28,11 +28,10 @@ using namespace Windows::UI::Xaml::Navigation;
 using namespace IpaSimApp;
 using namespace IpaSimApp::implementation;
 
-#if defined(_DEBUG)
-#define NDEBUG 0
+#if !defined(IPASIM_SHOW_LOG_WINDOW)
+#define IPASIM_SHOW_LOG_WINDOW 0
 #endif
-
-constexpr bool ShowLogWindow = NDEBUG;
+constexpr bool ShowLogWindow = IPASIM_SHOW_LOG_WINDOW;
 
 /// <summary>
 /// Initializes the singleton application object.  This is the first line of

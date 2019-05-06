@@ -72,7 +72,7 @@
       <ForcedIncludeFiles>..\my_iso646.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
-      <AdditionalDependencies Condition="'$(Platform)'=='Win32'">..\..\..\cmake\ipasim-x86-$(Configuration)\bin\libIpaSimLibrary.dll.a;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\..\cmake\ipasim-x86-$(Configuration)\bin\libIpaSimLibrary.dll.a;WindowsApp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
@@ -82,7 +82,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
     <ClCompile>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;IPASIM_SHOW_LOG_WINDOW;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup>
