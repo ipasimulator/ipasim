@@ -1,0 +1,7 @@
+[ver:1,total:7160]
+include/ipasim/Logger.hpp:6622,1557133200:1570,1557136800:1080,1557140400:3272,1557144000:700,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:180,1557129600:180,r
+include/ipasim/TextBlockStream.hpp:134,1557133200:20,1557140400:114,m
+src/HeadersAnalyzer/LLVMHelper.cpp:120,1557140400:120,r
+src/IpaSimulator/TextBlockStream.cpp:84,1557133200:60,1557140400:24,m
+include/ipasim/ErrorReporting.hpp:20,1557140400:20,r
