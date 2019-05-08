@@ -474,7 +474,8 @@ else ()
             "${CURRENT_IPASIM_CMAKE_DIR}"
         WORKING_DIRECTORY "${SOURCE_DIR}"
         USES_TERMINAL
-        DEPENDS HeadersAnalyzer Frameworks crtlib crtstubs)
+        DEPENDS HeadersAnalyzer Frameworks crtlib crtstubs
+            "${CURRENT_IPASIM_CMAKE_DIR}/bin/HeadersAnalyzer.exe")
 endif ()
 add_custom_target (CodeGen DEPENDS ${CG_OUTPUTS})
 
