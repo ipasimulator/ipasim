@@ -15,7 +15,7 @@ namespace ipasim {
 class SysTranslator {
 public:
   SysTranslator(DynamicLoader &Dyld, Emulator &Emu)
-      : Dyld(Dyld), Emu(Emu), Running(false), Restart(false), Continue(false),
+      : Dyld(Dyld), Emu(Emu), Restart(false), Continue(false),
         RestartFromLRs(false) {}
   void execute(LoadedLibrary *Lib);
   void execute(uint64_t Addr);
@@ -25,7 +25,16 @@ public:
   void call(const std::string &Lib, const std::string &Func,
             Args &&... Params) {
     LoadedLibrary *L = Dyld.load(Lib);
+    if (!L)
+      return;
+
     uint64_t Addr = L->findSymbol(Dyld, Func);
+    if (!Addr) {
+      Log.error() << "cannot find function " << Func << " in " << Lib
+                  << Log.end();
+      return;
+    }
+
     auto *Ptr = reinterpret_cast<void (*)(Args...)>(Addr);
     Ptr(std::forward<Args>(Params)...);
   }
@@ -52,7 +61,6 @@ private:
   DynamicLoader &Dyld;
   Emulator &Emu;
   std::stack<uint32_t> LRs; // stack of return addresses
-  bool Running; // `true` iff the Unicorn Engine is emulating some code
   bool Restart, Continue, RestartFromLRs;
   std::function<void()> Continuation;
 };

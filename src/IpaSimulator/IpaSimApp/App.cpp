@@ -105,17 +105,12 @@ static IAsyncAction startCore(LaunchActivatedEventArgs LaunchArgs) {
   Bin = co_await Folder.GetFileAsync(Bin.Name());
 
   // Execute the main logic inside `IpaSimLibrary`.
-  bool Result = ipasim::start(Bin.Path(), LaunchArgs);
+  ipasim::start(Bin.Path(), LaunchArgs);
 
   // Change status from "Loading..." to "Done.".
   if (auto F = Window::Current().Content().try_as<Frame>())
     if (auto Page = F.Content().try_as<IpaSimApp::MainPage>())
       Page.Loaded(true);
-
-  if (!Result) {
-    MessageDialog MD(L"A fatal error occured.");
-    co_await MD.ShowAsync();
-  }
 }
 static IAsyncAction start(LaunchActivatedEventArgs LaunchArgs) {
   if constexpr (ShowLogWindow) {

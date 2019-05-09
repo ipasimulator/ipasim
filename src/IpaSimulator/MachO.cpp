@@ -185,7 +185,15 @@ const char *ObjCMethod::getType() {
   return reinterpret_cast<method_t *>(MethodData)->types;
 }
 const char *ObjCClass::getName() {
+  if (Category)
+    return reinterpret_cast<category_t *>(Data)->name;
   return reinterpret_cast<objc_class *>(Data)->getInfo()->name;
+}
+ObjCClass ObjCClass::getCategoryClass() {
+  if (Category)
+    return ObjCClass(/* Category */ false,
+                     reinterpret_cast<category_t *>(Data)->cls);
+  return ObjCClass();
 }
 
 static method_t *findMethodImpl(method_list_t *Methods, uint64_t Addr) {
@@ -220,9 +228,9 @@ ObjCMethod MachO::findMethod(const char *Section, uint64_t Addr) {
       // Enumerate methods of every class and its meta-class.
       objc_class *Class = Classes[I];
       if (method_t *M = findMethodImpl(Class, Addr))
-        return ObjCMethod(Class, M);
+        return ObjCMethod(/* Category */ false, Class, M);
       if (method_t *M = findMethodImpl(Class->isa, Addr))
-        return ObjCMethod(Class->isa, M);
+        return ObjCMethod(/* Category */ false, Class->isa, M);
     }
   return ObjCMethod();
 }
@@ -244,9 +252,9 @@ ObjCMethod MachO::findMethod(uint64_t Addr) {
       // Enumerate methods of every category.
       category_t *Category = Categories[I];
       if (method_t *M = findMethodImpl(Category->classMethods, Addr))
-        return ObjCMethod(M);
+        return ObjCMethod(/* Category */ true, Category, M);
       if (method_t *M = findMethodImpl(Category->instanceMethods, Addr))
-        return ObjCMethod(M);
+        return ObjCMethod(/* Category */ true, Category, M);
     }
 
   return ObjCMethod();

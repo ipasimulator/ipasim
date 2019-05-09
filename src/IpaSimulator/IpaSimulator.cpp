@@ -15,25 +15,20 @@ using namespace Windows::ApplicationModel::Activation;
 // TODO: This Emu-Dyld circular reference is not very cool.
 IpaSimulator::IpaSimulator() : Emu(Dyld), Dyld(Emu), Sys(Dyld, Emu) {}
 
-bool ipasim::start(const hstring &Path,
+void ipasim::start(const hstring &Path,
                    const LaunchActivatedEventArgs &LaunchArgs) {
-  try {
-    // Load the binary.
-    IpaSim.MainBinary = to_string(Path);
-    LoadedLibrary *App = IpaSim.Dyld.load(IpaSim.MainBinary);
-    if (!App)
-      return false;
+  // Load the binary.
+  IpaSim.MainBinary = to_string(Path);
+  LoadedLibrary *App = IpaSim.Dyld.load(IpaSim.MainBinary);
+  if (!App)
+    return;
 
-    // Execute it.
-    IpaSim.Sys.execute(App);
+  // Execute it.
+  IpaSim.Sys.execute(App);
 
-    // Call `UIApplicationLaunched`. `get_abi` converts C++/WinRT object to its
-    // C++/CX equivalent.
-    IpaSim.Sys.call("UIKit.dll", "UIApplicationLaunched", get_abi(LaunchArgs));
-  } catch (const FatalError &) {
-    return false;
-  }
-  return true;
+  // Call `UIApplicationLaunched`. `get_abi` converts C++/WinRT object to its
+  // C++/CX equivalent.
+  IpaSim.Sys.call("UIKit.dll", "UIApplicationLaunched", get_abi(LaunchArgs));
 }
 TextBlockProvider &ipasim::logText() { return IpaSim.LogText; }
 void ipasim::error(const char *Message) { Log.error(Message); }

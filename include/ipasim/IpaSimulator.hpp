@@ -27,7 +27,7 @@ public:
   TextBlockProvider LogText;
 };
 
-IPASIM_EXPORT bool start(
+IPASIM_EXPORT void start(
     const winrt::hstring &Path,
     const winrt::Windows::ApplicationModel::Activation::LaunchActivatedEventArgs
         &LaunchArgs);
