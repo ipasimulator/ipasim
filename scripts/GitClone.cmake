@@ -4,8 +4,10 @@
 
 file (REMOVE_RECURSE "${TARGET_DIR}")
 
-execute_process (COMMAND git clone --recurse-submodules "${REPO}"
-    "${TARGET_DIR}")
+execute_process (COMMAND git clone "${REPO}" "${TARGET_DIR}")
 
-execute_process (COMMAND git checkout "${TAG}"
+execute_process (COMMAND git checkout -f "${TAG}"
+    WORKING_DIRECTORY "${TARGET_DIR}")
+
+execute_process (COMMAND git submodule update --init --recursive
     WORKING_DIRECTORY "${TARGET_DIR}")

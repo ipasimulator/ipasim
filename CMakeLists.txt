@@ -92,7 +92,8 @@ pthreads-win32/pthreads-w32-2-9-1-release.tar.gz")
         "b9205695b4edee91000383695be8de5ba8e0db41")
     git_download (unicorn "https://github.com/unicorn-engine/unicorn"
         "d38c8fb27f7f94d81ec546bff6c306e21f949d0e")
-    git_download (WinObjC "https://github.com/Microsoft/WinObjC"
+    git_download (WinObjC
+        "https://jjones.visualstudio.com/DefaultCollection/WinObjC/_git/WinObjC"
         "7bec24671c4c18b81aaf85eff2887438f18a697c")
 
     # Configure subprojects.
