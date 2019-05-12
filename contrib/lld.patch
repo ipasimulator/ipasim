@@ -1,0 +1,693 @@
+From 8d378ce59f2f6031fdcf415226a70e997ed55405 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20Jone=C5=A1?= <jjones@outlook.cz>
+Date: Sun, 12 May 2019 08:45:00 +0200
+Subject: [PATCH] Squash branch `port_70`
+
+---
+ .gitignore                                    |   3 +
+ COFF/Chunks.cpp                               | 248 ++++++++++++++++++
+ COFF/Chunks.h                                 |  29 ++
+ COFF/Config.h                                 |   2 +
+ COFF/Driver.cpp                               |  20 ++
+ COFF/Options.td                               |   9 +
+ COFF/SymbolTable.cpp                          |  12 +-
+ COFF/Writer.cpp                               |   7 +
+ .../lld/ReaderWriter/MachOLinkingContext.h    |   8 +
+ lib/Core/Resolver.cpp                         |   4 +
+ lib/Driver/DarwinLdDriver.cpp                 |   8 +
+ lib/Driver/DarwinLdOptions.td                 |   4 +
+ .../MachO/MachOLinkingContext.cpp             |   5 +
+ .../MachO/MachONormalizedFileBinaryWriter.cpp |  20 ++
+ .../MachO/MachONormalizedFileFromAtoms.cpp    |  14 +
+ lib/ReaderWriter/MachO/StubsPass.cpp          |   7 +-
+ 16 files changed, 396 insertions(+), 4 deletions(-)
+
+diff --git a/.gitignore b/.gitignore
+index 0a288ee8c..edc4ad5e6 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -22,3 +22,6 @@
+ #==============================================================================#
+ # Sphinx build files.
+ docs/_build
++
++# [port] CHANGED: Added, [gtm].
++/.gtm/
+diff --git a/COFF/Chunks.cpp b/COFF/Chunks.cpp
+index 412ff7832..c601c736c 100644
+--- a/COFF/Chunks.cpp
++++ b/COFF/Chunks.cpp
+@@ -10,14 +10,18 @@
+ #include "Chunks.h"
+ #include "InputFiles.h"
+ #include "Symbols.h"
++#include "SymbolTable.h" // [port] CHANGED: Added, [mhdr].
+ #include "Writer.h"
+ #include "lld/Common/ErrorHandler.h"
++#include "lld/ReaderWriter/MachOLinkingContext.h" // [port] CHANGED: Added, [mhdr].
+ #include "llvm/ADT/Twine.h"
+ #include "llvm/BinaryFormat/COFF.h"
++#include "llvm/BinaryFormat/MachO.h" // [port] CHANGED: Added, [mhdr].
+ #include "llvm/Object/COFF.h"
+ #include "llvm/Support/Debug.h"
+ #include "llvm/Support/Endian.h"
+ #include "llvm/Support/raw_ostream.h"
++#include "../lib/ReaderWriter/MachO/MachONormalizedFile.h" // [port] CHANGED: Added, [mhdr].
+ #include <algorithm>
+ 
+ using namespace llvm;
+@@ -26,6 +30,18 @@ using namespace llvm::support::endian;
+ using namespace llvm::COFF;
+ using llvm::support::ulittle32_t;
+ 
++// [port] CHANGED: Added all the forward declarations in `lld::mach_o::normalized`, [mhdr].
++namespace lld {
++namespace mach_o {
++namespace normalized {
++
++size_t headerAndLoadCommandsSize(const NormalizedFile &file);
++llvm::Error writeHeaderAndLoadCommands(const NormalizedFile &file,
++                                       uint8_t *buffer);
++}
++}
++}
++
+ namespace lld {
+ namespace coff {
+ 
+@@ -320,6 +336,16 @@ void SectionChunk::writeTo(uint8_t *Buf) const {
+     if (!Sym) {
+       if (isCodeView() || isDWARF())
+         continue;
++
++      // [port] CHANGED: Added this `if`, [fixbind].
++      // Ignore discarded symbols inside section `.fixbind`, just set them to
++      // NULL.
++      // [port] TODO: Also remove them from the file entirely.
++      if (getSectionName() == ".fixbind") {
++        *(uint32_t *)Off = 0;
++        continue;
++      }
++
+       // Symbols in early discarded sections are represented using null pointers,
+       // so we need to retrieve the name from the object file.
+       COFFSymbolRef Sym =
+@@ -640,5 +666,227 @@ void MergeChunk::writeTo(uint8_t *Buf) const {
+   Builder.write(Buf + OutputSectionOff);
+ }
+ 
++// [port] CHANGED: Added implementation of class `MhdrChunk`, [mhdr].
++// See also `MachObjectWriter::writeObject` and
++// `MachOFileLayout::MachOFileLayout`.
++MhdrChunk::~MhdrChunk() { delete File; }
++StringRef translateSectionName(StringRef Name) {
++  // We don't translate all `.`-prefixed sections, since there can be section
++  // `.data` and `__data`, for example, and this translation would lead to
++  // duplicate sections.
++  // TODO: How to allocate new string correctly in LLVM?
++  if (Name.equals(".mhdr") || Name.equals(".fixbind") ||
++      Name.startswith(".objc_"))
++    return *make<std::string>(("__" + Name.substr(1)).str());
++  if (strchr(Name.data(), '$'))
++    // HACK: For some weird reason, this removes `$*` postfixes, which is
++    // actually what we want to do here (and in the `if` above, as well).
++    return *make<std::string>(Name.str());
++  return Name;
++}
++void MhdrChunk::finalizeContents() {
++  using namespace lld::mach_o::normalized;
++
++  // Inspired by `llvm::mach_o::normalized::readBinary`.
++
++  // Fill `NormalizedFile`.
++  File = new NormalizedFile();
++  File->arch = MachOLinkingContext::Arch::arch_x86; // TODO: Dynamically select.
++  File->fileType = MachO::MH_EXECUTE;               // TODO: Or MH_DYLIB.
++  // TODO: Fill File->flags.
++  File->pageSize = 4096;
++
++  // Add segments and sections. Every section in PE corresponds to one segment
++  // containing one section in Mach-O header for now. Note that not everything
++  // is filled here. For example, we don't even know section sizes yet. Those
++  // things are filled later in function `MhdrChunk::writeTo`.
++  // TODO: Propagate segment info from compilation.
++
++  // By convention (see `getsectiondata` in `libobjc` and also some normal
++  // `.dylib`s), the segment `__TEXT` should start at the Mach-O header
++  // (although there is no section for it).
++  Segment TextSeg;
++  TextSeg.name = "__TEXT";
++  TextSeg.address = 0;
++  TextSeg.size = 4096;
++  TextSeg.init_access =
++      MachO::VM_PROT_READ | MachO::VM_PROT_WRITE | MachO::VM_PROT_EXECUTE;
++  TextSeg.max_access = TextSeg.init_access;
++
++  // Everything else is searched in segment `__DATA` (see `getDataSection` in
++  // `libobjc`). So, for simplicity, we put everything else into that segment
++  // (even code) for now.
++  Segment DataSeg;
++  DataSeg.name = "__DATA";
++  DataSeg.address = 4096;
++  DataSeg.init_access =
++      MachO::VM_PROT_READ | MachO::VM_PROT_WRITE | MachO::VM_PROT_EXECUTE;
++  DataSeg.max_access = DataSeg.init_access;
++  uint64_t DataSize = 0;
++
++  uint64_t DataRVA = 4096;
++  for (OutputSection *OS : *OutputSections) {
++    StringRef SegName;
++    uint64_t RVA;
++    if (OS->Name == ".mhdr") {
++      SegName = TextSeg.name;
++      RVA = 0;
++    } else {
++      DataSize += 4096;
++      SegName = DataSeg.name;
++      RVA = DataRVA;
++      DataRVA += 4096;
++    }
++
++    Section Section;
++    Section.segmentName = SegName;
++    Section.sectionName = translateSectionName(OS->Name);
++    Section.address = RVA;
++    Section.content = ArrayRef<uint8_t>(nullptr, 4096);
++    File->sections.push_back(std::move(Section));
++  }
++
++  DataSeg.size = DataSize;
++  File->segments.push_back(std::move(TextSeg));
++  File->segments.push_back(std::move(DataSeg));
++
++  // Add dependent libraries.
++  {
++    std::vector<StringRef> DLLs;
++    Symtab->forEachSymbol([&](Symbol *s) {
++      if (auto *Imp = dyn_cast<DefinedImportData>(s))
++        DLLs.push_back(Imp->getDLLName());
++    });
++    std::sort(DLLs.begin(), DLLs.end());
++    DLLs.erase(std::unique(DLLs.begin(), DLLs.end()), DLLs.end());
++    for (StringRef DLL : DLLs) {
++      DependentDylib Dylib;
++      Dylib.path = DLL;
++      Dylib.kind = MachO::LC_LOAD_DYLIB;
++      Dylib.compatVersion = 0;
++      Dylib.currentVersion = 0;
++
++      File->dependentDylibs.push_back(std::move(Dylib));
++    }
++  }
++
++  // Compute size of the header.
++  Size = headerAndLoadCommandsSize(*File);
++}
++void MhdrChunk::writeTo(uint8_t *Buf) const {
++  using namespace lld::mach_o::normalized;
++
++  // Fix some things inside `NormalizedFile` we know now.
++
++  // Fix section RVAs and sizes.
++  Segment &TextSegment = File->segments[0];
++  Segment &DataSegment = File->segments[1];
++  uint64_t DataRVA = std::numeric_limits<uint64_t>::max();
++  uint64_t DataOffset = std::numeric_limits<uint64_t>::max();
++  uint64_t DataLastRVA = 0, DataLastVirtSize = 0, DataLastOffset = 0,
++           DataLastSize = 0, TextOffset = 0, TextSize = 0;
++  for (OutputSection *OS : *OutputSections) {
++    if (OS->Name == ".mhdr") {
++      TextOffset = OS->getFileOff();
++      TextSize = OS->getRawSize();
++      TextSegment.size = OS->getVirtualSize();
++      TextSegment.address = OS->getRVA() + ImageBase;
++    } else {
++      DataRVA = std::min(DataRVA, OS->getRVA());
++      if (OS->getRVA() > DataLastRVA) {
++        DataLastRVA = OS->getRVA();
++        DataLastVirtSize = OS->getVirtualSize();
++      }
++      DataOffset = std::min(DataOffset, OS->getFileOff());
++      if (OS->getFileOff() > DataLastOffset) {
++        DataLastOffset = OS->getFileOff();
++        DataLastSize = OS->getRawSize();
++      }
++    }
++
++    // Find the corresponding section (note that `OutputSections` were probably
++    // reordered since the time we built `File->sections`).
++    bool SectionFound = false;
++    for (Section &Sec : File->sections) {
++      if (Sec.sectionName == translateSectionName(OS->Name)) {
++        Sec.address = OS->getRVA() + ImageBase;
++        // TODO: There is a clash since sections in Mach-O files have only one
++        // size.
++        Sec.content = ArrayRef<uint8_t>(
++            nullptr, std::min(OS->getVirtualSize(), OS->getRawSize()));
++        SectionFound = true;
++        break;
++      }
++    }
++    assert(SectionFound);
++  }
++  DataSegment.size = DataLastRVA - DataRVA + DataLastVirtSize;
++  DataSegment.address = DataRVA + ImageBase;
++
++  // Remove old sections.
++  std::vector<Section> NewSections;
++  NewSections.reserve(OutputSections->size());
++  for (Section &Sec : File->sections) {
++    bool SectionFound = false;
++    for (OutputSection *OS : *OutputSections) {
++      if (translateSectionName(OS->Name) == Sec.sectionName) {
++        SectionFound = true;
++        break;
++      }
++    }
++    if (SectionFound) {
++      NewSections.push_back(std::move(Sec));
++    }
++  }
++  File->sections = std::move(NewSections);
++
++  // Write Mach-O header and load commands using the `NormalizedFile` filled
++  // inside `finalizeContents`.
++  if (llvm::Error E =
++          lld::mach_o::normalized::writeHeaderAndLoadCommands(*File, Buf)) {
++    error("constructing Mach-O header failed: " + llvm::toString(std::move(E)));
++  }
++
++  // Fix things we know now but cannot be specified in `NormalizedFile` (i.e.,
++  // we have to fix them manually in the buffer).
++  auto *Header = reinterpret_cast<MachO::mach_header *>(Buf);
++  auto *Cmd = reinterpret_cast<MachO::load_command *>(Header + 1);
++  for (size_t I = 0, IEnd = Header->ncmds; I != IEnd; ++I) {
++    if (Cmd->cmd == MachO::LC_SEGMENT) {
++      // Fix segment's file offset and file size.
++      auto *Seg = reinterpret_cast<MachO::segment_command *>(Cmd);
++      if (!strncmp(Seg->segname, "__TEXT", 16)) {
++        Seg->fileoff = 0;
++        Seg->filesize = TextSize;
++      } else if (!strncmp(Seg->segname, "__DATA", 16)) {
++        Seg->fileoff = DataOffset - TextOffset;
++        Seg->filesize = DataLastOffset - DataOffset + DataLastSize;
++      } else
++        llvm_unreachable("Unexpected segment.");
++
++      for (auto *Sect = reinterpret_cast<MachO::section *>(Seg + 1),
++                *EndSect = Sect + Seg->nsects;
++           Sect != EndSect; ++Sect) {
++        // Find the corresponding `OutputSection`.
++        OutputSection *OutputSect = nullptr;
++        for (OutputSection *OS : *OutputSections) {
++          if (!strncmp(translateSectionName(OS->Name).data(), Sect->sectname,
++                       16)) {
++            OutputSect = OS;
++            break;
++          }
++        }
++
++        // Fix section's file offset.
++        Sect->offset = OutputSect->getFileOff() - TextOffset;
++      }
++    }
++
++    Cmd = reinterpret_cast<MachO::load_command *>(
++        reinterpret_cast<uint8_t *>(Cmd) + Cmd->cmdsize);
++  }
++}
++MhdrChunk *MhdrChunk::Instance;
++
+ } // namespace coff
+ } // namespace lld
+diff --git a/COFF/Chunks.h b/COFF/Chunks.h
+index b3199d8d6..6269c2e3a 100644
+--- a/COFF/Chunks.h
++++ b/COFF/Chunks.h
+@@ -21,6 +21,15 @@
+ #include <utility>
+ #include <vector>
+ 
++// [port] CHANGED: Added all the forward declarations in `lld::mach_o::normalized`, [mhdr].
++namespace lld {
++namespace mach_o {
++namespace normalized {
++struct NormalizedFile;
++}
++}
++}
++
+ namespace lld {
+ namespace coff {
+ 
+@@ -280,6 +289,26 @@ private:
+   StringRef Str;
+ };
+ 
++// [port] CHANGED: Added the whole class, [mhdr].
++// A chunk for Mach-O header (in `.mhdr` section).
++class MhdrChunk : public Chunk {
++public:
++  MhdrChunk(uint32_t ImageBase) : ImageBase(ImageBase) {}
++  ~MhdrChunk();
++  void init(std::vector<OutputSection *> &OS) { OutputSections = &OS; }
++  size_t getSize() const override { return Size; }
++  void finalizeContents() override;
++  void writeTo(uint8_t *Buf) const override;
++
++  static MhdrChunk *Instance;
++
++private:
++  uint32_t ImageBase;
++  size_t Size = 0;
++  std::vector<OutputSection *> *OutputSections;
++  mach_o::normalized::NormalizedFile *File;
++};
++
+ static const uint8_t ImportThunkX86[] = {
+     0xff, 0x25, 0x00, 0x00, 0x00, 0x00, // JMP *0x0
+ };
+diff --git a/COFF/Config.h b/COFF/Config.h
+index 3ae50b868..5dd0b1896 100644
+--- a/COFF/Config.h
++++ b/COFF/Config.h
+@@ -95,6 +95,8 @@ struct Configuration {
+   bool TailMerge;
+   bool Relocatable = true;
+   bool Force = false;
++  // [port] CHANGED: Added to support option `/force:multiple`.
++  bool ForceMultiple = false;
+   bool Debug = false;
+   bool DebugDwarf = false;
+   bool DebugGHashes = false;
+diff --git a/COFF/Driver.cpp b/COFF/Driver.cpp
+index e42a37f6a..b2197aa52 100644
+--- a/COFF/Driver.cpp
++++ b/COFF/Driver.cpp
+@@ -960,9 +960,15 @@ void LinkerDriver::link(ArrayRef<const char *> ArgsArr) {
+     Config->Verbose = true;
+   errorHandler().Verbose = Config->Verbose;
+ 
++  // [port] TODO: Option /force should also turn on /force:multiple.
+   // Handle /force or /force:unresolved
+   if (Args.hasArg(OPT_force, OPT_force_unresolved))
+     Config->Force = true;
++  
++  // [port] CHANGED: Added this block of code.
++  // Handle /force:multiple
++  if (Args.hasArg(OPT_force_multiple))
++    Config->ForceMultiple = true;
+ 
+   // Handle /debug
+   if (Args.hasArg(OPT_debug, OPT_debug_dwarf, OPT_debug_ghash)) {
+@@ -1441,6 +1447,20 @@ void LinkerDriver::link(ArrayRef<const char *> ArgsArr) {
+   // Needed for MSVC 2017 15.5 CRT.
+   Symtab->addAbsolute(mangle("__enclave_config"), 0);
+ 
++  // [port] CHANGED: Added, [mhdr].
++  {
++    // Define symbol pointing to the beginning of our `.mhdr` section.
++    MhdrChunk::Instance = make<MhdrChunk>(Config->ImageBase);
++    Symtab->addSynthetic(mangle("_mh_dylib_header"),
++                         MhdrChunk::Instance); // TODO: Or `_mh_execute_header`.
++
++    // Export that symbol. But make it `Private`, so that it's not added to the
++    // import library.
++    Export E = parseExport(mangle("_mh_dylib_header"));
++    E.Private = true;
++    Config->Exports.push_back(std::move(E));
++  }
++
+   // This code may add new undefined symbols to the link, which may enqueue more
+   // symbol resolution tasks, so we need to continue executing tasks until we
+   // converge.
+diff --git a/COFF/Options.td b/COFF/Options.td
+index 871bad8bd..b8970cc67 100644
+--- a/COFF/Options.td
++++ b/COFF/Options.td
+@@ -86,6 +86,8 @@ def deffile : Joined<["/", "-"], "def:">,
+ 
+ def debug : F<"debug">, HelpText<"Embed a symbol table in the image">;
+ def debug_full : F<"debug:full">, Alias<debug>;
++// [port] CHANGED: Added to support option `/debug:fastlink`.
++def debug_fastlink : F<"debug:fastlink">, Alias<debug>;
+ def debugtype : P<"debugtype", "Debug Info Options">;
+ def dll : F<"dll">, HelpText<"Create a DLL">;
+ def driver : P<"driver", "Generate a Windows NT Kernel Mode Driver">;
+@@ -98,9 +100,16 @@ def swaprun_net : F<"swaprun:net">;
+ def verbose : F<"verbose">;
+ def wholearchive_flag : F<"wholearchive">;
+ 
++// [port] CHANGED: Added those two definitions.
++// This adds support for `/winmd:no /winmdfile:...` combo, which has no effect anyway, so why not.
++def winmd_no : F<"winmd:no">;
++def winmdfile : P<"winmdfile", "Currently not supported">;
++
+ def force : F<"force">,
+     HelpText<"Allow undefined symbols when creating executables">;
+ def force_unresolved : F<"force:unresolved">;
++// [port] CHANGED: Added to support option `/force:multiple`.
++def force_multiple : F<"force:multiple">;
+ defm WX : B<"WX", "Treat warnings as errors", "Don't treat warnings as errors">;
+ 
+ defm allowbind : B<"allowbind", "Enable DLL binding (default)",
+diff --git a/COFF/SymbolTable.cpp b/COFF/SymbolTable.cpp
+index b286d865c..65b6f713d 100644
+--- a/COFF/SymbolTable.cpp
++++ b/COFF/SymbolTable.cpp
+@@ -59,6 +59,14 @@ void SymbolTable::addFile(InputFile *File) {
+   Driver->parseDirectives(S);
+ }
+ 
++// [port] CHANGED: Added this function.
++static void errorOrWarnMultiple(const Twine &S) {
++  if (Config->ForceMultiple)
++    warn(S);
++  else
++    error(S);
++}
++
+ static void errorOrWarn(const Twine &S) {
+   if (Config->Force)
+     warn(S);
+@@ -253,7 +261,9 @@ void SymbolTable::addLazy(ArchiveFile *F, const Archive::Symbol Sym) {
+ }
+ 
+ void SymbolTable::reportDuplicate(Symbol *Existing, InputFile *NewFile) {
+-  error("duplicate symbol: " + toString(*Existing) + " in " +
++  // [port] CHANGED: Used `errorOrWarnMultiple` instead of `error`.
++  // [port] TODO: Is this a correct way to implement `/force:multiple`?
++  errorOrWarnMultiple("duplicate symbol: " + toString(*Existing) + " in " +
+         toString(Existing->getFile()) + " and in " + toString(NewFile));
+ }
+ 
+diff --git a/COFF/Writer.cpp b/COFF/Writer.cpp
+index d17405ec2..030ab5202 100644
+--- a/COFF/Writer.cpp
++++ b/COFF/Writer.cpp
+@@ -199,6 +199,7 @@ private:
+   uint64_t SizeOfImage;
+   uint64_t SizeOfHeaders;
+ 
++  OutputSection *MhdrSec; // [port] CHANGED: Added, [mhdr].
+   OutputSection *TextSec;
+   OutputSection *RdataSec;
+   OutputSection *BuildidSec;
+@@ -418,6 +419,7 @@ void Writer::createSections() {
+   };
+ 
+   // Try to match the section order used by link.exe.
++  MhdrSec = CreateSection(".mhdr", DATA | R); // [port] CHANGED: Added, [mhdr].
+   TextSec = CreateSection(".text", CODE | R | X);
+   CreateSection(".bss", BSS | R | W);
+   RdataSec = CreateSection(".rdata", DATA | R);
+@@ -430,6 +432,11 @@ void Writer::createSections() {
+   RsrcSec = CreateSection(".rsrc", DATA | R);
+   RelocSec = CreateSection(".reloc", DATA | DISCARDABLE | R);
+ 
++  // [port] CHANGED: Added, [mhdr].
++  // Initialize `MhdrChunk`.
++  MhdrChunk::Instance->init(OutputSections);
++  MhdrSec->addChunk(MhdrChunk::Instance);
++
+   // Then bin chunks by name and output characteristics.
+   std::map<std::pair<StringRef, uint32_t>, std::vector<Chunk *>> Map;
+   for (Chunk *C : Symtab->getChunks()) {
+diff --git a/include/lld/ReaderWriter/MachOLinkingContext.h b/include/lld/ReaderWriter/MachOLinkingContext.h
+index fde65880c..98b8726a2 100644
+--- a/include/lld/ReaderWriter/MachOLinkingContext.h
++++ b/include/lld/ReaderWriter/MachOLinkingContext.h
+@@ -131,6 +131,12 @@ public:
+   bool exportRestrictMode() const { return _exportMode != ExportMode::globals; }
+   bool exportSymbolNamed(StringRef sym) const;
+ 
++  // [port] CHANGED: Added these two methods. See #23.
++  void addReexportedLibrary(std::string *lib);
++  std::set<std::string *> reexportedLibraries() const {
++    return _reexportedLibraries;
++  }
++
+   DebugInfoMode debugInfoMode() const { return _debugInfoMode; }
+   void setDebugInfoMode(DebugInfoMode mode) {
+     _debugInfoMode = mode;
+@@ -495,6 +501,8 @@ private:
+   mutable std::mutex _dylibsMutex;
+   ExportMode _exportMode = ExportMode::globals;
+   llvm::StringSet<> _exportedSymbols;
++  // [port] CHANGED: Added this field. See #23.
++  std::set<std::string *> _reexportedLibraries;
+   DebugInfoMode _debugInfoMode = DebugInfoMode::addDebugMap;
+   std::unique_ptr<llvm::raw_fd_ostream> _dependencyInfo;
+   llvm::StringMap<std::vector<OrderFileNode>> _orderFiles;
+diff --git a/lib/Core/Resolver.cpp b/lib/Core/Resolver.cpp
+index 9c51c6cdb..adf3c4291 100644
+--- a/lib/Core/Resolver.cpp
++++ b/lib/Core/Resolver.cpp
+@@ -422,6 +422,10 @@ bool Resolver::checkUndefines() {
+     if (_symbolTable.isCoalescedAway(undef))
+       continue;
+ 
++    // [port] CHANGED: Added this `if`. See #21.
++    if (undef->name() == "dyld_stub_binder")
++      continue;
++
+     // Seems like this symbol is undefined. Warn that.
+     foundUndefines = true;
+     if (_ctx.printRemainingUndefines()) {
+diff --git a/lib/Driver/DarwinLdDriver.cpp b/lib/Driver/DarwinLdDriver.cpp
+index ad2284520..58f58494f 100644
+--- a/lib/Driver/DarwinLdDriver.cpp
++++ b/lib/Driver/DarwinLdDriver.cpp
+@@ -698,6 +698,14 @@ bool parse(llvm::ArrayRef<const char *> args, MachOLinkingContext &ctx) {
+     ctx.addExportSymbol(symbol->getValue());
+   }
+ 
++  // [port] CHANGED: Added this `for`. See #23.
++  // Handle -reexport_library <library>
++  for (auto library : parsedArgs.filtered(OPT_reexport_library)) {
++    // TODO: This is a memory leak of the `string`, but otherwise, it gets
++    // destroyed too early.
++    ctx.addReexportedLibrary(new std::string(library->getValue()));
++  }
++
+   // Handle obosolete -multi_module and -single_module
+   if (llvm::opt::Arg *mod =
+           parsedArgs.getLastArg(OPT_multi_module, OPT_single_module)) {
+diff --git a/lib/Driver/DarwinLdOptions.td b/lib/Driver/DarwinLdOptions.td
+index 3bbde8bf1..a06c4d603 100644
+--- a/lib/Driver/DarwinLdOptions.td
++++ b/lib/Driver/DarwinLdOptions.td
+@@ -70,6 +70,10 @@ def unexported_symbols_list : Separate<["-"], "unexported_symbols_list">,
+ def unexported_symbol : Separate<["-"], "unexported_symbol">,
+      MetaVarName<"<symbol>">,
+      HelpText<"A symbol which should not be exported">, Group<grp_opts>;
++// [port] CHANGED: Added this `def`. See #23.
++def reexport_library : Separate<["-"], "reexport_library">,
++     MetaVarName<"<library>">,
++     HelpText<"Library whose symbols will be re-exported">, Group<grp_opts>;
+ def keep_private_externs : Flag<["-"], "keep_private_externs">,
+      HelpText<"Private extern (hidden) symbols should not be transformed "
+               "into local symbols">, Group<grp_opts>;
+diff --git a/lib/ReaderWriter/MachO/MachOLinkingContext.cpp b/lib/ReaderWriter/MachO/MachOLinkingContext.cpp
+index ce423d03a..b1b986026 100644
+--- a/lib/ReaderWriter/MachO/MachOLinkingContext.cpp
++++ b/lib/ReaderWriter/MachO/MachOLinkingContext.cpp
+@@ -861,6 +861,11 @@ bool MachOLinkingContext::exportSymbolNamed(StringRef sym) const {
+   llvm_unreachable("_exportMode unknown enum value");
+ }
+ 
++// [port] CHANGED: Added this method. See #23.
++void MachOLinkingContext::addReexportedLibrary(std::string *lib) {
++  _reexportedLibraries.insert(lib);
++}
++
+ std::string MachOLinkingContext::demangle(StringRef symbolName) const {
+   // Only try to demangle symbols if -demangle on command line
+   if (!demangleSymbols())
+diff --git a/lib/ReaderWriter/MachO/MachONormalizedFileBinaryWriter.cpp b/lib/ReaderWriter/MachO/MachONormalizedFileBinaryWriter.cpp
+index 7ef0237e8..e5f685def 100644
+--- a/lib/ReaderWriter/MachO/MachONormalizedFileBinaryWriter.cpp
++++ b/lib/ReaderWriter/MachO/MachONormalizedFileBinaryWriter.cpp
+@@ -122,6 +122,9 @@ public:
+   /// file may need the 'x' bit set.
+   llvm::Error writeBinary(StringRef path);
+ 
++  // [port] CHANGED: Added, [mhdr].
++  llvm::Error writeHeaderAndLoadCommands(uint8_t *buffer);
++
+ private:
+   uint32_t    loadCommandsSize(uint32_t &count);
+   void        buildFileOffsets();
+@@ -1547,6 +1550,23 @@ llvm::Error writeBinary(const NormalizedFile &file, StringRef path) {
+   return layout.writeBinary(path);
+ }
+ 
++// [port] CHANGED: Added the whole function, [mhdr].
++llvm::Error MachOFileLayout::writeHeaderAndLoadCommands(uint8_t *buffer) {
++  // Check for pending error from constructor.
++  if (_ec)
++    return llvm::errorCodeToError(_ec);
++
++  _buffer = buffer;
++  writeMachHeader();
++  return writeLoadCommands();
++}
++
++// [port] CHANGED: Added the whole function, [mhdr].
++llvm::Error writeHeaderAndLoadCommands(const NormalizedFile &file, uint8_t *buffer) {
++  MachOFileLayout layout(file);
++  return layout.writeHeaderAndLoadCommands(buffer);
++}
++
+ } // namespace normalized
+ } // namespace mach_o
+ } // namespace lld
+diff --git a/lib/ReaderWriter/MachO/MachONormalizedFileFromAtoms.cpp b/lib/ReaderWriter/MachO/MachONormalizedFileFromAtoms.cpp
+index e93ca86c3..8c4eb3e6c 100644
+--- a/lib/ReaderWriter/MachO/MachONormalizedFileFromAtoms.cpp
++++ b/lib/ReaderWriter/MachO/MachONormalizedFileFromAtoms.cpp
+@@ -1260,9 +1260,23 @@ void Util::addDependentDylibs(const lld::File &atomFile,
+     else if (_ctx.isUpwardDylib(dep.path))
+       dep.kind = llvm::MachO::LC_LOAD_UPWARD_DYLIB;
+   }
++  // [port] CHANGED: Added this block of code. See #23.
++  // Add re-exported libraries.
++  for (const std::string *lib : _ctx.reexportedLibraries()) {
++    DependentDylib depInfo;
++    depInfo.path = *lib;
++    depInfo.kind = llvm::MachO::LC_REEXPORT_DYLIB;
++    depInfo.currentVersion = _ctx.dylibCurrentVersion(*lib);
++    depInfo.compatVersion = _ctx.dylibCompatVersion(*lib);
++    nFile.dependentDylibs.push_back(depInfo);
++  }
+ }
+ 
+ int Util::dylibOrdinal(const SharedLibraryAtom *sa) {
++  // [port] CHANGED: Added this `if`. See #21.
++  if (!sa)
++    return 0;
++
+   return _dylibInfo[sa->loadName()].ordinal;
+ }
+ 
+diff --git a/lib/ReaderWriter/MachO/StubsPass.cpp b/lib/ReaderWriter/MachO/StubsPass.cpp
+index 04c586df3..88bf21ba5 100644
+--- a/lib/ReaderWriter/MachO/StubsPass.cpp
++++ b/lib/ReaderWriter/MachO/StubsPass.cpp
+@@ -276,9 +276,10 @@ public:
+         [&](const SharedLibraryAtom *atom) {
+           return atom->name().equals(_stubInfo.binderSymbolName);
+         });
+-    assert(I != mergedFile.sharedLibrary().end() &&
+-           "dyld_stub_binder not found");
+-    addReference(helperBinderNLPAtom, _stubInfo.nonLazyPointerReferenceToBinder, *I);
++    // [port] CHANGED: `assert` -> `if`. See #21.
++    if (I != mergedFile.sharedLibrary().end())
++      addReference(helperBinderNLPAtom,
++                   _stubInfo.nonLazyPointerReferenceToBinder, *I);
+ 
+     // Sort targets by name, so stubs and lazy pointers are consistent
+     std::vector<const Atom *> targetsNeedingStubs;
+-- 
+2.18.0.windows.1
+

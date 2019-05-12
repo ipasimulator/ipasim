@@ -1,0 +1,1287 @@
+From cbe9a200c910e1dc4082c70fefb1b9170b0a79fc Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20Jone=C5=A1?= <jjones@outlook.cz>
+Date: Sun, 12 May 2019 08:49:18 +0200
+Subject: [PATCH] Squash branch `port`
+
+---
+ .gitignore               |   2 +
+ config/config.h          |  56 +++----
+ dispatch/dispatch.h      |  11 ++
+ dispatch/source.h        |   2 +-
+ dispatch/time.h          |   2 +-
+ os/linux_base.h          |   2 +
+ private/private.h        |   4 +-
+ src/allocator_internal.h |   4 +-
+ src/event/event.c        |   6 +-
+ src/event/event_kevent.c |  18 ++-
+ src/init.c               |  16 +-
+ src/inline_internal.h    |   6 +-
+ src/internal.h           | 314 ++++++++++++++++++++++++++++++++++++++-
+ src/queue.c              |  11 +-
+ src/queue_internal.h     |  16 +-
+ src/shims.h              |   6 +-
+ src/shims/getprogname.h  |   2 +
+ src/shims/hw_config.h    |   2 +
+ src/shims/linux_stubs.c  |   2 +-
+ src/shims/lock.c         |  12 +-
+ src/shims/target.h       |   2 +-
+ src/shims/time.h         |  12 +-
+ src/shims/tsd.h          |   4 +-
+ src/shims/yield.h        |   4 +
+ src/source.c             |   2 +-
+ 25 files changed, 442 insertions(+), 76 deletions(-)
+ create mode 100644 .gitignore
+
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..4498f3a
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,2 @@
++# Git Time Metric
++/.gtm/
+diff --git a/config/config.h b/config/config.h
+index a24187e..fee2e9b 100644
+--- a/config/config.h
++++ b/config/config.h
+@@ -1,6 +1,9 @@
+ /* config/config.h.  Generated from config.h.in by configure.  */
+ /* config/config.h.in.  Generated from configure.ac by autoheader.  */
+ 
++/* Define if building pthread work queues from source */
++#define DISPATCH_USE_INTERNAL_WORKQUEUE 1
++
+ /* Define to 1 if you have the declaration of `CLOCK_MONOTONIC', and to 0 if
+    you don't. */
+ #define HAVE_DECL_CLOCK_MONOTONIC 0
+@@ -50,7 +53,7 @@
+ #define HAVE_DECL_PROGRAM_INVOCATION_SHORT_NAME 0
+ 
+ /* Define to 1 if you have the declaration of `SIGEMT', and to 0 if you don't.
+-   */
++ */
+ #define HAVE_DECL_SIGEMT 1
+ 
+ /* Define to 1 if you have the declaration of `VQ_UPDATE', and to 0 if you
+@@ -80,7 +83,7 @@
+ #define HAVE_FCNTL_H 1
+ 
+ /* Define to 1 if you have the `getprogname' function. */
+-#define HAVE_GETPROGNAME 1
++#define HAVE_GETPROGNAME 0
+ 
+ /* Define to 1 if you have the <inttypes.h> header file. */
+ #define HAVE_INTTYPES_H 1
+@@ -89,28 +92,28 @@
+ #define HAVE_LEAKS 1
+ 
+ /* Define to 1 if you have the <libkern/OSAtomic.h> header file. */
+-#define HAVE_LIBKERN_OSATOMIC_H 1
++#define HAVE_LIBKERN_OSATOMIC_H 0
+ 
+ /* Define to 1 if you have the <libkern/OSCrossEndian.h> header file. */
+-#define HAVE_LIBKERN_OSCROSSENDIAN_H 1
++#define HAVE_LIBKERN_OSCROSSENDIAN_H 0
+ 
+ /* Define to 1 if you have the <libproc_internal.h> header file. */
+-#define HAVE_LIBPROC_INTERNAL_H 1
++#define HAVE_LIBPROC_INTERNAL_H 0
+ 
+ /* Define if mach is present */
+-#define HAVE_MACH 1
++#define HAVE_MACH 0
+ 
+ /* Define to 1 if you have the `mach_absolute_time' function. */
+-#define HAVE_MACH_ABSOLUTE_TIME 1
++#define HAVE_MACH_ABSOLUTE_TIME 0
+ 
+ /* Define to 1 if you have the `mach_approximate_time' function. */
+-#define HAVE_MACH_APPROXIMATE_TIME 1
++#define HAVE_MACH_APPROXIMATE_TIME 0
+ 
+ /* Define to 1 if you have the `malloc_create_zone' function. */
+-#define HAVE_MALLOC_CREATE_ZONE 1
++#define HAVE_MALLOC_CREATE_ZONE 0
+ 
+ /* Define to 1 if you have the <malloc/malloc.h> header file. */
+-#define HAVE_MALLOC_MALLOC_H 1
++#define HAVE_MALLOC_MALLOC_H 0
+ 
+ /* Define to 1 if you have the <memory.h> header file. */
+ #define HAVE_MEMORY_H 1
+@@ -125,25 +128,25 @@
+ #define HAVE_PTHREAD_KEY_INIT_NP 1
+ 
+ /* Define to 1 if you have the <pthread_machdep.h> header file. */
+-#define HAVE_PTHREAD_MACHDEP_H 1
++#define HAVE_PTHREAD_MACHDEP_H 0
+ 
+ /* Define to 1 if you have the `pthread_main_np' function. */
+-#define HAVE_PTHREAD_MAIN_NP 1
++#define HAVE_PTHREAD_MAIN_NP 0
+ 
+ /* Define to 1 if you have the <pthread_np.h> header file. */
+ /* #undef HAVE_PTHREAD_NP_H */
+ 
+ /* Define to 1 if you have the <pthread/qos.h> header file. */
+-#define HAVE_PTHREAD_QOS_H 1
++#define HAVE_PTHREAD_QOS_H 0
+ 
+ /* Define if pthread work queues are present */
+-#define HAVE_PTHREAD_WORKQUEUES 1
++#define HAVE_PTHREAD_WORKQUEUES 0
+ 
+ /* Define to 1 if you have the <pthread_workqueue.h> header file. */
+-#define HAVE_PTHREAD_WORKQUEUE_H 1
++#define HAVE_PTHREAD_WORKQUEUE_H 0
+ 
+ /* Define to 1 if you have the <pthread/workqueue_private.h> header file. */
+-#define HAVE_PTHREAD_WORKQUEUE_PRIVATE_H 1
++#define HAVE_PTHREAD_WORKQUEUE_PRIVATE_H 0
+ 
+ /* Define to 1 if you have the <stdint.h> header file. */
+ #define HAVE_STDINT_H 1
+@@ -164,7 +167,7 @@
+ #define HAVE_SYS_CDEFS_H 1
+ 
+ /* Define to 1 if you have the <sys/guarded.h> header file. */
+-#define HAVE_SYS_GUARDED_H 1
++#define HAVE_SYS_GUARDED_H 0
+ 
+ /* Define to 1 if you have the <sys/stat.h> header file. */
+ #define HAVE_SYS_STAT_H 1
+@@ -176,7 +179,7 @@
+ #define HAVE_TARGETCONDITIONALS_H 1
+ 
+ /* Define to 1 if you have the <unistd.h> header file. */
+-#define HAVE_UNISTD_H 1
++#define HAVE_UNISTD_H 0
+ 
+ /* Define to 1 if you have the `_pthread_workqueue_init' function. */
+ #define HAVE__PTHREAD_WORKQUEUE_INIT 1
+@@ -209,39 +212,40 @@
+ #define STDC_HEADERS 1
+ 
+ /* Define to use non-portable pthread TSD optimizations for Mac OS X) */
+-#define USE_APPLE_TSD_OPTIMIZATIONS 1
++#define USE_APPLE_TSD_OPTIMIZATIONS 0
+ 
+ /* Define to tag libdispatch_init as a constructor */
+ /* #undef USE_LIBDISPATCH_INIT_CONSTRUCTOR */
+ 
+ /* Define to use Mach semaphores */
+-#define USE_MACH_SEM 1
++#define USE_MACH_SEM 0
+ 
+ /* Define to use POSIX semaphores */
+ /* #undef USE_POSIX_SEM */
+ 
++#define USE_WIN32_SEM 1
++
+ /* Enable extensions on AIX 3, Interix.  */
+ #ifndef _ALL_SOURCE
+-# define _ALL_SOURCE 1
++#define _ALL_SOURCE 1
+ #endif
+ /* Enable GNU extensions on systems that have them.  */
+ #ifndef _GNU_SOURCE
+-# define _GNU_SOURCE 1
++#define _GNU_SOURCE 1
+ #endif
+ /* Enable threading extensions on Solaris.  */
+ #ifndef _POSIX_PTHREAD_SEMANTICS
+-# define _POSIX_PTHREAD_SEMANTICS 1
++#define _POSIX_PTHREAD_SEMANTICS 1
+ #endif
+ /* Enable extensions on HP NonStop.  */
+ #ifndef _TANDEM_SOURCE
+-# define _TANDEM_SOURCE 1
++#define _TANDEM_SOURCE 1
+ #endif
+ /* Enable general extensions on Solaris.  */
+ #ifndef __EXTENSIONS__
+-# define __EXTENSIONS__ 1
++#define __EXTENSIONS__ 1
+ #endif
+ 
+-
+ /* Version number of package */
+ #define VERSION "1.3"
+ 
+diff --git a/dispatch/dispatch.h b/dispatch/dispatch.h
+index 79a4c60..35e51d0 100644
+--- a/dispatch/dispatch.h
++++ b/dispatch/dispatch.h
+@@ -21,6 +21,17 @@
+ #ifndef __DISPATCH_PUBLIC__
+ #define __DISPATCH_PUBLIC__
+ 
++// [port] CHANGED: Added this block.
++#ifndef __BEGIN_DECLS
++#if defined(__cplusplus)
++#define	__BEGIN_DECLS extern "C" {
++#define	__END_DECLS }
++#else
++#define	__BEGIN_DECLS
++#define	__END_DECLS
++#endif
++#endif
++
+ #ifdef __APPLE__
+ #include <Availability.h>
+ #include <os/availability.h>
+diff --git a/dispatch/source.h b/dispatch/source.h
+index 61a33bb..99dd374 100644
+--- a/dispatch/source.h
++++ b/dispatch/source.h
+@@ -31,7 +31,7 @@
+ #include <mach/message.h>
+ #endif
+ 
+-#if !TARGET_OS_WIN32
++#if !TARGET_OS_WIN32 && !defined(OBJC_PORT)
+ #include <sys/signal.h>
+ #endif
+ 
+diff --git a/dispatch/time.h b/dispatch/time.h
+index 02dd27f..0d57725 100644
+--- a/dispatch/time.h
++++ b/dispatch/time.h
+@@ -29,7 +29,7 @@
+ #include <stdint.h>
+ 
+ // <rdar://problem/6368156&7563559>
+-#if TARGET_OS_MAC
++#if TARGET_OS_MAC && !defined(OBJC_PORT)
+ #include <mach/clock_types.h>
+ #endif
+ 
+diff --git a/os/linux_base.h b/os/linux_base.h
+index 58b4971..fcddbd4 100644
+--- a/os/linux_base.h
++++ b/os/linux_base.h
+@@ -16,7 +16,9 @@
+ #if __has_include(<sys/sysmacros.h>)
+ #include <sys/sysmacros.h>
+ #endif
++#if !defined(OBJC_PORT)
+ #include <sys/param.h>
++#endif
+ 
+ #if __has_include(<sys/cdefs.h>)
+ #include <sys/cdefs.h>
+diff --git a/private/private.h b/private/private.h
+index df4aba5..c32f5ed 100644
+--- a/private/private.h
++++ b/private/private.h
+@@ -45,7 +45,7 @@
+ #include <unistd.h>
+ #endif
+ #include <pthread.h>
+-#if TARGET_OS_MAC
++#if TARGET_OS_MAC && !defined(OBJC_PORT)
+ #include <pthread/qos.h>
+ #endif
+ 
+@@ -171,7 +171,7 @@ void _dispatch_prohibit_transition_to_multithreaded(bool prohibit);
+  * SPI for CoreFoundation/Foundation ONLY
+  */
+ 
+-#if TARGET_OS_MAC
++#if TARGET_OS_MAC && !defined(OBJC_PORT)
+ #define DISPATCH_COCOA_COMPAT 1
+ #elif defined(__linux__)
+ #define DISPATCH_COCOA_COMPAT 1
+diff --git a/src/allocator_internal.h b/src/allocator_internal.h
+index 5f8c2f0..1a65b66 100644
+--- a/src/allocator_internal.h
++++ b/src/allocator_internal.h
+@@ -28,7 +28,7 @@
+ #define __DISPATCH_ALLOCATOR_INTERNAL__
+ 
+ #ifndef DISPATCH_ALLOCATOR
+-#if TARGET_OS_MAC && (defined(__LP64__) || TARGET_OS_IPHONE)
++#if TARGET_OS_MAC && (defined(__LP64__) || TARGET_OS_IPHONE) && !defined(OBJC_PORT)
+ #define DISPATCH_ALLOCATOR 1
+ #endif
+ #endif
+@@ -40,7 +40,7 @@
+ #endif
+ 
+ #ifndef DISPATCH_USE_MALLOCZONE
+-#if (TARGET_OS_MAC && !DISPATCH_USE_NANOZONE) || \
++#if (TARGET_OS_MAC && !DISPATCH_USE_NANOZONE && !defined(OBJC_PORT)) || \
+ 		(!TARGET_OS_MAC && HAVE_MALLOC_CREATE_ZONE)
+ #define DISPATCH_USE_MALLOCZONE 1
+ #endif
+diff --git a/src/event/event.c b/src/event/event.c
+index b1bc053..10b5abc 100644
+--- a/src/event/event.c
++++ b/src/event/event.c
+@@ -493,7 +493,7 @@ _dispatch_timer_heap_left_child(uint32_t idx)
+ 	return 2 * idx + DTH_ID_COUNT - heap_id;
+ }
+ 
+-#if DISPATCH_HAVE_TIMER_COALESCING
++#if DISPATCH_HAVE_TIMER_COALESCING && !defined(OBJC_PORT)
+ DISPATCH_ALWAYS_INLINE
+ static inline uint32_t
+ _dispatch_timer_heap_walk_skip(uint32_t idx, uint32_t count)
+@@ -952,6 +952,7 @@ _dispatch_source_timer_create(dispatch_source_type_t dst,
+ 	} else switch (handle) {
+ 	case 0:
+ 		break;
++#if !defined(OBJC_PORT)
+ 	case DISPATCH_CLOCKID_UPTIME:
+ 		dst = &_dispatch_source_type_timer_with_clock;
+ 		mask |= DISPATCH_TIMER_CLOCK_UPTIME;
+@@ -964,6 +965,7 @@ _dispatch_source_timer_create(dispatch_source_type_t dst,
+ 		dst = &_dispatch_source_type_timer_with_clock;
+ 		mask |= DISPATCH_TIMER_CLOCK_WALL;
+ 		break;
++#endif
+ 	default:
+ 		return DISPATCH_UNOTE_NULL;
+ 	}
+@@ -1151,7 +1153,7 @@ _dispatch_timers_get_delay(dispatch_timer_heap_t dth, uint32_t tidx,
+ 	}
+ 
+ 	if (qos < DISPATCH_TIMER_QOS_COUNT && dth[tidx].dth_count > 2) {
+-#if DISPATCH_HAVE_TIMER_COALESCING
++#if DISPATCH_HAVE_TIMER_COALESCING && !defined(OBJC_PORT)
+ 		// Timer pre-coalescing <rdar://problem/13222034>
+ 		// When we have several timers with this target/deadline bracket:
+ 		//
+diff --git a/src/event/event_kevent.c b/src/event/event_kevent.c
+index 1e7cdb5..239f17f 100644
+--- a/src/event/event_kevent.c
++++ b/src/event/event_kevent.c
+@@ -332,7 +332,7 @@ DISPATCH_ALWAYS_INLINE
+ static dispatch_unote_t
+ _dispatch_kevent_get_unote(dispatch_kevent_t ke)
+ {
+-	dispatch_assert((ke->udata & DISPATCH_KEVENT_MUXED_MARKER) == 0);
++	dispatch_assert(((unsigned long)ke->udata & DISPATCH_KEVENT_MUXED_MARKER) == 0);
+ 	return (dispatch_unote_t){ ._du = (dispatch_unote_class_t)ke->udata };
+ }
+ 
+@@ -352,7 +352,7 @@ _dispatch_kevent_print_error(dispatch_kevent_t ke)
+ 		}
+ 		// for EV_DELETE if the update was deferred we may have reclaimed
+ 		// the udata already, and it is unsafe to dereference it now.
+-	} else if (ke->udata & DISPATCH_KEVENT_MUXED_MARKER) {
++	} else if ((unsigned long)ke->udata & DISPATCH_KEVENT_MUXED_MARKER) {
+ 		ke->flags |= _dispatch_kevent_get_muxnote(ke)->dmn_kev.flags;
+ 	} else if (ke->udata) {
+ 		du = (dispatch_unote_class_t)(uintptr_t)ke->udata;
+@@ -364,8 +364,10 @@ _dispatch_kevent_print_error(dispatch_kevent_t ke)
+ 	switch (ke->data) {
+ 	case 0:
+ 		return;
++#if !defined(OBJC_PORT)
+ 	case ERANGE: /* A broken QoS was passed to kevent_id() */
+ 		DISPATCH_INTERNAL_CRASH(ke->qos, "Invalid kevent priority");
++#endif
+ 	default:
+ 		// log the unexpected error
+ 		_dispatch_bug_kevent_client("kevent", _evfiltstr(ke->filter),
+@@ -536,7 +538,7 @@ _dispatch_kevent_drain(dispatch_kevent_t ke)
+ 	}
+ #endif
+ 
+-	if (ke->udata & DISPATCH_KEVENT_MUXED_MARKER) {
++	if ((unsigned long)ke->udata & DISPATCH_KEVENT_MUXED_MARKER) {
+ 		return _dispatch_kevent_merge_muxed(ke);
+ 	}
+ 	return _dispatch_kevent_merge(_dispatch_kevent_get_unote(ke), ke);
+@@ -562,7 +564,9 @@ _dispatch_kq_create(intptr_t *fd_ptr)
+ 	guardid_t guard = (uintptr_t)fd_ptr;
+ 	kqfd = guarded_kqueue_np(&guard, GUARD_CLOSE | GUARD_DUP);
+ #else
++#if !defined(OBJC_PORT)
+ 	(void)guard_ptr;
++#endif
+ 	kqfd = kqueue();
+ #endif
+ 	if (kqfd == -1) {
+@@ -679,7 +683,7 @@ _dispatch_kq_poll(dispatch_wlh_t wlh, dispatch_kevent_t ke, int n,
+ 		for (r = 0; r < n; r++) {
+ 			ke[r].flags |= EV_RECEIPT;
+ 		}
+-		out_n = n;
++		n_out = n;
+ 	}
+ #endif
+ 
+@@ -1048,10 +1052,12 @@ _dispatch_unote_register_muxed(dispatch_unote_t du)
+ 	if (installed) {
+ 		dispatch_unote_linkage_t dul = _dispatch_unote_get_linkage(du);
+ 		LIST_INSERT_HEAD(&dmn->dmn_unotes_head, dul, du_link);
++#if !defined(OBJC_PORT)
+ 		if (du._du->du_filter == DISPATCH_EVFILT_MACH_NOTIFICATION) {
+ 			os_atomic_store2o(du._dmsr, dmsr_notification_armed,
+ 					DISPATCH_MACH_NOTIFICATION_ARMED(dmn), relaxed);
+ 		}
++#endif
+ 		dul->du_muxnote = dmn;
+ 		_dispatch_unote_state_set(du, DISPATCH_WLH_ANON, DU_STATE_ARMED);
+ 		_dispatch_du_debug("installed", du._du);
+@@ -1080,9 +1086,11 @@ _dispatch_unote_unregister_muxed(dispatch_unote_t du)
+ 	dispatch_muxnote_t dmn = dul->du_muxnote;
+ 	bool update = false, dispose = false;
+ 
++#if !defined(OBJC_PORT)
+ 	if (dmn->dmn_kev.filter == DISPATCH_EVFILT_MACH_NOTIFICATION) {
+ 		os_atomic_store2o(du._dmsr, dmsr_notification_armed, false, relaxed);
+ 	}
++#endif
+ 	_dispatch_unote_state_set(du, DU_STATE_UNREGISTERED);
+ 	LIST_REMOVE(dul, du_link);
+ 	_LIST_TRASH_ENTRY(dul, du_link);
+@@ -1357,7 +1365,7 @@ _dispatch_event_loop_timer_program(dispatch_timer_heap_t dth, uint32_t tidx,
+ 		.fflags = _dispatch_timer_index_to_fflags[tidx],
+ 		.data = (int64_t)target,
+ 		.udata = (uintptr_t)dth,
+-#if DISPATCH_HAVE_TIMER_COALESCING
++#if DISPATCH_HAVE_TIMER_COALESCING && !defined(OBJC_PORT)
+ 		.ext[1] = leeway,
+ #endif
+ #if DISPATCH_USE_KEVENT_QOS
+diff --git a/src/init.c b/src/init.c
+index c7d8699..d3c0339 100644
+--- a/src/init.c
++++ b/src/init.c
+@@ -78,9 +78,12 @@ dispatch_atfork_child(void)
+ int
+ _dispatch_sigmask(void)
+ {
++#if !defined(OBJC_PORT)
+ 	sigset_t mask;
++#endif
+ 	int r = 0;
+ 
++#if !defined(OBJC_PORT)
+ 	/* Workaround: 6269619 Not all signals can be delivered on any thread */
+ 	r |= sigfillset(&mask);
+ 	r |= sigdelset(&mask, SIGILL);
+@@ -95,6 +98,8 @@ _dispatch_sigmask(void)
+ 	r |= sigdelset(&mask, SIGPIPE);
+ 	r |= sigdelset(&mask, SIGPROF);
+ 	r |= pthread_sigmask(SIG_BLOCK, &mask, NULL);
++// !defined(OBJC_PORT)
++#endif
+ 	return dispatch_assume_zero(r);
+ }
+ 
+@@ -193,7 +198,7 @@ const struct dispatch_queue_offsets_s dispatch_queue_offsets = {
+ 	.dqo_priority_size = 0,
+ };
+ 
+-#if TARGET_OS_MAC
++#if TARGET_OS_MAC && !defined(OBJC_PORT)
+ const struct dispatch_allocator_layout_s dispatch_allocator_layout = {
+ 	.dal_version = 1,
+ #if DISPATCH_ALLOCATOR
+@@ -819,7 +824,7 @@ static char _dispatch_build[16];
+ static void
+ _dispatch_build_init(void *context DISPATCH_UNUSED)
+ {
+-#ifdef __APPLE__
++#if defined(__APPLE__) && !defined(OBJC_PORT)
+ 	int mib[] = { CTL_KERN, KERN_OSVERSION };
+ 	size_t bufsz = sizeof(_dispatch_build);
+ 
+@@ -959,9 +964,11 @@ _dispatch_bug_kevent_client(const char *msg, const char *filter,
+ 			dc = du._dr->ds_handler[DS_EVENT_HANDLER];
+ 			if (dc) func = _dispatch_continuation_get_function_symbol(dc);
+ 			break;
++#if !defined(OBJC_PORT)
+ 		case DISPATCH_MACH_CHANNEL_TYPE:
+ 			func = du._dmrr->dmrr_handler_func;
+ 			break;
++#endif
+ 		}
+ 		filter = dux_type(du._du)->dst_kind;
+ 	}
+@@ -998,9 +1005,11 @@ _dispatch_bug_kevent_vanished(dispatch_unote_t du)
+ 		dc = du._dr->ds_handler[DS_EVENT_HANDLER];
+ 		if (dc) func = _dispatch_continuation_get_function_symbol(dc);
+ 		break;
++#if !defined(OBJC_PORT)
+ 	case DISPATCH_MACH_CHANNEL_TYPE:
+ 		func = du._dmrr->dmrr_handler_func;
+ 		break;
++#endif
+ 	}
+ 	_dispatch_log_fault("LIBDISPATCH_STRICT: _dispatch_bug_kevent_vanished",
+ 			"BUG in libdispatch client: %s, monitored resource vanished before "
+@@ -1062,6 +1071,7 @@ _dispatch_logv_init(void *context DISPATCH_UNUSED)
+ 			dispatch_logfile = STDERR_FILENO;
+ 		}
+ 	}
++#if !defined(OBJC_PORT)
+ 	if (!dispatch_log_disabled) {
+ 		if (log_to_file && dispatch_logfile == -1) {
+ 			char path[PATH_MAX];
+@@ -1081,6 +1091,8 @@ _dispatch_logv_init(void *context DISPATCH_UNUSED)
+ 					tv.tv_sec, (int)tv.tv_usec);
+ 		}
+ 	}
++// !defined(OBJC_PORT)
++#endif
+ }
+ 
+ static inline void
+diff --git a/src/inline_internal.h b/src/inline_internal.h
+index 69805af..5e3f14e 100644
+--- a/src/inline_internal.h
++++ b/src/inline_internal.h
+@@ -89,6 +89,11 @@ _dispatch_client_callout4(void *ctxt, dispatch_mach_reason_t reason,
+ #pragma mark _os_object_t & dispatch_object_t
+ #if DISPATCH_PURE_C
+ 
++#if defined(OBJC_PORT)
++typedef void *id;
++extern const char *object_getClassName(id obj);
++#endif
++
+ DISPATCH_ALWAYS_INLINE
+ static inline const char *
+ _dispatch_object_class_name(dispatch_object_t dou)
+@@ -2028,7 +2033,6 @@ _dispatch_set_basepri(dispatch_priority_t dq_dbp)
+ 	_dispatch_thread_setspecific(dispatch_basepri_key, (void*)(uintptr_t)dbp);
+ 	return old_dbp;
+ #else
+-	(void)dbp;
+ 	return 0;
+ #endif
+ }
+diff --git a/src/internal.h b/src/internal.h
+index df742a2..a409165 100644
+--- a/src/internal.h
++++ b/src/internal.h
+@@ -27,6 +27,305 @@
+ #ifndef __DISPATCH_INTERNAL__
+ #define __DISPATCH_INTERNAL__
+ 
++#if defined(OBJC_PORT)
++// From apple headers
++typedef unsigned int qos_class_t;
++typedef int mach_error_t;
++typedef unsigned short mode_t;
++typedef unsigned int uid_t;
++/* vfsquery flags */
++#define VQ_NOTRESP	0x0001	/* server down */
++#define VQ_NEEDAUTH	0x0002	/* server bad auth */
++#define VQ_LOWDISK	0x0004	/* we're low on space */
++#define VQ_MOUNT	0x0008	/* new filesystem arrived */
++#define VQ_UNMOUNT	0x0010	/* filesystem has left */
++#define VQ_DEAD		0x0020	/* filesystem is dead, needs force unmount */
++#define VQ_ASSIST	0x0040	/* filesystem needs assistance from external program */
++#define VQ_NOTRESPLOCK	0x0080	/* server lockd down */
++#define VQ_UPDATE	0x0100	/* filesystem information has changed */
++#define VQ_VERYLOWDISK	0x0200	/* file system has *very* little disk space left */
++#define VQ_SYNCEVENT	0x0400	/* a sync just happened (not set by kernel starting Mac OS X 10.9) */
++#define VQ_SERVEREVENT  0x0800  /* server issued notification/warning */
++#define VQ_QUOTA	0x1000	/* a user quota has been hit */
++#define VQ_NEARLOWDISK		0x2000	/* Above lowdisk and below desired disk space */
++#define VQ_DESIRED_DISK 	0x4000	/* the desired disk space */
++#define VQ_FLAG8000	0x8000	/* placeholder */
++/*
++ *	Policy definitions.  Policies should be powers of 2,
++ *	but cannot be or'd together other than to test for a
++ *	policy 'class'.
++ */
++#define	POLICY_NULL		0	/* none			*/
++#define	POLICY_TIMESHARE	1	/* timesharing		*/
++#define	POLICY_RR		2	/* fixed round robin	*/
++#define POLICY_FIFO		4	/* fixed fifo		*/
++/* Macros for counting and rounding. */
++#define	howmany(x, y)	((((x) % (y)) == 0) ? ((x) / (y)) : (((x) / (y)) + 1))
++
++#define	SIZE_T_MAX	ULONG_MAX	/* max value for a size_t */
++
++// From <Windows.h>
++typedef unsigned long DWORD;
++typedef struct _FILETIME {
++    DWORD dwLowDateTime;
++    DWORD dwHighDateTime;
++} FILETIME, *PFILETIME, *LPFILETIME;
++typedef unsigned __int64 ULONGLONG;
++#define DUMMYSTRUCTNAME
++typedef union _ULARGE_INTEGER {
++    struct {
++        DWORD LowPart;
++        DWORD HighPart;
++    } DUMMYSTRUCTNAME;
++    struct {
++        DWORD LowPart;
++        DWORD HighPart;
++    } u;
++    ULONGLONG QuadPart;
++} ULARGE_INTEGER;
++typedef long LONG;
++typedef __int64 LONGLONG;
++typedef union _LARGE_INTEGER {
++    struct {
++        DWORD LowPart;
++        LONG HighPart;
++    } DUMMYSTRUCTNAME;
++    struct {
++        DWORD LowPart;
++        LONG HighPart;
++    } u;
++    LONGLONG QuadPart;
++} LARGE_INTEGER;
++typedef unsigned int        UINT;
++typedef UINT                MMRESULT;
++#define FAR
++#define NEAR
++typedef struct timecaps_tag {
++    UINT    wPeriodMin;     /* minimum period supported  */
++    UINT    wPeriodMax;     /* maximum period supported  */
++} TIMECAPS, *PTIMECAPS, NEAR *NPTIMECAPS, FAR *LPTIMECAPS;
++typedef const char *LPCSTR;
++typedef void       *LPVOID;
++#define BOOL int
++typedef struct _SECURITY_ATTRIBUTES {
++    DWORD nLength;
++    LPVOID lpSecurityDescriptor;
++    BOOL bInheritHandle;
++} SECURITY_ATTRIBUTES, *PSECURITY_ATTRIBUTES, *LPSECURITY_ATTRIBUTES;
++typedef void *HANDLE;
++typedef long            *LPLONG;
++#define DECLSPEC_IMPORT __declspec(dllimport)
++#define WINBASEAPI DECLSPEC_IMPORT
++#define VOID void
++#define WINAPI      __stdcall
++#define WINMMAPI        DECLSPEC_IMPORT
++#define MMSYSERR_NOERROR      0                    /* no error */
++#define TIMERR_NOERROR        (0)                  /* no error */
++#define INFINITE            0xFFFFFFFF  // Infinite timeout
++WINBASEAPI
++VOID
++WINAPI
++GetSystemTimeAsFileTime(
++    /*_Out_*/ LPFILETIME lpSystemTimeAsFileTime
++    );
++WINBASEAPI
++BOOL
++WINAPI
++QueryPerformanceCounter(
++    /*_Out_*/ LARGE_INTEGER* lpPerformanceCount
++    );
++WINBASEAPI
++DWORD
++WINAPI
++GetCurrentThreadId(
++    VOID
++    );
++WINBASEAPI
++DWORD
++WINAPI
++GetCurrentProcessId(
++    VOID
++    );
++WINBASEAPI
++VOID
++WINAPI
++Sleep(
++    /*_In_*/ DWORD dwMilliseconds
++    );
++WINMMAPI
++MMRESULT
++WINAPI
++timeGetDevCaps(
++    /*_Out_writes_bytes_(cbtc)*/ LPTIMECAPS ptc,
++    /*_In_*/ UINT cbtc
++    );
++WINMMAPI
++MMRESULT
++WINAPI
++timeBeginPeriod(
++    /*_In_*/ UINT uPeriod
++    );
++WINMMAPI
++MMRESULT
++WINAPI
++timeEndPeriod(
++    /*_In_*/ UINT uPeriod
++    );
++WINBASEAPI
++/* _Ret_maybenull_ */
++HANDLE
++WINAPI
++CreateSemaphoreA(
++    /* _In_opt_ */ LPSECURITY_ATTRIBUTES lpSemaphoreAttributes,
++    /* _In_     */ LONG lInitialCount,
++    /* _In_     */ LONG lMaximumCount,
++    /* _In_opt_ */ LPCSTR lpName
++    );
++#define CreateSemaphore  CreateSemaphoreA
++WINBASEAPI
++BOOL
++WINAPI
++CloseHandle(
++    /* _In_ _Post_ptr_invalid_ */ HANDLE hObject
++    );
++WINBASEAPI
++BOOL
++WINAPI
++ReleaseSemaphore(
++    /* _In_ */ HANDLE hSemaphore,
++    /* _In_ */ LONG lReleaseCount,
++    /* _Out_opt_ */ LPLONG lpPreviousCount
++    );
++WINBASEAPI
++DWORD
++WINAPI
++WaitForSingleObject(
++    /* _In_ */ HANDLE hHandle,
++    /* _In_ */ DWORD dwMilliseconds
++    );
++
++#undef BOOL
++
++// From `libdispatch` port (inside WinObjC)
++#if 0
++#include <time.h>
++struct timeval {
++	long tv_sec;
++	long tv_usec;
++};
++struct timezone 
++{
++	int  tz_minuteswest; /* minutes W of Greenwich */
++	int  tz_dsttime;     /* type of dst correction */
++};
++
++static const unsigned __int64 intervals_per_second      = 10000000ULL;
++static const unsigned __int64 microseconds_per_second   = 1000000ULL;
++static const unsigned __int64 intervals_per_microsecond = 10ULL;
++static const unsigned __int64 intervals_since_epoch     = 116444736000000000ULL;
++static const unsigned __int64 microseconds_since_epoch  = 11644473600000000ULL;
++
++static inline int gettimeofday(struct timeval* tv, struct timezone* tz)
++{
++	static int tzflag = 0;
++
++	if(NULL != tv)
++	{
++		FILETIME file_time;
++		ULARGE_INTEGER ularge;
++
++		GetSystemTimeAsFileTime(&file_time);
++		ularge.LowPart = file_time.dwLowDateTime;
++		ularge.HighPart = file_time.dwHighDateTime;
++		ularge.QuadPart -= intervals_since_epoch;
++		ularge.QuadPart /= intervals_per_microsecond;
++		tv->tv_sec = (long) (ularge.QuadPart / microseconds_per_second);
++		tv->tv_usec = (long) (ularge.QuadPart % microseconds_per_second);
++	}
++
++	if (NULL != tz)
++	{
++		long seconds = 0;
++		int hours = 0;
++		if (!tzflag)
++		{
++			_tzset();
++			tzflag++;
++		}
++		_get_timezone(&seconds);
++		_get_daylight(&hours);
++
++		tz->tz_minuteswest = seconds / 60;
++		tz->tz_dsttime = hours;
++	}
++
++	return 0;
++}
++#endif // 0
++
++#include <stdarg.h>
++#include <stdlib.h>
++#include <stdio.h>
++static inline int vasprintf(char** str, const char* fmt, va_list ap)
++{
++	va_list original_ap = ap;
++	size_t size = 32;
++	int n;
++	char* p = NULL;
++	char* np = NULL;
++
++	for(;;)
++	{
++		ap = original_ap;
++		if((np = realloc(p, size)) == NULL)
++		{
++			free(p);
++			return -1;
++		}
++		p = np;
++		n = vsnprintf(p, size, fmt, ap);
++		va_end(ap);
++
++		if(n > -1 && (size_t)n < size)
++		{
++			*str = p;
++			return n;
++		}
++		size *= 2;
++	}
++}
++static inline int asprintf(char **str, const char *fmt, ...)
++{
++	va_list ap;
++	int ret;
++
++	*str = NULL;
++	va_start(ap, fmt);
++	ret = vasprintf(str, fmt, ap);
++	va_end(ap);
++	return ret;
++}
++
++// Stubs
++#define os_likely(x) (x)
++#define os_unlikely(x) (x)
++#define MIN(A,B)    ((A) < (B) ? (A) : (B))
++#define MAX(A,B)    ((A) > (B) ? (A) : (B))
++#define strcasecmp	_stricmp
++#define STDIN_FILENO    0   /* standard input file descriptor */
++#define STDOUT_FILENO   1   /* standard output file descriptor */
++#define STDERR_FILENO   2   /* standard error file descriptor */
++#define PATH_MAX          260
++#define getpid GetCurrentProcessId
++typedef signed int ssize_t;
++
++static inline int usleep(unsigned int useconds) {
++  Sleep(useconds / 1000);
++  return 0;
++}
++// defined(OBJC_PORT)
++#endif
++
+ #if __has_include(<config/config_ac.h>)
+ #include <config/config_ac.h>
+ #else
+@@ -49,20 +348,20 @@
+ #if !defined(OS_VOUCHER_CREATION_SPI) && TARGET_OS_MAC
+ #define OS_VOUCHER_CREATION_SPI 1
+ #endif
+-#if !defined(OS_VOUCHER_ACTIVITY_SPI) && TARGET_OS_MAC
++#if !defined(OS_VOUCHER_ACTIVITY_SPI) && TARGET_OS_MAC && !defined(OBJC_PORT)
+ #define OS_VOUCHER_ACTIVITY_SPI 1
+ #endif
+ #if !defined(OS_VOUCHER_ACTIVITY_GENERATE_SWAPS)
+ #define OS_VOUCHER_ACTIVITY_GENERATE_SWAPS 0
+ #endif
+-#if !defined(OS_FIREHOSE_SPI) && TARGET_OS_MAC
++#if !defined(OS_FIREHOSE_SPI) && TARGET_OS_MAC && !defined(OBJC_PORT)
+ #define OS_FIREHOSE_SPI 1
+ #endif
+-#if !defined(DISPATCH_LAYOUT_SPI) && TARGET_OS_MAC
++#if !defined(DISPATCH_LAYOUT_SPI) && TARGET_OS_MAC && !defined(OBJC_PORT)
+ #define DISPATCH_LAYOUT_SPI 1
+ #endif
+ 
+-#if __has_include(<mach-o/dyld_priv.h>)
++#if __has_include(<mach-o/dyld_priv.h>) && !defined(OBJC_PORT)
+ #include <mach-o/dyld_priv.h>
+ #if !defined(HAVE_DYLD_IS_MEMORY_IMMUTABLE)
+ #if defined(DYLD_MACOSX_VERSION_10_12) || defined(DYLD_IOS_VERSION_10_0)
+@@ -268,7 +567,7 @@ upcast(dispatch_object_t dou)
+ 
+ #include <sys/stat.h>
+ 
+-#if !TARGET_OS_WIN32
++#if !TARGET_OS_WIN32 && !defined(OBJC_PORT)
+ #include <sys/mount.h>
+ #include <sys/queue.h>
+ #ifdef __ANDROID__
+@@ -354,7 +653,7 @@ DISPATCH_EXPORT DISPATCH_NOTHROW void dispatch_atfork_child(void);
+ #define DISPATCH_DEBUG_QOS DISPATCH_DEBUG
+ #endif
+ 
+-#if __GNUC__
++#if __GNUC__ || defined(OBJC_PORT)
+ #define DISPATCH_NOINLINE __attribute__((__noinline__))
+ #define DISPATCH_USED __attribute__((__used__))
+ #define DISPATCH_UNUSED __attribute__((__unused__))
+@@ -921,6 +1220,9 @@ _dispatch_ktrace_impl(uint32_t code, uint64_t a, uint64_t b,
+ #define mach_voucher_t mach_port_t
+ #define MACH_VOUCHER_NULL MACH_PORT_NULL
+ #define MACH_SEND_INVALID_VOUCHER 0x10000005
++#elif defined(OBJC_PORT)
++typedef mach_port_t		mach_voucher_t;
++#define MACH_VOUCHER_NULL MACH_PORT_NULL
+ #endif
+ 
+ #ifndef VOUCHER_USE_MACH_VOUCHER
+diff --git a/src/queue.c b/src/queue.c
+index 59048c3..03c48e7 100644
+--- a/src/queue.c
++++ b/src/queue.c
+@@ -4003,6 +4003,7 @@ _dispatch_workloop_activate_attributes(dispatch_workloop_t dwl)
+ 	if (dwla->dwla_flags & DISPATCH_WORKLOOP_ATTR_HAS_POLICY) {
+ 		pthread_attr_setschedpolicy(&attr, dwla->dwla_policy);
+ 	}
++#if !defined(OBJC_PORT)
+ 	if (dwla->dwla_flags & DISPATCH_WORKLOOP_ATTR_HAS_CPUPERCENT) {
+ 		pthread_attr_setcpupercent_np(&attr, dwla->dwla_cpupercent.percent,
+ 				(unsigned long)dwla->dwla_cpupercent.refillms);
+@@ -4021,6 +4022,8 @@ _dispatch_workloop_activate_attributes(dispatch_workloop_t dwl)
+ 			dispatch_assert_zero(rv);
+ 		}
+ 	}
++// !defined(OBJC_PORT)
++#endif
+ 	pthread_attr_destroy(&attr);
+ }
+ 
+@@ -4065,10 +4068,12 @@ _dispatch_workloop_dispose(dispatch_workloop_t dwl, bool *allow_free)
+ 		dwl->dwl_timer_heap = NULL;
+ 	}
+ 
++#if !defined(OBJC_PORT)
+ 	if (dwl->dwl_attr && (dwl->dwl_attr->dwla_flags &
+ 			DISPATCH_WORKLOOP_ATTR_NEEDS_DESTROY)) {
+ 		(void)dispatch_assume_zero(_pthread_workloop_destroy((uint64_t)dwl));
+ 	}
++#endif
+ 	_dispatch_workloop_attributes_dispose(dwl);
+ 	_dispatch_queue_dispose(dwl, allow_free);
+ }
+@@ -5145,7 +5150,7 @@ _dispatch_mgr_priority_raise(const pthread_attr_t *attr)
+ 		return;
+ 	}
+ #endif
+-#if DISPATCH_USE_MGR_THREAD
++#if DISPATCH_USE_MGR_THREAD && !defined(OBJC_PORT)
+ 	if (_dispatch_mgr_sched.tid) {
+ 		return _dispatch_mgr_priority_apply();
+ 	}
+@@ -5924,8 +5929,8 @@ _dispatch_root_queue_init_pthread_pool(dispatch_queue_global_t dq,
+ #if HAVE_PTHREAD_WORKQUEUE_QOS
+ 		r = pthread_attr_set_qos_class_np(attr, cls, 0);
+ 		dispatch_assume_zero(r);
+-	}
+ #endif // HAVE_PTHREAD_WORKQUEUE_QOS
++	}
+ 	_dispatch_sema4_t *sema = &pqc->dpq_thread_mediator.dsema_sema;
+ 	pqc->dpq_thread_mediator.do_vtable = DISPATCH_VTABLE(semaphore);
+ 	_dispatch_sema4_init(sema, _DSEMA4_POLICY_LIFO);
+@@ -6698,11 +6703,13 @@ DISPATCH_NOINLINE DISPATCH_NORETURN
+ static void
+ _dispatch_sigsuspend(void)
+ {
++#if !defined(OBJC_PORT)
+ 	static const sigset_t mask;
+ 
+ 	for (;;) {
+ 		sigsuspend(&mask);
+ 	}
++#endif
+ }
+ 
+ DISPATCH_NORETURN
+diff --git a/src/queue_internal.h b/src/queue_internal.h
+index a627f0e..3fccb7a 100644
+--- a/src/queue_internal.h
++++ b/src/queue_internal.h
+@@ -647,6 +647,13 @@ struct dispatch_queue_global_s {
+ 	DISPATCH_QUEUE_ROOT_CLASS_HEADER(lane);
+ } DISPATCH_CACHELINE_ALIGN;
+ 
++typedef struct dispatch_pthread_root_queue_observer_hooks_s {
++	void (*queue_will_execute)(dispatch_queue_t queue);
++	void (*queue_did_execute)(dispatch_queue_t queue);
++} dispatch_pthread_root_queue_observer_hooks_s;
++typedef dispatch_pthread_root_queue_observer_hooks_s
++		*dispatch_pthread_root_queue_observer_hooks_t;
++
+ #if DISPATCH_USE_PTHREAD_POOL
+ typedef struct dispatch_pthread_root_queue_context_s {
+ 	pthread_attr_t dpq_thread_attr;
+@@ -1201,14 +1208,7 @@ dispatch_qos_t _dispatch_continuation_init_slow(dispatch_continuation_t dc,
+ 
+ #endif /* __BLOCKS__ */
+ 
+-typedef struct dispatch_pthread_root_queue_observer_hooks_s {
+-	void (*queue_will_execute)(dispatch_queue_t queue);
+-	void (*queue_did_execute)(dispatch_queue_t queue);
+-} dispatch_pthread_root_queue_observer_hooks_s;
+-typedef dispatch_pthread_root_queue_observer_hooks_s
+-		*dispatch_pthread_root_queue_observer_hooks_t;
+-
+-#ifdef __APPLE__
++#if defined(__APPLE__) && !defined(OBJC_PORT)
+ #define DISPATCH_IOHID_SPI 1
+ 
+ DISPATCH_EXPORT DISPATCH_MALLOC DISPATCH_RETURNS_RETAINED DISPATCH_WARN_RESULT
+diff --git a/src/shims.h b/src/shims.h
+index fd8b354..512feba 100644
+--- a/src/shims.h
++++ b/src/shims.h
+@@ -65,11 +65,11 @@
+ #define FD_COPY(f, t) (void)(*(t) = *(f))
+ #endif
+ 
+-#if TARGET_OS_WIN32
++#if TARGET_OS_WIN32 || defined(OBJC_PORT)
+ #define bzero(ptr,len) memset((ptr), 0, (len))
+ #define snprintf _snprintf
+ 
+-inline size_t strlcpy(char *dst, const char *src, size_t size) {
++static inline size_t strlcpy(char *dst, const char *src, size_t size) {
+ 	int res = strlen(dst) + strlen(src) + 1;
+ 	if (size > 0) {
+ 		size_t n = size - 1;
+@@ -265,7 +265,7 @@ _dispatch_mempcpy(void *ptr, const void *data, size_t len)
+ #define _dispatch_memappend(ptr, e) \
+ 	_dispatch_mempcpy(ptr, e, sizeof(*(e)))
+ 
+-#ifdef __APPLE__
++#if defined(__APPLE__) && !defined(OBJC_PORT)
+ // Clear the stack before calling long-running thread-handler functions that
+ // never return (and don't take arguments), to facilitate leak detection and
+ // provide cleaner backtraces. <rdar://problem/9050566>
+diff --git a/src/shims/getprogname.h b/src/shims/getprogname.h
+index 7eb1978..f949ce3 100644
+--- a/src/shims/getprogname.h
++++ b/src/shims/getprogname.h
+@@ -35,6 +35,8 @@ getprogname(void)
+ 	return program_invocation_short_name;
+ # elif defined(__ANDROID__)
+ 	return __progname;
++# elif defined(OBJC_PORT)
++  return "libdispatch.dll";
+ # else
+ #   error getprogname(3) is not available on this platform
+ # endif
+diff --git a/src/shims/hw_config.h b/src/shims/hw_config.h
+index 6de0394..34a1e27 100644
+--- a/src/shims/hw_config.h
++++ b/src/shims/hw_config.h
+@@ -138,10 +138,12 @@ _dispatch_hw_get_config(_dispatch_hw_config_t c)
+ 	 (void)c; name = "kern.smp.cpus";
+ #endif
+ 	if (name) {
++#if !defined(OBJC_PORT)
+ 		size_t valsz = sizeof(val);
+ 		r = sysctlbyname(name, &val, &valsz, NULL, 0);
+ 		(void)dispatch_assume_zero(r);
+ 		dispatch_assert(valsz == sizeof(uint32_t));
++#endif
+ 	} else {
+ #if HAVE_SYSCONF && defined(_SC_NPROCESSORS_ONLN)
+ 		r = (int)sysconf(_SC_NPROCESSORS_ONLN);
+diff --git a/src/shims/linux_stubs.c b/src/shims/linux_stubs.c
+index 4923eb0..40d0e27 100644
+--- a/src/shims/linux_stubs.c
++++ b/src/shims/linux_stubs.c
+@@ -19,7 +19,7 @@
+ #include <stdint.h>
+ #ifdef __ANDROID__
+ #include <sys/syscall.h>
+-#else
++#elif !defined(OBJC_PORT)
+ #include <syscall.h>
+ #endif /* __ANDROID__ */
+ 
+diff --git a/src/shims/lock.c b/src/shims/lock.c
+index 3f43023..09137a3 100644
+--- a/src/shims/lock.c
++++ b/src/shims/lock.c
+@@ -30,7 +30,7 @@
+ 		break; \
+ 	}
+ 
+-#if TARGET_OS_MAC
++#if TARGET_OS_MAC && !defined(OBJC_PORT)
+ dispatch_static_assert(DLOCK_LOCK_DATA_CONTENTION ==
+ 		ULF_WAIT_WORKQ_DATA_CONTENTION);
+ 
+@@ -291,6 +291,7 @@ _dispatch_sema4_wait(_dispatch_sema4_t *sema)
+ 	WaitForSingleObject(*sema, INFINITE);
+ }
+ 
++#if !defined(OBJC_PORT)
+ bool
+ _dispatch_sema4_timedwait(_dispatch_sema4_t *sema, dispatch_time_t timeout)
+ {
+@@ -306,6 +307,7 @@ _dispatch_sema4_timedwait(_dispatch_sema4_t *sema, dispatch_time_t timeout)
+ 	_pop_timer_resolution(resolution);
+ 	return wait_result == WAIT_TIMEOUT;
+ }
++#endif
+ #else
+ #error "port has to implement _dispatch_sema4_t"
+ #endif
+@@ -430,6 +432,7 @@ _dispatch_futex_unlock_pi(uint32_t *uaddr, int opflags)
+ #endif
+ #pragma mark - wait for address
+ 
++#if !defined(OBJC_PORT)
+ int
+ _dispatch_wait_on_address(uint32_t volatile *_address, uint32_t value,
+ 		dispatch_time_t timeout, dispatch_lock_options_t flags)
+@@ -465,6 +468,7 @@ _dispatch_wait_on_address(uint32_t volatile *_address, uint32_t value,
+ #error _dispatch_wait_on_address unimplemented for this platform
+ #endif
+ }
++#endif
+ 
+ void
+ _dispatch_wake_by_address(uint32_t volatile *address)
+@@ -557,7 +561,7 @@ _dispatch_unfair_lock_lock_slow(dispatch_unfair_lock_t dul,
+ 	(void)flags;
+ 	_dispatch_futex_lock_pi(&dul->dul_lock, NULL, 1, FUTEX_PRIVATE_FLAG);
+ }
+-#else
++#elif !defined(OBJC_PORT)
+ void
+ _dispatch_unfair_lock_lock_slow(dispatch_unfair_lock_t dul,
+ 		dispatch_lock_options_t flags)
+@@ -629,7 +633,7 @@ _dispatch_once_wait(dispatch_once_gate_t dgo)
+ #elif HAVE_FUTEX
+ 		_dispatch_futex_wait(lock, (dispatch_lock)new_v, NULL,
+ 				FUTEX_PRIVATE_FLAG);
+-#else
++#elif !defined(OBJC_PORT)
+ 		_dispatch_thread_switch(new_v, flags, timeout++);
+ #endif
+ 		(void)timeout;
+@@ -652,7 +656,7 @@ _dispatch_gate_broadcast_slow(dispatch_gate_t dgl, dispatch_lock cur)
+ #endif
+ }
+ 
+-#if TARGET_OS_MAC
++#if TARGET_OS_MAC && !defined(OBJC_PORT)
+ 
+ void
+ _dispatch_firehose_gate_wait(dispatch_gate_t dgl, uint32_t owner,
+diff --git a/src/shims/target.h b/src/shims/target.h
+index 8e996aa..d9cb5e6 100644
+--- a/src/shims/target.h
++++ b/src/shims/target.h
+@@ -49,7 +49,7 @@
+ #  endif // !DISPATCH_MIN_REQUIRED_OSX_AT_LEAST(101200)
+ #else
+ #  define DISPATCH_MIN_REQUIRED_OSX_AT_LEAST(x) 1
+-#  if __IPHONE_OS_VERSION_MIN_REQUIRED < 90000
++#  if __IPHONE_OS_VERSION_MIN_REQUIRED < 90000 && !defined(OBJC_PORT)
+ #    error "iOS hosts older than iOS 9.0 aren't supported anymore"
+ #  endif
+ #endif
+diff --git a/src/shims/time.h b/src/shims/time.h
+index 348e149..74df06e 100644
+--- a/src/shims/time.h
++++ b/src/shims/time.h
+@@ -31,7 +31,7 @@
+ #error "Please #include <dispatch/dispatch.h> instead of this file directly."
+ #endif
+ 
+-#if TARGET_OS_WIN32
++#if TARGET_OS_WIN32 || defined(OBJC_PORT)
+ static inline unsigned int
+ sleep(unsigned int seconds)
+ {
+@@ -101,13 +101,13 @@ _dispatch_get_nanoseconds(void)
+ 	dispatch_static_assert(sizeof(NSEC_PER_SEC) == 8);
+ 	dispatch_static_assert(sizeof(USEC_PER_SEC) == 8);
+ 
+-#if TARGET_OS_MAC
++#if TARGET_OS_MAC && !defined(OBJC_PORT)
+ 	return clock_gettime_nsec_np(CLOCK_REALTIME);
+ #elif HAVE_DECL_CLOCK_REALTIME
+ 	struct timespec ts;
+ 	dispatch_assume_zero(clock_gettime(CLOCK_REALTIME, &ts));
+ 	return _dispatch_timespec_to_nano(ts);
+-#elif TARGET_OS_WIN32
++#elif TARGET_OS_WIN32 || defined(OBJC_PORT)
+ 	// FILETIME is 100-nanosecond intervals since January 1, 1601 (UTC).
+ 	FILETIME ft;
+ 	ULARGE_INTEGER li;
+@@ -135,7 +135,7 @@ _dispatch_uptime(void)
+ 	struct timespec ts;
+ 	dispatch_assume_zero(clock_gettime(CLOCK_UPTIME, &ts));
+ 	return _dispatch_timespec_to_nano(ts);
+-#elif TARGET_OS_WIN32
++#elif TARGET_OS_WIN32 || defined(OBJC_PORT)
+ 	LARGE_INTEGER now;
+ 	return QueryPerformanceCounter(&now) ? now.QuadPart : 0;
+ #else
+@@ -156,7 +156,7 @@ _dispatch_monotonic_time(void)
+ 	struct timespec ts;
+ 	dispatch_assume_zero(clock_gettime(CLOCK_MONOTONIC, &ts));
+ 	return _dispatch_timespec_to_nano(ts);
+-#elif TARGET_OS_WIN32
++#elif TARGET_OS_WIN32 || defined(OBJC_PORT)
+ 	LARGE_INTEGER now;
+ 	return QueryPerformanceCounter(&now) ? now.QuadPart : 0;
+ #else
+@@ -210,7 +210,7 @@ _dispatch_time_now_cached(dispatch_clock_t clock,
+ 	if (likely(cache->nows[clock])) {
+ 		return cache->nows[clock];
+ 	}
+-#if TARGET_OS_MAC
++#if TARGET_OS_MAC && !defined(OBJC_PORT)
+ 	struct timespec ts;
+ 	mach_get_times(&cache->nows[DISPATCH_CLOCK_UPTIME],
+ 			&cache->nows[DISPATCH_CLOCK_MONOTONIC], &ts);
+diff --git a/src/shims/tsd.h b/src/shims/tsd.h
+index eaed362..085bfa6 100644
+--- a/src/shims/tsd.h
++++ b/src/shims/tsd.h
+@@ -285,7 +285,7 @@ _dispatch_thread_setspecific_packed_pair(pthread_key_t k1, pthread_key_t k2,
+ }
+ #endif
+ 
+-#if TARGET_OS_WIN32
++#if TARGET_OS_WIN32 || defined(OBJC_PORT)
+ #define _dispatch_thread_self() ((uintptr_t)GetCurrentThreadId())
+ #else
+ #if DISPATCH_USE_DIRECT_TSD
+@@ -296,7 +296,7 @@ _dispatch_thread_setspecific_packed_pair(pthread_key_t k1, pthread_key_t k2,
+ #endif
+ #endif
+ 
+-#if TARGET_OS_WIN32
++#if TARGET_OS_WIN32 || defined(OBJC_PORT)
+ #define _dispatch_thread_port() ((mach_port_t)0)
+ #elif !DISPATCH_USE_THREAD_LOCAL_STORAGE
+ #if DISPATCH_USE_DIRECT_TSD
+diff --git a/src/shims/yield.h b/src/shims/yield.h
+index 121b48e..e8a648d 100644
+--- a/src/shims/yield.h
++++ b/src/shims/yield.h
+@@ -124,6 +124,10 @@
+ #pragma mark -
+ #pragma mark _dispatch_preemption_yield
+ 
++#if defined(OBJC_PORT)
++#define pthread_yield_np()
++#endif
++
+ #if HAVE_MACH
+ #if defined(SWITCH_OPTION_OSLOCK_DEPRESS)
+ #define DISPATCH_YIELD_THREAD_SWITCH_OPTION SWITCH_OPTION_OSLOCK_DEPRESS
+diff --git a/src/source.c b/src/source.c
+index b1b8931..c7c3d08 100644
+--- a/src/source.c
++++ b/src/source.c
+@@ -147,8 +147,8 @@ dispatch_source_get_handle(dispatch_source_t ds)
+ unsigned long
+ dispatch_source_get_data(dispatch_source_t ds)
+ {
+-#if DISPATCH_USE_MEMORYSTATUS
+ 	dispatch_source_refs_t dr = ds->ds_refs;
++#if DISPATCH_USE_MEMORYSTATUS
+ 	if (dr->du_vmpressure_override) {
+ 		return NOTE_VM_PRESSURE;
+ 	}
+-- 
+2.18.0.windows.1
+

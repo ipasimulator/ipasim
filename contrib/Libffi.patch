@@ -1,0 +1,40 @@
+From c1f167e8953e6220d55c275a1e9138f6879a5201 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20Jone=C5=A1?= <jjones@outlook.cz>
+Date: Sun, 12 May 2019 08:48:26 +0200
+Subject: [PATCH] Squash branch `port`
+
+---
+ .gitignore     | 3 +++
+ CMakeLists.txt | 5 ++++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/.gitignore b/.gitignore
+index 6afbbe3..2d2d0ef 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -6,3 +6,6 @@ build/
+ .AppleDouble
+ .LSOverride
+ ._*
++
++# Git Time Metric
++/.gtm/
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index d823425..7d8c5ca 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -59,7 +59,10 @@ if (MSVC)
+         set(fmasm "/c /Cx /coff /safeseh /Fo")
+     endif()
+ 
+-    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Oy- /Oi /Gy /Zi /GL /Gd")
++    # [port] CHANGED: Removed `/GL` as that option generates object files in
++    # [port] format not supported by Clang. And we use the output library when
++    # [port] linking with Clang.
++    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Oy- /Oi /Gy /Zi /Gd")
+     set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} /Oy-")
+ 
+     add_custom_target(preprocess
+-- 
+2.18.0.windows.1
+

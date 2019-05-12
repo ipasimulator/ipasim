@@ -1,0 +1,2794 @@
+From e46a27ebd86b6d3c0a86d21db04d3b3634fad129 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20Jone=C5=A1?= <jjones@outlook.cz>
+Date: Sun, 12 May 2019 08:54:30 +0200
+Subject: [PATCH] Squash branch `objc_port`
+
+---
+ .gitattributes                                |   5 +
+ .gitignore                                    |  26 +-
+ Libc-825.40.1/pthreads/pthread_machdep.h      |  10 +-
+ .../usr/include/libkern/_OSByteOrder.h        |   2 +
+ .../usr/include/libkern/i386/OSByteOrder.h    |   2 +
+ MacOSX10.13.sdk/usr/include/mach-o/ldsyms.h   |   5 +
+ MacOSX10.13.sdk/usr/include/mach-o/loader.h   |   5 +
+ MacOSX10.13.sdk/usr/include/mach/mach.h       |  11 +
+ MacOSX10.13.sdk/usr/include/mach/mach_init.h  |  24 +
+ MacOSX10.13.sdk/usr/include/mach/message.h    |   2 +
+ MacOSX10.13.sdk/usr/include/mach/port.h       |   6 +
+ MacOSX10.13.sdk/usr/include/mach/vm_types.h   |   8 +-
+ MacOSX10.13.sdk/usr/include/sys/cdefs.h       |  13 +
+ MacOSX10.13.sdk/usr/include/sys/event.h       |   2 +
+ README.md                                     |  24 +-
+ dyld-519.2.2/include/mach-o/dyld_priv.h       | 439 ++++++++++++
+ libclosure-67/Block_private.h                 | 236 +++++++
+ libplatform-161/LICENSE                       | 202 ++++++
+ libplatform-161/private/_simple.h             | 162 +++++
+ libplatform-161/private/os/lock_private.h     | 649 ++++++++++++++++++
+ xnu-4570.41.2/APPLE_LICENSE                   | 367 ++++++++++
+ xnu-4570.41.2/bsd/sys/reason.h                | 238 +++++++
+ 22 files changed, 2429 insertions(+), 9 deletions(-)
+ create mode 100644 .gitattributes
+ create mode 100644 dyld-519.2.2/include/mach-o/dyld_priv.h
+ create mode 100644 libclosure-67/Block_private.h
+ create mode 100644 libplatform-161/LICENSE
+ create mode 100644 libplatform-161/private/_simple.h
+ create mode 100644 libplatform-161/private/os/lock_private.h
+ create mode 100644 xnu-4570.41.2/APPLE_LICENSE
+ create mode 100644 xnu-4570.41.2/bsd/sys/reason.h
+
+diff --git a/.gitattributes b/.gitattributes
+new file mode 100644
+index 0000000..718c5e9
+--- /dev/null
++++ b/.gitattributes
+@@ -0,0 +1,5 @@
++* text=auto
++
++# We need `.tbd` files to have LF line endings because they
++# are parsed by `tapi` which doesn't play nicely with CRLF.
++*.tbd text eol=lf
+diff --git a/.gitignore b/.gitignore
+index ca64ef6..b5b15c2 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -5,6 +5,30 @@
+ /Libc-*/*/**
+ !/Libc-*/pthreads/pthread_machdep.h
+ 
+-/dyld-*/*/**
++/dyld-*/*/*/**
++/dyld-*/*/*.*
+ /dyld-*/*.*
+ !/dyld-*/include/objc-shared-cache.h
++!/dyld-*/include/mach-o/dyld_priv.h
++
++/libplatform-*/*/*/**
++/libplatform-*/*/*.*
++/libplatform-*/*.*
++!/libplatform-*/private/os/lock_private.h
++!/libplatform-*/private/_simple.h
++
++/libclosure-*/**
++!/libclosure-*/Block_private.h
++
++/xnu-*/*/*/**
++/xnu-*/*/*.*
++/xnu-*/*.*
++/xnu-*/**/Makefile
++/xnu-*/**/newvers
++/xnu-*/**/MASTER
++/xnu-*/**/MasterVersion
++/xnu-*/**/*blacklist*
++!/xnu-*/bsd/sys/reason.h
++
++# Git Time Metric
++/.gtm/
+diff --git a/Libc-825.40.1/pthreads/pthread_machdep.h b/Libc-825.40.1/pthreads/pthread_machdep.h
+index 001a8ae..41e2e55 100644
+--- a/Libc-825.40.1/pthreads/pthread_machdep.h
++++ b/Libc-825.40.1/pthreads/pthread_machdep.h
+@@ -58,6 +58,9 @@
+ #include <TargetConditionals.h>
+ #include <stdint.h>
+ 
++// [port] CHANGED: Not supporting direct pthread keys.
++#ifndef OBJC_PORT
++
+ /*
+ ** Define macros for inline pthread_getspecific() usage.
+ ** We reserve a number of slots for Apple internal use.
+@@ -197,7 +200,6 @@
+ ** This number can grow dynamically, no need to fix it.
+ */
+ 
+-
+ #if defined(__cplusplus)
+ extern "C" {
+ #endif
+@@ -211,6 +213,9 @@ int       pthread_key_init_np(int, void (*)(void *));
+ }
+ #endif
+ 
++// [port] !OBJC_PORT
++#endif
++
+ typedef int pthread_lock_t;
+ 
+ __inline__ static int
+@@ -232,7 +237,8 @@ _pthread_has_direct_tsd(void)
+ }
+ 
+ #if TARGET_IPHONE_SIMULATOR || defined(__ppc__) || defined(__ppc64__) || \
+-	(defined(__arm__) && !defined(_ARM_ARCH_7) && defined(_ARM_ARCH_6) && defined(__thumb__))
++	(defined(__arm__) && !defined(_ARM_ARCH_7) && defined(_ARM_ARCH_6) && defined(__thumb__)) \
++    || defined(OBJC_PORT) // [port] CHANGED: We want these instead of the assembly ones below.
+ 
+ #define _pthread_getspecific_direct(key) pthread_getspecific((key))
+ #define _pthread_setspecific_direct(key, val) pthread_setspecific((key), (val))
+diff --git a/MacOSX10.13.sdk/usr/include/libkern/_OSByteOrder.h b/MacOSX10.13.sdk/usr/include/libkern/_OSByteOrder.h
+index 3ceec32..1c3da21 100644
+--- a/MacOSX10.13.sdk/usr/include/libkern/_OSByteOrder.h
++++ b/MacOSX10.13.sdk/usr/include/libkern/_OSByteOrder.h
+@@ -37,7 +37,9 @@
+  * <libkern/arch/_OSByteOrder.h> for little-endian architectures.
+  */
+ 
++#if !defined(OBJC_PORT)
+ #include <sys/_types.h>
++#endif
+ 
+ /* Macros for swapping constant values in the preprocessing stage. */
+ #define __DARWIN_OSSwapConstInt16(x) \
+diff --git a/MacOSX10.13.sdk/usr/include/libkern/i386/OSByteOrder.h b/MacOSX10.13.sdk/usr/include/libkern/i386/OSByteOrder.h
+index f38e065..37beb60 100644
+--- a/MacOSX10.13.sdk/usr/include/libkern/i386/OSByteOrder.h
++++ b/MacOSX10.13.sdk/usr/include/libkern/i386/OSByteOrder.h
+@@ -30,8 +30,10 @@
+ #define _OS_OSBYTEORDERI386_H
+ 
+ #include <stdint.h>
++#if !defined(OBJC_PORT)
+ #include <libkern/i386/_OSByteOrder.h>
+ #include <sys/_types/_os_inline.h>
++#endif
+ 
+ /* Functions for byte reversed loads. */
+ 
+diff --git a/MacOSX10.13.sdk/usr/include/mach-o/ldsyms.h b/MacOSX10.13.sdk/usr/include/mach-o/ldsyms.h
+index 3f28b1b..9609ff0 100644
+--- a/MacOSX10.13.sdk/usr/include/mach-o/ldsyms.h
++++ b/MacOSX10.13.sdk/usr/include/mach-o/ldsyms.h
+@@ -87,6 +87,11 @@ _mh_bundle_header;
+  */
+ #define _MH_DYLIB_SYM	"__mh_dylib_header"
+ #define MH_DYLIB_SYM	"_mh_dylib_header"
++// [port] CHANGED: If this was not marked `extern "C"`, it would be mangled badly.
++// [port] TODO: How come this works in the original code?
++#if defined(OBJC_PORT)
++extern "C"
++#endif
+ extern const struct
+ #ifdef __LP64__
+ mach_header_64
+diff --git a/MacOSX10.13.sdk/usr/include/mach-o/loader.h b/MacOSX10.13.sdk/usr/include/mach-o/loader.h
+index dc1eb66..21a19b9 100644
+--- a/MacOSX10.13.sdk/usr/include/mach-o/loader.h
++++ b/MacOSX10.13.sdk/usr/include/mach-o/loader.h
+@@ -23,6 +23,11 @@
+ #ifndef _MACHO_LOADER_H_
+ #define _MACHO_LOADER_H_
+ 
++// [port] TODO: Don't do this.
++#if defined(OBJC_PORT)
++#include <mach/vm_statistics.h>
++#endif
++
+ /*
+  * This file describes the format of mach object files.
+  */
+diff --git a/MacOSX10.13.sdk/usr/include/mach/mach.h b/MacOSX10.13.sdk/usr/include/mach/mach.h
+index 00abb72..d23531b 100644
+--- a/MacOSX10.13.sdk/usr/include/mach/mach.h
++++ b/MacOSX10.13.sdk/usr/include/mach/mach.h
+@@ -62,6 +62,14 @@
+ #define __MACH30__
+ #define MACH_IPC_FLAVOR UNTYPED
+ 
++// [port] CHANGED: Including only what's needed.
++#if defined(OBJC_PORT)
++#include <mach/vm_types.h> 	  // [port] for vm_address_t
++#include <mach/kern_return.h> // [port] for kern_return_t
++#include <mach/mach_init.h>	  // [port] for mach_task_self
++#include <mach/vm_statistics.h> // [port] for VM_*
++#else
++
+ #include <mach/std_types.h>
+ #include <mach/mach_types.h>
+ #include <mach/mach_interface.h>
+@@ -241,4 +249,7 @@ extern void voucher_mach_msg_revert(voucher_mach_msg_state_t state);
+ 
+ __END_DECLS
+ 
++// [port] !defined(OBJC_PORT)
++#endif
++
+ #endif	/* _MACH_H_ */
+diff --git a/MacOSX10.13.sdk/usr/include/mach/mach_init.h b/MacOSX10.13.sdk/usr/include/mach/mach_init.h
+index 85e8319..dd4200b 100644
+--- a/MacOSX10.13.sdk/usr/include/mach/mach_init.h
++++ b/MacOSX10.13.sdk/usr/include/mach/mach_init.h
+@@ -58,24 +58,45 @@
+ #ifndef	_MACH_INIT_
+ #define	_MACH_INIT_	1
+ 
++// [port] CHANGED: Not needed.
++#if !defined(OBJC_PORT)
++
+ #include <mach/mach_types.h>
+ #include <mach/vm_page_size.h>
+ #include <stdarg.h>
+ 
+ #include <sys/cdefs.h>
+ 
++// [port] !defined(OBJC_PORT)
++#endif
++
+ /*
+  *	Kernel-related ports; how a task/thread controls itself
+  */
+ 
+ __BEGIN_DECLS
++
++// [port] CHANGED: Not needed.
++#if !defined(OBJC_PORT)
++
+ extern mach_port_t mach_host_self(void);
+ extern mach_port_t mach_thread_self(void);
+ extern kern_return_t host_page_size(host_t, vm_size_t *);
+ 
++// [port] !defined(OBJC_PORT)
++#endif
++
++// [port] CHANGED: mach_port_t is undefined.
++#if defined(OBJC_PORT)
++#define	mach_task_self() 0
++#else
+ extern mach_port_t	mach_task_self_;
+ #define	mach_task_self() mach_task_self_
+ #define	current_task()	mach_task_self()
++#endif
++
++// [port] CHANGED: Not needed.
++#if !defined(OBJC_PORT)
+ 
+ __END_DECLS
+ #include <mach/mach_traps.h>
+@@ -105,6 +126,9 @@ extern	mach_port_t	bootstrap_port;
+  */
+ extern int (*vprintf_stderr_func)(const char *format, va_list ap);
+ 
++// [port] !defined(OBJC_PORT)
++#endif
++
+ __END_DECLS
+ 
+ #endif	/* _MACH_INIT_ */
+diff --git a/MacOSX10.13.sdk/usr/include/mach/message.h b/MacOSX10.13.sdk/usr/include/mach/message.h
+index 4822eac..e244a59 100644
+--- a/MacOSX10.13.sdk/usr/include/mach/message.h
++++ b/MacOSX10.13.sdk/usr/include/mach/message.h
+@@ -78,7 +78,9 @@
+ #include <mach/machine/vm_types.h>
+ 
+ #include <sys/cdefs.h>
++#if !defined(OBJC_PORT)
+ #include <sys/appleapiopts.h>
++#endif
+ #include <Availability.h>
+ 
+ /*
+diff --git a/MacOSX10.13.sdk/usr/include/mach/port.h b/MacOSX10.13.sdk/usr/include/mach/port.h
+index 35de196..3a0a65a 100644
+--- a/MacOSX10.13.sdk/usr/include/mach/port.h
++++ b/MacOSX10.13.sdk/usr/include/mach/port.h
+@@ -123,12 +123,18 @@ typedef mach_port_name_t *mach_port_name_array_t;
+  *
+  */
+ 
++#if defined(OBJC_PORT)
++typedef unsigned int mach_port_t;
++#else
+ #include <sys/_types.h>
+ #include <sys/_types/_mach_port_t.h>
+ 
+ 
+ typedef mach_port_t			*mach_port_array_t;
+ 
++// !defined(OBJC_PORT)
++#endif
++
+ /*
+  *  MACH_PORT_NULL is a legal value that can be carried in messages.
+  *  It indicates the absence of any port or port rights.  (A port
+diff --git a/MacOSX10.13.sdk/usr/include/mach/vm_types.h b/MacOSX10.13.sdk/usr/include/mach/vm_types.h
+index 96a744f..5f94f56 100644
+--- a/MacOSX10.13.sdk/usr/include/mach/vm_types.h
++++ b/MacOSX10.13.sdk/usr/include/mach/vm_types.h
+@@ -32,7 +32,10 @@
+ #ifndef	_MACH_VM_TYPES_H_
+ #define _MACH_VM_TYPES_H_
+ 
++// [port] CHANGED: Not needed.
++#if !defined(OBJC_PORT)
+ #include <mach/port.h>
++#endif
+ #include <mach/machine/vm_types.h>
+ 
+ #include <stdint.h>
+@@ -68,7 +71,8 @@ typedef	uint32_t	reg64_t;
+ typedef uint32_t ppnum_t;		/* Physical page number */
+ #define PPNUM_MAX UINT32_MAX
+ 
+-
++// [port] CHANGED: mach_port_t is undefined.
++#if !defined(OBJC_PORT)
+ 
+ typedef mach_port_t		vm_map_t;
+ 
+@@ -88,6 +92,8 @@ typedef uint64_t		vm_object_size_t;
+ typedef mach_port_t		upl_t;
+ typedef mach_port_t		vm_named_entry_t;
+ 
++// [port] !defined(OBJC_PORT)
++#endif
+ 
+ #define UPL_NULL		((upl_t) 0)
+ #define VM_NAMED_ENTRY_NULL	((vm_named_entry_t) 0)
+diff --git a/MacOSX10.13.sdk/usr/include/sys/cdefs.h b/MacOSX10.13.sdk/usr/include/sys/cdefs.h
+index 522437e..0b7d590 100644
+--- a/MacOSX10.13.sdk/usr/include/sys/cdefs.h
++++ b/MacOSX10.13.sdk/usr/include/sys/cdefs.h
+@@ -75,11 +75,14 @@
+ #define	__END_DECLS
+ #endif
+ 
++// [port] TODO: Why is this warning issued even though we use clang?
++#if !defined(OBJC_PORT)
+ /* This SDK is designed to work with clang and specific versions of
+  * gcc >= 4.0 with Apple's patch sets */
+ #if !defined(__GNUC__) || __GNUC__ < 4
+ #warning "Unsupported compiler detected"
+ #endif
++#endif
+ 
+ /*
+  * Compatibility with compilers and environments that don't support compiler
+@@ -115,6 +118,10 @@
+ 
+ #define	__const		const		/* define reserved names to standard */
+ #define	__signed	signed
++// [port] CHANGED: We must first undefine what MSVC headers defined.
++#if defined(OBJC_PORT)
++#   undef __volatile
++#endif
+ #define	__volatile	volatile
+ #if defined(__cplusplus)
+ #define	__inline	inline		/* convert to C++ keyword */
+@@ -581,6 +588,8 @@
+ #define __DARWIN_EXTSN(sym)		__asm("_" __STRING(sym) __DARWIN_SUF_EXTSN)
+ #define __DARWIN_EXTSN_C(sym)		__asm("_" __STRING(sym) __DARWIN_SUF_EXTSN __DARWIN_SUF_NON_CANCELABLE)
+ 
++// [port] CHANGED: Not needed.
++#if !defined(OBJC_PORT)
+ /*
+  * symbol release macros
+  */
+@@ -593,6 +602,7 @@
+ #else
+ #define __DARWIN_ALIAS_STARTING(_mac, _iphone, x)   x
+ #endif
++#endif
+ 
+ 
+ /*
+@@ -649,10 +659,13 @@
+ #define _POSIX_C_SOURCE         198808L
+ #endif
+ 
++// [port] CHANGED: Not needed.
++#if !defined(OBJC_PORT)
+ /* POSIX C deprecation macros */
+ #include <sys/_posix_availability.h>
+ 
+ #define __POSIX_C_DEPRECATED(ver) ___POSIX_C_DEPRECATED_STARTING_##ver
++#endif
+ 
+ /*
+  * Set a single macro which will always be defined and can be used to determine
+diff --git a/MacOSX10.13.sdk/usr/include/sys/event.h b/MacOSX10.13.sdk/usr/include/sys/event.h
+index 5400ad6..a99176c 100644
+--- a/MacOSX10.13.sdk/usr/include/sys/event.h
++++ b/MacOSX10.13.sdk/usr/include/sys/event.h
+@@ -56,7 +56,9 @@
+ #ifndef _SYS_EVENT_H_
+ #define _SYS_EVENT_H_
+ 
++#if !defined(OBJC_PORT)
+ #include <machine/types.h>
++#endif
+ #include <sys/cdefs.h>
+ #include <stdint.h>
+ 
+diff --git a/README.md b/README.md
+index 9f892bd..a8c2105 100644
+--- a/README.md
++++ b/README.md
+@@ -1,11 +1,25 @@
+ # `apple-headers` submodule
+ 
+-As the title suggests, this repository is primarily meant as a submodule for the `IPASimulator` project.
++As the title suggests, this repository is primarily meant as a submodule for the
++`IPASimulator` project.
+ 
+-It contains `.h` files analyzed by `HeadersAnalyzer` and used by `objc` library port.
+-The `iPhoneOS*.sdk` was obtained from a macOS machine with Xcode installed (in `/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk`), but it can also be downloaded from [airnativeextensions website](http://resources.airnativeextensions.com/ios/).
++It contains `.h` files analyzed by `HeadersAnalyzer` and used by `objc` library
++port. The `iPhoneOS*.sdk` was obtained from a macOS machine with Xcode installed
++(in
++`/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk`),
++but it can also be downloaded from
++[airnativeextensions website](http://resources.airnativeextensions.com/ios/).
+ Similarly the `MacOSX*.sdk`.
+ 
+-The other folders are other Apple libraries obtained from the official [tarball repository](https://opensource.apple.com/tarballs/).
++The other folders are other Apple libraries obtained from the official
++[tarball repository](https://opensource.apple.com/tarballs/).
+ 
+-Not everything from the original SDK and libraries is included, though, see [the `.gitignore` file](.gitignore) for more information on what's excluded.
++Not everything from the original SDK and libraries is included, though, see
++[the `.gitignore` file](.gitignore) for more information on what's excluded.
++
++## Git tags
++
++We use the following tags as prefixes to commit messages:
++
++- `[dyld]`, `[iOS]`, `[Libc]`, `[closure]`, `[plat]`, `[macOS]`, `[xnu]`: These
++  correspond to the root folders.
+diff --git a/dyld-519.2.2/include/mach-o/dyld_priv.h b/dyld-519.2.2/include/mach-o/dyld_priv.h
+new file mode 100644
+index 0000000..5c9ccf8
+--- /dev/null
++++ b/dyld-519.2.2/include/mach-o/dyld_priv.h
+@@ -0,0 +1,439 @@
++/* -*- mode: C++; c-basic-offset: 4; tab-width: 4 -*-
++ *
++ * Copyright (c) 2003-2010 Apple Inc. All rights reserved.
++ *
++ * @APPLE_LICENSE_HEADER_START@
++ * 
++ * This file contains Original Code and/or Modifications of Original Code
++ * as defined in and that are subject to the Apple Public Source License
++ * Version 2.0 (the 'License'). You may not use this file except in
++ * compliance with the License. Please obtain a copy of the License at
++ * http://www.opensource.apple.com/apsl/ and read it before using this
++ * file.
++ * 
++ * The Original Code and all software distributed under the License are
++ * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
++ * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
++ * INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
++ * Please see the License for the specific language governing rights and
++ * limitations under the License.
++ * 
++ * @APPLE_LICENSE_HEADER_END@
++ */
++#ifndef _MACH_O_DYLD_PRIV_H_
++#define _MACH_O_DYLD_PRIV_H_
++
++#include <stdbool.h>
++#include <Availability.h>
++#include <TargetConditionals.h>
++#include <mach-o/dyld.h>
++#include <mach-o/dyld_images.h>
++
++// [port] CHANGED: `uuid_t` was undefined.
++#if defined(OBJC_PORT)
++// [port] From `darwin-xnu/_types.h`.
++typedef unsigned char uuid_t[16];
++#endif
++
++#if __cplusplus
++extern "C" {
++#endif /* __cplusplus */
++
++
++
++//
++// private interface between libSystem.dylib and dyld
++//
++extern void _dyld_fork_child();
++
++
++// DEPRECATED
++enum dyld_image_states
++{
++	dyld_image_state_mapped					= 10,		// No batch notification for this
++	dyld_image_state_dependents_mapped		= 20,		// Only batch notification for this
++	dyld_image_state_rebased				= 30, 
++	dyld_image_state_bound					= 40,
++	dyld_image_state_dependents_initialized	= 45,		// Only single notification for this
++	dyld_image_state_initialized			= 50,
++	dyld_image_state_terminated				= 60		// Only single notification for this
++};
++
++// DEPRECATED
++typedef const char* (*dyld_image_state_change_handler)(enum dyld_image_states state, uint32_t infoCount, const struct dyld_image_info info[]);
++
++
++
++typedef void (*_dyld_objc_notify_mapped)(unsigned count, const char* const paths[], const struct mach_header* const mh[]);
++typedef void (*_dyld_objc_notify_init)(const char* path, const struct mach_header* mh);
++typedef void (*_dyld_objc_notify_unmapped)(const char* path, const struct mach_header* mh);
++
++
++//
++// Note: only for use by objc runtime
++// Register handlers to be called when objc images are mapped, unmapped, and initialized.
++// Dyld will call back the "mapped" function with an array of images that contain an objc-image-info section.
++// Those images that are dylibs will have the ref-counts automatically bumped, so objc will no longer need to
++// call dlopen() on them to keep them from being unloaded.  During the call to _dyld_objc_notify_register(),
++// dyld will call the "mapped" function with already loaded objc images.  During any later dlopen() call,
++// dyld will also call the "mapped" function.  Dyld will call the "init" function when dyld would be called
++// initializers in that image.  This is when objc calls any +load methods in that image.
++//
++void _dyld_objc_notify_register(_dyld_objc_notify_mapped    mapped,
++                                _dyld_objc_notify_init      init,
++                                _dyld_objc_notify_unmapped  unmapped);
++
++
++
++//
++// Possible thread-local variable state changes for which you can register to be notified
++//
++enum dyld_tlv_states {
++    dyld_tlv_state_allocated = 10,   // TLV range newly allocated
++    dyld_tlv_state_deallocated = 20  // TLV range about to be deallocated
++};
++
++// 
++// Info about thread-local variable storage.
++// 
++typedef struct {
++    size_t info_size;    // sizeof(dyld_tlv_info)
++    void * tlv_addr;     // Base address of TLV storage
++    size_t tlv_size;     // Byte size of TLV storage
++} dyld_tlv_info;
++
++#if __BLOCKS__
++
++// 
++// Callback that notes changes to thread-local variable storage.
++// 
++typedef void (^dyld_tlv_state_change_handler)(enum dyld_tlv_states state, const dyld_tlv_info *info);
++
++//
++// Register a handler to be called when a thread adds or removes storage for thread-local variables.
++// The registered handler will only be called from and on behalf of the thread that owns the storage.
++// The registered handler will NOT be called for any storage that was 
++//   already allocated before dyld_register_tlv_state_change_handler() was 
++//   called. Use dyld_enumerate_tlv_storage() to get that information.
++// Exists in Mac OS X 10.7 and later 
++// 
++extern void 
++dyld_register_tlv_state_change_handler(enum dyld_tlv_states state, dyld_tlv_state_change_handler handler);
++
++// 
++// Enumerate the current thread-local variable storage allocated for the current thread. 
++// Exists in Mac OS X 10.7 and later 
++//
++extern void 
++dyld_enumerate_tlv_storage(dyld_tlv_state_change_handler handler);
++
++#endif
++
++
++//
++// get slide for a given loaded mach_header  
++// Mac OS X 10.6 and later
++//
++extern intptr_t _dyld_get_image_slide(const struct mach_header* mh);
++
++
++
++struct dyld_unwind_sections
++{
++	const struct mach_header*		mh;
++	const void*						dwarf_section;
++	uintptr_t						dwarf_section_length;
++	const void*						compact_unwind_section;
++	uintptr_t						compact_unwind_section_length;
++};
++
++
++//
++// Returns true iff some loaded mach-o image contains "addr".
++//	info->mh							mach header of image containing addr
++//  info->dwarf_section					pointer to start of __TEXT/__eh_frame section
++//  info->dwarf_section_length			length of __TEXT/__eh_frame section
++//  info->compact_unwind_section		pointer to start of __TEXT/__unwind_info section
++//  info->compact_unwind_section_length	length of __TEXT/__unwind_info section
++//
++// Exists in Mac OS X 10.6 and later 
++#if !__USING_SJLJ_EXCEPTIONS__
++extern bool _dyld_find_unwind_sections(void* addr, struct dyld_unwind_sections* info);
++#endif
++
++
++//
++// This is an optimized form of dladdr() that only returns the dli_fname field.
++//
++// Exists in Mac OS X 10.6 and later 
++extern const char* dyld_image_path_containing_address(const void* addr);
++
++
++//
++// This is an optimized form of dladdr() that only returns the dli_fbase field.
++// Return NULL, if address is not in any image tracked by dyld.
++//
++// Exists in Mac OS X 10.11 and later
++extern const struct mach_header* dyld_image_header_containing_address(const void* addr);
++
++
++
++// Convienence constants for return values from dyld_get_sdk_version() and friends.
++
++//@MAC_VERSION_DEFS@
++
++//@IOS_VERSION_DEFS@
++
++//@WATCHOS_VERSION_DEFS@
++
++
++//
++// This finds the SDK version a binary was built against.
++// Returns zero on error, or if SDK version could not be determined.
++//
++// Exists in Mac OS X 10.8 and later 
++// Exists in iOS 6.0 and later
++extern uint32_t dyld_get_sdk_version(const struct mach_header* mh);
++
++
++//
++// This finds the SDK version that the main executable was built against.
++// Returns zero on error, or if SDK version could not be determined.
++//
++// Note on watchOS, this returns the equivalent iOS SDK version number
++// (i.e an app built against watchOS 2.0 SDK returne 9.0).  To see the
++// platform specific sdk version use dyld_get_program_sdk_watch_os_version().
++//
++// Exists in Mac OS X 10.8 and later 
++// Exists in iOS 6.0 and later
++extern uint32_t dyld_get_program_sdk_version();
++
++
++#if __WATCH_OS_VERSION_MIN_REQUIRED
++// watchOS only.
++// This finds the Watch OS SDK version that the main executable was built against.
++// Exists in Watch OS 2.0 and later
++extern uint32_t dyld_get_program_sdk_watch_os_version() __IOS_UNAVAILABLE __OSX_UNAVAILABLE __WATCHOS_AVAILABLE(2.0);
++
++
++// watchOS only.
++// This finds the Watch min OS version that the main executable was built to run on.
++// Note: dyld_get_program_min_os_version() returns the iOS equivalent (e.g. 9.0)
++//       whereas this returns the raw watchOS version (e.g. 2.0).
++// Exists in Watch OS 3.0 and later
++extern uint32_t dyld_get_program_min_watch_os_version(); // __WATCHOS_AVAILABLE(3.0);
++#endif
++
++
++#if TARGET_OS_BRIDGE
++// bridgeOS only.
++// This finds the bridgeOS SDK version that the main executable was built against.
++// Exists in bridgeOSOS 2.0 and later
++extern uint32_t dyld_get_program_sdk_bridge_os_version();
++
++// bridgeOS only.
++// This finds the Watch min OS version that the main executable was built to run on.
++// Note: dyld_get_program_min_os_version() returns the iOS equivalent (e.g. 9.0)
++//       whereas this returns the raw bridgeOS version (e.g. 2.0).
++// Exists in bridgeOS 2.0 and later
++extern uint32_t dyld_get_program_min_bridge_os_version();
++#endif
++
++//
++// This finds the min OS version a binary was built to run on.
++// Returns zero on error, or if no min OS recorded in binary.
++//
++// Exists in Mac OS X 10.8 and later 
++// Exists in iOS 6.0 and later
++extern uint32_t dyld_get_min_os_version(const struct mach_header* mh);
++
++
++//
++// This finds the min OS version the main executable was built to run on.
++// Returns zero on error, or if no min OS recorded in binary.
++//
++// Exists in Mac OS X 10.8 and later 
++// Exists in iOS 6.0 and later
++extern uint32_t dyld_get_program_min_os_version();
++
++
++
++
++//
++// Returns if any OS dylib has overridden its copy in the shared cache
++//
++// Exists in iPhoneOS 3.1 and later 
++// Exists in Mac OS X 10.10 and later
++extern bool dyld_shared_cache_some_image_overridden();
++
++
++	
++//
++// Returns if the process is setuid or is code signed with entitlements.
++//
++// Exists in Mac OS X 10.9 and later
++extern bool dyld_process_is_restricted();
++
++
++
++//
++// Returns path used by dyld for standard dyld shared cache file for the current arch.
++//
++// Exists in Mac OS X 10.11 and later
++extern const char* dyld_shared_cache_file_path();
++
++
++
++//
++// <rdar://problem/13820686> for OpenGL to tell dyld it is ok to deallocate a memory based image when done.
++//
++// Exists in Mac OS X 10.9 and later
++#define NSLINKMODULE_OPTION_CAN_UNLOAD                  0x20
++
++
++//
++// Update all bindings on specified image. 
++// Looks for uses of 'replacement' and changes it to 'replacee'.
++// NOTE: this is less safe than using static interposing via DYLD_INSERT_LIBRARIES
++// because the running program may have already copy the pointer values to other
++// locations that dyld does not know about.
++//
++struct dyld_interpose_tuple {
++	const void* replacement;
++	const void* replacee;
++};
++extern void dyld_dynamic_interpose(const struct mach_header* mh, const struct dyld_interpose_tuple array[], size_t count);
++
++
++struct dyld_shared_cache_dylib_text_info {
++	uint64_t		version;		// current version 1
++	// following fields all exist in version 1
++	uint64_t		loadAddressUnslid;
++	uint64_t		textSegmentSize; 
++	uuid_t			dylibUuid;
++	const char*		path;			// pointer invalid at end of iterations
++	// following fields all exist in version 2
++	uint64_t        textSegmentOffset;  // offset from start of cache
++};
++typedef struct dyld_shared_cache_dylib_text_info dyld_shared_cache_dylib_text_info;
++
++
++#ifdef __BLOCKS__
++//
++// Given the UUID of a dyld shared cache file, this function will attempt to locate the cache
++// file and if found iterate all images, returning info about each one.  Returns 0 on success.
++//
++// Exists in Mac OS X 10.11 and later
++//           iOS 9.0 and later
++extern int dyld_shared_cache_iterate_text(const uuid_t cacheUuid, void (^callback)(const dyld_shared_cache_dylib_text_info* info));
++
++
++//
++// Given the UUID of a dyld shared cache file, and a NULL terminated array of extra directory paths to search,
++// this function will scan the standard and extra directories looking for a cache file that matches the UUID
++// and if found iterate all images, returning info about each one.  Returns 0 on success.
++//
++// Exists in Mac OS X 10.12 and later
++//           iOS 10.0 and later
++extern int dyld_shared_cache_find_iterate_text(const uuid_t cacheUuid, const char* extraSearchDirs[], void (^callback)(const dyld_shared_cache_dylib_text_info* info));
++#endif /* __BLOCKS */
++
++
++//
++// Returns if the specified address range is in a dyld owned memory
++// that is mapped read-only and will never be unloaded.
++//
++// Exists in Mac OS X 10.12 and later
++//           iOS 10.0 and later
++extern bool _dyld_is_memory_immutable(const void* addr, size_t length);
++
++
++//
++// Finds the UUID (from LC_UUID load command) of given image.
++// Returns false if LC_UUID is missing or mach_header is malformed.
++//
++// Exists in Mac OS X 10.12 and later
++// Exists in iOS 10.0 and later
++extern bool _dyld_get_image_uuid(const struct mach_header* mh, uuid_t uuid);
++
++
++//
++// Gets the UUID of the dyld shared cache in the current process.
++// Returns false if there is no dyld shared cache in use by the processes.
++//
++// Exists in Mac OS X 10.12 and later
++// Exists in iOS 10.0 and later
++extern bool _dyld_get_shared_cache_uuid(uuid_t uuid);
++
++
++//
++// Returns the start address of the dyld cache in the process and sets length to the size of the cache.
++// Returns NULL if the process is not using a dyld shared cache
++//
++// Exists in Mac OS X 10.13 and later
++// Exists in iOS 11.0 and later
++extern const void* _dyld_get_shared_cache_range(size_t* length);
++
++
++
++//
++// When dyld must terminate a process because of a required dependent dylib
++// could not be loaded or a symbol is missing, dyld calls abort_with_reason()
++// using one of the following error codes.
++//
++#define DYLD_EXIT_REASON_DYLIB_MISSING          1
++#define DYLD_EXIT_REASON_DYLIB_WRONG_ARCH       2
++#define DYLD_EXIT_REASON_DYLIB_WRONG_VERSION    3
++#define DYLD_EXIT_REASON_SYMBOL_MISSING         4
++#define DYLD_EXIT_REASON_CODE_SIGNATURE         5
++#define DYLD_EXIT_REASON_FILE_SYSTEM_SANDBOX    6
++#define DYLD_EXIT_REASON_MALFORMED_MACHO        7
++#define DYLD_EXIT_REASON_OTHER                  9
++
++//
++// When it has more information about the termination, dyld will use abort_with_payload().
++// The payload is a dyld_abort_payload structure.  The fixed fields are offsets into the
++// payload for the corresponding string.  If the offset is zero, that string is not available.
++//
++struct dyld_abort_payload {
++	uint32_t version;                   // first version is 1
++	uint32_t flags;                     // 0x00000001 means dyld terminated at launch, backtrace not useful
++	uint32_t targetDylibPathOffset;     // offset in payload of path string to dylib that could not be loaded
++	uint32_t clientPathOffset;          // offset in payload of path string to image requesting dylib
++	uint32_t symbolOffset;              // offset in payload of symbol string that could not be found
++	// string data
++};
++typedef struct dyld_abort_payload dyld_abort_payload;
++
++
++// These global variables are implemented in libdyld.dylib
++// Old programs that used crt1.o also defined these globals.
++// The ones in dyld are not used when an old program is run.
++extern int          NXArgc;
++extern const char** NXArgv;
++extern       char** environ;       // POSIX says this not const, because it pre-dates const
++extern const char*  __progname;
++
++
++// called by libSystem_initializer only
++extern void _dyld_initializer();
++
++// never called from source code. Used by static linker to implement lazy binding
++extern void dyld_stub_binder() __asm__("dyld_stub_binder");
++
++
++// called by exit() before it calls cxa_finalize() so that thread_local
++// objects are destroyed before global objects.
++extern void _tlv_exit();
++
++
++// temp exports to keep tapi happy, until ASan stops using dyldVersionNumber
++extern double      dyldVersionNumber;
++extern const char* dyldVersionString;
++
++#if __cplusplus
++}
++#endif /* __cplusplus */
++
++#endif /* _MACH_O_DYLD_PRIV_H_ */
+diff --git a/libclosure-67/Block_private.h b/libclosure-67/Block_private.h
+new file mode 100644
+index 0000000..9307b47
+--- /dev/null
++++ b/libclosure-67/Block_private.h
+@@ -0,0 +1,236 @@
++/*
++ * Block_private.h
++ *
++ * SPI for Blocks
++ *
++ * Copyright (c) 2008-2010 Apple Inc. All rights reserved.
++ *
++ * @APPLE_LLVM_LICENSE_HEADER@
++ *
++ */
++
++#ifndef _BLOCK_PRIVATE_H_
++#define _BLOCK_PRIVATE_H_
++
++#include <Availability.h>
++#include <AvailabilityMacros.h>
++#include <TargetConditionals.h>
++
++#include <stdbool.h>
++#include <stdint.h>
++#include <stdio.h>
++
++#include <Block.h>
++
++#if __cplusplus
++extern "C" {
++#endif
++
++
++// Values for Block_layout->flags to describe block objects
++enum {
++    BLOCK_DEALLOCATING =      (0x0001),  // runtime
++    BLOCK_REFCOUNT_MASK =     (0xfffe),  // runtime
++    BLOCK_NEEDS_FREE =        (1 << 24), // runtime
++    BLOCK_HAS_COPY_DISPOSE =  (1 << 25), // compiler
++    BLOCK_HAS_CTOR =          (1 << 26), // compiler: helpers have C++ code
++    BLOCK_IS_GC =             (1 << 27), // runtime
++    BLOCK_IS_GLOBAL =         (1 << 28), // compiler
++    BLOCK_USE_STRET =         (1 << 29), // compiler: undefined if !BLOCK_HAS_SIGNATURE
++    BLOCK_HAS_SIGNATURE  =    (1 << 30), // compiler
++    BLOCK_HAS_EXTENDED_LAYOUT=(1 << 31)  // compiler
++};
++
++#define BLOCK_DESCRIPTOR_1 1
++struct Block_descriptor_1 {
++    uintptr_t reserved;
++    uintptr_t size;
++};
++
++#define BLOCK_DESCRIPTOR_2 1
++struct Block_descriptor_2 {
++    // requires BLOCK_HAS_COPY_DISPOSE
++    void (*copy)(void *dst, const void *src);
++    void (*dispose)(const void *);
++};
++
++#define BLOCK_DESCRIPTOR_3 1
++struct Block_descriptor_3 {
++    // requires BLOCK_HAS_SIGNATURE
++    const char *signature;
++    const char *layout;     // contents depend on BLOCK_HAS_EXTENDED_LAYOUT
++};
++
++struct Block_layout {
++    void *isa;
++    volatile int32_t flags; // contains ref count
++    int32_t reserved; 
++    void (*invoke)(void *, ...);
++    struct Block_descriptor_1 *descriptor;
++    // imported variables
++};
++
++
++// Values for Block_byref->flags to describe __block variables
++enum {
++    // Byref refcount must use the same bits as Block_layout's refcount.
++    // BLOCK_DEALLOCATING =      (0x0001),  // runtime
++    // BLOCK_REFCOUNT_MASK =     (0xfffe),  // runtime
++
++    BLOCK_BYREF_LAYOUT_MASK =       (0xf << 28), // compiler
++    BLOCK_BYREF_LAYOUT_EXTENDED =   (  1 << 28), // compiler
++    BLOCK_BYREF_LAYOUT_NON_OBJECT = (  2 << 28), // compiler
++    BLOCK_BYREF_LAYOUT_STRONG =     (  3 << 28), // compiler
++    BLOCK_BYREF_LAYOUT_WEAK =       (  4 << 28), // compiler
++    BLOCK_BYREF_LAYOUT_UNRETAINED = (  5 << 28), // compiler
++
++    BLOCK_BYREF_IS_GC =             (  1 << 27), // runtime
++
++    BLOCK_BYREF_HAS_COPY_DISPOSE =  (  1 << 25), // compiler
++    BLOCK_BYREF_NEEDS_FREE =        (  1 << 24), // runtime
++};
++
++struct Block_byref {
++    void *isa;
++    struct Block_byref *forwarding;
++    volatile int32_t flags; // contains ref count
++    uint32_t size;
++};
++
++struct Block_byref_2 {
++    // requires BLOCK_BYREF_HAS_COPY_DISPOSE
++    void (*byref_keep)(struct Block_byref *dst, struct Block_byref *src);
++    void (*byref_destroy)(struct Block_byref *);
++};
++
++struct Block_byref_3 {
++    // requires BLOCK_BYREF_LAYOUT_EXTENDED
++    const char *layout;
++};
++
++
++// Extended layout encoding.
++
++// Values for Block_descriptor_3->layout with BLOCK_HAS_EXTENDED_LAYOUT
++// and for Block_byref_3->layout with BLOCK_BYREF_LAYOUT_EXTENDED
++
++// If the layout field is less than 0x1000, then it is a compact encoding 
++// of the form 0xXYZ: X strong pointers, then Y byref pointers, 
++// then Z weak pointers.
++
++// If the layout field is 0x1000 or greater, it points to a 
++// string of layout bytes. Each byte is of the form 0xPN.
++// Operator P is from the list below. Value N is a parameter for the operator.
++// Byte 0x00 terminates the layout; remaining block data is non-pointer bytes.
++
++enum {
++    BLOCK_LAYOUT_ESCAPE = 0, // N=0 halt, rest is non-pointer. N!=0 reserved.
++    BLOCK_LAYOUT_NON_OBJECT_BYTES = 1,    // N bytes non-objects
++    BLOCK_LAYOUT_NON_OBJECT_WORDS = 2,    // N words non-objects
++    BLOCK_LAYOUT_STRONG           = 3,    // N words strong pointers
++    BLOCK_LAYOUT_BYREF            = 4,    // N words byref pointers
++    BLOCK_LAYOUT_WEAK             = 5,    // N words weak pointers
++    BLOCK_LAYOUT_UNRETAINED       = 6,    // N words unretained pointers
++    BLOCK_LAYOUT_UNKNOWN_WORDS_7  = 7,    // N words, reserved
++    BLOCK_LAYOUT_UNKNOWN_WORDS_8  = 8,    // N words, reserved
++    BLOCK_LAYOUT_UNKNOWN_WORDS_9  = 9,    // N words, reserved
++    BLOCK_LAYOUT_UNKNOWN_WORDS_A  = 0xA,  // N words, reserved
++    BLOCK_LAYOUT_UNUSED_B         = 0xB,  // unspecified, reserved
++    BLOCK_LAYOUT_UNUSED_C         = 0xC,  // unspecified, reserved
++    BLOCK_LAYOUT_UNUSED_D         = 0xD,  // unspecified, reserved
++    BLOCK_LAYOUT_UNUSED_E         = 0xE,  // unspecified, reserved
++    BLOCK_LAYOUT_UNUSED_F         = 0xF,  // unspecified, reserved
++};
++
++
++// Runtime support functions used by compiler when generating copy/dispose helpers
++
++// Values for _Block_object_assign() and _Block_object_dispose() parameters
++enum {
++    // see function implementation for a more complete description of these fields and combinations
++    BLOCK_FIELD_IS_OBJECT   =  3,  // id, NSObject, __attribute__((NSObject)), block, ...
++    BLOCK_FIELD_IS_BLOCK    =  7,  // a block variable
++    BLOCK_FIELD_IS_BYREF    =  8,  // the on stack structure holding the __block variable
++    BLOCK_FIELD_IS_WEAK     = 16,  // declared __weak, only used in byref copy helpers
++    BLOCK_BYREF_CALLER      = 128, // called from __block (byref) copy/dispose support routines.
++};
++
++enum {
++    BLOCK_ALL_COPY_DISPOSE_FLAGS = 
++        BLOCK_FIELD_IS_OBJECT | BLOCK_FIELD_IS_BLOCK | BLOCK_FIELD_IS_BYREF |
++        BLOCK_FIELD_IS_WEAK | BLOCK_BYREF_CALLER
++};
++
++
++// Other support functions
++
++// runtime entry to get total size of a closure
++BLOCK_EXPORT size_t Block_size(void *aBlock);
++
++// indicates whether block was compiled with compiler that sets the ABI related metadata bits
++BLOCK_EXPORT bool _Block_has_signature(void *aBlock)
++    __OSX_AVAILABLE_STARTING(__MAC_10_7, __IPHONE_4_3);
++
++// returns TRUE if return value of block is on the stack, FALSE otherwise
++BLOCK_EXPORT bool _Block_use_stret(void *aBlock)
++    __OSX_AVAILABLE_STARTING(__MAC_10_7, __IPHONE_4_3);
++
++// Returns a string describing the block's parameter and return types.
++// The encoding scheme is the same as Objective-C @encode.
++// Returns NULL for blocks compiled with some compilers.
++BLOCK_EXPORT const char * _Block_signature(void *aBlock)
++    __OSX_AVAILABLE_STARTING(__MAC_10_7, __IPHONE_4_3);
++
++// Returns a string describing the block's GC layout.
++// This uses the GC skip/scan encoding.
++// May return NULL.
++BLOCK_EXPORT const char * _Block_layout(void *aBlock)
++    __OSX_AVAILABLE_STARTING(__MAC_10_7, __IPHONE_4_3);
++
++// Returns a string describing the block's layout.
++// This uses the "extended layout" form described above.
++// May return NULL.
++BLOCK_EXPORT const char * _Block_extended_layout(void *aBlock)
++    __OSX_AVAILABLE_STARTING(__MAC_10_8, __IPHONE_7_0);
++
++// Callable only from the ARR weak subsystem while in exclusion zone
++BLOCK_EXPORT bool _Block_tryRetain(const void *aBlock)
++    __OSX_AVAILABLE_STARTING(__MAC_10_7, __IPHONE_4_3);
++
++// Callable only from the ARR weak subsystem while in exclusion zone
++BLOCK_EXPORT bool _Block_isDeallocating(const void *aBlock)
++    __OSX_AVAILABLE_STARTING(__MAC_10_7, __IPHONE_4_3);
++
++
++// the raw data space for runtime classes for blocks
++// class+meta used for stack, malloc, and collectable based blocks
++BLOCK_EXPORT void * _NSConcreteMallocBlock[32]
++    __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2);
++BLOCK_EXPORT void * _NSConcreteAutoBlock[32]
++    __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2);
++BLOCK_EXPORT void * _NSConcreteFinalizingBlock[32]
++    __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2);
++BLOCK_EXPORT void * _NSConcreteWeakBlockVariable[32]
++    __OSX_AVAILABLE_STARTING(__MAC_10_6, __IPHONE_3_2);
++// declared in Block.h
++// BLOCK_EXPORT void * _NSConcreteGlobalBlock[32];
++// BLOCK_EXPORT void * _NSConcreteStackBlock[32];
++
++
++struct Block_callbacks_RR {
++    size_t  size;                   // size == sizeof(struct Block_callbacks_RR)
++    void  (*retain)(const void *);
++    void  (*release)(const void *);
++    void  (*destructInstance)(const void *);
++};
++typedef struct Block_callbacks_RR Block_callbacks_RR;
++
++BLOCK_EXPORT void _Block_use_RR2(const Block_callbacks_RR *callbacks);
++
++
++#if __cplusplus
++}
++#endif
++
++
++#endif
+diff --git a/libplatform-161/LICENSE b/libplatform-161/LICENSE
+new file mode 100644
+index 0000000..d645695
+--- /dev/null
++++ b/libplatform-161/LICENSE
+@@ -0,0 +1,202 @@
++
++                                 Apache License
++                           Version 2.0, January 2004
++                        http://www.apache.org/licenses/
++
++   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
++
++   1. Definitions.
++
++      "License" shall mean the terms and conditions for use, reproduction,
++      and distribution as defined by Sections 1 through 9 of this document.
++
++      "Licensor" shall mean the copyright owner or entity authorized by
++      the copyright owner that is granting the License.
++
++      "Legal Entity" shall mean the union of the acting entity and all
++      other entities that control, are controlled by, or are under common
++      control with that entity. For the purposes of this definition,
++      "control" means (i) the power, direct or indirect, to cause the
++      direction or management of such entity, whether by contract or
++      otherwise, or (ii) ownership of fifty percent (50%) or more of the
++      outstanding shares, or (iii) beneficial ownership of such entity.
++
++      "You" (or "Your") shall mean an individual or Legal Entity
++      exercising permissions granted by this License.
++
++      "Source" form shall mean the preferred form for making modifications,
++      including but not limited to software source code, documentation
++      source, and configuration files.
++
++      "Object" form shall mean any form resulting from mechanical
++      transformation or translation of a Source form, including but
++      not limited to compiled object code, generated documentation,
++      and conversions to other media types.
++
++      "Work" shall mean the work of authorship, whether in Source or
++      Object form, made available under the License, as indicated by a
++      copyright notice that is included in or attached to the work
++      (an example is provided in the Appendix below).
++
++      "Derivative Works" shall mean any work, whether in Source or Object
++      form, that is based on (or derived from) the Work and for which the
++      editorial revisions, annotations, elaborations, or other modifications
++      represent, as a whole, an original work of authorship. For the purposes
++      of this License, Derivative Works shall not include works that remain
++      separable from, or merely link (or bind by name) to the interfaces of,
++      the Work and Derivative Works thereof.
++
++      "Contribution" shall mean any work of authorship, including
++      the original version of the Work and any modifications or additions
++      to that Work or Derivative Works thereof, that is intentionally
++      submitted to Licensor for inclusion in the Work by the copyright owner
++      or by an individual or Legal Entity authorized to submit on behalf of
++      the copyright owner. For the purposes of this definition, "submitted"
++      means any form of electronic, verbal, or written communication sent
++      to the Licensor or its representatives, including but not limited to
++      communication on electronic mailing lists, source code control systems,
++      and issue tracking systems that are managed by, or on behalf of, the
++      Licensor for the purpose of discussing and improving the Work, but
++      excluding communication that is conspicuously marked or otherwise
++      designated in writing by the copyright owner as "Not a Contribution."
++
++      "Contributor" shall mean Licensor and any individual or Legal Entity
++      on behalf of whom a Contribution has been received by Licensor and
++      subsequently incorporated within the Work.
++
++   2. Grant of Copyright License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      copyright license to reproduce, prepare Derivative Works of,
++      publicly display, publicly perform, sublicense, and distribute the
++      Work and such Derivative Works in Source or Object form.
++
++   3. Grant of Patent License. Subject to the terms and conditions of
++      this License, each Contributor hereby grants to You a perpetual,
++      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
++      (except as stated in this section) patent license to make, have made,
++      use, offer to sell, sell, import, and otherwise transfer the Work,
++      where such license applies only to those patent claims licensable
++      by such Contributor that are necessarily infringed by their
++      Contribution(s) alone or by combination of their Contribution(s)
++      with the Work to which such Contribution(s) was submitted. If You
++      institute patent litigation against any entity (including a
++      cross-claim or counterclaim in a lawsuit) alleging that the Work
++      or a Contribution incorporated within the Work constitutes direct
++      or contributory patent infringement, then any patent licenses
++      granted to You under this License for that Work shall terminate
++      as of the date such litigation is filed.
++
++   4. Redistribution. You may reproduce and distribute copies of the
++      Work or Derivative Works thereof in any medium, with or without
++      modifications, and in Source or Object form, provided that You
++      meet the following conditions:
++
++      (a) You must give any other recipients of the Work or
++          Derivative Works a copy of this License; and
++
++      (b) You must cause any modified files to carry prominent notices
++          stating that You changed the files; and
++
++      (c) You must retain, in the Source form of any Derivative Works
++          that You distribute, all copyright, patent, trademark, and
++          attribution notices from the Source form of the Work,
++          excluding those notices that do not pertain to any part of
++          the Derivative Works; and
++
++      (d) If the Work includes a "NOTICE" text file as part of its
++          distribution, then any Derivative Works that You distribute must
++          include a readable copy of the attribution notices contained
++          within such NOTICE file, excluding those notices that do not
++          pertain to any part of the Derivative Works, in at least one
++          of the following places: within a NOTICE text file distributed
++          as part of the Derivative Works; within the Source form or
++          documentation, if provided along with the Derivative Works; or,
++          within a display generated by the Derivative Works, if and
++          wherever such third-party notices normally appear. The contents
++          of the NOTICE file are for informational purposes only and
++          do not modify the License. You may add Your own attribution
++          notices within Derivative Works that You distribute, alongside
++          or as an addendum to the NOTICE text from the Work, provided
++          that such additional attribution notices cannot be construed
++          as modifying the License.
++
++      You may add Your own copyright statement to Your modifications and
++      may provide additional or different license terms and conditions
++      for use, reproduction, or distribution of Your modifications, or
++      for any such Derivative Works as a whole, provided Your use,
++      reproduction, and distribution of the Work otherwise complies with
++      the conditions stated in this License.
++
++   5. Submission of Contributions. Unless You explicitly state otherwise,
++      any Contribution intentionally submitted for inclusion in the Work
++      by You to the Licensor shall be under the terms and conditions of
++      this License, without any additional terms or conditions.
++      Notwithstanding the above, nothing herein shall supersede or modify
++      the terms of any separate license agreement you may have executed
++      with Licensor regarding such Contributions.
++
++   6. Trademarks. This License does not grant permission to use the trade
++      names, trademarks, service marks, or product names of the Licensor,
++      except as required for reasonable and customary use in describing the
++      origin of the Work and reproducing the content of the NOTICE file.
++
++   7. Disclaimer of Warranty. Unless required by applicable law or
++      agreed to in writing, Licensor provides the Work (and each
++      Contributor provides its Contributions) on an "AS IS" BASIS,
++      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
++      implied, including, without limitation, any warranties or conditions
++      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
++      PARTICULAR PURPOSE. You are solely responsible for determining the
++      appropriateness of using or redistributing the Work and assume any
++      risks associated with Your exercise of permissions under this License.
++
++   8. Limitation of Liability. In no event and under no legal theory,
++      whether in tort (including negligence), contract, or otherwise,
++      unless required by applicable law (such as deliberate and grossly
++      negligent acts) or agreed to in writing, shall any Contributor be
++      liable to You for damages, including any direct, indirect, special,
++      incidental, or consequential damages of any character arising as a
++      result of this License or out of the use or inability to use the
++      Work (including but not limited to damages for loss of goodwill,
++      work stoppage, computer failure or malfunction, or any and all
++      other commercial damages or losses), even if such Contributor
++      has been advised of the possibility of such damages.
++
++   9. Accepting Warranty or Additional Liability. While redistributing
++      the Work or Derivative Works thereof, You may choose to offer,
++      and charge a fee for, acceptance of support, warranty, indemnity,
++      or other liability obligations and/or rights consistent with this
++      License. However, in accepting such obligations, You may act only
++      on Your own behalf and on Your sole responsibility, not on behalf
++      of any other Contributor, and only if You agree to indemnify,
++      defend, and hold each Contributor harmless for any liability
++      incurred by, or claims asserted against, such Contributor by reason
++      of your accepting any such warranty or additional liability.
++
++   END OF TERMS AND CONDITIONS
++
++   APPENDIX: How to apply the Apache License to your work.
++
++      To apply the Apache License to your work, attach the following
++      boilerplate notice, with the fields enclosed by brackets "[]"
++      replaced with your own identifying information. (Don't include
++      the brackets!)  The text should be enclosed in the appropriate
++      comment syntax for the file format. We also recommend that a
++      file or class name and description of purpose be included on the
++      same "printed page" as the copyright notice for easier
++      identification within third-party archives.
++
++   Copyright [yyyy] [name of copyright owner]
++
++   Licensed under the Apache License, Version 2.0 (the "License");
++   you may not use this file except in compliance with the License.
++   You may obtain a copy of the License at
++
++       http://www.apache.org/licenses/LICENSE-2.0
++
++   Unless required by applicable law or agreed to in writing, software
++   distributed under the License is distributed on an "AS IS" BASIS,
++   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++   See the License for the specific language governing permissions and
++   limitations under the License.
+diff --git a/libplatform-161/private/_simple.h b/libplatform-161/private/_simple.h
+new file mode 100644
+index 0000000..2ae8384
+--- /dev/null
++++ b/libplatform-161/private/_simple.h
+@@ -0,0 +1,162 @@
++/*
++ * Copyright (c) 2006, 2010, 2013 Apple Inc. All rights reserved.
++ *
++ * @APPLE_LICENSE_HEADER_START@
++ * 
++ * This file contains Original Code and/or Modifications of Original Code
++ * as defined in and that are subject to the Apple Public Source License
++ * Version 2.0 (the 'License'). You may not use this file except in
++ * compliance with the License. Please obtain a copy of the License at
++ * http://www.opensource.apple.com/apsl/ and read it before using this
++ * file.
++ * 
++ * The Original Code and all software distributed under the License are
++ * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
++ * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
++ * INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
++ * Please see the License for the specific language governing rights and
++ * limitations under the License.
++ * 
++ * @APPLE_LICENSE_HEADER_END@
++ */
++
++#ifndef _SYSTEM_SIMPLE_H_
++#define _SYSTEM_SIMPLE_H_
++
++#include <sys/cdefs.h>
++#include <stdarg.h>
++
++#include <Availability.h>
++
++typedef void *_SIMPLE_STRING;
++typedef const char *_esc_func(unsigned char);
++
++__BEGIN_DECLS
++/*
++ * A simplified vfprintf variant.  The format string is interpreted with
++ * arguments from the va_list, and the results are written to the given
++ * file descriptor.
++ */
++void _simple_vdprintf(int __fd, const char *__fmt, va_list __ap) __printflike(2, 0);
++
++/*
++ * A simplified fprintf variant.  The format string is interpreted with
++ * arguments from the variable argument list, and the results are written
++ * to the given file descriptor.
++ */
++void _simple_dprintf(int __fd, const char *__fmt, ...) __printflike(2, 3);
++
++/*
++ * A simplified string allocate routine.  Pass the opaque pointer to structure
++ * to _simple_*sprintf() routines.  Use _simple_string() to retrieve the
++ * current string (the string is guaranteed to be null terminated only on
++ * the call to _simple_string()).  Use _simple_sfree() to free the structure
++ * and string memory.
++ */
++_SIMPLE_STRING _simple_salloc(void);
++
++/*
++ * The format string is interpreted with arguments from the va_list, and the
++ * results are appended to the string maintained by the opaque structure, as
++ * returned by a previous call to _simple_salloc().  Non-zero is returned on
++ * out-of-memory error.
++ */
++int _simple_vsprintf(_SIMPLE_STRING __b, const char *__fmt, va_list __ap) __printflike(2, 0);
++
++/*
++ * The format string is interpreted with arguments from the variable argument
++ * list, and the results are appended to the string maintained by the opaque
++ * structure, as returned by a previous call to _simple_salloc().  Non-zero is
++ * returned on out-of-memory error.
++ */
++int _simple_sprintf(_SIMPLE_STRING __b, const char *__fmt, ...) __printflike(2, 3);
++
++/*
++ * Like _simple_vsprintf(), except __esc is a function to call on each
++ * character; the function returns NULL if the character should be passed
++ * as is, otherwise, the returned character string is used instead.
++ */
++int _simple_vesprintf(_SIMPLE_STRING __b, _esc_func __esc, const char *__fmt, va_list __ap) __printflike(3, 0);
++
++/*
++ * Like _simple_sprintf(), except __esc is a function to call on each
++ * character; the function returns NULL if the character should be passed
++ * as is, otherwise, the returned character string is used instead.
++ */
++int _simple_esprintf(_SIMPLE_STRING __b, _esc_func __esc, const char *__fmt, ...) __printflike(3, 4);
++
++/*
++ * Return the null terminated string from the opaque structure, as returned
++ * by a previous call to _simple_salloc().
++ */
++char *_simple_string(_SIMPLE_STRING __b);
++
++/*
++ * Reposition the pointer to the first null in the buffer.  After a call to
++ * _simple_string, the buffer can be modified, and shrunk.
++ */
++void _simple_sresize(_SIMPLE_STRING __b);
++
++/*
++ * Append the null-terminated string to the string associated with the opaque
++ * structure.  Non-zero is returned on out-of-memory error.
++ */
++int _simple_sappend(_SIMPLE_STRING __b, const char *__str);
++
++/*
++ * Like _simple_sappend(), except __esc is a function to call on each
++ * character; the function returns NULL if the character should be passed
++ * as is, otherwise, the returned character string is used instead.
++ */
++int _simple_esappend(_SIMPLE_STRING __b, _esc_func __esc, const char *__str);
++
++/*
++ * Write the string associated with the opaque structure to the file descriptor.
++ */
++void _simple_put(_SIMPLE_STRING __b, int __fd);
++
++/*
++ * Write the string associated with the opaque structure and a trailing newline,
++ * to the file descriptor.
++ */
++void _simple_putline(_SIMPLE_STRING __b, int __fd);
++
++/*
++ * Free the opaque structure, and the associated string.
++ */
++void _simple_sfree(_SIMPLE_STRING __b);
++
++/*
++ * Simplified ASL log interface; does not use malloc.  Unfortunately, this
++ * requires knowledge of the format used by ASL.
++ */
++#ifndef ASL_LEVEL_DEBUG
++#define ASL_LEVEL_EMERG   0
++#define ASL_LEVEL_ALERT   1
++#define ASL_LEVEL_CRIT    2
++#define ASL_LEVEL_ERR     3
++#define ASL_LEVEL_WARNING 4
++#define ASL_LEVEL_NOTICE  5
++#define ASL_LEVEL_INFO    6
++#define ASL_LEVEL_DEBUG   7
++#endif
++
++void _simple_asl_log(int __level, const char *__facility, const char *__message);
++void _simple_asl_log_prog(int level, const char *facility, const char *message, const char *progname);
++
++__OSX_AVAILABLE_STARTING(__MAC_10_9,__IPHONE_7_0)
++_SIMPLE_STRING _simple_asl_msg_new(void);
++
++__OSX_AVAILABLE_STARTING(__MAC_10_9,__IPHONE_7_0)
++void _simple_asl_msg_set(_SIMPLE_STRING __b, const char *__key, const char *__val);
++
++__OSX_AVAILABLE_STARTING(__MAC_10_9,__IPHONE_7_0)
++void _simple_asl_send(_SIMPLE_STRING __b);
++
++__OSX_AVAILABLE_STARTING(__MAC_10_9,__IPHONE_7_0)
++const char *_simple_getenv(const char *envp[], const char *var);
++
++__END_DECLS
++
++#endif /* _SYSTEM_SIMPLE_H_ */
+diff --git a/libplatform-161/private/os/lock_private.h b/libplatform-161/private/os/lock_private.h
+new file mode 100644
+index 0000000..00329e2
+--- /dev/null
++++ b/libplatform-161/private/os/lock_private.h
+@@ -0,0 +1,649 @@
++/*
++ * Copyright (c) 2013-2016 Apple Inc. All rights reserved.
++ *
++ * @APPLE_APACHE_LICENSE_HEADER_START@
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *     http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
++ * @APPLE_APACHE_LICENSE_HEADER_END@
++ */
++
++#ifndef __OS_LOCK_PRIVATE__
++#define __OS_LOCK_PRIVATE__
++
++#include <Availability.h>
++#include <TargetConditionals.h>
++#include <sys/cdefs.h>
++#include <stddef.h>
++#include <stdint.h>
++#include <stdbool.h>
++#include <os/base_private.h>
++#include <os/lock.h>
++
++OS_ASSUME_NONNULL_BEGIN
++
++/*! @header
++ * Low-level lock SPI
++ */
++
++#define OS_LOCK_SPI_VERSION 20160406
++
++/*!
++ * @typedef os_lock_t
++ *
++ * @abstract
++ * Pointer to one of the os_lock variants.
++ */
++
++#define OS_LOCK_TYPE_STRUCT(type) const struct _os_lock_type_##type##_s
++#define OS_LOCK_TYPE_REF(type) _os_lock_type_##type
++#define OS_LOCK_TYPE_DECL(type) OS_LOCK_TYPE_STRUCT(type) OS_LOCK_TYPE_REF(type)
++
++#define OS_LOCK(type) os_lock_##type##_s
++#define OS_LOCK_STRUCT(type) struct OS_LOCK(type)
++
++#if defined(__cplusplus) && __cplusplus >= 201103L
++
++#define OS_LOCK_DECL(type, size) \
++		typedef OS_LOCK_STRUCT(type) : public OS_LOCK(base) { \
++			private: \
++			OS_LOCK_TYPE_STRUCT(type) * const osl_type OS_UNUSED; \
++			uintptr_t _osl_##type##_opaque[size-1] OS_UNUSED; \
++			public: \
++            constexpr OS_LOCK(type)() : \
++				osl_type(&OS_LOCK_TYPE_REF(type)), _osl_##type##_opaque() {} \
++		} OS_LOCK(type)
++#define OS_LOCK_INIT(type) {}
++
++typedef OS_LOCK_STRUCT(base) {
++	protected:
++	constexpr OS_LOCK(base)() {}
++} *os_lock_t;
++
++#else
++
++#define OS_LOCK_DECL(type, size) \
++		typedef OS_LOCK_STRUCT(type) { \
++			OS_LOCK_TYPE_STRUCT(type) * const osl_type; \
++			uintptr_t _osl_##type##_opaque[size-1]; \
++		} OS_LOCK(type)
++
++#define OS_LOCK_INIT(type) { .osl_type = &OS_LOCK_TYPE_REF(type), }
++
++#ifndef OS_LOCK_T_MEMBER
++#define OS_LOCK_T_MEMBER(type) OS_LOCK_STRUCT(type) *_osl_##type
++#endif
++
++typedef OS_TRANSPARENT_UNION union {
++	OS_LOCK_T_MEMBER(base);
++	OS_LOCK_T_MEMBER(unfair);
++	OS_LOCK_T_MEMBER(nospin);
++	OS_LOCK_T_MEMBER(spin);
++	OS_LOCK_T_MEMBER(handoff);
++	OS_LOCK_T_MEMBER(eliding);
++	OS_LOCK_T_MEMBER(transactional);
++} os_lock_t;
++
++#endif
++
++/*!
++ * @typedef os_lock_unfair_s
++ *
++ * @abstract
++ * os_lock variant equivalent to os_unfair_lock. Does not spin on contention but
++ * waits in the kernel to be woken up by an unlock. The lock value contains
++ * ownership information that the system may use to attempt to resolve priority
++ * inversions.
++ *
++ * @discussion
++ * Intended as a replacement for os_lock_spin_s or OSSpinLock. Like with
++ * OSSpinLock there is no attempt at fairness or lock ordering, e.g. an unlocker
++ * can potentially immediately reacquire the lock before a woken up waiter gets
++ * an opportunity to attempt to acquire the lock, so starvation is possibile.
++ *
++ * Must be initialized with OS_LOCK_UNFAIR_INIT
++ */
++__OSX_AVAILABLE(10.12) __IOS_AVAILABLE(10.0)
++__TVOS_AVAILABLE(10.0) __WATCHOS_AVAILABLE(3.0)
++OS_EXPORT OS_LOCK_TYPE_DECL(unfair);
++OS_LOCK_DECL(unfair, 2);
++#define OS_LOCK_UNFAIR_INIT OS_LOCK_INIT(unfair)
++
++/*!
++ * @typedef os_lock_nospin_s
++ *
++ * @abstract
++ * os_lock variant that does not spin on contention but waits in the kernel to
++ * be woken up by an unlock. No attempt to resolve priority inversions is made
++ * so os_unfair_lock or os_lock_unfair_s should generally be preferred.
++ *
++ * @discussion
++ * Intended as a replacement for os_lock_spin_s or OSSpinLock. Like with
++ * OSSpinLock there is no attempt at fairness or lock ordering, e.g. an unlocker
++ * can potentially immediately reacquire the lock before a woken up waiter gets
++ * an opportunity to attempt to acquire the lock, so starvation is possibile.
++ *
++ * Must be initialized with OS_LOCK_NOSPIN_INIT
++ */
++__OSX_AVAILABLE(10.12) __IOS_AVAILABLE(10.0)
++__TVOS_AVAILABLE(10.0) __WATCHOS_AVAILABLE(3.0)
++OS_EXPORT OS_LOCK_TYPE_DECL(nospin);
++OS_LOCK_DECL(nospin, 2);
++#define OS_LOCK_NOSPIN_INIT OS_LOCK_INIT(nospin)
++
++/*!
++ * @typedef os_lock_spin_s
++ *
++ * @abstract
++ * Deprecated os_lock variant that on contention starts by spinning trying to
++ * acquire the lock, then depressing the priority of the current thread and
++ * finally blocking the thread waiting for the lock to become available.
++ * Equivalent to OSSpinLock and equally not recommended, see discussion in
++ * libkern/OSAtomic.h headerdoc.
++ *
++ * @discussion
++ * Spinlocks are intended to be held only for very brief periods of time. The
++ * critical section must not make syscalls and should avoid touching areas of
++ * memory that may trigger a page fault, in particular if the critical section
++ * may be executing on threads of widely differing priorities or on a mix of
++ * IO-throttled and unthrottled threads.
++ *
++ * Must be initialized with OS_LOCK_SPIN_INIT
++ */
++__OSX_AVAILABLE_STARTING(__MAC_10_9,__IPHONE_7_0)
++OS_EXPORT OS_LOCK_TYPE_DECL(spin);
++OS_LOCK_DECL(spin, 2);
++#define OS_LOCK_SPIN_INIT OS_LOCK_INIT(spin)
++
++/*!
++ * @typedef os_lock_handoff_s
++ *
++ * @abstract
++ * os_lock variant that on contention hands off the current kernel thread to the
++ * lock-owning userspace thread (if it is not running), temporarily overriding
++ * its priority and IO throttle if necessary.
++ *
++ * @discussion
++ * Intended for use in limited circumstances where the critical section might
++ * be executing on threads of widely differing priorities or on a mix of
++ * IO-throttled and unthrottled threads where the ordinary os_lock_spin_s would
++ * be likely to encounter a priority inversion.
++ *
++ * IMPORTANT: This lock variant is NOT intended as a general replacement for all
++ * uses of os_lock_spin_s or OSSpinLock.
++ *
++ * Must be initialized with OS_LOCK_HANDOFF_INIT
++ */
++__OSX_AVAILABLE_STARTING(__MAC_10_9,__IPHONE_7_0)
++OS_EXPORT OS_LOCK_TYPE_DECL(handoff);
++OS_LOCK_DECL(handoff, 2);
++#define OS_LOCK_HANDOFF_INIT OS_LOCK_INIT(handoff)
++
++
++#if !TARGET_OS_IPHONE
++/*!
++ * @typedef os_lock_eliding_s
++ *
++ * @abstract
++ * os_lock variant that uses hardware lock elision support if available to allow
++ * multiple processors to concurrently execute a critical section as long as
++ * they don't perform conflicting operations on each other's data. In case of
++ * conflict, the lock reverts to exclusive operation and os_lock_spin_s behavior
++ * on contention (at potential extra cost for the aborted attempt at lock-elided
++ * concurrent execution). If hardware HLE support is not present, this lock
++ * variant behaves like os_lock_spin_s.
++ *
++ * @discussion
++ * IMPORTANT: Use of this lock variant MUST be extensively tested on hardware
++ * with HLE support to ensure the data access pattern and length of the critical
++ * section allows lock-elided execution to succeed frequently enough to offset
++ * the cost of any aborted concurrent execution.
++ *
++ * Must be initialized with OS_LOCK_ELIDING_INIT
++ */
++__OSX_AVAILABLE_STARTING(__MAC_10_9,__IPHONE_NA)
++OS_EXPORT OS_LOCK_TYPE_DECL(eliding);
++OS_LOCK_DECL(eliding, 8) OS_ALIGNED(64);
++#define OS_LOCK_ELIDING_INIT OS_LOCK_INIT(eliding)
++
++/*!
++ * @typedef os_lock_transactional_s
++ *
++ * @abstract
++ * os_lock variant that uses hardware restricted transactional memory support if
++ * available to allow multiple processors to concurrently execute the critical
++ * section as a transactional region. If transactional execution aborts, the
++ * lock reverts to exclusive operation and os_lock_spin_s behavior on contention
++ * (at potential extra cost for the aborted attempt at transactional concurrent
++ * execution). If hardware RTM support is not present, this lock variant behaves
++ * like os_lock_eliding_s.
++ *
++ * @discussion
++ * IMPORTANT: Use of this lock variant MUST be extensively tested on hardware
++ * with RTM support to ensure the data access pattern and length of the critical
++ * section allows transactional execution to succeed frequently enough to offset
++ * the cost of any aborted transactions.
++ *
++ * Must be initialized with OS_LOCK_TRANSACTIONAL_INIT
++ */
++__OSX_AVAILABLE_STARTING(__MAC_10_9,__IPHONE_NA)
++OS_EXPORT OS_LOCK_TYPE_DECL(transactional);
++OS_LOCK_DECL(transactional, 8) OS_ALIGNED(64);
++#define OS_LOCK_TRANSACTIONAL_INIT OS_LOCK_INIT(transactional)
++#endif
++
++__BEGIN_DECLS
++
++/*!
++ * @function os_lock_lock
++ *
++ * @abstract
++ * Locks an os_lock variant.
++ *
++ * @param lock
++ * Pointer to one of the os_lock variants.
++ */
++__OSX_AVAILABLE_STARTING(__MAC_10_9,__IPHONE_7_0)
++OS_EXPORT OS_NOTHROW OS_NONNULL_ALL
++void os_lock_lock(os_lock_t lock);
++
++/*!
++ * @function os_lock_trylock
++ *
++ * @abstract
++ * Locks an os_lock variant if it is not already locked.
++ *
++ * @param lock
++ * Pointer to one of the os_lock variants.
++ *
++ * @result
++ * Returns true if the lock was succesfully locked and false if the lock was
++ * already locked.
++ */
++__OSX_AVAILABLE_STARTING(__MAC_10_9,__IPHONE_7_0)
++OS_EXPORT OS_NOTHROW OS_NONNULL_ALL
++bool os_lock_trylock(os_lock_t lock);
++
++/*!
++ * @function os_lock_unlock
++ *
++ * @abstract
++ * Unlocks an os_lock variant.
++ *
++ * @param lock
++ * Pointer to one of the os_lock variants.
++ */
++__OSX_AVAILABLE_STARTING(__MAC_10_9,__IPHONE_7_0)
++OS_EXPORT OS_NOTHROW OS_NONNULL_ALL
++void os_lock_unlock(os_lock_t lock);
++
++/*! @group os_unfair_lock SPI
++ *
++ * @abstract
++ * Replacement for the deprecated OSSpinLock. Does not spin on contention but
++ * waits in the kernel to be woken up by an unlock. The opaque lock value
++ * contains thread ownership information that the system may use to attempt to
++ * resolve priority inversions.
++ *
++ * This lock must be unlocked from the same thread that locked it, attemps to
++ * unlock from a different thread will cause an assertion aborting the process.
++ *
++ * This lock must not be accessed from multiple processes or threads via shared
++ * or multiply-mapped memory, the lock implementation relies on the address of
++ * the lock value and owning process.
++ *
++ * @discussion
++ * As with OSSpinLock there is no attempt at fairness or lock ordering, e.g. an
++ * unlocker can potentially immediately reacquire the lock before a woken up
++ * waiter gets an opportunity to attempt to acquire the lock. This may be
++ * advantageous for performance reasons, but also makes starvation of waiters a
++ * possibility.
++ *
++ * Must be initialized with OS_UNFAIR_LOCK_INIT
++ */
++
++/*!
++ * @typedef os_unfair_lock_options_t
++ *
++ * @const OS_UNFAIR_LOCK_DATA_SYNCHRONIZATION
++ * This flag informs the runtime that the specified lock is used for data
++ * synchronization and that the lock owner is always able to make progress
++ * toward releasing the lock without the help of another thread in the same
++ * process. This hint will cause the workqueue subsystem to not create new
++ * threads to offset for threads waiting for the lock.
++ *
++ * When this flag is used, the code running under the critical section should
++ * be well known and under your control  (Generally it should not call into
++ * framework code).
++ */
++OS_ENUM(os_unfair_lock_options, uint32_t,
++	OS_UNFAIR_LOCK_NONE
++		OS_UNFAIR_LOCK_AVAILABILITY = 0x00000000,
++	OS_UNFAIR_LOCK_DATA_SYNCHRONIZATION
++		OS_UNFAIR_LOCK_AVAILABILITY = 0x00010000,
++);
++
++/*!
++ * @function os_unfair_lock_lock_with_options
++ *
++ * @abstract
++ * Locks an os_unfair_lock.
++ *
++ * @param lock
++ * Pointer to an os_unfair_lock.
++ *
++ * @param options
++ * Options to alter the behavior of the lock. See os_unfair_lock_options_t.
++ */
++OS_UNFAIR_LOCK_AVAILABILITY
++OS_EXPORT OS_NOTHROW OS_NONNULL_ALL
++void os_unfair_lock_lock_with_options(os_unfair_lock_t lock,
++		os_unfair_lock_options_t options);
++
++/*!
++ * @function os_unfair_lock_assert_owner
++ *
++ * @abstract
++ * Asserts that the calling thread is the current owner of the specified
++ * unfair lock.
++ *
++ * @discussion
++ * If the lock is currently owned by the calling thread, this function returns.
++ *
++ * If the lock is unlocked or owned by a different thread, this function
++ * asserts and terminates the process.
++ *
++ * @param lock
++ * Pointer to an os_unfair_lock.
++ */
++OS_UNFAIR_LOCK_AVAILABILITY
++OS_EXPORT OS_NOTHROW OS_NONNULL_ALL
++void os_unfair_lock_assert_owner(os_unfair_lock_t lock);
++
++/*!
++ * @function os_unfair_lock_assert_not_owner
++ *
++ * @abstract
++ * Asserts that the calling thread is not the current owner of the specified
++ * unfair lock.
++ *
++ * @discussion
++ * If the lock is unlocked or owned by a different thread, this function
++ * returns.
++ *
++ * If the lock is currently owned by the current thread, this function asserts
++ * and terminates the process.
++ *
++ * @param lock
++ * Pointer to an os_unfair_lock.
++ */
++OS_UNFAIR_LOCK_AVAILABILITY
++OS_EXPORT OS_NOTHROW OS_NONNULL_ALL
++void os_unfair_lock_assert_not_owner(os_unfair_lock_t lock);
++
++/*! @group os_unfair_lock no-TSD interfaces
++ *
++ * Like the above, but don't require being on a thread with valid TSD, so they
++ * can be called from injected mach-threads.  The normal routines use the TSD
++ * value for mach_thread_self(), these routines use MACH_PORT_DEAD for the
++ * locked value instead.  As a result, they will be unable to resolve priority
++ * inversions.
++ *
++ * This should only be used by libpthread.
++ *
++ */
++OS_UNFAIR_LOCK_AVAILABILITY
++OS_EXPORT OS_NOTHROW OS_NONNULL_ALL
++void os_unfair_lock_lock_no_tsd_4libpthread(os_unfair_lock_t lock);
++
++OS_UNFAIR_LOCK_AVAILABILITY
++OS_EXPORT OS_NOTHROW OS_NONNULL_ALL
++void os_unfair_lock_unlock_no_tsd_4libpthread(os_unfair_lock_t lock);
++
++__END_DECLS
++
++OS_ASSUME_NONNULL_END
++
++/*! @group Inline os_unfair_lock interfaces
++ *
++ * Inline versions of the os_unfair_lock fastpath.
++ *
++ * Intended exclusively for special highly performance-sensitive cases where the
++ * function calls to the os_unfair_lock API entrypoints add measurable overhead.
++ *
++ * Do not use in frameworks to implement synchronization API primitives that are
++ * exposed to developers, that would lead to false positives for that API from
++ * tools such as ThreadSanitizer.
++ *
++ * !!!!!!!!!!!!!!!!!!!!! WARNING WARNING WARNING WARNING !!!!!!!!!!!!!!!!!!!!!
++ * DO NOT USE IN CODE THAT IS NOT PART OF THE OPERATING SYSTEM OR THAT IS NOT
++ *          REBUILT AS PART OF AN OS WORLDBUILD. YOU HAVE BEEN WARNED!
++ * !!!!!!!!!!!!!!!!!!!!! WARNING WARNING WARNING WARNING !!!!!!!!!!!!!!!!!!!!!
++ *
++ * Define OS_UNFAIR_LOCK_INLINE=1 to indicate that you have read the warning
++ * above and still wish to use these interfaces.
++ */
++
++#if defined(OS_UNFAIR_LOCK_INLINE) && OS_UNFAIR_LOCK_INLINE
++
++#include <pthread/tsd_private.h>
++
++#ifdef __cplusplus
++extern "C++" {
++#if !(__has_include(<atomic>) && __has_feature(cxx_atomic))
++#error Cannot use inline os_unfair_lock without <atomic> and C++11 atomics
++#endif
++#include <atomic>
++typedef std::atomic<os_unfair_lock> _os_atomic_unfair_lock;
++#define OSLOCK_STD(_a) std::_a
++__BEGIN_DECLS
++#else
++#if !(__has_include(<stdatomic.h>) && __has_extension(c_atomic))
++#error Cannot use inline os_unfair_lock without <stdatomic.h> and C11 atomics
++#endif
++#include <stdatomic.h>
++typedef _Atomic(os_unfair_lock) _os_atomic_unfair_lock;
++#define OSLOCK_STD(_a) _a
++#endif
++
++OS_ASSUME_NONNULL_BEGIN
++
++#if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
++#define OS_UNFAIR_LOCK_UNLOCKED ((os_unfair_lock){0})
++#elif defined(__cplusplus) && __cplusplus >= 201103L
++#define OS_UNFAIR_LOCK_UNLOCKED (os_unfair_lock{})
++#elif defined(__cplusplus)
++#define OS_UNFAIR_LOCK_UNLOCKED (os_unfair_lock())
++#else
++#define OS_UNFAIR_LOCK_UNLOCKED {0}
++#endif
++
++/*!
++ * @function os_unfair_lock_lock_inline
++ *
++ * @abstract
++ * Locks an os_unfair_lock.
++ *
++ * @param lock
++ * Pointer to an os_unfair_lock.
++ */
++OS_UNFAIR_LOCK_AVAILABILITY
++OS_INLINE OS_ALWAYS_INLINE OS_NONNULL_ALL
++void
++os_unfair_lock_lock_inline(os_unfair_lock_t lock)
++{
++	if (!_pthread_has_direct_tsd()) return os_unfair_lock_lock(lock);
++	uintptr_t mts = (uintptr_t)_pthread_getspecific_direct(
++			_PTHREAD_TSD_SLOT_MACH_THREAD_SELF);
++	os_unfair_lock unlocked = OS_UNFAIR_LOCK_UNLOCKED, locked = { mts };
++	if (!OSLOCK_STD(atomic_compare_exchange_strong_explicit)(
++			(_os_atomic_unfair_lock*)lock, &unlocked, locked,
++			OSLOCK_STD(memory_order_acquire),
++			OSLOCK_STD(memory_order_relaxed))) {
++		return os_unfair_lock_lock(lock);
++	}
++}
++
++/*!
++ * @function os_unfair_lock_lock_with_options_inline
++ *
++ * @abstract
++ * Locks an os_unfair_lock.
++ *
++ * @param lock
++ * Pointer to an os_unfair_lock.
++ *
++ * @param options
++ * Options to alter the behavior of the lock. See os_unfair_lock_options_t.
++ */
++OS_UNFAIR_LOCK_AVAILABILITY
++OS_INLINE OS_ALWAYS_INLINE OS_NONNULL_ALL
++void
++os_unfair_lock_lock_with_options_inline(os_unfair_lock_t lock,
++		os_unfair_lock_options_t options)
++{
++	if (!_pthread_has_direct_tsd()) {
++		return os_unfair_lock_lock_with_options(lock, options);
++	}
++	uintptr_t mts = (uintptr_t)_pthread_getspecific_direct(
++			_PTHREAD_TSD_SLOT_MACH_THREAD_SELF);
++	os_unfair_lock unlocked = OS_UNFAIR_LOCK_UNLOCKED, locked = { mts };
++	if (!OSLOCK_STD(atomic_compare_exchange_strong_explicit)(
++			(_os_atomic_unfair_lock*)lock, &unlocked, locked,
++			OSLOCK_STD(memory_order_acquire),
++			OSLOCK_STD(memory_order_relaxed))) {
++		return os_unfair_lock_lock_with_options(lock, options);
++	}
++}
++
++/*!
++ * @function os_unfair_lock_trylock_inline
++ *
++ * @abstract
++ * Locks an os_unfair_lock if it is not already locked.
++ *
++ * @discussion
++ * It is invalid to surround this function with a retry loop, if this function
++ * returns false, the program must be able to proceed without having acquired
++ * the lock, or it must call os_unfair_lock_lock_inline() instead.
++ *
++ * @param lock
++ * Pointer to an os_unfair_lock.
++ *
++ * @result
++ * Returns true if the lock was succesfully locked and false if the lock was
++ * already locked.
++ */
++OS_UNFAIR_LOCK_AVAILABILITY
++OS_INLINE OS_ALWAYS_INLINE OS_WARN_RESULT OS_NONNULL_ALL
++bool
++os_unfair_lock_trylock_inline(os_unfair_lock_t lock)
++{
++	if (!_pthread_has_direct_tsd()) return os_unfair_lock_trylock(lock);
++	uintptr_t mts = (uintptr_t)_pthread_getspecific_direct(
++			_PTHREAD_TSD_SLOT_MACH_THREAD_SELF);
++	os_unfair_lock unlocked = OS_UNFAIR_LOCK_UNLOCKED, locked = { mts };
++	return OSLOCK_STD(atomic_compare_exchange_strong_explicit)(
++			(_os_atomic_unfair_lock*)lock, &unlocked, locked,
++			OSLOCK_STD(memory_order_acquire), OSLOCK_STD(memory_order_relaxed));
++}
++
++/*!
++ * @function os_unfair_lock_unlock_inline
++ *
++ * @abstract
++ * Unlocks an os_unfair_lock.
++ *
++ * @param lock
++ * Pointer to an os_unfair_lock.
++ */
++OS_UNFAIR_LOCK_AVAILABILITY
++OS_INLINE OS_ALWAYS_INLINE OS_NONNULL_ALL
++void
++os_unfair_lock_unlock_inline(os_unfair_lock_t lock)
++{
++	if (!_pthread_has_direct_tsd()) return os_unfair_lock_unlock(lock);
++	uintptr_t mts = (uintptr_t)_pthread_getspecific_direct(
++			_PTHREAD_TSD_SLOT_MACH_THREAD_SELF);
++	os_unfair_lock unlocked = OS_UNFAIR_LOCK_UNLOCKED, locked = { mts };
++	if (!OSLOCK_STD(atomic_compare_exchange_strong_explicit)(
++			(_os_atomic_unfair_lock*)lock, &locked, unlocked,
++			OSLOCK_STD(memory_order_release),
++			OSLOCK_STD(memory_order_relaxed))) {
++		return os_unfair_lock_unlock(lock);
++	}
++}
++
++/*!
++ * @function os_unfair_lock_lock_inline_no_tsd_4libpthread
++ *
++ * @abstract
++ * Locks an os_unfair_lock, without requiring valid TSD.
++ *
++ * This should only be used by libpthread.
++ *
++ * @param lock
++ * Pointer to an os_unfair_lock.
++ */
++OS_UNFAIR_LOCK_AVAILABILITY
++OS_INLINE OS_ALWAYS_INLINE OS_NONNULL_ALL
++void
++os_unfair_lock_lock_inline_no_tsd_4libpthread(os_unfair_lock_t lock)
++{
++	uintptr_t mts = (uintptr_t)MACH_PORT_DEAD;
++	os_unfair_lock unlocked = OS_UNFAIR_LOCK_UNLOCKED, locked = { mts };
++	if (!OSLOCK_STD(atomic_compare_exchange_strong_explicit)(
++			(_os_atomic_unfair_lock*)lock, &unlocked, locked,
++			OSLOCK_STD(memory_order_acquire),
++			OSLOCK_STD(memory_order_relaxed))) {
++		return os_unfair_lock_lock_no_tsd_4libpthread(lock);
++	}
++}
++
++/*!
++ * @function os_unfair_lock_unlock_inline_no_tsd_4libpthread
++ *
++ * @abstract
++ * Unlocks an os_unfair_lock, without requiring valid TSD.
++ *
++ * This should only be used by libpthread.
++ *
++ * @param lock
++ * Pointer to an os_unfair_lock.
++ */
++OS_UNFAIR_LOCK_AVAILABILITY
++OS_INLINE OS_ALWAYS_INLINE OS_NONNULL_ALL
++void
++os_unfair_lock_unlock_inline_no_tsd_4libpthread(os_unfair_lock_t lock)
++{
++	uintptr_t mts = (uintptr_t)MACH_PORT_DEAD;
++	os_unfair_lock unlocked = OS_UNFAIR_LOCK_UNLOCKED, locked = { mts };
++	if (!OSLOCK_STD(atomic_compare_exchange_strong_explicit)(
++			(_os_atomic_unfair_lock*)lock, &locked, unlocked,
++			OSLOCK_STD(memory_order_release),
++			OSLOCK_STD(memory_order_relaxed))) {
++		return os_unfair_lock_unlock_no_tsd_4libpthread(lock);
++	}
++}
++
++OS_ASSUME_NONNULL_END
++
++#undef OSLOCK_STD
++#ifdef __cplusplus
++__END_DECLS
++} // extern "C++"
++#endif
++
++#endif // OS_UNFAIR_LOCK_INLINE
++
++#endif // __OS_LOCK_PRIVATE__
+diff --git a/xnu-4570.41.2/APPLE_LICENSE b/xnu-4570.41.2/APPLE_LICENSE
+new file mode 100644
+index 0000000..fe81a60
+--- /dev/null
++++ b/xnu-4570.41.2/APPLE_LICENSE
+@@ -0,0 +1,367 @@
++APPLE PUBLIC SOURCE LICENSE
++Version 2.0 - August 6, 2003
++
++Please read this License carefully before downloading this software.
++By downloading or using this software, you are agreeing to be bound by
++the terms of this License. If you do not or cannot agree to the terms
++of this License, please do not download or use the software.
++
++1. General; Definitions. This License applies to any program or other
++work which Apple Computer, Inc. ("Apple") makes publicly available and
++which contains a notice placed by Apple identifying such program or
++work as "Original Code" and stating that it is subject to the terms of
++this Apple Public Source License version 2.0 ("License"). As used in
++this License:
++
++1.1 "Applicable Patent Rights" mean: (a) in the case where Apple is
++the grantor of rights, (i) claims of patents that are now or hereafter
++acquired, owned by or assigned to Apple and (ii) that cover subject
++matter contained in the Original Code, but only to the extent
++necessary to use, reproduce and/or distribute the Original Code
++without infringement; and (b) in the case where You are the grantor of
++rights, (i) claims of patents that are now or hereafter acquired,
++owned by or assigned to You and (ii) that cover subject matter in Your
++Modifications, taken alone or in combination with Original Code.
++
++1.2 "Contributor" means any person or entity that creates or
++contributes to the creation of Modifications.
++
++1.3 "Covered Code" means the Original Code, Modifications, the
++combination of Original Code and any Modifications, and/or any
++respective portions thereof.
++
++1.4 "Externally Deploy" means: (a) to sublicense, distribute or
++otherwise make Covered Code available, directly or indirectly, to
++anyone other than You; and/or (b) to use Covered Code, alone or as
++part of a Larger Work, in any way to provide a service, including but
++not limited to delivery of content, through electronic communication
++with a client other than You.
++
++1.5 "Larger Work" means a work which combines Covered Code or portions
++thereof with code not governed by the terms of this License.
++
++1.6 "Modifications" mean any addition to, deletion from, and/or change
++to, the substance and/or structure of the Original Code, any previous
++Modifications, the combination of Original Code and any previous
++Modifications, and/or any respective portions thereof. When code is
++released as a series of files, a Modification is: (a) any addition to
++or deletion from the contents of a file containing Covered Code;
++and/or (b) any new file or other representation of computer program
++statements that contains any part of Covered Code.
++
++1.7 "Original Code" means (a) the Source Code of a program or other
++work as originally made available by Apple under this License,
++including the Source Code of any updates or upgrades to such programs
++or works made available by Apple under this License, and that has been
++expressly identified by Apple as such in the header file(s) of such
++work; and (b) the object code compiled from such Source Code and
++originally made available by Apple under this License.
++
++1.8 "Source Code" means the human readable form of a program or other
++work that is suitable for making modifications to it, including all
++modules it contains, plus any associated interface definition files,
++scripts used to control compilation and installation of an executable
++(object code).
++
++1.9 "You" or "Your" means an individual or a legal entity exercising
++rights under this License. For legal entities, "You" or "Your"
++includes any entity which controls, is controlled by, or is under
++common control with, You, where "control" means (a) the power, direct
++or indirect, to cause the direction or management of such entity,
++whether by contract or otherwise, or (b) ownership of fifty percent
++(50%) or more of the outstanding shares or beneficial ownership of
++such entity.
++
++2. Permitted Uses; Conditions & Restrictions. Subject to the terms
++and conditions of this License, Apple hereby grants You, effective on
++the date You accept this License and download the Original Code, a
++world-wide, royalty-free, non-exclusive license, to the extent of
++Apple's Applicable Patent Rights and copyrights covering the Original
++Code, to do the following:
++
++2.1 Unmodified Code. You may use, reproduce, display, perform,
++internally distribute within Your organization, and Externally Deploy
++verbatim, unmodified copies of the Original Code, for commercial or
++non-commercial purposes, provided that in each instance:
++
++(a) You must retain and reproduce in all copies of Original Code the
++copyright and other proprietary notices and disclaimers of Apple as
++they appear in the Original Code, and keep intact all notices in the
++Original Code that refer to this License; and
++
++(b) You must include a copy of this License with every copy of Source
++Code of Covered Code and documentation You distribute or Externally
++Deploy, and You may not offer or impose any terms on such Source Code
++that alter or restrict this License or the recipients' rights
++hereunder, except as permitted under Section 6.
++
++2.2 Modified Code. You may modify Covered Code and use, reproduce,
++display, perform, internally distribute within Your organization, and
++Externally Deploy Your Modifications and Covered Code, for commercial
++or non-commercial purposes, provided that in each instance You also
++meet all of these conditions:
++
++(a) You must satisfy all the conditions of Section 2.1 with respect to
++the Source Code of the Covered Code;
++
++(b) You must duplicate, to the extent it does not already exist, the
++notice in Exhibit A in each file of the Source Code of all Your
++Modifications, and cause the modified files to carry prominent notices
++stating that You changed the files and the date of any change; and
++
++(c) If You Externally Deploy Your Modifications, You must make
++Source Code of all Your Externally Deployed Modifications either
++available to those to whom You have Externally Deployed Your
++Modifications, or publicly available. Source Code of Your Externally
++Deployed Modifications must be released under the terms set forth in
++this License, including the license grants set forth in Section 3
++below, for as long as you Externally Deploy the Covered Code or twelve
++(12) months from the date of initial External Deployment, whichever is
++longer. You should preferably distribute the Source Code of Your
++Externally Deployed Modifications electronically (e.g. download from a
++web site).
++
++2.3 Distribution of Executable Versions. In addition, if You
++Externally Deploy Covered Code (Original Code and/or Modifications) in
++object code, executable form only, You must include a prominent
++notice, in the code itself as well as in related documentation,
++stating that Source Code of the Covered Code is available under the
++terms of this License with information on how and where to obtain such
++Source Code.
++
++2.4 Third Party Rights. You expressly acknowledge and agree that
++although Apple and each Contributor grants the licenses to their
++respective portions of the Covered Code set forth herein, no
++assurances are provided by Apple or any Contributor that the Covered
++Code does not infringe the patent or other intellectual property
++rights of any other entity. Apple and each Contributor disclaim any
++liability to You for claims brought by any other entity based on
++infringement of intellectual property rights or otherwise. As a
++condition to exercising the rights and licenses granted hereunder, You
++hereby assume sole responsibility to secure any other intellectual
++property rights needed, if any. For example, if a third party patent
++license is required to allow You to distribute the Covered Code, it is
++Your responsibility to acquire that license before distributing the
++Covered Code.
++
++3. Your Grants. In consideration of, and as a condition to, the
++licenses granted to You under this License, You hereby grant to any
++person or entity receiving or distributing Covered Code under this
++License a non-exclusive, royalty-free, perpetual, irrevocable license,
++under Your Applicable Patent Rights and other intellectual property
++rights (other than patent) owned or controlled by You, to use,
++reproduce, display, perform, modify, sublicense, distribute and
++Externally Deploy Your Modifications of the same scope and extent as
++Apple's licenses under Sections 2.1 and 2.2 above.
++
++4. Larger Works. You may create a Larger Work by combining Covered
++Code with other code not governed by the terms of this License and
++distribute the Larger Work as a single product. In each such instance,
++You must make sure the requirements of this License are fulfilled for
++the Covered Code or any portion thereof.
++
++5. Limitations on Patent License. Except as expressly stated in
++Section 2, no other patent rights, express or implied, are granted by
++Apple herein. Modifications and/or Larger Works may require additional
++patent licenses from Apple which Apple may grant in its sole
++discretion.
++
++6. Additional Terms. You may choose to offer, and to charge a fee for,
++warranty, support, indemnity or liability obligations and/or other
++rights consistent with the scope of the license granted herein
++("Additional Terms") to one or more recipients of Covered Code.
++However, You may do so only on Your own behalf and as Your sole
++responsibility, and not on behalf of Apple or any Contributor. You
++must obtain the recipient's agreement that any such Additional Terms
++are offered by You alone, and You hereby agree to indemnify, defend
++and hold Apple and every Contributor harmless for any liability
++incurred by or claims asserted against Apple or such Contributor by
++reason of any such Additional Terms.
++
++7. Versions of the License. Apple may publish revised and/or new
++versions of this License from time to time. Each version will be given
++a distinguishing version number. Once Original Code has been published
++under a particular version of this License, You may continue to use it
++under the terms of that version. You may also choose to use such
++Original Code under the terms of any subsequent version of this
++License published by Apple. No one other than Apple has the right to
++modify the terms applicable to Covered Code created under this
++License.
++
++8. NO WARRANTY OR SUPPORT. The Covered Code may contain in whole or in
++part pre-release, untested, or not fully tested works. The Covered
++Code may contain errors that could cause failures or loss of data, and
++may be incomplete or contain inaccuracies. You expressly acknowledge
++and agree that use of the Covered Code, or any portion thereof, is at
++Your sole and entire risk. THE COVERED CODE IS PROVIDED "AS IS" AND
++WITHOUT WARRANTY, UPGRADES OR SUPPORT OF ANY KIND AND APPLE AND
++APPLE'S LICENSOR(S) (COLLECTIVELY REFERRED TO AS "APPLE" FOR THE
++PURPOSES OF SECTIONS 8 AND 9) AND ALL CONTRIBUTORS EXPRESSLY DISCLAIM
++ALL WARRANTIES AND/OR CONDITIONS, EXPRESS OR IMPLIED, INCLUDING, BUT
++NOT LIMITED TO, THE IMPLIED WARRANTIES AND/OR CONDITIONS OF
++MERCHANTABILITY, OF SATISFACTORY QUALITY, OF FITNESS FOR A PARTICULAR
++PURPOSE, OF ACCURACY, OF QUIET ENJOYMENT, AND NONINFRINGEMENT OF THIRD
++PARTY RIGHTS. APPLE AND EACH CONTRIBUTOR DOES NOT WARRANT AGAINST
++INTERFERENCE WITH YOUR ENJOYMENT OF THE COVERED CODE, THAT THE
++FUNCTIONS CONTAINED IN THE COVERED CODE WILL MEET YOUR REQUIREMENTS,
++THAT THE OPERATION OF THE COVERED CODE WILL BE UNINTERRUPTED OR
++ERROR-FREE, OR THAT DEFECTS IN THE COVERED CODE WILL BE CORRECTED. NO
++ORAL OR WRITTEN INFORMATION OR ADVICE GIVEN BY APPLE, AN APPLE
++AUTHORIZED REPRESENTATIVE OR ANY CONTRIBUTOR SHALL CREATE A WARRANTY.
++You acknowledge that the Covered Code is not intended for use in the
++operation of nuclear facilities, aircraft navigation, communication
++systems, or air traffic control machines in which case the failure of
++the Covered Code could lead to death, personal injury, or severe
++physical or environmental damage.
++
++9. LIMITATION OF LIABILITY. TO THE EXTENT NOT PROHIBITED BY LAW, IN NO
++EVENT SHALL APPLE OR ANY CONTRIBUTOR BE LIABLE FOR ANY INCIDENTAL,
++SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES ARISING OUT OF OR RELATING
++TO THIS LICENSE OR YOUR USE OR INABILITY TO USE THE COVERED CODE, OR
++ANY PORTION THEREOF, WHETHER UNDER A THEORY OF CONTRACT, WARRANTY,
++TORT (INCLUDING NEGLIGENCE), PRODUCTS LIABILITY OR OTHERWISE, EVEN IF
++APPLE OR SUCH CONTRIBUTOR HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
++DAMAGES AND NOTWITHSTANDING THE FAILURE OF ESSENTIAL PURPOSE OF ANY
++REMEDY. SOME JURISDICTIONS DO NOT ALLOW THE LIMITATION OF LIABILITY OF
++INCIDENTAL OR CONSEQUENTIAL DAMAGES, SO THIS LIMITATION MAY NOT APPLY
++TO YOU. In no event shall Apple's total liability to You for all
++damages (other than as may be required by applicable law) under this
++License exceed the amount of fifty dollars ($50.00).
++
++10. Trademarks. This License does not grant any rights to use the
++trademarks or trade names "Apple", "Apple Computer", "Mac", "Mac OS",
++"QuickTime", "QuickTime Streaming Server" or any other trademarks,
++service marks, logos or trade names belonging to Apple (collectively
++"Apple Marks") or to any trademark, service mark, logo or trade name
++belonging to any Contributor. You agree not to use any Apple Marks in
++or as part of the name of products derived from the Original Code or
++to endorse or promote products derived from the Original Code other
++than as expressly permitted by and in strict compliance at all times
++with Apple's third party trademark usage guidelines which are posted
++at http://www.apple.com/legal/guidelinesfor3rdparties.html.
++
++11. Ownership. Subject to the licenses granted under this License,
++each Contributor retains all rights, title and interest in and to any
++Modifications made by such Contributor. Apple retains all rights,
++title and interest in and to the Original Code and any Modifications
++made by or on behalf of Apple ("Apple Modifications"), and such Apple
++Modifications will not be automatically subject to this License. Apple
++may, at its sole discretion, choose to license such Apple
++Modifications under this License, or on different terms from those
++contained in this License or may choose not to license them at all.
++
++12. Termination.
++
++12.1 Termination. This License and the rights granted hereunder will
++terminate:
++
++(a) automatically without notice from Apple if You fail to comply with
++any term(s) of this License and fail to cure such breach within 30
++days of becoming aware of such breach;
++
++(b) immediately in the event of the circumstances described in Section
++13.5(b); or
++
++(c) automatically without notice from Apple if You, at any time during
++the term of this License, commence an action for patent infringement
++against Apple; provided that Apple did not first commence
++an action for patent infringement against You in that instance.
++
++12.2 Effect of Termination. Upon termination, You agree to immediately
++stop any further use, reproduction, modification, sublicensing and
++distribution of the Covered Code. All sublicenses to the Covered Code
++which have been properly granted prior to termination shall survive
++any termination of this License. Provisions which, by their nature,
++should remain in effect beyond the termination of this License shall
++survive, including but not limited to Sections 3, 5, 8, 9, 10, 11,
++12.2 and 13. No party will be liable to any other for compensation,
++indemnity or damages of any sort solely as a result of terminating
++this License in accordance with its terms, and termination of this
++License will be without prejudice to any other right or remedy of
++any party.
++
++13. Miscellaneous.
++
++13.1 Government End Users. The Covered Code is a "commercial item" as
++defined in FAR 2.101. Government software and technical data rights in
++the Covered Code include only those rights customarily provided to the
++public as defined in this License. This customary commercial license
++in technical data and software is provided in accordance with FAR
++12.211 (Technical Data) and 12.212 (Computer Software) and, for
++Department of Defense purchases, DFAR 252.227-7015 (Technical Data --
++Commercial Items) and 227.7202-3 (Rights in Commercial Computer
++Software or Computer Software Documentation). Accordingly, all U.S.
++Government End Users acquire Covered Code with only those rights set
++forth herein.
++
++13.2 Relationship of Parties. This License will not be construed as
++creating an agency, partnership, joint venture or any other form of
++legal association between or among You, Apple or any Contributor, and
++You will not represent to the contrary, whether expressly, by
++implication, appearance or otherwise.
++
++13.3 Independent Development. Nothing in this License will impair
++Apple's right to acquire, license, develop, have others develop for
++it, market and/or distribute technology or products that perform the
++same or similar functions as, or otherwise compete with,
++Modifications, Larger Works, technology or products that You may
++develop, produce, market or distribute.
++
++13.4 Waiver; Construction. Failure by Apple or any Contributor to
++enforce any provision of this License will not be deemed a waiver of
++future enforcement of that or any other provision. Any law or
++regulation which provides that the language of a contract shall be
++construed against the drafter will not apply to this License.
++
++13.5 Severability. (a) If for any reason a court of competent
++jurisdiction finds any provision of this License, or portion thereof,
++to be unenforceable, that provision of the License will be enforced to
++the maximum extent permissible so as to effect the economic benefits
++and intent of the parties, and the remainder of this License will
++continue in full force and effect. (b) Notwithstanding the foregoing,
++if applicable law prohibits or restricts You from fully and/or
++specifically complying with Sections 2 and/or 3 or prevents the
++enforceability of either of those Sections, this License will
++immediately terminate and You must immediately discontinue any use of
++the Covered Code and destroy all copies of it that are in your
++possession or control.
++
++13.6 Dispute Resolution. Any litigation or other dispute resolution
++between You and Apple relating to this License shall take place in the
++Northern District of California, and You and Apple hereby consent to
++the personal jurisdiction of, and venue in, the state and federal
++courts within that District with respect to this License. The
++application of the United Nations Convention on Contracts for the
++International Sale of Goods is expressly excluded.
++
++13.7 Entire Agreement; Governing Law. This License constitutes the
++entire agreement between the parties with respect to the subject
++matter hereof. This License shall be governed by the laws of the
++United States and the State of California, except that body of
++California law concerning conflicts of law.
++
++Where You are located in the province of Quebec, Canada, the following
++clause applies: The parties hereby confirm that they have requested
++that this License and all related documents be drafted in English. Les
++parties ont exige que le present contrat et tous les documents
++connexes soient rediges en anglais.
++
++EXHIBIT A.
++
++"Portions Copyright (c) 1999-2003 Apple Computer, Inc. All Rights
++Reserved.
++
++This file contains Original Code and/or Modifications of Original Code
++as defined in and that are subject to the Apple Public Source License
++Version 2.0 (the 'License'). You may not use this file except in
++compliance with the License. Please obtain a copy of the License at
++http://www.opensource.apple.com/apsl/ and read it before using this
++file.
++
++The Original Code and all software distributed under the License are
++distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
++EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
++INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
++Please see the License for the specific language governing rights and
++limitations under the License."
+diff --git a/xnu-4570.41.2/bsd/sys/reason.h b/xnu-4570.41.2/bsd/sys/reason.h
+new file mode 100644
+index 0000000..a7dc43f
+--- /dev/null
++++ b/xnu-4570.41.2/bsd/sys/reason.h
+@@ -0,0 +1,238 @@
++/*
++ * Copyright (c) 2016 Apple Inc. All rights reserved.
++ *
++ * @APPLE_OSREFERENCE_LICENSE_HEADER_START@
++ *
++ * This file contains Original Code and/or Modifications of Original Code
++ * as defined in and that are subject to the Apple Public Source License
++ * Version 2.0 (the 'License'). You may not use this file except in
++ * compliance with the License. The rights granted to you under the License
++ * may not be used to create, or enable the creation or redistribution of,
++ * unlawful or unlicensed copies of an Apple operating system, or to
++ * circumvent, violate, or enable the circumvention or violation of, any
++ * terms of an Apple operating system software license agreement.
++ *
++ * Please obtain a copy of the License at
++ * http://www.opensource.apple.com/apsl/ and read it before using this file.
++ *
++ * The Original Code and all software distributed under the License are
++ * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
++ * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
++ * INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
++ * Please see the License for the specific language governing rights and
++ * limitations under the License.
++ *
++ * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
++ */
++
++#ifndef _REASON_H_
++#define _REASON_H_
++
++#include <stdint.h>
++
++__BEGIN_DECLS
++
++#ifdef KERNEL_PRIVATE
++
++#include <kern/kern_cdata.h>
++
++#ifdef XNU_KERNEL_PRIVATE
++#include <kern/locks.h>
++
++typedef struct os_reason {
++	decl_lck_mtx_data(,       	osr_lock)
++	unsigned int			osr_refcount;
++	uint32_t			osr_namespace;
++	uint64_t			osr_code;
++	uint64_t			osr_flags;
++	uint32_t			osr_bufsize;
++	struct kcdata_descriptor	osr_kcd_descriptor;
++	char 				*osr_kcd_buf;
++} *os_reason_t;
++
++#define OS_REASON_NULL ((os_reason_t) 0)
++
++/* We only include 800 bytes of the exit reason description to not blow through the panic buffer */
++#define LAUNCHD_PANIC_REASON_STRING_MAXLEN "800"
++
++void os_reason_init(void);
++
++os_reason_t build_userspace_exit_reason(uint32_t reason_namespace, uint64_t reason_code, user_addr_t payload, uint32_t payload_size,
++					user_addr_t reason_string, uint64_t reason_flags);
++char *launchd_exit_reason_get_string_desc(os_reason_t exit_reason);
++
++/* The blocking allocation is currently not exported to KEXTs */
++int os_reason_alloc_buffer(os_reason_t cur_reason, uint32_t osr_bufsize);
++
++#else /* XNU_KERNEL_PRIVATE */
++
++typedef void * os_reason_t;
++
++#endif /* XNU_KERNEL_PRIVATE */
++
++os_reason_t os_reason_create(uint32_t osr_namespace, uint64_t osr_code);
++int os_reason_alloc_buffer_noblock(os_reason_t cur_reason, uint32_t osr_bufsize);
++struct kcdata_descriptor * os_reason_get_kcdata_descriptor(os_reason_t cur_reason);
++void os_reason_ref(os_reason_t cur_reason);
++void os_reason_free(os_reason_t cur_reason);
++
++#endif /* KERNEL_PRIVATE */
++
++/*
++ * Reason namespaces.
++ */
++#define OS_REASON_INVALID       0
++#define OS_REASON_JETSAM        1
++#define OS_REASON_SIGNAL        2
++#define OS_REASON_CODESIGNING   3
++#define OS_REASON_HANGTRACER    4
++#define OS_REASON_TEST          5
++#define OS_REASON_DYLD          6
++#define OS_REASON_LIBXPC        7
++#define OS_REASON_OBJC          8
++#define OS_REASON_EXEC          9
++#define OS_REASON_SPRINGBOARD   10
++#define OS_REASON_TCC           11
++#define OS_REASON_REPORTCRASH   12
++#define OS_REASON_COREANIMATION 13
++#define OS_REASON_AGGREGATED    14
++#define OS_REASON_ASSERTIOND    15
++#define OS_REASON_SKYWALK       16
++#define OS_REASON_SETTINGS      17
++#define OS_REASON_LIBSYSTEM     18
++#define OS_REASON_FOUNDATION    19
++#define OS_REASON_WATCHDOG      20
++#define OS_REASON_METAL         21
++#define OS_REASON_WATCHKIT      22
++
++/*
++ * Update whenever new OS_REASON namespaces are added.
++ */
++#define OS_REASON_MAX_VALID_NAMESPACE OS_REASON_WATCHKIT
++
++#define OS_REASON_BUFFER_MAX_SIZE 5120
++
++#define OS_REASON_FLAG_NO_CRASH_REPORT          0x1   /* Don't create a crash report */
++#define OS_REASON_FLAG_GENERATE_CRASH_REPORT    0x2   /* Create a crash report - the default for userspace requests */
++#define OS_REASON_FLAG_FROM_USERSPACE           0x4   /* Reason created from a userspace syscall */
++#define OS_REASON_FLAG_FAILED_DATA_COPYIN       0x8   /* We failed to copyin data from userspace */
++#define OS_REASON_FLAG_PAYLOAD_TRUNCATED        0x10  /* The payload was truncated because it was longer than allowed */
++#define OS_REASON_FLAG_BAD_PARAMS               0x20  /* Invalid parameters were passed involved with creating this reason */
++#define OS_REASON_FLAG_CONSISTENT_FAILURE       0x40  /* Whatever caused this reason to be created will happen again */
++#define OS_REASON_FLAG_ONE_TIME_FAILURE         0x80  /* Whatever caused this reason to be created was a one time issue */
++#define OS_REASON_FLAG_NO_CRASHED_TID           0x100 /* Don't include the TID that processed the exit in the crash report */
++
++/*
++ * Set of flags that are allowed to be passed from userspace
++ */
++#define OS_REASON_FLAG_MASK_ALLOWED_FROM_USER	(OS_REASON_FLAG_CONSISTENT_FAILURE | OS_REASON_FLAG_ONE_TIME_FAILURE | OS_REASON_FLAG_NO_CRASH_REPORT)
++
++/*
++ * Macros to encode the exit reason namespace and first 32 bits of code in exception code
++ * which is used by Report Crash as a hint. It should be only used as a hint since it
++ * looses higher 32 bits of exit reason code.
++ */
++#define ENCODE_OSR_NAMESPACE_TO_MACH_EXCEPTION_CODE(code, osr_namespace) \
++	(code) = (code) | (((osr_namespace) & ((uint64_t)UINT32_MAX)) << 32)
++#define ENCODE_OSR_CODE_TO_MACH_EXCEPTION_CODE(code, osr_code) \
++	(code) = (code) | ((osr_code) & ((uint64_t)UINT32_MAX))
++
++#ifndef KERNEL
++/*
++ * abort_with_reason: Used to exit the current process and pass along
++ *                    specific information about why it is being terminated.
++ *
++ * Inputs:              args->reason_namespace - OS_REASON namespace specified for the reason
++ *                      args->reason_code - code in the specified namespace for the reason
++ *                      args->reason_string - additional string formatted information about the request
++ *                      args->reason_flags - options requested for how the process should be terminated (see OS_REASON_FLAG_* above).
++ *
++ * Outputs:             Does not return.
++ */
++void abort_with_reason(uint32_t reason_namespace, uint64_t reason_code, const char *reason_string, uint64_t reason_flags) __attribute__((noreturn));
++
++/*
++ * abort_with_payload: Used to exit the current process and pass along
++ *                     specific information about why it is being terminated. The payload pointer
++ *                     should point to structured data that can be interpreted by the consumer of
++ *                     exit reason information.
++ *
++ * Inputs:              args->reason_namespace - OS_REASON namespace specified for the reason
++ *                      args->reason_code - code in the specified namespace for the reason
++ *                      args->payload - pointer to payload structure in user space
++ *                      args->payload_size - length of payload buffer (this will be truncated to EXIT_REASON_PAYLOAD_MAX_LEN)
++ *                      args->reason_string - additional string formatted information about the request
++ *                      args->reason_flags - options requested for how the process should be terminated (see OS_REASON_FLAG_* above).
++ *
++ * Outputs:             Does not return.
++ */
++void abort_with_payload(uint32_t reason_namespace, uint64_t reason_code, void *payload, uint32_t payload_size, const char *reason_string,
++                                uint64_t reason_flags) __attribute__((noreturn));
++
++/*
++ * terminate_with_reason: Used to terminate a specific process and pass along
++ *                        specific information about why it is being terminated.
++ *
++ * Inputs:              args->pid - the PID of the process to be terminated
++ *                      args->reason_namespace - OS_REASON namespace specified for the reason
++ *                      args->reason_code - code in the specified namespace for the reason
++ *                      args->reason_string - additional string formatted information about the request
++ *                      args->reason_flags - options requested for how the process should be terminated (see OS_REASON_FLAG_* above)
++ *
++ * Outputs:             EINVAL if the PID requested is the same as that of the calling process, invalid or the namespace provided is invalid.
++ *                      ESRCH if we couldn't find a live process with the requested PID
++ *                      EPERM if the caller is not privileged enough to kill the process with the requested PID
++ *                      returns 0 otherwise
++ */
++int terminate_with_reason(int pid, uint32_t reason_namespace, uint64_t reason_code, const char *reason_string, uint64_t reason_flags);
++
++/*
++ * terminate_with_payload: Used to terminate a specific process and pass along
++ *                         specific information about why it is being terminated. The payload pointer
++ *                         should point to structured data that can be interpreted by the consumer of
++ *                         exit reason information.
++ *
++ * Inputs:              args->pid - the PID of the process to be terminated.
++ *                      args->reason_namespace - OS_REASON namespace specified for the reason
++ *                      args->reason_code - code in the specified namespace for the reason
++ *                      args->payload - pointer to payload structure in user space
++ *                      args->payload_size - length of payload buffer (this will be truncated to EXIT_REASON_PAYLOAD_MAX_LEN)
++ *                      args->reason_string - additional string formatted information about the request
++ *                      args->reason_flags - options requested for how the process should be terminated (see OS_REASON_FLAG_* above)
++ *
++ * Outputs:             EINVAL if the PID requested is the same as that of the calling process, is invalid or the namespace provided is invalid.
++ *                      ESRCH if we couldn't find a live process with the requested PID
++ *                      EPERM if the caller is not privileged enough to kill the process with the requested PID
++ *                      returns 0 otherwise
++ */
++int terminate_with_payload(int pid, uint32_t reason_namespace, uint64_t reason_code, void *payload, uint32_t payload_size,
++                                const char *reason_string, uint64_t reason_flags);
++#endif /* KERNEL */
++
++/*
++ * codesigning exit reasons
++ */
++#define CODESIGNING_EXIT_REASON_TASKGATED_INVALID_SIG 1
++#define CODESIGNING_EXIT_REASON_INVALID_PAGE          2
++#define CODESIGNING_EXIT_REASON_TASK_ACCESS_PORT      3
++
++/*
++ * exec path specific exit reasons
++ */
++#define EXEC_EXIT_REASON_BAD_MACHO          1
++#define EXEC_EXIT_REASON_SUGID_FAILURE      2
++#define EXEC_EXIT_REASON_ACTV_THREADSTATE   3
++#define EXEC_EXIT_REASON_STACK_ALLOC        4
++#define EXEC_EXIT_REASON_APPLE_STRING_INIT  5
++#define EXEC_EXIT_REASON_COPYOUT_STRINGS    6
++#define EXEC_EXIT_REASON_COPYOUT_DYNLINKER  7
++#define EXEC_EXIT_REASON_SECURITY_POLICY    8
++#define EXEC_EXIT_REASON_TASKGATED_OTHER    9
++#define EXEC_EXIT_REASON_FAIRPLAY_DECRYPT   10
++#define EXEC_EXIT_REASON_DECRYPT            11
++#define EXEC_EXIT_REASON_UPX                12
++
++__END_DECLS
++
++#endif /* _REASON_H_ */
+-- 
+2.18.0.windows.1
+

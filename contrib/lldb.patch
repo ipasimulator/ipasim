@@ -1,0 +1,315 @@
+From 79d1abd3e15cf1fc1064f4a4b41017f626edec8e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20Jone=C5=A1?= <jjones@outlook.cz>
+Date: Sun, 12 May 2019 08:43:45 +0200
+Subject: [PATCH] Squash branch `port_70`
+
+---
+ .gitignore                                    |  2 +
+ source/API/CMakeLists.txt                     |  3 +-
+ source/API/SystemInitializerFull.cpp          |  9 +++--
+ .../SystemInitializerCommon.cpp               |  6 +++
+ source/Plugins/CMakeLists.txt                 |  3 +-
+ .../ASan/ASanRuntime.cpp                      |  0
+ .../ASan/ASanRuntime.h                        |  0
+ .../ASan/CMakeLists.txt                       |  0
+ .../CMakeLists.txt                            |  0
+ .../MainThreadChecker/CMakeLists.txt          |  0
+ .../MainThreadCheckerRuntime.cpp              |  0
+ .../MainThreadCheckerRuntime.h                |  0
+ .../TSan/CMakeLists.txt                       |  0
+ .../TSan/TSanRuntime.cpp                      |  0
+ .../TSan/TSanRuntime.h                        |  0
+ .../UBSan/CMakeLists.txt                      |  0
+ .../UBSan/UBSanRuntime.cpp                    |  0
+ .../UBSan/UBSanRuntime.h                      |  0
+ .../Utility/RegisterContextDarwin_arm.cpp     | 38 +++++++++++++++----
+ .../Utility/RegisterContextDarwin_arm64.cpp   | 36 ++++++++++++++----
+ 20 files changed, 75 insertions(+), 22 deletions(-)
+ rename source/Plugins/{InstrumentationRuntime => IRt}/ASan/ASanRuntime.cpp (100%)
+ rename source/Plugins/{InstrumentationRuntime => IRt}/ASan/ASanRuntime.h (100%)
+ rename source/Plugins/{InstrumentationRuntime => IRt}/ASan/CMakeLists.txt (100%)
+ rename source/Plugins/{InstrumentationRuntime => IRt}/CMakeLists.txt (100%)
+ rename source/Plugins/{InstrumentationRuntime => IRt}/MainThreadChecker/CMakeLists.txt (100%)
+ rename source/Plugins/{InstrumentationRuntime => IRt}/MainThreadChecker/MainThreadCheckerRuntime.cpp (100%)
+ rename source/Plugins/{InstrumentationRuntime => IRt}/MainThreadChecker/MainThreadCheckerRuntime.h (100%)
+ rename source/Plugins/{InstrumentationRuntime => IRt}/TSan/CMakeLists.txt (100%)
+ rename source/Plugins/{InstrumentationRuntime => IRt}/TSan/TSanRuntime.cpp (100%)
+ rename source/Plugins/{InstrumentationRuntime => IRt}/TSan/TSanRuntime.h (100%)
+ rename source/Plugins/{InstrumentationRuntime => IRt}/UBSan/CMakeLists.txt (100%)
+ rename source/Plugins/{InstrumentationRuntime => IRt}/UBSan/UBSanRuntime.cpp (100%)
+ rename source/Plugins/{InstrumentationRuntime => IRt}/UBSan/UBSanRuntime.h (100%)
+
+diff --git a/.gitignore b/.gitignore
+index 35da4f658..a787e5f65 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -51,3 +51,5 @@ tags
+ # Ignore test trace directories.
+ 20??-??-??-??_??_??/
+ 
++# [port] CHANGED: Added. See [gtm].
++/.gtm/
+diff --git a/source/API/CMakeLists.txt b/source/API/CMakeLists.txt
+index be9d4115c..4f109ebdc 100644
+--- a/source/API/CMakeLists.txt
++++ b/source/API/CMakeLists.txt
+@@ -4,7 +4,8 @@ endif()
+ 
+ get_property(LLDB_ALL_PLUGINS GLOBAL PROPERTY LLDB_PLUGINS)
+ 
+-add_lldb_library(liblldb SHARED
++# [port] CHANGED: Removed `SHARED`. We want a static library.
++add_lldb_library(liblldb
+   SBAddress.cpp
+   SBAttachInfo.cpp
+   SBBlock.cpp
+diff --git a/source/API/SystemInitializerFull.cpp b/source/API/SystemInitializerFull.cpp
+index 18de37618..d0ef34135 100644
+--- a/source/API/SystemInitializerFull.cpp
++++ b/source/API/SystemInitializerFull.cpp
+@@ -52,10 +52,11 @@
+ #include "Plugins/DynamicLoader/Windows-DYLD/DynamicLoaderWindowsDYLD.h"
+ #include "Plugins/Instruction/ARM64/EmulateInstructionARM64.h"
+ #include "Plugins/Instruction/PPC64/EmulateInstructionPPC64.h"
+-#include "Plugins/InstrumentationRuntime/ASan/ASanRuntime.h"
+-#include "Plugins/InstrumentationRuntime/MainThreadChecker/MainThreadCheckerRuntime.h"
+-#include "Plugins/InstrumentationRuntime/TSan/TSanRuntime.h"
+-#include "Plugins/InstrumentationRuntime/UBSan/UBSanRuntime.h"
++// [port] CHANGED: `InstrumentationRuntime` -> `IRt`. See [irt].
++#include "Plugins/IRt/ASan/ASanRuntime.h"
++#include "Plugins/IRt/MainThreadChecker/MainThreadCheckerRuntime.h"
++#include "Plugins/IRt/TSan/TSanRuntime.h"
++#include "Plugins/IRt/UBSan/UBSanRuntime.h"
+ #include "Plugins/JITLoader/GDB/JITLoaderGDB.h"
+ #include "Plugins/Language/CPlusPlus/CPlusPlusLanguage.h"
+ #include "Plugins/Language/Go/GoLanguage.h"
+diff --git a/source/Initialization/SystemInitializerCommon.cpp b/source/Initialization/SystemInitializerCommon.cpp
+index 006ab2359..e777288ce 100644
+--- a/source/Initialization/SystemInitializerCommon.cpp
++++ b/source/Initialization/SystemInitializerCommon.cpp
+@@ -20,6 +20,9 @@
+ #include "lldb/Utility/Log.h"
+ #include "lldb/Utility/Timer.h"
+ 
++// [port] CHANGED: Removed `#if defined(__APPLE__)`. See [macho].
++#include "Plugins/ObjectFile/Mach-O/ObjectFileMachO.h"
++
+ #if defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__)
+ #include "Plugins/Process/POSIX/ProcessPOSIXLog.h"
+ #endif
+@@ -81,6 +84,9 @@ void SystemInitializerCommon::Initialize() {
+   //----------------------------------------------------------------------
+   ObjectContainerUniversalMachO::Initialize();
+ 
++  // [port] CHANGED: Removed `#if defined(__APPLE__)`. See [macho].
++  ObjectFileMachO::Initialize();
++
+ #if defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__)
+   ProcessPOSIXLog::Initialize();
+ #endif
+diff --git a/source/Plugins/CMakeLists.txt b/source/Plugins/CMakeLists.txt
+index 5092b210a..da00629f7 100644
+--- a/source/Plugins/CMakeLists.txt
++++ b/source/Plugins/CMakeLists.txt
+@@ -4,7 +4,8 @@ add_subdirectory(Disassembler)
+ add_subdirectory(DynamicLoader)
+ add_subdirectory(ExpressionParser)
+ add_subdirectory(Instruction)
+-add_subdirectory(InstrumentationRuntime)
++# [port] CHANGED: `InstrumentationRuntime` -> `IRt`. See [irt].
++add_subdirectory(IRt)
+ add_subdirectory(JITLoader)
+ add_subdirectory(Language)
+ add_subdirectory(LanguageRuntime)
+diff --git a/source/Plugins/InstrumentationRuntime/ASan/ASanRuntime.cpp b/source/Plugins/IRt/ASan/ASanRuntime.cpp
+similarity index 100%
+rename from source/Plugins/InstrumentationRuntime/ASan/ASanRuntime.cpp
+rename to source/Plugins/IRt/ASan/ASanRuntime.cpp
+diff --git a/source/Plugins/InstrumentationRuntime/ASan/ASanRuntime.h b/source/Plugins/IRt/ASan/ASanRuntime.h
+similarity index 100%
+rename from source/Plugins/InstrumentationRuntime/ASan/ASanRuntime.h
+rename to source/Plugins/IRt/ASan/ASanRuntime.h
+diff --git a/source/Plugins/InstrumentationRuntime/ASan/CMakeLists.txt b/source/Plugins/IRt/ASan/CMakeLists.txt
+similarity index 100%
+rename from source/Plugins/InstrumentationRuntime/ASan/CMakeLists.txt
+rename to source/Plugins/IRt/ASan/CMakeLists.txt
+diff --git a/source/Plugins/InstrumentationRuntime/CMakeLists.txt b/source/Plugins/IRt/CMakeLists.txt
+similarity index 100%
+rename from source/Plugins/InstrumentationRuntime/CMakeLists.txt
+rename to source/Plugins/IRt/CMakeLists.txt
+diff --git a/source/Plugins/InstrumentationRuntime/MainThreadChecker/CMakeLists.txt b/source/Plugins/IRt/MainThreadChecker/CMakeLists.txt
+similarity index 100%
+rename from source/Plugins/InstrumentationRuntime/MainThreadChecker/CMakeLists.txt
+rename to source/Plugins/IRt/MainThreadChecker/CMakeLists.txt
+diff --git a/source/Plugins/InstrumentationRuntime/MainThreadChecker/MainThreadCheckerRuntime.cpp b/source/Plugins/IRt/MainThreadChecker/MainThreadCheckerRuntime.cpp
+similarity index 100%
+rename from source/Plugins/InstrumentationRuntime/MainThreadChecker/MainThreadCheckerRuntime.cpp
+rename to source/Plugins/IRt/MainThreadChecker/MainThreadCheckerRuntime.cpp
+diff --git a/source/Plugins/InstrumentationRuntime/MainThreadChecker/MainThreadCheckerRuntime.h b/source/Plugins/IRt/MainThreadChecker/MainThreadCheckerRuntime.h
+similarity index 100%
+rename from source/Plugins/InstrumentationRuntime/MainThreadChecker/MainThreadCheckerRuntime.h
+rename to source/Plugins/IRt/MainThreadChecker/MainThreadCheckerRuntime.h
+diff --git a/source/Plugins/InstrumentationRuntime/TSan/CMakeLists.txt b/source/Plugins/IRt/TSan/CMakeLists.txt
+similarity index 100%
+rename from source/Plugins/InstrumentationRuntime/TSan/CMakeLists.txt
+rename to source/Plugins/IRt/TSan/CMakeLists.txt
+diff --git a/source/Plugins/InstrumentationRuntime/TSan/TSanRuntime.cpp b/source/Plugins/IRt/TSan/TSanRuntime.cpp
+similarity index 100%
+rename from source/Plugins/InstrumentationRuntime/TSan/TSanRuntime.cpp
+rename to source/Plugins/IRt/TSan/TSanRuntime.cpp
+diff --git a/source/Plugins/InstrumentationRuntime/TSan/TSanRuntime.h b/source/Plugins/IRt/TSan/TSanRuntime.h
+similarity index 100%
+rename from source/Plugins/InstrumentationRuntime/TSan/TSanRuntime.h
+rename to source/Plugins/IRt/TSan/TSanRuntime.h
+diff --git a/source/Plugins/InstrumentationRuntime/UBSan/CMakeLists.txt b/source/Plugins/IRt/UBSan/CMakeLists.txt
+similarity index 100%
+rename from source/Plugins/InstrumentationRuntime/UBSan/CMakeLists.txt
+rename to source/Plugins/IRt/UBSan/CMakeLists.txt
+diff --git a/source/Plugins/InstrumentationRuntime/UBSan/UBSanRuntime.cpp b/source/Plugins/IRt/UBSan/UBSanRuntime.cpp
+similarity index 100%
+rename from source/Plugins/InstrumentationRuntime/UBSan/UBSanRuntime.cpp
+rename to source/Plugins/IRt/UBSan/UBSanRuntime.cpp
+diff --git a/source/Plugins/InstrumentationRuntime/UBSan/UBSanRuntime.h b/source/Plugins/IRt/UBSan/UBSanRuntime.h
+similarity index 100%
+rename from source/Plugins/InstrumentationRuntime/UBSan/UBSanRuntime.h
+rename to source/Plugins/IRt/UBSan/UBSanRuntime.h
+diff --git a/source/Plugins/Process/Utility/RegisterContextDarwin_arm.cpp b/source/Plugins/Process/Utility/RegisterContextDarwin_arm.cpp
+index 5d9ff02fa..922a176ea 100644
+--- a/source/Plugins/Process/Utility/RegisterContextDarwin_arm.cpp
++++ b/source/Plugins/Process/Utility/RegisterContextDarwin_arm.cpp
+@@ -7,9 +7,27 @@
+ //
+ //===----------------------------------------------------------------------===//
+ 
++// [port] CHANGED: Removed `#if defined(__APPLE__)` (over the whole file). See
++// [port] [macho].
++
+ #include "RegisterContextDarwin_arm.h"
+ #include "RegisterContextDarwinConstants.h"
+ 
++// [port] CHANGED: Added `defined(__APPLE__)` and the `#else` branch. See
++// [port] [macho].
++#if defined(__APPLE__)
++// C Includes
++#include <mach/mach_types.h>
++#include <mach/thread_act.h>
++#else
++// [port] All headers are from
++// [port] `/deps/apple-headers/MacOSX10.13.sdk/usr/include/`.
++
++// [port] From <mach/kern_return.h>.
++#define KERN_SUCCESS 0
++#define KERN_INVALID_ARGUMENT 4
++#endif
++
+ // C++ Includes
+ // Other libraries and framework includes
+ #include "lldb/Core/RegisterValue.h"
+@@ -180,12 +198,11 @@ enum {
+     sizeof(RegisterContextDarwin_arm::EXC)))
+ 
+ #define DEFINE_DBG(reg, i)                                                     \
+-  #reg, NULL, sizeof(((RegisterContextDarwin_arm::DBG *) NULL)->reg[i]),       \
+-                      DBG_OFFSET(reg[i]), eEncodingUint, eFormatHex,           \
+-                                 {LLDB_INVALID_REGNUM, LLDB_INVALID_REGNUM,    \
+-                                  LLDB_INVALID_REGNUM, LLDB_INVALID_REGNUM,    \
+-                                  LLDB_INVALID_REGNUM },                       \
+-                                  nullptr, nullptr, nullptr, 0
++#reg, NULL, sizeof(((RegisterContextDarwin_arm::DBG *)NULL)->reg[i]),        \
++      DBG_OFFSET(reg[i]), eEncodingUint, eFormatHex,                           \
++      {LLDB_INVALID_REGNUM, LLDB_INVALID_REGNUM, LLDB_INVALID_REGNUM,          \
++       LLDB_INVALID_REGNUM, LLDB_INVALID_REGNUM },                             \
++       nullptr, nullptr, nullptr, 0
+ #define REG_CONTEXT_SIZE                                                       \
+   (sizeof(RegisterContextDarwin_arm::GPR) +                                    \
+    sizeof(RegisterContextDarwin_arm::FPU) +                                    \
+@@ -914,7 +931,9 @@ static uint32_t g_fpu_regnums[] = {
+ // Exception registers
+ 
+ static uint32_t g_exc_regnums[] = {
+-    exc_exception, exc_fsr, exc_far,
++    exc_exception,
++    exc_fsr,
++    exc_far,
+ };
+ 
+ static size_t k_num_register_infos = llvm::array_lengthof(g_register_infos);
+@@ -969,7 +988,10 @@ const size_t k_num_exc_registers = llvm::array_lengthof(g_exc_regnums);
+ //----------------------------------------------------------------------
+ static const RegisterSet g_reg_sets[] = {
+     {
+-        "General Purpose Registers", "gpr", k_num_gpr_registers, g_gpr_regnums,
++        "General Purpose Registers",
++        "gpr",
++        k_num_gpr_registers,
++        g_gpr_regnums,
+     },
+     {"Floating Point Registers", "fpu", k_num_fpu_registers, g_fpu_regnums},
+     {"Exception State Registers", "exc", k_num_exc_registers, g_exc_regnums}};
+diff --git a/source/Plugins/Process/Utility/RegisterContextDarwin_arm64.cpp b/source/Plugins/Process/Utility/RegisterContextDarwin_arm64.cpp
+index 03ce7ef9f..a39997740 100644
+--- a/source/Plugins/Process/Utility/RegisterContextDarwin_arm64.cpp
++++ b/source/Plugins/Process/Utility/RegisterContextDarwin_arm64.cpp
+@@ -8,9 +8,28 @@
+ //
+ //===----------------------------------------------------------------------===//
+ 
++// [port] CHANGED: Removed `#if defined(__APPLE__)` (over the whole file). See
++// [port] [macho].
++
+ #include "RegisterContextDarwin_arm64.h"
+ #include "RegisterContextDarwinConstants.h"
+ 
++// [port] CHANGED: Added `defined(__APPLE__)` and the `#else` branch. See
++// [port] [macho].
++#if defined(__APPLE__)
++// C Includes
++#include <mach/mach_types.h>
++#include <mach/thread_act.h>
++#include <sys/sysctl.h>
++#else
++// [port] All headers are from
++// [port] `/deps/apple-headers/MacOSX10.13.sdk/usr/include/`.
++
++// [port] From <mach/kern_return.h>.
++#define KERN_SUCCESS 0
++#define KERN_INVALID_ARGUMENT 4
++#endif
++
+ // C++ Includes
+ // Other libraries and framework includes
+ #include "lldb/Core/RegisterValue.h"
+@@ -57,13 +76,11 @@ using namespace lldb_private;
+    sizeof(RegisterContextDarwin_arm64::EXC))
+ 
+ #define DEFINE_DBG(reg, i)                                                     \
+-  #reg, NULL,                                                                  \
+-      sizeof(((RegisterContextDarwin_arm64::DBG *) NULL)->reg[i]),             \
+-              DBG_OFFSET_NAME(reg[i]), eEncodingUint, eFormatHex,              \
+-                              {LLDB_INVALID_REGNUM, LLDB_INVALID_REGNUM,       \
+-                               LLDB_INVALID_REGNUM, LLDB_INVALID_REGNUM,       \
+-                               LLDB_INVALID_REGNUM },                          \
+-                               NULL, NULL, NULL, 0
++#reg, NULL, sizeof(((RegisterContextDarwin_arm64::DBG *)NULL)->reg[i]),      \
++      DBG_OFFSET_NAME(reg[i]), eEncodingUint, eFormatHex,                      \
++      {LLDB_INVALID_REGNUM, LLDB_INVALID_REGNUM, LLDB_INVALID_REGNUM,          \
++       LLDB_INVALID_REGNUM, LLDB_INVALID_REGNUM },                             \
++       NULL, NULL, NULL, 0
+ #define REG_CONTEXT_SIZE                                                       \
+   (sizeof(RegisterContextDarwin_arm64::GPR) +                                  \
+    sizeof(RegisterContextDarwin_arm64::FPU) +                                  \
+@@ -149,7 +166,10 @@ const size_t k_num_exc_registers = llvm::array_lengthof(g_exc_regnums);
+ //----------------------------------------------------------------------
+ static const RegisterSet g_reg_sets[] = {
+     {
+-        "General Purpose Registers", "gpr", k_num_gpr_registers, g_gpr_regnums,
++        "General Purpose Registers",
++        "gpr",
++        k_num_gpr_registers,
++        g_gpr_regnums,
+     },
+     {"Floating Point Registers", "fpu", k_num_fpu_registers, g_fpu_regnums},
+     {"Exception State Registers", "exc", k_num_exc_registers, g_exc_regnums}};
+-- 
+2.18.0.windows.1
+

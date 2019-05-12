@@ -1,0 +1,14 @@
+/apple-headers/*/
+/clang/
+/libclosure/
+/libdispatch/
+/Libffi/
+/LIEF/
+/lld/
+/lldb/
+/llvm/
+/objc4/
+/pthreads.2/
+/tapi/
+/unicorn/
+/WinObjC/

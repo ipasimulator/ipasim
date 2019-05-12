@@ -1,0 +1,456 @@
+From 8d0fdb8f39438b0d7a8074ef7cfa23fc9a5e3d3b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20Jone=C5=A1?= <jjones@outlook.cz>
+Date: Fri, 10 May 2019 14:37:13 +0200
+Subject: [PATCH] Squash branch `port`
+
+---
+ .gitignore                                 |  6 ++
+ include/tapi/Core/ArchitectureConfig.h     | 20 +++++++
+ include/tapi/Core/ArchitectureSupport.h    |  6 +-
+ include/tapi/Core/YAML.h                   | 18 ++++--
+ include/tapi/Defines.h                     |  5 ++
+ include/tapi/Driver/DiagnosticTAPIKinds.td | 11 ++++
+ include/tapi/Version.inc                   |  6 ++
+ lib/Core/ConfigurationFile.cpp             |  3 +-
+ lib/Core/MachODylibReader.cpp              | 66 +++++++++++++++++++---
+ lib/Core/TextAPI_v1.cpp                    |  5 ++
+ lib/Core/TextStub_v1.cpp                   |  6 ++
+ lib/Core/TextStub_v2.cpp                   | 12 ++++
+ lib/Driver/Snapshot.cpp                    |  3 +-
+ lib/Driver/SnapshotFileSystem.cpp          |  4 ++
+ 14 files changed, 154 insertions(+), 17 deletions(-)
+ create mode 100644 include/tapi/Core/ArchitectureConfig.h
+ create mode 100644 include/tapi/Version.inc
+
+diff --git a/.gitignore b/.gitignore
+index 0a288ee..3eff5bf 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -22,3 +22,9 @@
+ #==============================================================================#
+ # Sphinx build files.
+ docs/_build
++
++# [port] CHANGED: Added. See [gtm].
++/.gtm/
++
++# [port] CHANGED: Added. It contains CMake build files.
++/build/
+diff --git a/include/tapi/Core/ArchitectureConfig.h b/include/tapi/Core/ArchitectureConfig.h
+new file mode 100644
+index 0000000..b662224
+--- /dev/null
++++ b/include/tapi/Core/ArchitectureConfig.h
+@@ -0,0 +1,20 @@
++// [port] CHANGED: Added this file. See [no-cmake].
++
++#ifndef TAPI_CORE_ARCHITECTURE_CONFIG_H
++#define TAPI_CORE_ARCHITECTURE_CONFIG_H
++
++#define SUPPORT_ARCH_I386 1
++#define SUPPORT_ARCH_X86_64 1
++#define SUPPORT_ARCH_X86_64H 1
++#define SUPPORT_ARCH_ARMV4T 1
++#define SUPPORT_ARCH_ARMV6 1
++#define SUPPORT_ARCH_ARMV5 1
++#define SUPPORT_ARCH_ARMV7 1
++#define SUPPORT_ARCH_ARMV7S 1
++#define SUPPORT_ARCH_ARMV7K 1
++#define SUPPORT_ARCH_ARMV6M 1
++#define SUPPORT_ARCH_ARMV7M 1
++#define SUPPORT_ARCH_ARMV7EM 1
++#define SUPPORT_ARCH_ARM64 1
++
++#endif // TAPI_CORE_ARCHITECTURE_CONFIG_H
+diff --git a/include/tapi/Core/ArchitectureSupport.h b/include/tapi/Core/ArchitectureSupport.h
+index 7239579..2e2747c 100644
+--- a/include/tapi/Core/ArchitectureSupport.h
++++ b/include/tapi/Core/ArchitectureSupport.h
+@@ -21,8 +21,9 @@
+ #include "tapi/LinkerInterfaceFile.h"
+ #include "tapi/PackedVersion32.h"
+ #include "tapi/tapi.h"
+-#include "clang/Basic/VersionTuple.h"
+ #include "llvm/ADT/StringRef.h"
++// [port] CHANGED: `clang/Basic` -> `llvm/Support`.
++#include "llvm/Support/VersionTuple.h"
+ #include "llvm/Support/raw_ostream.h"
+ #include <utility>
+ 
+@@ -39,7 +40,8 @@ struct PackedVersion {
+   constexpr PackedVersion(uint32_t version) : _version(version) {}
+   PackedVersion(unsigned major, unsigned minor, unsigned subminor)
+       : _version((major << 16) | ((minor & 0xff) << 8) | (subminor & 0xff)) {}
+-  PackedVersion(clang::VersionTuple version) {
++  // [port] CHANGED: `clang` -> `llvm`.
++  PackedVersion(llvm::VersionTuple version) {
+     _version = version.getMajor() << 16;
+     if (auto minor = version.getMinor())
+       _version |= (*minor & 0xff) << 8;
+diff --git a/include/tapi/Core/YAML.h b/include/tapi/Core/YAML.h
+index d46c081..77b5b21 100644
+--- a/include/tapi/Core/YAML.h
++++ b/include/tapi/Core/YAML.h
+@@ -40,7 +40,8 @@ template <> struct ScalarTraits<FlowStringRef> {
+   static StringRef input(StringRef value, void *ctx, FlowStringRef &out) {
+     return Impl::input(value, ctx, out.value);
+   }
+-  static bool mustQuote(StringRef name) { return Impl::mustQuote(name); }
++  // [port] CHANGED: See [must-quote].
++  static QuotingType mustQuote(StringRef name) { return Impl::mustQuote(name); }
+ };
+ 
+ using tapi::ObjCConstraint;
+@@ -92,7 +93,8 @@ template <> struct ScalarTraits<Architecture> {
+     return {};
+   }
+ 
+-  static bool mustQuote(StringRef) { return false; }
++  // [port] CHANGED: See [must-quote].
++  static QuotingType mustQuote(StringRef) { return QuotingType::None; }
+ };
+ 
+ using TAPI_INTERNAL::PackedVersion;
+@@ -107,7 +109,8 @@ template <> struct ScalarTraits<PackedVersion> {
+     return {};
+   }
+ 
+-  static bool mustQuote(StringRef) { return false; }
++  // [port] CHANGED: See [must-quote].
++  static QuotingType mustQuote(StringRef) { return QuotingType::None; }
+ };
+ 
+ template <> struct ScalarTraits<SwiftVersion> {
+@@ -147,7 +150,8 @@ template <> struct ScalarTraits<SwiftVersion> {
+     return StringRef();
+   }
+ 
+-  static bool mustQuote(StringRef) { return false; }
++  // [port] CHANGED: See [must-quote].
++  static QuotingType mustQuote(StringRef) { return QuotingType::None; }
+ };
+ 
+ using TAPI_INTERNAL::AvailabilityInfo;
+@@ -185,7 +189,8 @@ template <> struct ScalarTraits<AvailabilityInfo> {
+     return StringRef();
+   }
+ 
+-  static bool mustQuote(StringRef) { return false; }
++  // [port] CHANGED: See [must-quote].
++  static QuotingType mustQuote(StringRef) { return QuotingType::None; }
+ };
+ 
+ template <> struct ScalarTraits<UUID> {
+@@ -204,7 +209,8 @@ template <> struct ScalarTraits<UUID> {
+     return {};
+   }
+ 
+-  static bool mustQuote(StringRef) { return true; }
++  // [port] CHANGED: See [must-quote].
++  static QuotingType mustQuote(StringRef) { return QuotingType::Double; }
+ };
+ 
+ } // end namespace yaml.
+diff --git a/include/tapi/Defines.h b/include/tapi/Defines.h
+index 9d98c5a..14b8cd8 100644
+--- a/include/tapi/Defines.h
++++ b/include/tapi/Defines.h
+@@ -22,7 +22,12 @@
+ #define TAPI_NAMESPACE_V1_BEGIN namespace tapi { inline namespace v1 {
+ #define TAPI_NAMESPACE_V1_END } }
+ 
++// [port] CHANGED: Porting `visibility("default")` to Windows.
++#if defined(TAPI_PORT)
++#define TAPI_PUBLIC
++#else
+ #define TAPI_PUBLIC __attribute__((visibility ("default")))
++#endif
+ 
+ #endif // TAPI_DEFINES_H
+ 
+diff --git a/include/tapi/Driver/DiagnosticTAPIKinds.td b/include/tapi/Driver/DiagnosticTAPIKinds.td
+index bc446e6..7c06f4f 100644
+--- a/include/tapi/Driver/DiagnosticTAPIKinds.td
++++ b/include/tapi/Driver/DiagnosticTAPIKinds.td
+@@ -7,6 +7,17 @@
+ //
+ //===----------------------------------------------------------------------===//
+ 
++// [port] CHANGED: Added this class (copied from Clang's `Diagnostic.td`).
++// [port] `clang-tblgen` complained otherwise.
++// Textual substitutions which may be performed on the text of diagnostics
++class TextSubstitution<string Text> {
++  string Substitution = Text;
++  // TODO: These are only here to allow substitutions to be declared inline with
++  // diagnostics
++  string Component = "";
++  string CategoryName = "";
++}
++
+ // Define the diagnostic severities.
+ class Severity<string N> {
+   string Name = N;
+diff --git a/include/tapi/Version.inc b/include/tapi/Version.inc
+new file mode 100644
+index 0000000..28a42ff
+--- /dev/null
++++ b/include/tapi/Version.inc
+@@ -0,0 +1,6 @@
++// [port] CHANGED: Added this file. See [no-cmake].
++
++#define TAPI_VERSION "2.0.0"
++#define TAPI_VERSION_MAJOR 2U
++#define TAPI_VERSION_MINOR 0U
++#define TAPI_VERSION_PATCH 0U
+diff --git a/lib/Core/ConfigurationFile.cpp b/lib/Core/ConfigurationFile.cpp
+index 76ccef1..91e3cd3 100644
+--- a/lib/Core/ConfigurationFile.cpp
++++ b/lib/Core/ConfigurationFile.cpp
+@@ -50,7 +50,8 @@ template <> struct ScalarTraits<Macro> {
+     return {"invalid macro"};
+   }
+ 
+-  static bool mustQuote(StringRef /*unused*/) { return false; }
++  // [port] CHANGED: See [must-quote].
++  static QuotingType mustQuote(StringRef /*unused*/) { return QuotingType::None; }
+ };
+ 
+ template <> struct ScalarEnumerationTraits<clang::InputKind::Language> {
+diff --git a/lib/Core/MachODylibReader.cpp b/lib/Core/MachODylibReader.cpp
+index 10b1741..d2b786b 100644
+--- a/lib/Core/MachODylibReader.cpp
++++ b/lib/Core/MachODylibReader.cpp
+@@ -309,10 +309,20 @@ static Error readObjectiveCMetadata(MachOObjectFile *object,
+   auto H = object->getHeader();
+   auto arch = getArchType(H.cputype, H.cpusubtype);
+ 
++  // [port] CHANGED: `MachOMetadata` is not taking `llvm::Error` (anymore?).
++#if !defined(TAPI_PORT)
+   auto error = Error::success();
+-  MachOMetadata metadata(object, error);
++#endif
++  MachOMetadata metadata(object
++#if !defined(TAPI_PORT)
++                         ,
++                         error
++#endif
++  );
++#if !defined(TAPI_PORT)
+   if (error)
+     return std::move(error);
++#endif
+ 
+   ///
+   /// Classes
+@@ -352,22 +362,36 @@ static Error readObjectiveCMetadata(MachOObjectFile *object,
+       if (!name)
+         return name.takeError();
+ 
++      // [port] CHANGED: See [no-dynamic].
++#if !defined(TAPI_PORT)
+       auto isDynamic = property.isDynamic();
+       if (!isDynamic)
+         return isDynamic.takeError();
++#endif
+ 
+       auto setter = property.getSetter();
+       if (!setter)
+         return setter.takeError();
+       if (!setter->empty())
+         file->addObjCSelector(objcClass, *setter, arch,
+-                              /*isInstanceMethod=*/true, *isDynamic, access);
++                              /*isInstanceMethod=*/true,
++#if !defined(TAPI_PORT)
++                              *isDynamic,
++#else
++                              /*isDynamic=*/false,
++#endif
++                              access);
+ 
+       auto getter = property.getGetter();
+       if (!getter)
+         return getter.takeError();
+       file->addObjCSelector(objcClass, *getter, arch, /*isInstanceMethod=*/true,
+-                            *isDynamic, access);
++#if !defined(TAPI_PORT)
++                            *isDynamic,
++#else
++                            /*isDynamic=*/false,
++#endif
++                            access);
+     }
+ 
+     auto classMethods = objcClassMeta->classMethods();
+@@ -432,22 +456,37 @@ static Error readObjectiveCMetadata(MachOObjectFile *object,
+       if (!name)
+         return name.takeError();
+ 
++      // [port] CHANGED: See [no-dynamic].
++#if !defined(TAPI_PORT)
+       auto isDynamic = property.isDynamic();
+       if (!isDynamic)
+         return isDynamic.takeError();
++#endif
+ 
+       auto setter = property.getSetter();
+       if (!setter)
+         return setter.takeError();
+       if (!setter->empty())
+         file->addObjCSelector(objcCategory, *setter, arch,
+-                              /*isInstanceMethod=*/true, *isDynamic, access);
++                              /*isInstanceMethod=*/true,
++#if !defined(TAPI_PORT)
++                              *isDynamic,
++#else
++                              /*isDynamic=*/false,
++#endif
++                              access);
+ 
+       auto getter = property.getGetter();
+       if (!getter)
+         return getter.takeError();
+       file->addObjCSelector(objcCategory, *getter, arch,
+-                            /*isInstanceMethod=*/true, *isDynamic, access);
++                            /*isInstanceMethod=*/true,
++#if !defined(TAPI_PORT)
++                            *isDynamic,
++#else
++                            /*isDynamic=*/false,
++#endif
++                            access);
+     }
+ 
+     auto classMethods = category->classMethods();
+@@ -506,22 +545,35 @@ static Error readObjectiveCMetadata(MachOObjectFile *object,
+       if (!name)
+         return name.takeError();
+ 
++      // [port] CHANGED: See [no-dynamic].
++#if !defined(TAPI_PORT)
+       auto isDynamic = property.isDynamic();
+       if (!isDynamic)
+         return isDynamic.takeError();
++#endif
+ 
+       auto setter = property.getSetter();
+       if (!setter)
+         return setter.takeError();
+       if (!setter->empty())
+         file->addObjCSelector(objcProtocol, *setter, arch,
+-                              /*isInstanceMethod=*/true, *isDynamic);
++                              /*isInstanceMethod=*/true
++#if !defined(TAPI_PORT)
++                              ,
++                              *isDynamic
++#endif
++        );
+ 
+       auto getter = property.getGetter();
+       if (!getter)
+         return getter.takeError();
+       file->addObjCSelector(objcProtocol, *getter, arch,
+-                            /*isInstanceMethod=*/true, *isDynamic);
++                            /*isInstanceMethod=*/true
++#if !defined(TAPI_PORT)
++                            ,
++                            *isDynamic
++#endif
++      );
+     }
+ 
+     auto classMethods = protocol->classMethods();
+diff --git a/lib/Core/TextAPI_v1.cpp b/lib/Core/TextAPI_v1.cpp
+index d0c72ad..352b7e8 100644
+--- a/lib/Core/TextAPI_v1.cpp
++++ b/lib/Core/TextAPI_v1.cpp
+@@ -149,6 +149,11 @@ template <> struct MappingTraits<const ExtendedInterfaceFile *> {
+           }
+         }
+ 
++        // [port] CHANGED: See [sort].
++#if defined(TAPI_PORT)
++        using TAPI_INTERNAL::sort;
++#endif
++
+         sort(section.symbols);
+         sort(section.classes);
+         sort(section.classEHs);
+diff --git a/lib/Core/TextStub_v1.cpp b/lib/Core/TextStub_v1.cpp
+index cf65b61..ec092ea 100644
+--- a/lib/Core/TextStub_v1.cpp
++++ b/lib/Core/TextStub_v1.cpp
+@@ -128,6 +128,12 @@ template <> struct MappingTraits<const InterfaceFile *> {
+             break;
+           }
+         }
++
++        // [port] CHANGED: See [sort].
++#if defined(TAPI_PORT)
++        using TAPI_INTERNAL::sort;
++#endif
++
+         sort(section.symbols);
+         sort(section.classes);
+         sort(section.ivars);
+diff --git a/lib/Core/TextStub_v2.cpp b/lib/Core/TextStub_v2.cpp
+index 39fae44..a2ad5b4 100644
+--- a/lib/Core/TextStub_v2.cpp
++++ b/lib/Core/TextStub_v2.cpp
+@@ -186,6 +186,12 @@ template <> struct MappingTraits<const InterfaceFile *> {
+             break;
+           }
+         }
++
++        // [port] CHANGED: See [sort].
++#if defined(TAPI_PORT)
++        using TAPI_INTERNAL::sort;
++#endif
++
+         sort(section.symbols);
+         sort(section.classes);
+         sort(section.ivars);
+@@ -233,6 +239,12 @@ template <> struct MappingTraits<const InterfaceFile *> {
+             break;
+           }
+         }
++
++        // [port] CHANGED: See [sort].
++#if defined(TAPI_PORT)
++        using TAPI_INTERNAL::sort;
++#endif
++
+         sort(section.symbols);
+         sort(section.classes);
+         sort(section.ivars);
+diff --git a/lib/Driver/Snapshot.cpp b/lib/Driver/Snapshot.cpp
+index 03b1ea9..c0024c0 100644
+--- a/lib/Driver/Snapshot.cpp
++++ b/lib/Driver/Snapshot.cpp
+@@ -89,7 +89,8 @@ template <> struct ScalarTraits<Macro> {
+     return {};
+   }
+ 
+-  static bool mustQuote(StringRef /*unused*/) { return true; }
++  // [port] CHANGED: See [must-quote].
++  static QuotingType mustQuote(StringRef /*unused*/) { return QuotingType::Double; }
+ };
+ 
+ template <> struct ScalarEnumerationTraits<VerificationMode> {
+diff --git a/lib/Driver/SnapshotFileSystem.cpp b/lib/Driver/SnapshotFileSystem.cpp
+index c27a624..fc093e2 100644
+--- a/lib/Driver/SnapshotFileSystem.cpp
++++ b/lib/Driver/SnapshotFileSystem.cpp
+@@ -145,6 +145,10 @@ SnapshotFileSystem::openFileForRead(const Twine &path) {
+ 
+   auto status = getFileStatus(path, *externalStatus);
+   return std::unique_ptr<File>(
++      // [port] CHANGED: It was ambiguous.
++#if defined(TAPI_PORT)
++      llvm::
++#endif
+       make_unique<FileWithFixedStatus>(std::move(*result2), status));
+ }
+ 
+-- 
+2.18.0.windows.1
+

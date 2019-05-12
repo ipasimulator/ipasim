@@ -1,0 +1,264 @@
+From 02210dbfcbc7f329b0c613e12d815dd6fab78101 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20Jone=C5=A1?= <jjones@outlook.cz>
+Date: Fri, 10 May 2019 14:29:51 +0200
+Subject: [PATCH] Squash branch `port`
+
+---
+ .gitignore                   |   3 +
+ CMakeLists.txt               | 173 +++++++++++++++++++++++++++++++++++
+ qemu/include/qemu/compiler.h |   3 +-
+ qemu/target-arm/cpu.c        |   8 +-
+ uc.c                         |   3 +-
+ 5 files changed, 185 insertions(+), 5 deletions(-)
+ create mode 100644 CMakeLists.txt
+
+diff --git a/.gitignore b/.gitignore
+index b68a0c8..e05bef6 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -99,3 +99,6 @@ build/
+ [Oo]bj/
+ packages/
+ cmocka/
++
++# Git Time Metric
++/.gtm/
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+new file mode 100644
+index 0000000..e1a1b12
+--- /dev/null
++++ b/CMakeLists.txt
+@@ -0,0 +1,173 @@
++set (SOURCE_FILES
++    # From `unicorn.vcxproj`
++    list.c
++    qemu/accel.c
++    qemu/glib_compat.c
++    qemu/hw/core/machine.c
++    qemu/hw/core/qdev.c
++    qemu/qapi/qapi-dealloc-visitor.c
++    qemu/qapi/qapi-visit-core.c
++    qemu/qapi/qmp-input-visitor.c
++    qemu/qapi/qmp-output-visitor.c
++    qemu/qapi/string-input-visitor.c
++    qemu/qemu-log.c
++    qemu/qemu-timer.c
++    qemu/qobject/qbool.c
++    qemu/qobject/qdict.c
++    qemu/qobject/qerror.c
++    qemu/qobject/qfloat.c
++    qemu/qobject/qint.c
++    qemu/qobject/qlist.c
++    qemu/qobject/qstring.c
++    qemu/qom/container.c
++    qemu/qom/cpu.c
++    qemu/qom/object.c
++    qemu/qom/qom-qobject.c
++    qemu/tcg-runtime.c
++    qemu/util/aes.c
++    qemu/util/bitmap.c
++    qemu/util/bitops.c
++    qemu/util/crc32c.c
++    qemu/util/cutils.c
++    qemu/util/error.c
++    qemu/util/getauxval.c
++    qemu/util/host-utils.c
++    qemu/util/module.c
++    qemu/util/oslib-win32.c
++    qemu/util/qemu-error.c
++    qemu/util/qemu-thread-win32.c
++    qemu/util/qemu-timer-common.c
++    qemu/vl.c
++    uc.c)
++
++add_library (unicorn SHARED ${SOURCE_FILES})
++add_prep_dep (unicorn)
++
++target_include_directories (unicorn
++    # From `unicorn.vcxproj`
++    PRIVATE msvc/unicorn qemu qemu/include qemu/tcg)
++library_headers (unicorn
++    # From `unicorn.vcxproj`
++    include)
++
++target_compile_definitions (unicorn PRIVATE
++    # From `unicorn.vcxproj`
++    WIN32
++    $<IF:$<CONFIG:Debug>,_DEBUG,NDEBUG>
++    _WINDOWS
++    _USRDLL
++    UNICORN_DLL_EXPORTS
++    UNICORN_SHARED
++    _CRT_SECURE_NO_WARNINGS
++    inline=__inline
++    __func__=__FUNCTION__
++    __x86_64__
++    UNICORN_HAS_ARM
++    # UNICORN_HAS_ARM64
++    # UNICORN_HAS_M68K
++    # UNICORN_HAS_MIPS
++    # UNICORN_HAS_MIPS64
++    # UNICORN_HAS_MIPSEL
++    # UNICORN_HAS_MIPS64EL
++    # UNICORN_HAS_SPARC
++    # UNICORN_HAS_X86
++    WIN32_LEAN_AND_MEAN)
++
++add_library (arm-softmmu STATIC
++    # From `arm-softmmu.vcxproj`
++    qemu/cpu-exec.c
++    qemu/cpus.c
++    qemu/cputlb.c
++    qemu/exec.c
++    qemu/fpu/softfloat.c
++    qemu/hw/arm/tosa.c
++    qemu/hw/arm/virt.c
++    qemu/ioport.c
++    qemu/memory.c
++    qemu/memory_mapping.c
++    qemu/target-arm/cpu.c
++    qemu/target-arm/crypto_helper.c
++    qemu/target-arm/helper.c
++    qemu/target-arm/iwmmxt_helper.c
++    qemu/target-arm/neon_helper.c
++    qemu/target-arm/op_helper.c
++    qemu/target-arm/psci.c
++    qemu/target-arm/translate.c
++    qemu/target-arm/unicorn_arm.c
++    qemu/tcg/optimize.c
++    qemu/tcg/tcg.c
++    qemu/translate-all.c)
++add_prep_dep (arm-softmmu)
++
++target_include_directories (arm-softmmu PRIVATE
++    # From `arm-softmmu.vcxproj`
++    msvc/unicorn/arm-softmmu msvc/unicorn qemu qemu/include qemu/tcg
++    qemu/tcg/i386 qemu/target-arm include)
++
++target_compile_definitions (arm-softmmu PRIVATE
++    # From `arm-softmmu.vcxproj`
++    WIN32
++    $<IF:$<CONFIG:Debug>,_DEBUG,NDEBUG>
++    _LIB
++    __i386__
++    _CRT_SECURE_NO_WARNINGS
++    inline=__inline
++    __func__=__FUNCTION__
++    NEED_CPU_H
++    WIN32_LEAN_AND_MEAN)
++
++target_compile_options (arm-softmmu PRIVATE
++    -Wno-macro-redefined
++    # From `arm-softmmu.vcxproj`
++    -includearm.h)
++
++add_library (armeb-softmmu STATIC
++    # From `armeb-softmmu.vcxproj`
++    qemu/cpu-exec.c
++    qemu/cpus.c
++    qemu/cputlb.c
++    qemu/exec.c
++    qemu/fpu/softfloat.c
++    qemu/hw/arm/tosa.c
++    qemu/hw/arm/virt.c
++    qemu/ioport.c
++    qemu/memory.c
++    qemu/memory_mapping.c
++    qemu/target-arm/cpu.c
++    qemu/target-arm/crypto_helper.c
++    qemu/target-arm/helper.c
++    qemu/target-arm/iwmmxt_helper.c
++    qemu/target-arm/neon_helper.c
++    qemu/target-arm/op_helper.c
++    qemu/target-arm/psci.c
++    qemu/target-arm/translate.c
++    qemu/target-arm/unicorn_arm.c
++    qemu/tcg/optimize.c
++    qemu/tcg/tcg.c
++    qemu/translate-all.c)
++add_prep_dep (armeb-softmmu)
++
++target_include_directories (armeb-softmmu PRIVATE
++    # From `armeb-softmmu.vcxproj`
++    msvc/unicorn/armeb-softmmu msvc/unicorn qemu qemu/include qemu/tcg
++    qemu/tcg/i386 qemu/target-arm include)
++
++target_compile_definitions (armeb-softmmu PRIVATE
++    # From `armeb-softmmu.vcxproj`
++    WIN32
++    $<IF:$<CONFIG:Debug>,_DEBUG,NDEBUG>
++    _LIB
++    __i386__
++    _CRT_SECURE_NO_WARNINGS
++    inline=__inline
++    __func__=__FUNCTION__
++    NEED_CPU_H
++    WIN32_LEAN_AND_MEAN)
++
++target_compile_options (armeb-softmmu PRIVATE
++    -Wno-macro-redefined
++    # From `armeb-softmmu.vcxproj`
++    -includearmeb.h)
++
++# From `unicorn.vcxproj`
++target_link_libraries (unicorn arm-softmmu armeb-softmmu)
+diff --git a/qemu/include/qemu/compiler.h b/qemu/include/qemu/compiler.h
+index 20909ea..a5bde6e 100644
+--- a/qemu/include/qemu/compiler.h
++++ b/qemu/include/qemu/compiler.h
+@@ -25,7 +25,8 @@
+ #endif
+ 
+ 
+-static double rint( double x )
++// [port] CHANGED: Added `inline`.
++static inline double rint( double x )
+ {
+     return floor(x < 0 ? x - 0.5 : x + 0.5);
+ }
+diff --git a/qemu/target-arm/cpu.c b/qemu/target-arm/cpu.c
+index 7a0b839..c592b4a 100644
+--- a/qemu/target-arm/cpu.c
++++ b/qemu/target-arm/cpu.c
+@@ -113,10 +113,11 @@ static void arm_cpu_reset(CPUState *s)
+         env->pc = cpu->rvbar;
+ #endif
+     } else {
+-#if defined(CONFIG_USER_ONLY)
++        // [port] CHANGED: Enabled even if `!defined(CONFIG_USER_ONLY)`.
++//#if defined(CONFIG_USER_ONLY)
+         /* Userspace expects access to cp10 and cp11 for FP/Neon */
+         env->cp15.c1_coproc = deposit64(env->cp15.c1_coproc, 20, 4, 0xf);
+-#endif
++//#endif
+     }
+ 
+ #if defined(CONFIG_USER_ONLY)
+@@ -173,7 +174,8 @@ static void arm_cpu_reset(CPUState *s)
+         env->regs[15] = 0xFFFF0000;
+     }
+ 
+-    env->vfp.xregs[ARM_VFP_FPEXC] = 0;
++    // [port] CHANGED: `0` -> `1 << 30` to enable the VFP11 coprocessor.
++    env->vfp.xregs[ARM_VFP_FPEXC] = 1 << 30;
+ #endif
+     set_flush_to_zero(1, &env->vfp.standard_fp_status);
+     set_flush_inputs_to_zero(1, &env->vfp.standard_fp_status);
+diff --git a/uc.c b/uc.c
+index 1139901..f2d9882 100644
+--- a/uc.c
++++ b/uc.c
+@@ -1186,8 +1186,9 @@ void helper_uc_tracecode(int32_t size, uc_hook_type type, void *handle, int64_t
+     }
+ }
+ 
++// [port] CHANGED: `uint32_t` -> `uc_err`.
+ UNICORN_EXPORT
+-uint32_t uc_mem_regions(uc_engine *uc, uc_mem_region **regions, uint32_t *count)
++uc_err uc_mem_regions(uc_engine *uc, uc_mem_region **regions, uint32_t *count)
+ {
+     uint32_t i;
+     uc_mem_region *r = NULL;
+-- 
+2.18.0.windows.1
+

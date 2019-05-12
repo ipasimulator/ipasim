@@ -1,0 +1,181 @@
+From 46df42fe9e43cc866b20be5199ef8736f516d197 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20Jone=C5=A1?= <jjones@outlook.cz>
+Date: Sun, 12 May 2019 08:50:15 +0200
+Subject: [PATCH] Squash branch `objc_port`
+
+---
+ .gitignore      |  2 ++
+ Block_private.h |  8 ++++++++
+ runtime.c       | 52 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 62 insertions(+)
+ create mode 100644 .gitignore
+
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..d8a7b0f
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,2 @@
++# [port] CHANGED: Added, [gtm].
++/.gtm/
+diff --git a/Block_private.h b/Block_private.h
+index 9307b47..2d77381 100644
+--- a/Block_private.h
++++ b/Block_private.h
+@@ -227,6 +227,14 @@ typedef struct Block_callbacks_RR Block_callbacks_RR;
+ 
+ BLOCK_EXPORT void _Block_use_RR2(const Block_callbacks_RR *callbacks);
+ 
++// [port] CHANGED: Copied from WinObjC's `blocks_private.h`. This is needed by
++// [port] `libdispatch`.
++struct Block_basic {
++	void *isa;
++	int flags;
++	int reserved;
++	void (*Block_invoke)(void *);
++};
+ 
+ #if __cplusplus
+ }
+diff --git a/runtime.c b/runtime.c
+index 6995e2d..adf791f 100644
+--- a/runtime.c
++++ b/runtime.c
+@@ -14,13 +14,23 @@
+ #include <string.h>
+ #include <stdint.h>
+ #include <dlfcn.h>
++// [port] CHANGED: Not needed.
++#if !defined(OBJC_PORT)
+ #include <os/assumes.h>
++#endif
++// [port] CHANGED: Porting os_* macros.
++#if defined(OBJC_PORT)
++#include <assert.h>
++#define os_assert(x) assert(x)
++#define os_assumes(x) (x)
++#else
+ #ifndef os_assumes
+ #define os_assumes(_x) os_assumes(_x)
+ #endif
+ #ifndef os_assert
+ #define os_assert(_x) os_assert(_x)
+ #endif
++#endif
+ 
+ #if TARGET_OS_WIN32
+ #define _CRT_SECURE_NO_WARNINGS 1
+@@ -160,12 +170,22 @@ static struct Block_descriptor_3 * _Block_descriptor_3(struct Block_layout *aBlo
+     return (struct Block_descriptor_3 *)desc;
+ }
+ 
++// [port] CHANGED: See `IpaSimLibrary` for implementation.
++#if defined(OBJC_PORT)
++extern "C" __declspec(dllimport) void ipaSim_callBack1(void *FP, void *Arg0);
++extern "C" __declspec(dllimport) void ipaSim_callBack2(void *FP, void *Arg0, void *Arg1);
++#endif
++
+ static void _Block_call_copy_helper(void *result, struct Block_layout *aBlock)
+ {
+     struct Block_descriptor_2 *desc = _Block_descriptor_2(aBlock);
+     if (!desc) return;
+ 
++#if defined(OBJC_PORT)
++    ipaSim_callBack2((void *)desc->copy, result, aBlock);
++#else
+     (*desc->copy)(result, aBlock); // do fixup
++#endif
+ }
+ 
+ static void _Block_call_dispose_helper(struct Block_layout *aBlock)
+@@ -173,7 +193,11 @@ static void _Block_call_dispose_helper(struct Block_layout *aBlock)
+     struct Block_descriptor_2 *desc = _Block_descriptor_2(aBlock);
+     if (!desc) return;
+ 
++#if defined(OBJC_PORT)
++    ipaSim_callBack1((void *)desc->dispose, aBlock);
++#else
+     (*desc->dispose)(aBlock);
++#endif
+ }
+ 
+ /*******************************************************************************
+@@ -202,7 +226,12 @@ void *_Block_copy(const void *arg) {
+     }
+     else {
+         // Its a stack block.  Make a copy.
++        // [port] CHANGED: [ptr-conversion].
++#if defined(OBJC_PORT)
++        struct Block_layout *result = (__typeof__(result))malloc(aBlock->descriptor->size);
++#else
+         struct Block_layout *result = malloc(aBlock->descriptor->size);
++#endif
+         if (!result) return NULL;
+         memmove(result, aBlock, aBlock->descriptor->size); // bitcopy first
+         // reset refcount
+@@ -249,7 +278,11 @@ static struct Block_byref *_Block_byref_copy(const void *arg) {
+                 copy3->layout = src3->layout;
+             }
+ 
++#if defined(OBJC_PORT)
++            ipaSim_callBack2((void *)src2->byref_keep, copy, src);
++#else
+             (*src2->byref_keep)(copy, src);
++#endif
+         }
+         else {
+             // Bitwise copy.
+@@ -277,7 +310,11 @@ static void _Block_byref_release(const void *arg) {
+         if (latching_decr_int_should_deallocate(&byref->flags)) {
+             if (byref->flags & BLOCK_BYREF_HAS_COPY_DISPOSE) {
+                 struct Block_byref_2 *byref2 = (struct Block_byref_2 *)(byref+1);
++#if defined(OBJC_PORT)
++                ipaSim_callBack1((void *)byref2->byref_destroy, byref);
++#else
+                 (*byref2->byref_destroy)(byref);
++#endif
+             }
+             free(byref);
+         }
+@@ -346,7 +383,12 @@ bool _Block_has_signature(void *aBlock) {
+ 
+ const char * _Block_signature(void *aBlock)
+ {
++    // [port] CHANGED: [ptr-conversion].
++#if defined(OBJC_PORT)
++    struct Block_descriptor_3 *desc3 = _Block_descriptor_3((struct Block_layout *)aBlock);
++#else
+     struct Block_descriptor_3 *desc3 = _Block_descriptor_3(aBlock);
++#endif
+     if (!desc3) return NULL;
+ 
+     return desc3->signature;
+@@ -358,7 +400,12 @@ const char * _Block_layout(void *aBlock)
+     struct Block_layout *layout = (struct Block_layout *)aBlock;
+     if (layout->flags & BLOCK_HAS_EXTENDED_LAYOUT) return NULL;
+ 
++    // [port] CHANGED: [ptr-conversion].
++#if defined(OBJC_PORT)
++    struct Block_descriptor_3 *desc3 = _Block_descriptor_3((struct Block_layout *)aBlock);
++#else
+     struct Block_descriptor_3 *desc3 = _Block_descriptor_3(aBlock);
++#endif
+     if (!desc3) return NULL;
+ 
+     return desc3->layout;
+@@ -370,7 +417,12 @@ const char * _Block_extended_layout(void *aBlock)
+     struct Block_layout *layout = (struct Block_layout *)aBlock;
+     if (! (layout->flags & BLOCK_HAS_EXTENDED_LAYOUT)) return NULL;
+ 
++    // [port] CHANGED: [ptr-conversion].
++#if defined(OBJC_PORT)
++    struct Block_descriptor_3 *desc3 = _Block_descriptor_3((struct Block_layout *)aBlock);
++#else
+     struct Block_descriptor_3 *desc3 = _Block_descriptor_3(aBlock);
++#endif
+     if (!desc3) return NULL;
+ 
+     // Return empty string (all non-object bytes) instead of NULL 
+-- 
+2.18.0.windows.1
+

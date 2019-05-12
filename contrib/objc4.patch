@@ -1,0 +1,2051 @@
+From 031bf258e97a1551970132cb9253481c4bc0f364 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jan=20Jone=C5=A1?= <jjones@outlook.cz>
+Date: Sun, 12 May 2019 08:38:51 +0200
+Subject: [PATCH] Squash branch `port`
+
+---
+ .gitignore                                    |   2 +
+ README.md                                     |   9 +
+ runtime/Messengers.subproj/objc-msg-i386.s    |   3 +-
+ .../objc-msg-simulator-i386.s                 |  59 +++++-
+ runtime/NSObjCRuntime.h                       |   5 +
+ runtime/NSObject.h                            |   6 +
+ runtime/NSObject.mm                           | 127 +++++++++++-
+ runtime/Protocol.h                            |   5 +
+ runtime/Protocol.mm                           |   3 +
+ runtime/hashtable.h                           |   5 +
+ runtime/hashtable2.h                          |   5 +
+ runtime/maptable.h                            |   5 +
+ runtime/message.h                             |   6 +
+ runtime/objc-abi.h                            |  10 +
+ runtime/objc-accessors.mm                     |   3 +
+ runtime/objc-api.h                            |   3 +-
+ runtime/objc-block-trampolines.mm             |  22 +++
+ runtime/objc-cache.mm                         |  17 +-
+ runtime/objc-class.h                          |   6 +
+ runtime/objc-class.mm                         |  29 ++-
+ runtime/objc-config.h                         |   6 +-
+ runtime/objc-errors.mm                        |  54 +++++
+ runtime/objc-exception.h                      |   5 +
+ runtime/objc-exception.mm                     |  12 ++
+ runtime/objc-gdb.h                            |   6 +
+ runtime/objc-initialize.mm                    |  27 ++-
+ runtime/objc-internal.h                       |   9 +
+ runtime/objc-load.h                           |   5 +
+ runtime/objc-loadmethod.mm                    |  15 +-
+ runtime/objc-os.h                             | 185 +++++++++++++++++-
+ runtime/objc-os.mm                            |  16 +-
+ runtime/objc-private.h                        |  15 ++
+ runtime/objc-references.mm                    |   8 +-
+ runtime/objc-runtime-new.mm                   |  20 ++
+ runtime/objc-runtime.mm                       |  18 +-
+ runtime/objc-sync.h                           |   5 +
+ runtime/objc-sync.mm                          |  11 +-
+ runtime/objc-weak.h                           |   5 +
+ runtime/objc-weak.mm                          |   3 +
+ runtime/objc.h                                |   5 +
+ runtime/runtime.h                             |   7 +-
+ 41 files changed, 737 insertions(+), 30 deletions(-)
+ create mode 100644 .gitignore
+ create mode 100644 README.md
+
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..d8a7b0f
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,2 @@
++# [port] CHANGED: Added, [gtm].
++/.gtm/
+diff --git a/README.md b/README.md
+new file mode 100644
+index 0000000..1080b59
+--- /dev/null
++++ b/README.md
+@@ -0,0 +1,9 @@
++# Port of Apple's `objc4` to UWP
++
++## Code organization
++
++In branch `master` is the original code retrieved from [the official Apple's repository](https://opensource.apple.com/tarballs/objc4/).
++The current version there is `objc4-723`.
++
++In branch `port` (most likely this branch) are changes made to the original source code for porting.
++One of such change is adding this `README.md` file.
+diff --git a/runtime/Messengers.subproj/objc-msg-i386.s b/runtime/Messengers.subproj/objc-msg-i386.s
+index 8a64ba0..833ba44 100644
+--- a/runtime/Messengers.subproj/objc-msg-i386.s
++++ b/runtime/Messengers.subproj/objc-msg-i386.s
+@@ -22,7 +22,8 @@
+  */
+ 
+ #include <TargetConditionals.h>
+-#if defined(__i386__)  &&  !TARGET_OS_SIMULATOR
++// [port] CHANGED: [i386-asm].
++#if defined(__i386__)  &&  !TARGET_OS_SIMULATOR  &&  !defined(OBJC_PORT)
+ 
+ /********************************************************************
+  ********************************************************************
+diff --git a/runtime/Messengers.subproj/objc-msg-simulator-i386.s b/runtime/Messengers.subproj/objc-msg-simulator-i386.s
+index beb7ac5..1c7309f 100644
+--- a/runtime/Messengers.subproj/objc-msg-simulator-i386.s
++++ b/runtime/Messengers.subproj/objc-msg-simulator-i386.s
+@@ -22,9 +22,14 @@
+  */
+ 
+ #include <TargetConditionals.h>
+-#if defined(__i386__)  &&  TARGET_OS_SIMULATOR
++// [port] CHANGED: [i386-asm].
++#if defined(__i386__)  &&  (TARGET_OS_SIMULATOR  ||  defined(OBJC_PORT))
+ 
++#if defined(OBJC_PORT)
++#include "..\objc-config.h"
++#else
+ #include "objc-config.h"
++#endif
+ 
+ .data
+ 
+@@ -290,6 +295,12 @@ LExit$0:
+ 
+ .if $1 == CALL
+ 	MESSENGER_END_FAST
++
++    // [port] CHANGED: Added this block of code.
++    pushl	%eax
++    call	_ipaSim_translate4
++    popl	%eax
++
+ 	jmp	*4(%eax)		// call imp
+ 
+ .elseif $1 == LOOKUP
+@@ -340,7 +351,13 @@ LExit$0:
+ 
+ 1:
+ 	// loop
++	// [port] CHANGED: "cmpq" is for x64 only.
++	// [port] TODO: How could this work in the original code?
++#if defined(OBJC_PORT)
++	cmpl	$$1, (%eax)
++#else
+ 	cmpq	$$1, (%eax)
++#endif
+ 	jbe	3f			// if (bucket->sel <= 1) wrap or miss
+ 	
+ 	addl	$$8, %eax		// bucket++
+@@ -383,10 +400,18 @@ LExit$0:
+ 	movl    selector_stret+4(%ebp), %ecx
+ .endif
+ 	
++	// [port] CHANGED: [unaligned].
++#if defined(OBJC_PORT)
++	movdqu  %xmm3, 4*16(%esp)
++	movdqu  %xmm2, 3*16(%esp)
++	movdqu  %xmm1, 2*16(%esp)
++	movdqu  %xmm0, 1*16(%esp)
++#else
+ 	movdqa  %xmm3, 4*16(%esp)
+ 	movdqa  %xmm2, 3*16(%esp)
+ 	movdqa  %xmm1, 2*16(%esp)
+ 	movdqa  %xmm0, 1*16(%esp)
++#endif
+ 	
+ 	movl	%edx, 8(%esp)		// class
+ 	movl	%ecx, 4(%esp)		// selector
+@@ -395,10 +420,18 @@ LExit$0:
+ 
+ 	// imp in eax
+ 
++	// [port] CHANGED: [unaligned].
++#if defined(OBJC_PORT)
++	movdqu  4*16(%esp), %xmm3
++	movdqu  3*16(%esp), %xmm2
++	movdqu  2*16(%esp), %xmm1
++	movdqu  1*16(%esp), %xmm0
++#else
+ 	movdqa  4*16(%esp), %xmm3
+ 	movdqa  3*16(%esp), %xmm2
+ 	movdqa  2*16(%esp), %xmm1
+ 	movdqa  1*16(%esp), %xmm0
++#endif
+ 
+ .if $0 == NORMAL
+ 	cmp	%eax, %eax	// set eq for nonstret forwarding
+@@ -889,6 +922,12 @@ LCacheMiss:
+ 
+ 	// edx is already the class to search
+ 	MethodTableLookup NORMAL
++
++    // [port] CHANGED: Added this block of code.
++    pushl	%eax
++    call	_ipaSim_translate
++    addl	$4, %esp
++
+ 	jmp	*%eax		// call imp
+ 
+ 	END_ENTRY __objc_msgSend_uncached
+@@ -902,6 +941,12 @@ LCacheMiss:
+ 
+ 	// edx is already the class to search
+ 	MethodTableLookup STRET
++
++    // [port] CHANGED: Added this block of code.
++    pushl	%eax
++    call	_ipaSim_translate
++    addl	$4, %esp
++
+ 	jmp	*%eax		// call imp
+ 
+ 	END_ENTRY __objc_msgSend_stret_uncached
+@@ -1022,6 +1067,12 @@ L_forward_stret_handler:
+ 	movl	method_name(%ecx), %edx
+ 	movl	method_imp(%ecx), %eax
+ 	movl	%edx, selector(%esp)
++
++    // [port] CHANGED: Added this block of code.
++    pushl	%eax
++    call	_ipaSim_translate
++    addl	$4, %esp
++
+ 	jmp	*%eax
+ 	
+ 	END_ENTRY _method_invoke
+@@ -1033,6 +1084,12 @@ L_forward_stret_handler:
+ 	movl	method_name(%ecx), %edx
+ 	movl	method_imp(%ecx), %eax
+ 	movl	%edx, selector_stret(%esp)
++
++    // [port] CHANGED: Added this block of code.
++    pushl	%eax
++    call	_ipaSim_translate
++    addl	$4, %esp
++
+ 	jmp	*%eax
+ 	
+ 	END_ENTRY _method_invoke_stret
+diff --git a/runtime/NSObjCRuntime.h b/runtime/NSObjCRuntime.h
+index d111e0e..a0269bd 100644
+--- a/runtime/NSObjCRuntime.h
++++ b/runtime/NSObjCRuntime.h
+@@ -6,7 +6,12 @@
+ #define _OBJC_NSOBJCRUNTIME_H_
+ 
+ #include <TargetConditionals.h>
++// [port] CHANGED: [angle-brackets].
++#ifdef OBJC_PORT
++#include "objc.h"
++#else
+ #include <objc/objc.h>
++#endif // [port] !OBJC_PORT
+ 
+ #if __LP64__ || (TARGET_OS_EMBEDDED && !TARGET_OS_IPHONE) || TARGET_OS_WIN32 || NS_BUILD_32_LIKE_64
+ typedef long NSInteger;
+diff --git a/runtime/NSObject.h b/runtime/NSObject.h
+index 2172aba..690defd 100644
+--- a/runtime/NSObject.h
++++ b/runtime/NSObject.h
+@@ -7,8 +7,14 @@
+ 
+ #if __OBJC__
+ 
++// [port] CHANGED: [angle-brackets].
++#ifdef OBJC_PORT
++#include "objc.h"
++#include "NSObjCRuntime.h"
++#else
+ #include <objc/objc.h>
+ #include <objc/NSObjCRuntime.h>
++#endif // [port] !OBJC_PORT
+ 
+ @class NSString, NSMethodSignature, NSInvocation;
+ 
+diff --git a/runtime/NSObject.mm b/runtime/NSObject.mm
+index ec528a0..3e900cb 100644
+--- a/runtime/NSObject.mm
++++ b/runtime/NSObject.mm
+@@ -28,18 +28,32 @@
+ #include "llvm-DenseMap.h"
+ #include "NSObject.h"
+ 
++// [port] CHANGED: Including Windows's <malloc.h>
++#ifdef OBJC_PORT
++#include <malloc.h>
++#else
+ #include <malloc/malloc.h>
++#endif // [port] !OBJC_PORT
+ #include <stdint.h>
+ #include <stdbool.h>
++// [port] TODO: Are those needed?
++#ifndef OBJC_PORT
+ #include <mach/mach.h>
+ #include <mach-o/dyld.h>
+ #include <mach-o/nlist.h>
++#endif
+ #include <sys/types.h>
++// [port] TODO: Are those needed?
++#ifndef OBJC_PORT
+ #include <sys/mman.h>
+ #include <libkern/OSAtomic.h>
+-#include <Block.h>
++#endif
++#include <Block.h> // [port] For _Block_copy.
+ #include <map>
++// [port] TODO: Is this needed?
++#ifndef OBJC_PORT
+ #include <execinfo.h>
++#endif
+ 
+ @interface NSInvocation
+ - (SEL)selector;
+@@ -693,7 +707,12 @@ class AutoreleasePoolPage
+ #   define EMPTY_POOL_PLACEHOLDER ((id*)1)
+ 
+ #   define POOL_BOUNDARY nil
++    // [port] CHANGED: [no-direct-keys].
++#if defined(OBJC_PORT)
++    static pthread_key_t key;
++#else
+     static pthread_key_t const key = AUTORELEASE_POOL_KEY;
++#endif
+     static uint8_t const SCRIBBLE = 0xA3;  // 0xA3A3A3A3 after releasing
+     static size_t const SIZE = 
+ #if PROTECT_AUTORELEASEPOOL
+@@ -714,7 +733,13 @@ class AutoreleasePoolPage
+     // SIZE-sizeof(*this) bytes of contents follow
+ 
+     static void * operator new(size_t size) {
++        // [port] CHANGED: Replacing malloc_zone_memalign(malloc_default_zone(), ...)
++        // [port] -> posix_memalign(...) -> _aligned_malloc(...).
++#if defined(OBJC_PORT)
++        return _aligned_malloc(SIZE, SIZE);
++#else
+         return malloc_zone_memalign(malloc_default_zone(), SIZE, SIZE);
++#endif
+     }
+     static void operator delete(void * p) {
+         return free(p);
+@@ -1018,11 +1043,14 @@ class AutoreleasePoolPage
+         else if (obj != POOL_BOUNDARY  &&  DebugMissingPools) {
+             // We are pushing an object with no pool in place, 
+             // and no-pool debugging was requested by environment.
++            // [port] CHANGED: [format-error-pthread-self].
++#if !defined(OBJC_PORT)
+             _objc_inform("MISSING POOLS: (%p) Object %p of class %s "
+                          "autoreleased with no pool in place - "
+                          "just leaking - break on "
+                          "objc_autoreleaseNoPool() to debug", 
+                          pthread_self(), (void*)obj, object_getClassName(obj));
++#endif
+             objc_autoreleaseNoPool(obj);
+             return nil;
+         }
+@@ -1167,9 +1195,15 @@ public:
+ 
+     static void init()
+     {
++        // [port] CHANGED: [no-direct-keys].
++#if defined(OBJC_PORT)
++        pthread_key_create(&AutoreleasePoolPage::key,
++                           AutoreleasePoolPage::tls_dealloc);
++#else
+         int r __unused = pthread_key_init_np(AutoreleasePoolPage::key, 
+                                              AutoreleasePoolPage::tls_dealloc);
+         assert(r == 0);
++#endif
+     }
+ 
+     void print() 
+@@ -1192,7 +1226,10 @@ public:
+     static void printAll()
+     {        
+         _objc_inform("##############");
++        // [port] CHANGED: [format-error-pthread-self].
++#if !defined(OBJC_PORT)
+         _objc_inform("AUTORELEASE POOLS for thread %p", pthread_self());
++#endif
+ 
+         AutoreleasePoolPage *page;
+         ptrdiff_t objects = 0;
+@@ -1229,10 +1266,16 @@ public:
+                 p->protect();
+             }
+             
++            // [port] CHANGED: [format-error-pthread-self].      
++#if !defined(OBJC_PORT)
+             _objc_inform("POOL HIGHWATER: new high water mark of %u "
+                          "pending releases for thread %p:", 
+                          mark, pthread_self());
+-            
++#endif
++
++            // [port] CHANGED: "backtrace" is undefined.
++            // [port] TODO: Port this using https://stackoverflow.com/a/26398082.
++#if !defined(OBJC_PORT)
+             void *stack[128];
+             int count = backtrace(stack, sizeof(stack)/sizeof(stack[0]));
+             char **sym = backtrace_symbols(stack, count);
+@@ -1240,12 +1283,19 @@ public:
+                 _objc_inform("POOL HIGHWATER:     %s", sym[i]);
+             }
+             free(sym);
++#endif
+         }
+     }
+ 
+ #undef POOL_BOUNDARY
+ };
+ 
++// [port] CHANGED: Let's define the key.
++// [port] TODO: Is this correctly done?
++#if defined(OBJC_PORT)
++pthread_key_t AutoreleasePoolPage::key;
++#endif
++
+ // anonymous namespace
+ };
+ 
+@@ -1637,11 +1687,20 @@ objc_object::sidetable_clearDeallocating()
+ 
+ #if __OBJC2__
+ 
++// [port] CHANGED: Defined in `stubs.mm`. See #27.
++#if defined(OBJC_PORT)
++extern bool dispatch_is_dispatch_object(const void *);
++#endif
++
+ __attribute__((aligned(16)))
+ id 
+ objc_retain(id obj)
+ {
+     if (!obj) return obj;
++    // [port] CHANGED: See #27.
++#if defined(OBJC_PORT)
++    if (dispatch_is_dispatch_object(obj)) return obj;
++#endif
+     if (obj->isTaggedPointer()) return obj;
+     return obj->retain();
+ }
+@@ -1652,6 +1711,10 @@ void
+ objc_release(id obj)
+ {
+     if (!obj) return;
++    // [port] CHANGED: See #27.
++#if defined(OBJC_PORT)
++    if (dispatch_is_dispatch_object(obj)) return;
++#endif
+     if (obj->isTaggedPointer()) return;
+     return obj->release();
+ }
+@@ -1662,6 +1725,10 @@ id
+ objc_autorelease(id obj)
+ {
+     if (!obj) return obj;
++    // [port] CHANGED: See #27.
++#if defined(OBJC_PORT)
++    if (dispatch_is_dispatch_object(obj)) return obj;
++#endif
+     if (obj->isTaggedPointer()) return obj;
+     return obj->autorelease();
+ }
+@@ -2215,6 +2282,59 @@ void arr_init(void)
+     return ((id(*)(id, SEL, id, id))objc_msgSend)(self, sel, obj1, obj2);
+ }
+ 
++// [port] CHANGED: Copied from WinObjC's NSObject.
++#if defined(OBJC_PORT)
++
++/**
++ @Status Interoperable
++*/
+++ (NSMethodSignature*)methodSignatureForSelector:(SEL)selector {
++    Class metaClass = object_getClass(self);
++    Method method = class_getInstanceMethod(metaClass, selector);
++
++    if (!method && [self resolveClassMethod:selector]) {
++        method = class_getInstanceMethod(metaClass, selector);
++    }
++
++    if (!method) {
++        //TraceWarning(L"Objective-C", L"+[%hs %hs]: unrecognized selector in signature lookup.", class_getName(self), sel_getName(selector));
++        return nil;
++    }
++
++    const char* methodTypes = method_getTypeEncoding(method);
++
++    return [objc_getClass("NSMethodSignature") signatureWithObjCTypes:methodTypes];
++}
++
++/**
++ @Status Interoperable
++*/
++- (NSMethodSignature*)methodSignatureForSelector:(SEL)selector {
++    return [[self class] instanceMethodSignatureForSelector:selector];
++}
++
++/**
++ @Status Interoperable
++*/
+++ (NSMethodSignature*)instanceMethodSignatureForSelector:(SEL)selector {
++    Method method = class_getInstanceMethod(self, selector);
++
++    if (!method && [self resolveInstanceMethod:selector]) {
++        method = class_getInstanceMethod(self, selector);
++    }
++
++    if (!method) {
++        //TraceWarning(L"Objective-C", L"-[%hs %hs]: unrecognized selector in signature lookup.", class_getName(self), sel_getName(selector));
++        return nil;
++    }
++
++    const char* methodTypes = method_getTypeEncoding(method);
++
++    return [objc_getClass("NSMethodSignature") signatureWithObjCTypes:methodTypes];
++}
++
++// defined(OBJC_PORT)
++#else
+ 
+ // Replaced by CF (returns an NSMethodSignature)
+ + (NSMethodSignature *)instanceMethodSignatureForSelector:(SEL)sel {
+@@ -2234,6 +2354,9 @@ void arr_init(void)
+                 "not available without CoreFoundation");
+ }
+ 
++// !defined(OBJC_PORT)
++#endif
++
+ + (void)forwardInvocation:(NSInvocation *)invocation {
+     [self doesNotRecognizeSelector:(invocation ? [invocation selector] : 0)];
+ }
+diff --git a/runtime/Protocol.h b/runtime/Protocol.h
+index f5169be..8f522c6 100644
+--- a/runtime/Protocol.h
++++ b/runtime/Protocol.h
+@@ -36,7 +36,12 @@
+ 
+ #elif __OBJC2__
+ 
++// [port] CHANGED: [angle-brackets].
++#if defined(OBJC_PORT)
++#include "NSObject.h"
++#else
+ #include <objc/NSObject.h>
++#endif
+ 
+ // All methods of class Protocol are unavailable. 
+ // Use the functions in objc/runtime.h instead.
+diff --git a/runtime/Protocol.mm b/runtime/Protocol.mm
+index 2a2b3da..7501a3a 100644
+--- a/runtime/Protocol.mm
++++ b/runtime/Protocol.mm
+@@ -32,7 +32,10 @@
+ 
+ #include <stdlib.h>
+ #include <string.h>
++// [port] CHANGED: Not needed.
++#if !defined(OBJC_PORT)
+ #include <mach-o/dyld.h>
++#endif
+ #include <mach-o/ldsyms.h>
+ 
+ #include "Protocol.h"
+diff --git a/runtime/hashtable.h b/runtime/hashtable.h
+index 7f62780..9f40ca8 100644
+--- a/runtime/hashtable.h
++++ b/runtime/hashtable.h
+@@ -1,2 +1,7 @@
++// [port] CHANGED: [angle-brackets].
++#ifdef OBJC_PORT
++#include "hashtable2.h"
++#else
+ #include <objc/hashtable2.h>
++#endif
+ 
+diff --git a/runtime/hashtable2.h b/runtime/hashtable2.h
+index a7dd3c8..11d383d 100644
+--- a/runtime/hashtable2.h
++++ b/runtime/hashtable2.h
+@@ -38,7 +38,12 @@
+ #   define OBJC_HASH_AVAILABILITY
+ #endif
+ 
++// [port] CHANGED: [angle-brackets].
++#ifdef OBJC_PORT
++#include "objc.h"
++#else
+ #include <objc/objc.h>
++#endif // [port] !OBJC_PORT
+ #include <stdint.h>
+ #include <TargetConditionals.h>
+ 
+diff --git a/runtime/maptable.h b/runtime/maptable.h
+index 248c18f..f998bf1 100644
+--- a/runtime/maptable.h
++++ b/runtime/maptable.h
+@@ -38,7 +38,12 @@
+ #   define OBJC_MAP_AVAILABILITY
+ #endif
+ 
++// [port] CHANGED: [angle-brackets].
++#ifdef OBJC_PORT
++#include "objc.h"
++#else
+ #include <objc/objc.h>
++#endif // [port] !OBJC_PORT
+ 
+ __BEGIN_DECLS
+ 
+diff --git a/runtime/message.h b/runtime/message.h
+index a53b430..e9922a6 100644
+--- a/runtime/message.h
++++ b/runtime/message.h
+@@ -24,8 +24,14 @@
+ #ifndef _OBJC_MESSAGE_H
+ #define _OBJC_MESSAGE_H
+ 
++// [port] CHANGED: [angle-brackets].
++#ifdef OBJC_PORT
++#include "objc.h"
++#include "runtime.h"
++#else
+ #include <objc/objc.h>
+ #include <objc/runtime.h>
++#endif // [port] !OBJC_PORT
+ 
+ #ifndef OBJC_SUPER
+ #define OBJC_SUPER
+diff --git a/runtime/objc-abi.h b/runtime/objc-abi.h
+index 8d861ef..b8fc410 100644
+--- a/runtime/objc-abi.h
++++ b/runtime/objc-abi.h
+@@ -37,11 +37,21 @@
+  * objc-abi.h: Declarations for functions used by compiler codegen.
+  */
+ 
++// [port] CHANGED: Trying to use external headers as little as possible.
++#ifndef OBJC_PORT
+ #include <malloc/malloc.h>
++#endif // [port] !OBJC_PORT
+ #include <TargetConditionals.h>
++// [port] CHANGED: [angle-brackets].
++#ifdef OBJC_PORT
++#include "objc.h"
++#include "runtime.h"
++#include "message.h"
++#else
+ #include <objc/objc.h>
+ #include <objc/runtime.h>
+ #include <objc/message.h>
++#endif // [port] !OBJC_PORT
+ 
+ /* Runtime startup. */
+ 
+diff --git a/runtime/objc-accessors.mm b/runtime/objc-accessors.mm
+index 612abea..81c9487 100644
+--- a/runtime/objc-accessors.mm
++++ b/runtime/objc-accessors.mm
+@@ -24,7 +24,10 @@
+ #include <string.h>
+ #include <stddef.h>
+ 
++// [port] TODO: Is this needed?
++#if !defined(OBJC_PORT)
+ #include <libkern/OSAtomic.h>
++#endif
+ 
+ #include "objc-private.h"
+ #include "runtime.h"
+diff --git a/runtime/objc-api.h b/runtime/objc-api.h
+index fb0e9ea..fd174c9 100644
+--- a/runtime/objc-api.h
++++ b/runtime/objc-api.h
+@@ -203,7 +203,8 @@
+ #endif
+ 
+ #if !defined(OBJC_VISIBLE)
+-#   if TARGET_OS_WIN32
++    // [port] CHANGED: Exporting symbols the Windows way.
++#   if TARGET_OS_WIN32 || defined(OBJC_PORT)
+ #       if defined(BUILDING_OBJC)
+ #           define OBJC_VISIBLE __declspec(dllexport)
+ #       else
+diff --git a/runtime/objc-block-trampolines.mm b/runtime/objc-block-trampolines.mm
+index 6ef5fcf..233d9f5 100644
+--- a/runtime/objc-block-trampolines.mm
++++ b/runtime/objc-block-trampolines.mm
+@@ -38,11 +38,21 @@
+ 
+ // symbols defined in assembly files
+ // Don't use the symbols directly; they're thumb-biased on some ARM archs.
++// [port] CHANGED: Otherwise, the symbol was imported C++-mangled, but is exported C-mangled.
++// [port] TODO: Why and how come the original works on macOS?
++#if defined(OBJC_PORT)
++#define TRAMP(tramp)                                \
++    extern "C" void *_##tramp;                      \
++    static inline __unused uintptr_t tramp(void) {  \
++        return ((uintptr_t)&_##tramp) & ~1UL;       \
++    }
++#else
+ #define TRAMP(tramp)                                \
+     static inline __unused uintptr_t tramp(void) {  \
+         extern void *_##tramp;                      \
+         return ((uintptr_t)&_##tramp) & ~1UL;       \
+     }
++#endif
+ // Scalar return
+ TRAMP(a1a2_tramphead);   // trampoline header code
+ TRAMP(a1a2_firsttramp);  // first trampoline
+@@ -219,12 +229,18 @@ static TrampolineBlockPagePair *_allocateTrampolinesAndData(ArgumentMode aMode)
+     
+     assert(headPagePair == nil  ||  headPagePair->nextAvailablePage == nil);
+     
++    // [port] CHANGED: Porting vm_allocate using malloc.
++    // [port] TODO: [use-unicorn-alloc].
++#if defined(OBJC_PORT)
++    dataAddress = (uintptr_t)malloc(PAGE_MAX_SIZE * 2);
++#else
+     kern_return_t result;
+     result = vm_allocate(mach_task_self(), &dataAddress, PAGE_MAX_SIZE * 2,
+                          VM_FLAGS_ANYWHERE | VM_MAKE_TAG(VM_MEMORY_FOUNDATION));
+     if (result != KERN_SUCCESS) {
+         _objc_fatal("vm_allocate trampolines failed (%d)", result);
+     }
++#endif
+ 
+     vm_address_t codeAddress = dataAddress + PAGE_MAX_SIZE;
+         
+@@ -243,6 +259,11 @@ static TrampolineBlockPagePair *_allocateTrampolinesAndData(ArgumentMode aMode)
+         break;
+     }
+     
++    // [port] CHANGED: Porting vm_remap using realloc.
++    // [port] TODO: [use-unicorn-alloc].
++#if defined(OBJC_PORT)
++    codeAddress = (uintptr_t)realloc((void *)codeAddress, PAGE_MAX_SIZE);
++#else
+     vm_prot_t currentProtection, maxProtection;
+     result = vm_remap(mach_task_self(), &codeAddress, PAGE_MAX_SIZE, 
+                       0, VM_FLAGS_FIXED | VM_FLAGS_OVERWRITE,
+@@ -252,6 +273,7 @@ static TrampolineBlockPagePair *_allocateTrampolinesAndData(ArgumentMode aMode)
+         // vm_deallocate(mach_task_self(), dataAddress, PAGE_MAX_SIZE * 2);
+         _objc_fatal("vm_remap trampolines failed (%d)", result);
+     }
++#endif
+     
+     TrampolineBlockPagePair *pagePair = (TrampolineBlockPagePair *) dataAddress;
+     pagePair->nextAvailable = pagePair->startIndex();
+diff --git a/runtime/objc-cache.mm b/runtime/objc-cache.mm
+index a0c6545..62e036e 100644
+--- a/runtime/objc-cache.mm
++++ b/runtime/objc-cache.mm
+@@ -141,6 +141,16 @@ static void recordDeadCache(mask_t capacity)
+ #define stringize(x) #x
+ #define stringize2(x) stringize(x)
+ 
++// [port] CHANGED: Porting Mach-O-only directives.
++#if defined(OBJC_PORT)
++asm("\n .section __const"
++    "\n .globl __objc_empty_vtable"
++    "\n .set __objc_empty_vtable, 0"
++    "\n .globl __objc_empty_cache"
++    "\n .align 4" // [port] TODO: Is this OK?
++    "\n __objc_empty_cache: .space " stringize2(EMPTY_BYTES)
++    );
++#else
+ // "cache" is cache->buckets; "vtable" is cache->mask/occupied
+ // hack to avoid conflicts with compiler's internal declaration
+ asm("\n .section __TEXT,__const"
+@@ -150,6 +160,7 @@ asm("\n .section __TEXT,__const"
+     "\n .align 3"
+     "\n __objc_empty_cache: .space " stringize2(EMPTY_BYTES)
+     );
++#endif
+ 
+ 
+ #if __arm__  ||  __x86_64__  ||  __i386__
+@@ -614,7 +625,8 @@ void cache_delete(Class cls)
+ * cache collection.
+ **********************************************************************/
+ 
+-#if !TARGET_OS_WIN32
++// [port] CHANGED: Not supporting these.
++#if !TARGET_OS_WIN32 && !defined(OBJC_PORT)
+ 
+ // A sentinel (magic value) to report bad thread_get_state status.
+ // Must not be a valid PC.
+@@ -670,7 +682,8 @@ OBJC_EXPORT uintptr_t objc_exitPoints[];
+ 
+ static int _collecting_in_critical(void)
+ {
+-#if TARGET_OS_WIN32
++    // [port] CHANGED: Yes, we want this stub, too!
++#if TARGET_OS_WIN32 || defined(OBJC_PORT)
+     return TRUE;
+ #else
+     thread_act_port_array_t threads;
+diff --git a/runtime/objc-class.h b/runtime/objc-class.h
+index 4599f08..7eb6c67 100644
+--- a/runtime/objc-class.h
++++ b/runtime/objc-class.h
+@@ -1,2 +1,8 @@
++// [port] CHANGED: [angle-brackets].
++#if defined(OBJC_PORT)
++#include "runtime.h"
++#include "message.h"
++#else
+ #include <objc/runtime.h>
+ #include <objc/message.h>
++#endif
+diff --git a/runtime/objc-class.mm b/runtime/objc-class.mm
+index 9e96b6d..413d43d 100644
+--- a/runtime/objc-class.mm
++++ b/runtime/objc-class.mm
+@@ -158,7 +158,12 @@
+ 
+ #include "objc-private.h"
+ #include "objc-abi.h"
++// [port] CHANGED: [angle-brackets].
++#if defined(OBJC_PORT)
++#include "message.h"
++#else
+ #include <objc/message.h>
++#endif
+ 
+ 
+ /* overriding the default object allocation and error handling routines */
+@@ -436,6 +441,11 @@ Ivar object_getInstanceVariable(id obj, const char *name, void **value)
+     return nil;
+ }
+ 
++// [port] CHANGED: See `IpaSimLibrary` for implementation.
++#if defined(OBJC_PORT)
++extern "C" __declspec(dllimport) void ipaSim_callBack1(void *FP, void *Arg0);
++#endif
++
+ 
+ /***********************************************************************
+ * object_cxxDestructFromClass.
+@@ -459,7 +469,11 @@ static void object_cxxDestructFromClass(id obj, Class cls)
+                 _objc_inform("CXX: calling C++ destructors for class %s", 
+                              cls->nameForLogging());
+             }
++#if defined(OBJC_PORT)
++            ipaSim_callBack1((void *)dtor, obj);
++#else
+             (*dtor)(obj);
++#endif
+         }
+     }
+ }
+@@ -575,7 +589,6 @@ void fixupCopiedIvars(id newObject, id oldObject)
+     }
+ }
+ 
+-
+ /***********************************************************************
+ * _class_resolveClassMethod
+ * Call +resolveClassMethod, looking for a method to be added to class cls.
+@@ -967,6 +980,20 @@ _objc_constructOrFree(id bytes, Class cls)
+     return obj;
+ }
+ 
++// [port] CHANGED: Porting malloc_zone_batch_malloc.
++#if defined(OBJC_PORT)
++// [port] From https://github.com/emeryberger/Malloc-Implementations/blob/17e52035d91f9f2e52e3303c8872ee29f5b5a7c5/Heap-Layers/wrappers/macwrapper.cpp#L277.
++static unsigned malloc_zone_batch_malloc(malloc_zone_t *, size_t sz, void ** results, unsigned num_requested)
++{
++    for (unsigned i = 0; i < num_requested; i++) {
++        results[i] = malloc(sz);
++        if (results[i] == NULL) {
++            return i;
++        }
++    }
++    return num_requested;
++}
++#endif
+ 
+ /***********************************************************************
+ * _class_createInstancesFromZone
+diff --git a/runtime/objc-config.h b/runtime/objc-config.h
+index 979b467..934f3d9 100644
+--- a/runtime/objc-config.h
++++ b/runtime/objc-config.h
+@@ -146,14 +146,16 @@
+ #endif
+ 
+ // Define SUPPORT_MESSAGE_LOGGING to enable NSObjCMessageLoggingEnabled
+-#if TARGET_OS_WIN32  ||  TARGET_OS_EMBEDDED
++// [port] CHANGED: Message logging uses undefined functions.
++#if TARGET_OS_WIN32  ||  TARGET_OS_EMBEDDED  ||  defined(OBJC_PORT)
+ #   define SUPPORT_MESSAGE_LOGGING 0
+ #else
+ #   define SUPPORT_MESSAGE_LOGGING 1
+ #endif
+ 
+ // Define SUPPORT_QOS_HACK to work around deadlocks due to QoS bugs.
+-#if !__OBJC2__  ||  TARGET_OS_WIN32
++// [port] CHANGED: We don't want to support qos hack right now.
++#if !__OBJC2__  ||  TARGET_OS_WIN32  ||  defined(OBJC_PORT)
+ #   define SUPPORT_QOS_HACK 0
+ #else
+ #   define SUPPORT_QOS_HACK 1
+diff --git a/runtime/objc-errors.mm b/runtime/objc-errors.mm
+index 6d65ca2..fd1c684 100644
+--- a/runtime/objc-errors.mm
++++ b/runtime/objc-errors.mm
+@@ -130,6 +130,8 @@ static void _objc_crashlog(const char *message)
+     }
+ }
+ 
++// [port] CHANGED: fstat is undefined.
++#if !defined(OBJC_PORT)
+ // Returns true if logs should be sent to stderr as well as syslog.
+ // Copied from CFUtilities.c
+ static bool also_do_stderr(void) 
+@@ -143,17 +145,59 @@ static bool also_do_stderr(void)
+     }
+     return false;
+ }
++#endif
++
++// [port] CHANGED: Porting _simple_asl_log.
++#if defined(OBJC_PORT)
++__declspec(dllimport) void __stdcall OutputDebugStringA(const char *);
++void _simple_asl_log(int __level, const char *__facility, const char *__message) {
++    puts(__message);
++    OutputDebugStringA(__message); // See #19.
++}
++#endif
+ 
+ // Print "message" to the console.
+ static void _objc_syslog(const char *message)
+ {
+     _simple_asl_log(ASL_LEVEL_ERR, nil, message);
+ 
++    // [port] CHANGED: also_do_stderr is not implemented.
++#if !defined(OBJC_PORT)
+     if (also_do_stderr()) {
+         write(STDERR_FILENO, message, strlen(message));
+     }
++#endif
+ }
+ 
++// [port] CHANGED: Porting vasprintf.
++// [port] Source: https://stackoverflow.com/a/49873938.
++#if defined(OBJC_PORT)
++static int vasprintf(char **strp, const char *format, va_list ap)
++{
++    int len = _vscprintf(format, ap);
++    if (len == -1)
++        return -1;
++    char *str = (char*)malloc((size_t) len + 1);
++    if (!str)
++        return -1;
++    int retval = vsnprintf(str, len + 1, format, ap);
++    if (retval == -1) {
++        free(str);
++        return -1;
++    }
++    *strp = str;
++    return retval;
++}
++static int asprintf(char **strp, const char *format, ...)
++{
++    va_list ap;
++    va_start(ap, format);
++    int retval = vasprintf(strp, format, ap);
++    va_end(ap);
++    return retval;
++}
++#endif
++
+ /*
+  * _objc_error is the default *_error handler.
+  */
+@@ -183,6 +227,11 @@ void __objc_error(id rcv, const char *fmt, ...)
+     va_end(vp);
+ }
+ 
++// [port] CHANGED: Porting getpid.
++#if defined(OBJC_PORT)
++#define getpid GetCurrentProcessId
++#endif
++
+ static __attribute__((noreturn))
+ void _objc_fatalv(uint64_t reason, uint64_t flags, const char *fmt, va_list ap)
+ {
+@@ -193,15 +242,20 @@ void _objc_fatalv(uint64_t reason, uint64_t flags, const char *fmt, va_list ap)
+     asprintf(&buf2, "objc[%d]: %s\n", getpid(), buf1);
+     _objc_syslog(buf2);
+ 
++    // [port] CHANGED: abort_with_reason is undefined.
++#if !defined(OBJC_PORT)
+     if (DebugDontCrash) {
++#endif
+         char *buf3;
+         asprintf(&buf3, "objc[%d]: HALTED\n", getpid());
+         _objc_syslog(buf3);
+         _Exit(1);
++#if !defined(OBJC_PORT)
+     }
+     else {
+         abort_with_reason(OS_REASON_OBJC, reason, buf1, flags);
+     }
++#endif
+ }
+ 
+ void _objc_fatal_with_reason(uint64_t reason, uint64_t flags, 
+diff --git a/runtime/objc-exception.h b/runtime/objc-exception.h
+index d6cbb7e..544eb2c 100644
+--- a/runtime/objc-exception.h
++++ b/runtime/objc-exception.h
+@@ -24,7 +24,12 @@
+ #ifndef __OBJC_EXCEPTION_H_
+ #define __OBJC_EXCEPTION_H_
+ 
++// [port] CHANGED: [angle-brackets].
++#if defined(OBJC_PORT)
++#include "objc.h"
++#else
+ #include <objc/objc.h>
++#endif
+ #include <stdint.h>
+ 
+ #if !__OBJC2__
+diff --git a/runtime/objc-exception.mm b/runtime/objc-exception.mm
+index d510d23..6b6ba7d 100644
+--- a/runtime/objc-exception.mm
++++ b/runtime/objc-exception.mm
+@@ -238,9 +238,18 @@ void _destroyAltHandlerList(struct alt_handler_list *list)
+ **********************************************************************/
+ 
+ #include "objc-private.h"
++// [port] CHANGED: [angle-brackets].
++#if defined(OBJC_PORT)
++#include "objc-exception.h"
++#include "NSObject.h"
++#else
+ #include <objc/objc-exception.h>
+ #include <objc/NSObject.h>
++#endif
++// [port] CHANGED: Not needed.
++#if !defined(OBJC_PORT)
+ #include <execinfo.h>
++#endif
+ 
+ // unwind library types and functions
+ // Mostly adapted from Itanium C++ ABI: Exception Handling
+@@ -538,9 +547,12 @@ void objc_exception_throw(id obj)
+         if (!PrintExceptions)
+             _objc_inform("EXCEPTIONS: throwing %p (object %p, a %s)", 
+                          exc, (void*)obj, object_getClassName(obj));
++        // [port] CHANGED: backtrace is undefined.
++#if !defined(OBJC_PORT)
+         void* callstack[500];
+         int frameCount = backtrace(callstack, 500);
+         backtrace_symbols_fd(callstack, frameCount, fileno(stderr));
++#endif
+     }
+     
+     OBJC_RUNTIME_OBJC_EXCEPTION_THROW(obj);  // dtrace probe to log throw activity
+diff --git a/runtime/objc-gdb.h b/runtime/objc-gdb.h
+index 9177775..7b41590 100644
+--- a/runtime/objc-gdb.h
++++ b/runtime/objc-gdb.h
+@@ -36,8 +36,14 @@
+ 
+ #define _OBJC_PRIVATE_H_
+ #include <stdint.h>
++// [port] CHANGED: [angle-brackets].
++#ifdef OBJC_PORT
++#include "hashtable.h"
++#include "maptable.h"
++#else
+ #include <objc/hashtable.h>
+ #include <objc/maptable.h>
++#endif // [port] !OBJC_PORT
+ 
+ __BEGIN_DECLS
+ 
+diff --git a/runtime/objc-initialize.mm b/runtime/objc-initialize.mm
+index 80491bb..689fd6b 100644
+--- a/runtime/objc-initialize.mm
++++ b/runtime/objc-initialize.mm
+@@ -279,10 +279,13 @@ static void _finishInitializing(Class cls, Class supercls)
+     classInitLock.assertLocked();
+     assert(!supercls  ||  supercls->isInitialized());
+ 
++// [port] CHANGED: [format-error-pthread-self].
++#if !defined(OBJC_PORT)
+     if (PrintInitializing) {
+         _objc_inform("INITIALIZE: thread %p: %s is fully +initialized",
+                      pthread_self(), cls->nameForLogging());
+     }
++#endif
+ 
+     // mark this class as fully +initialized
+     cls->setInitialized();
+@@ -322,12 +325,15 @@ static void _finishInitializingAfter(Class cls, Class supercls)
+ 
+     classInitLock.assertLocked();
+ 
++// [port] CHANGED: [format-error-pthread-self].
++#if !defined(OBJC_PORT)
+     if (PrintInitializing) {
+         _objc_inform("INITIALIZE: thread %p: class %s will be marked as fully "
+                      "+initialized after superclass +[%s initialize] completes",
+                      pthread_self(), cls->nameForLogging(),
+                      supercls->nameForLogging());
+     }
++#endif
+ 
+     if (!pendingInitializeMap) {
+         pendingInitializeMap = 
+@@ -354,10 +360,13 @@ void callInitialize(Class cls)
+ 
+ void waitForInitializeToComplete(Class cls)
+ {
++// [port] CHANGED: [format-error-pthread-self].
++#if !defined(OBJC_PORT)
+     if (PrintInitializing) {
+         _objc_inform("INITIALIZE: thread %p: blocking until +[%s initialize] "
+                      "completes", pthread_self(), cls->nameForLogging());
+     }
++#endif
+ 
+     monitor_locker_t lock(classInitLock);
+     while (!cls->isInitialized()) {
+@@ -448,20 +457,26 @@ BREAKPOINT_FUNCTION(
+ void performForkChildInitialize(Class cls, Class supercls)
+ {
+     if (classHasTrivialInitialize(cls)) {
++// [port] CHANGED: [format-error-pthread-self].
++#if !defined(OBJC_PORT)
+         if (PrintInitializing) {
+             _objc_inform("INITIALIZE: thread %p: skipping trivial +[%s "
+                          "initialize] in fork() child process",
+                          pthread_self(), cls->nameForLogging());
+         }
++#endif
+         lockAndFinishInitializing(cls, supercls);
+     }
+     else {
++// [port] CHANGED: [format-error-pthread-self].
++#if !defined(OBJC_PORT)
+         if (PrintInitializing) {
+             _objc_inform("INITIALIZE: thread %p: refusing to call +[%s "
+                          "initialize] in fork() child process because "
+                          "it may have been in progress when fork() was called",
+                          pthread_self(), cls->nameForLogging());
+         }
++#endif
+         _objc_inform_now_and_on_crash
+             ("+[%s initialize] may have been in progress in another thread "
+              "when fork() was called.",
+@@ -519,10 +534,13 @@ void _class_initialize(Class cls)
+         // Send the +initialize message.
+         // Note that +initialize is sent to the superclass (again) if 
+         // this class doesn't implement +initialize. 2157218
++// [port] CHANGED: [format-error-pthread-self].
++#if !defined(OBJC_PORT)
+         if (PrintInitializing) {
+             _objc_inform("INITIALIZE: thread %p: calling +[%s initialize]",
+                          pthread_self(), cls->nameForLogging());
+         }
++#endif
+ 
+         // Exceptions: A +initialize call that throws an exception 
+         // is deemed to be a complete and successful +initialize.
+@@ -530,18 +548,23 @@ void _class_initialize(Class cls)
+         // Only __OBJC2__ adds these handlers. !__OBJC2__ has a
+         // bootstrapping problem of this versus CF's call to
+         // objc_exception_set_functions().
+-#if __OBJC2__
++// [port] CHANGED: [format-error-pthread-self].
++#if __OBJC2__ && !defined(OBJC_PORT)
+         @try
+ #endif
+         {
+             callInitialize(cls);
+ 
++// [port] CHANGED: [format-error-pthread-self].
++#if !defined(OBJC_PORT)
+             if (PrintInitializing) {
+                 _objc_inform("INITIALIZE: thread %p: finished +[%s initialize]",
+                              pthread_self(), cls->nameForLogging());
+             }
++#endif
+         }
+-#if __OBJC2__
++// [port] CHANGED: [format-error-pthread-self].
++#if __OBJC2__ && !defined(OBJC_PORT)
+         @catch (...) {
+             if (PrintInitializing) {
+                 _objc_inform("INITIALIZE: thread %p: +[%s initialize] "
+diff --git a/runtime/objc-internal.h b/runtime/objc-internal.h
+index fbd8820..eb898b7 100644
+--- a/runtime/objc-internal.h
++++ b/runtime/objc-internal.h
+@@ -37,11 +37,20 @@
+  * objc-internal.h: Private SPI for use by other system frameworks.
+  */
+ 
++ // [port] CHANGED: [angle-brackets].
++#ifdef OBJC_PORT
++#include "objc.h"
++#include "runtime.h"
++#else
+ #include <objc/objc.h>
+ #include <objc/runtime.h>
++#endif // [port] !OBJC_PORT
+ #include <Availability.h>
++// [port] CHANGED: Trying to use external headers as little as possible.
++#ifndef OBJC_PORT 
+ #include <malloc/malloc.h>
+ #include <dispatch/dispatch.h>
++#endif // [port] !OBJC_PORT
+ 
+ __BEGIN_DECLS
+ 
+diff --git a/runtime/objc-load.h b/runtime/objc-load.h
+index 0e334a2..5ad48d7 100644
+--- a/runtime/objc-load.h
++++ b/runtime/objc-load.h
+@@ -28,7 +28,12 @@
+ #ifndef _OBJC_LOAD_H_
+ #define _OBJC_LOAD_H_
+ 
++// [port] CHANGED: [angle-brackets].
++#if defined(OBJC_PORT)
++#include "objc-class.h"
++#else
+ #include <objc/objc-class.h>
++#endif
+ 
+ #include <mach-o/loader.h>
+ 
+diff --git a/runtime/objc-loadmethod.mm b/runtime/objc-loadmethod.mm
+index 55ef00b..7492c22 100644
+--- a/runtime/objc-loadmethod.mm
++++ b/runtime/objc-loadmethod.mm
+@@ -173,6 +173,12 @@ void remove_category_from_loadable_list(Category cat)
+     }
+ }
+ 
++// [port] CHANGED: See `IpaSimLibrary` for implementation.
++#if defined(OBJC_PORT)
++extern "C" __declspec(dllimport) void ipaSim_callBack2(void *FP, void *Arg0,
++                                                       void *Arg1);
++#endif
++
+ 
+ /***********************************************************************
+ * call_class_loads
+@@ -201,14 +207,17 @@ static void call_class_loads(void)
+         if (PrintLoading) {
+             _objc_inform("LOAD: +[%s load]\n", cls->nameForLogging());
+         }
++#if defined(OBJC_PORT)
++        ipaSim_callBack2((void *)load_method, cls, SEL_load);
++#else
+         (*load_method)(cls, SEL_load);
++#endif
+     }
+     
+     // Destroy the detached list.
+     if (classes) free(classes);
+ }
+ 
+-
+ /***********************************************************************
+ * call_category_loads
+ * Call some pending category +load methods.
+@@ -248,7 +257,11 @@ static bool call_category_loads(void)
+                              cls->nameForLogging(), 
+                              _category_getName(cat));
+             }
++#if defined(OBJC_PORT)
++            ipaSim_callBack2((void *)load_method, cls, SEL_load);
++#else
+             (*load_method)(cls, SEL_load);
++#endif
+             cats[i].cat = nil;
+         }
+     }
+diff --git a/runtime/objc-os.h b/runtime/objc-os.h
+index 0104d7d..ea169f6 100644
+--- a/runtime/objc-os.h
++++ b/runtime/objc-os.h
+@@ -45,9 +45,13 @@
+ static inline uint32_t word_align(uint32_t x) {
+     return (x + WORD_MASK) & ~WORD_MASK;
+ }
++// [port] CHANGED: This was causing a redefinition error.
++// [port] TODO: Why?
++#ifndef OBJC_PORT
+ static inline size_t word_align(size_t x) {
+     return (x + WORD_MASK) & ~WORD_MASK;
+ }
++#endif
+ 
+ 
+ // Mix-in for classes that must not be copied.
+@@ -69,6 +73,30 @@ class nocopy_t {
+ #       define __STDC_LIMIT_MACROS
+ #   endif
+ 
++#ifdef OBJC_PORT
++// [port] From MacOSX SDK's <sys/cdefs.h>.
++/* [MacOSX SDK] __unused denotes variables and functions that may not be used, preventing
++ * [MacOSX SDK] the compiler from warning about it if not used.
++ */
++#define __unused	__attribute__((unused))
++
++// [port] CHANGED: Plain typeof doesn't work for some reason.
++#define typeof __typeof__
++
++// [port] TODO: Where is this officialy defined?
++// [port] TODO: Was this added or what? If so, it should be documented with CHANGE comment!
++#define __BEGIN_DECLS extern "C" {
++#define __END_DECLS }
++
++#include <pthread.h>
++#include <System/pthread_machdep.h> // [port] TODO: Not needed right now.
++#include <chrono> // [port] for high_resolution_clock
++#include <sys/reason.h> // [port] for OS_REASON_* definitions
++#include <mach-o/getsect.h> // [port] for getsectiondata
++#include <dlfcn.h> // [port] for dladdr
++#include <mach-o/ldsyms.h> // [port] for _mh_dylib_header
++#include <mach-o/dyld_priv.h> // [port] for _dyld_objc_notify_register
++#else
+ #   include <stdio.h>
+ #   include <stdlib.h>
+ #   include <stdint.h>
+@@ -101,11 +129,12 @@ class nocopy_t {
+ #   include <mach-o/getsect.h>
+ #   include <mach-o/dyld_priv.h>
+ #   include <malloc/malloc.h>
+-#   include <os/lock_private.h>
++#   include <os/lock_private.h> // [port] This includes <os/lock.h> in turn.
+ #   include <libkern/OSAtomic.h>
+ #   include <libkern/OSCacheControl.h>
+ #   include <System/pthread_machdep.h>
+ #   include "objc-probes.h"  // generated dtrace probe definitions.
++#endif
+ 
+ // Some libc functions call objc_msgSend() 
+ // so we can't use them without deadlocks.
+@@ -119,6 +148,13 @@ void vsyslog(int, const char *, va_list) UNAVAILABLE_ATTRIBUTE;
+ #define fastpath(x) (__builtin_expect(bool(x), 1))
+ #define slowpath(x) (__builtin_expect(bool(x), 0))
+ 
++// [port] CHANGED: If these are not redefined like follows, compiler complains.
++// [port] TODO: Why?
++// [port] See https://clang.llvm.org/docs/LanguageExtensions.html for more info about these.
++#ifdef OBJC_PORT
++#	define __builtin_addcl __builtin_addc
++#	define __builtin_subcl __builtin_subc
++#endif
+ 
+ static ALWAYS_INLINE uintptr_t 
+ addc(uintptr_t lhs, uintptr_t rhs, uintptr_t carryin, uintptr_t *carryout)
+@@ -276,7 +312,8 @@ ClearExclusive(uintptr_t *dst __unused)
+     OBJC_EXTERN __attribute__((noinline, used, visibility("hidden"))) \
+     prototype { asm(""); }
+ 
+-#elif TARGET_OS_WIN32
++#endif // [port] CHANGED: We want these, too, so changing elif to if.
++#if TARGET_OS_WIN32 || defined(OBJC_PORT) // [port] CHANGED: We want these Windows headers!
+ 
+ #   define WINVER 0x0501		// target Windows XP and later
+ #   define _WIN32_WINNT 0x0501	// target Windows XP and later
+@@ -307,6 +344,8 @@ ClearExclusive(uintptr_t *dst __unused)
+ #       define __END_DECLS   /*empty*/
+ #   endif
+ 
++// [port] CHANGED: Not redefining these.
++#ifndef OBJC_PORT
+ #   define PRIVATE_EXTERN
+ #   define __attribute__(x)
+ #   define inline __inline
+@@ -316,6 +355,7 @@ ClearExclusive(uintptr_t *dst __unused)
+    BREAKPOINT_FUNCTION( void MyBreakpointFunction(void) ); */
+ #   define BREAKPOINT_FUNCTION(prototype) \
+     __declspec(noinline) prototype { __asm { } }
++#endif // [port] !OBJC_PORT
+ 
+ /* stub out dtrace probes */
+ #   define OBJC_RUNTIME_OBJC_EXCEPTION_RETHROW() do {} while(0)  
+@@ -326,8 +366,13 @@ ClearExclusive(uintptr_t *dst __unused)
+ #endif
+ 
+ 
++#ifdef OBJC_PORT
++#include "objc.h"
++#include "objc-api.h"
++#else
+ #include <objc/objc.h>
+ #include <objc/objc-api.h>
++#endif
+ 
+ extern void _objc_fatal(const char *fmt, ...) 
+     __attribute__((noreturn, format (printf, 1, 2)));
+@@ -362,6 +407,20 @@ extern void _objc_fatal_with_reason(uint64_t reason, uint64_t flags,
+     } while (0)
+ 
+ 
++// [port] CHANGED: [no-direct-keys].
++#if defined(OBJC_PORT)
++struct port_pthread_direct_keys {
++    static pthread_key_t return_disposition_key;
++
++    // [port] TODO: Call this!
++    static void init() {
++        pthread_key_create(&return_disposition_key, nullptr);
++    }
++};
++#define SUPPORT_DIRECT_THREAD_KEYS 1
++#define RETURN_DISPOSITION_KEY port_pthread_direct_keys::return_disposition_key
++// [port] defined(OBJC_PORT)
++#else
+ // Thread keys reserved by libc for our use.
+ #if defined(__PTK_FRAMEWORK_OBJC_KEY0)
+ #   define SUPPORT_DIRECT_THREAD_KEYS 1
+@@ -378,9 +437,11 @@ extern void _objc_fatal_with_reason(uint64_t reason, uint64_t flags,
+ #else
+ #   define SUPPORT_DIRECT_THREAD_KEYS 0
+ #endif
++// [port] !defined(OBJC_PORT)
++#endif
+ 
+-
+-#if TARGET_OS_WIN32
++// [port] CHANGED: We want these stubs in our port!
++#if TARGET_OS_WIN32 || defined(OBJC_PORT)
+ 
+ // Compiler compatibility
+ 
+@@ -399,7 +460,7 @@ int asprintf(char **dstp, const char *format, ...);
+ 
+ typedef void * malloc_zone_t;
+ 
+-static __inline malloc_zone_t malloc_default_zone(void) { return (malloc_zone_t)-1; }
++static __inline malloc_zone_t *malloc_default_zone(void) { return (malloc_zone_t *)-1; }
+ static __inline void *malloc_zone_malloc(malloc_zone_t z, size_t size) { return malloc(size); }
+ static __inline void *malloc_zone_calloc(malloc_zone_t z, size_t size, size_t count) { return calloc(size, count); }
+ static __inline void *malloc_zone_realloc(malloc_zone_t z, void *p, size_t size) { return realloc(p, size); }
+@@ -407,7 +468,6 @@ static __inline void malloc_zone_free(malloc_zone_t z, void *p) { free(p); }
+ static __inline malloc_zone_t malloc_zone_from_ptr(const void *p) { return (malloc_zone_t)-1; }
+ static __inline size_t malloc_size(const void *p) { return _msize((void*)p); /* fixme invalid pointer check? */ }
+ 
+-
+ // OSAtomic
+ 
+ static __inline BOOL OSAtomicCompareAndSwapLong(long oldl, long newl, long volatile *dst) 
+@@ -439,6 +499,20 @@ static __inline int32_t OSAtomicIncrement32Barrier(volatile int32_t *dst)
+     return InterlockedIncrement((volatile long *)dst);
+ }
+ 
++// [port] CHANGED: Added these OSAtomic function support.
++// [port] Signatures copied from "libkern/OSAtomicDeprecated.h".
++static __inline int32_t	OSAtomicOr32Barrier(uint32_t val, volatile uint32_t *dst)
++{
++    return InterlockedOr(reinterpret_cast<volatile long *>(dst), val);
++}
++static __inline int32_t OSAtomicXor32Barrier(uint32_t val, volatile uint32_t *dst)
++{
++    return InterlockedXor(reinterpret_cast<volatile long *>(dst), val);
++}
++
++#endif // [port] TARGET_OS_WIN32 || defined(OBJC_PORT)
++#if TARGET_OS_WIN32
++
+ 
+ // Internal data types
+ 
+@@ -643,9 +717,18 @@ OBJC_EXTERN IMAGE_DOS_HEADER __ImageBase;
+ 
+ // OS compatibility
+ 
++// [port] CHANGED: Porting with <chrono>.
++#ifdef OBJC_PORT
++static inline uint64_t nanoseconds() {
++    return std::chrono::time_point_cast<std::chrono::nanoseconds>(
++        std::chrono::high_resolution_clock::now())
++        .time_since_epoch().count();
++}
++#else
+ static inline uint64_t nanoseconds() {
+     return mach_absolute_time();
+ }
++#endif // [port] !OBJC_PORT
+ 
+ // Internal data types
+ 
+@@ -677,6 +760,11 @@ static inline void tls_set(tls_key_t k, void *value) {
+ 
+ #if DEBUG
+ static bool is_valid_direct_key(tls_key_t k) {
++// [port] CHANGED: [no-direct-keys], operator== wouldn't probably work anyway.
++#if defined(OBJC_PORT)
++    return 1;
++// [port] defined(OBJC_PORT)
++#else
+     return (   k == SYNC_DATA_DIRECT_KEY
+             || k == SYNC_COUNT_DIRECT_KEY
+             || k == AUTORELEASE_POOL_KEY
+@@ -687,6 +775,8 @@ static bool is_valid_direct_key(tls_key_t k) {
+             || k == QOS_KEY
+ #   endif
+                );
++// [port] !defined(OBJC_PORT)
++#endif
+ }
+ #endif
+ 
+@@ -714,6 +804,8 @@ static inline void tls_set_direct(tls_key_t k, void *value)
+ // SUPPORT_DIRECT_THREAD_KEYS
+ #endif
+ 
++// [port] CHANGED: Not supporting these right now.
++#ifndef OBJC_PORT
+ 
+ static inline pthread_t pthread_self_direct()
+ {
+@@ -736,6 +828,7 @@ static inline pthread_priority_t pthread_self_priority_direct()
+ }
+ #endif
+ 
++#endif // [port] !OBJC_PORT
+ 
+ template <bool Debug> class mutex_tt;
+ template <bool Debug> class monitor_tt;
+@@ -764,12 +857,39 @@ extern const fork_unsafe_lock_t fork_unsafe_lock;
+ 
+ template <bool Debug>
+ class mutex_tt : nocopy_t {
++// [port] CHANGED: Used an older version that uses pthread's mutex instead
++// [port] of macOS-specific os_unfair_lock. See source code here:
++// [port] https://opensource.apple.com/source/objc4/objc4-680/runtime/objc-os.h.auto.html.
++#ifdef OBJC_PORT
++    pthread_mutex_t mLock;
++  public:
++    mutex_tt() : mLock(PTHREAD_MUTEX_INITIALIZER) { }
++
++    void lock()
++    {
++        lockdebug_mutex_lock(this);
++
++        int err = pthread_mutex_lock(&mLock);
++        if (err) _objc_fatal("pthread_mutex_lock failed (%d)", err);
++    }
++
++    void unlock()
++    {
++        lockdebug_mutex_unlock(this);
++
++        int err = pthread_mutex_unlock(&mLock);
++        if (err) _objc_fatal("pthread_mutex_unlock failed (%d)", err);
++    }
++#else // [port] !OBJC_PORT
+     os_unfair_lock mLock;
+  public:
+     mutex_tt() : mLock(OS_UNFAIR_LOCK_INIT) {
+         lockdebug_remember_mutex(this);
+     }
+ 
++    // [port] CHANGED: Since this seems to be equivalent to the constructor with zero arguments,
++    // [port] we use that instead of this one everywhere. If this equivalency is broken in the
++    // [port] future, be careful to use the proper constructor!
+     mutex_tt(const fork_unsafe_lock_t unsafe) : mLock(OS_UNFAIR_LOCK_INIT) { }
+ 
+     void lock() {
+@@ -784,12 +904,23 @@ class mutex_tt : nocopy_t {
+ 
+         os_unfair_lock_unlock_inline(&mLock);
+     }
++#endif // [port] !OBJC_PORT
+ 
+     void forceReset() {
++        // [port] CHANGED: Porting reset.
++        // [port] TODO: We probably should be able to reset even locked mutex.
++        // [port] See this for a possible implementation:
++        // [port] https://stackoverflow.com/a/29883165.
++#if defined(OBJC_PORT)
++        int err = pthread_mutex_destroy(&mLock);
++        if (err) _objc_fatal("pthread_mutex_destroy failed (%d)", err);
++        mLock = PTHREAD_MUTEX_INITIALIZER;
++#else
+         lockdebug_mutex_unlock(this);
+ 
+         bzero(&mLock, sizeof(mLock));
+         mLock = os_unfair_lock OS_UNFAIR_LOCK_INIT;
++#endif
+     }
+ 
+     void assertLocked() {
+@@ -830,7 +961,6 @@ class mutex_tt : nocopy_t {
+ 
+ using mutex_locker_t = mutex_tt<LOCKDEBUG>::locker;
+ 
+-
+ template <bool Debug>
+ class recursive_mutex_tt : nocopy_t {
+     pthread_mutex_t mLock;
+@@ -965,6 +1095,8 @@ class monitor_tt {
+     }
+ };
+ 
++// [port] CHANGED: We are not supporting "semaphore_t" right now.
++#ifndef OBJC_PORT
+ 
+ // semaphore_create formatted for INIT_ONCE use
+ static inline semaphore_t create_semaphore(void)
+@@ -976,6 +1108,7 @@ static inline semaphore_t create_semaphore(void)
+     return sem;
+ }
+ 
++#endif // [port] OBJC_PORT
+ 
+ #if SUPPORT_QOS_HACK
+ // Override QOS class to avoid priority inversion in rwlocks
+@@ -1151,9 +1284,13 @@ typedef struct section_64 sectionType;
+ 
+ // Prototypes
+ 
++// [port] CHANGED: Don't know what it is, don't support it.
++#ifndef OBJC_PORT
++
+ /* Secure /tmp usage */
+ extern int secure_open(const char *filename, int flags, uid_t euid);
+ 
++#endif // [port] OBJC_PORT
+ 
+ #else
+ 
+@@ -1163,7 +1300,6 @@ extern int secure_open(const char *filename, int flags, uid_t euid);
+ 
+ #endif
+ 
+-
+ static inline void *
+ memdup(const void *mem, size_t len)
+ {
+@@ -1172,6 +1308,18 @@ memdup(const void *mem, size_t len)
+     return dup;
+ }
+ 
++// [port] CHANGED: Adding stub.
++#ifdef OBJC_PORT
++// [port] Signature copied from the "dyld-519.2.2/dyld3/APIs.h" header.
++constexpr bool objc_port_is_memory_immutable(const void* addr, size_t length) {
++    // [port] Let's say everything is immutable so that the strdupIfMutable and related
++    // [port] functions copy the key always (even if it's not necessary, just to be sure).
++    // [port] TODO: Actually find out if the memory is immutable!
++    return false;
++}
++#define _dyld_is_memory_immutable objc_port_is_memory_immutable
++#endif
++
+ // strdup that doesn't copy read-only memory
+ static inline char *
+ strdupIfMutable(const char *str)
+@@ -1196,6 +1344,11 @@ freeIfMutable(char *str)
+     }
+ }
+ 
++// [port] CHANGED: Undefining our stub.
++#ifdef OBJC_PORT
++#undef _dyld_is_memory_immutable
++#endif
++
+ // nil-checking unsigned strdup
+ static inline uint8_t *
+ ustrdupMaybeNil(const uint8_t *str)
+@@ -1218,8 +1371,15 @@ ustrdupMaybeNil(const uint8_t *str)
+ #   define sdkVersion() dyld_get_program_sdk_version()
+ 
+ #elif TARGET_OS_IOS
+-#   define DYLD_OS_VERSION(x, i, t, w, b) DYLD_IOS_VERSION_##i
+-#   define sdkVersion() dyld_get_program_sdk_version()
++    // [port] CHANGED: dyld_get_program_sdk_version doesn't exist.
++#   if defined(OBJC_PORT)
++        // [port] TODO: Return something meaningful.
++#       define DYLD_OS_VERSION(x, i, t, w, b) 0
++#       define sdkVersion() 0
++#   else
++#       define DYLD_OS_VERSION(x, i, t, w, b) DYLD_IOS_VERSION_##i
++#       define sdkVersion() dyld_get_program_sdk_version()
++#   endif
+ 
+ #elif TARGET_OS_TV
+     // dyld does not currently have distinct constants for tvOS
+@@ -1263,6 +1423,9 @@ ustrdupMaybeNil(const uint8_t *str)
+     (unsigned  char)(((uint32_t)(v))>>8),   \
+     (unsigned  char)(((uint32_t)(v))>>0)
+ 
++// [port] CHANGED: Not supporting those custom locks.
++#ifndef OBJC_PORT
++
+ // fork() safety requires careful tracking of all locks.
+ // Our custom lock types check this in debug builds.
+ // Disallow direct use of all other lock types.
+@@ -1271,5 +1434,7 @@ typedef __darwin_pthread_rwlock_t pthread_rwlock_t UNAVAILABLE_ATTRIBUTE;
+ typedef int32_t OSSpinLock UNAVAILABLE_ATTRIBUTE;
+ typedef struct os_unfair_lock_s os_unfair_lock UNAVAILABLE_ATTRIBUTE;
+ 
++#endif
++
+ 
+ #endif
+diff --git a/runtime/objc-os.mm b/runtime/objc-os.mm
+index b2fc8ac..61e92e3 100644
+--- a/runtime/objc-os.mm
++++ b/runtime/objc-os.mm
+@@ -197,6 +197,10 @@ OBJC_EXPORT void _objc_unload_image(HMODULE image, header_info *hinfo)
+ #include "objc-file-old.h"
+ #include "objc-file.h"
+ 
++// [port] CHANGED: [no-direct-keys].
++#if defined(OBJC_PORT)
++pthread_key_t port_pthread_direct_keys::return_disposition_key;
++#endif
+ 
+ /***********************************************************************
+ * libobjc must never run static destructors. 
+@@ -771,7 +775,13 @@ static bool ForkIsMultithreaded;
+ void _objc_atfork_prepare()
+ {
+     // Save threaded-ness for the child's use.
++    // [port] CHANGED: Let's say we have multiple threads, just in case...
++    // [port] TODO: Actually implement pthread_is_threaded_np via Win32 APIs.
++#if defined(OBJC_PORT)
++    ForkIsMultithreaded = true;
++#else
+     ForkIsMultithreaded = pthread_is_threaded_np();
++#endif
+ 
+     lockdebug_assert_no_locks_locked();
+     lockdebug_setInForkPrepare(true);
+@@ -930,7 +940,8 @@ const header_info *_headerForClass(Class cls)
+     return _headerForAddress(cls);
+ }
+ 
+-
++// [port] CHANGED: Not supporting this (too Unix-y).
++#if !defined(OBJC_PORT)
+ /**********************************************************************
+ * secure_open
+ * Securely open a file from a world-writable directory (like /tmp)
+@@ -1013,7 +1024,8 @@ int secure_open(const char *filename, int flags, uid_t euid)
+         }
+     }
+ }
+-
++// [port] !defined(OBJC_PORT)
++#endif
+ 
+ #if TARGET_OS_IPHONE
+ 
+diff --git a/runtime/objc-private.h b/runtime/objc-private.h
+index aac2d51..57f2266 100644
+--- a/runtime/objc-private.h
++++ b/runtime/objc-private.h
+@@ -41,7 +41,11 @@
+ #define OBJC_TYPES_DEFINED 1
+ #define OBJC_OLD_DISPATCH_PROTOTYPES 0
+ 
++ // [port] CHANGED: <cstddef> doesn't play nicely with clang.
++ // [port] TODO: Revert this when newer clang is used.
++#ifndef OBJC_PORT
+ #include <cstddef>  // for nullptr_t
++#endif
+ #include <stdint.h>
+ #include <assert.h>
+ 
+@@ -378,6 +382,17 @@ private:
+ 
+ struct header_info_rw* getPreoptimizedHeaderRW(const struct header_info *const hdr);
+ 
++// [port] CHANGED: Porting dyld_image_path_containing_address using dladdr.
++// [port] Copied (and modified) from sym function in objc-lockdebug.mm.
++#if defined(OBJC_PORT)
++inline const char* dyld_image_path_containing_address(const void* addr) {
++    Dl_info info;
++    int ok = dladdr(addr, &info);
++    if (ok && info.dli_fname && info.dli_fname[0]) return info.dli_fname;
++    else return "??";
++}
++#endif
++
+ typedef struct header_info {
+ private:
+     // Note, this is no longer a pointer, but instead an offset to a pointer
+diff --git a/runtime/objc-references.mm b/runtime/objc-references.mm
+index c1119f0..de51fe3 100644
+--- a/runtime/objc-references.mm
++++ b/runtime/objc-references.mm
+@@ -26,10 +26,16 @@
+ 
+ 
+ #include "objc-private.h"
++// [port] CHANGED: [angle-brackets].
++#if defined(OBJC_PORT)
++#include "message.h"
++#else
+ #include <objc/message.h>
++#endif
+ #include <map>
+ 
+-#if _LIBCPP_VERSION
++// [port] TODO: Why isn't _LIBCPP_VERSION defined (and does it matter elsewhere)?
++#if _LIBCPP_VERSION || defined(OBJC_PORT)
+ #   include <unordered_map>
+ #else
+ #   include <tr1/unordered_map>
+diff --git a/runtime/objc-runtime-new.mm b/runtime/objc-runtime-new.mm
+index 8ad820c..eaabe2d 100644
+--- a/runtime/objc-runtime-new.mm
++++ b/runtime/objc-runtime-new.mm
+@@ -33,8 +33,16 @@
+ #include "objc-file.h"
+ #include "objc-cache.h"
+ #include <Block.h>
++// [port] CHANGED: [angle-brackets].
++#if defined(OBJC_PORT)
++#include "message.h"
++#else
+ #include <objc/message.h>
++#endif
++// [port] CHANGED: Not needed.
++#if !defined(OBJC_PORT)
+ #include <mach/shared_region.h>
++#endif
+ 
+ #define newprotocol(p) ((protocol_t *)p)
+ 
+@@ -459,6 +467,12 @@ static void removeAllUnattachedCategoriesForClass(Class cls)
+     if (list) free(list);
+ }
+ 
++// [port] TODO: Why is this needed?
++#if defined(OBJC_PORT)
++extern "C" objc_class OBJC_CLASS_$_Protocol;
++extern "C" objc_class OBJC_CLASS_$___IncompleteProtocol;
++extern "C" objc_class OBJC_CLASS_$_NSObject;
++#endif
+ 
+ /***********************************************************************
+ * classNSObject
+@@ -4528,13 +4542,19 @@ Method class_getInstanceMethod(Class cls, SEL sel)
+     // This implementation is a bit weird because it's the only place that 
+     // wants a Method instead of an IMP.
+ 
++    // [port] CHANGED: Not our job.
++#if !defined(OBJC_PORT)
+ #warning fixme build and search caches
++#endif
+         
+     // Search method lists, try method resolver, etc.
+     lookUpImpOrNil(cls, sel, nil, 
+                    NO/*initialize*/, NO/*cache*/, YES/*resolver*/);
+ 
++    // [port] CHANGED: Not our job.
++#if !defined(OBJC_PORT)
+ #warning fixme build and search caches
++#endif
+ 
+     return _class_getMethod(cls, sel);
+ }
+diff --git a/runtime/objc-runtime.mm b/runtime/objc-runtime.mm
+index ba1b38d..678e5a3 100644
+--- a/runtime/objc-runtime.mm
++++ b/runtime/objc-runtime.mm
+@@ -250,6 +250,10 @@ void environ_init(void)
+     bool PrintOptions = false;
+     bool maybeMallocDebugging = false;
+ 
++    // [port] CHANGED: _NSGetEnviron is undefined. This should work as if
++    // [port] no relevant environment variables were set, which is fine.
++    // [port] TODO: Actually implement this.
++#if !defined(OBJC_PORT)
+     // Scan environ[] directly instead of calling getenv() a lot.
+     // This optimizes the case where none are set.
+     for (char **p = *_NSGetEnviron(); *p != nil; p++) {
+@@ -284,6 +288,7 @@ void environ_init(void)
+             }
+         }            
+     }
++#endif
+ 
+     // Special case: enable some autorelease pool debugging 
+     // when some malloc debugging is enabled 
+@@ -418,7 +423,10 @@ void _objc_pthread_destroyspecific(void *arg)
+ 
+ void tls_init(void)
+ {
+-#if SUPPORT_DIRECT_THREAD_KEYS
++    // [port] CHANGED: [no-direct-keys] - we don't support direct thread keys,
++    // [port] but we must act like we do elsewhere, that's why
++    // [port] SUPPORT_DIRECT_THREAD_KEYS is still defined to be 1.
++#if SUPPORT_DIRECT_THREAD_KEYS && !defined(OBJC_PORT)
+     _objc_pthread_key = TLS_DIRECT_KEY;
+     pthread_key_init_np(TLS_DIRECT_KEY, &_objc_pthread_destroyspecific);
+ #else
+@@ -460,6 +468,10 @@ objc_defaultForwardHandler(id self, SEL sel)
+                 class_isMetaClass(object_getClass(self)) ? '+' : '-', 
+                 object_getClassName(self), sel_getName(sel), self);
+ }
++// [port] TODO: Why is this needed?
++#if defined(OBJC_PORT)
++extern "C"
++#endif
+ void *_objc_forward_handler = (void*)objc_defaultForwardHandler;
+ 
+ #if SUPPORT_STRET
+@@ -469,6 +481,10 @@ objc_defaultForwardStretHandler(id self, SEL sel)
+ {
+     objc_defaultForwardHandler(self, sel);
+ }
++// [port] TODO: Why is this needed?
++#if defined(OBJC_PORT)
++extern "C"
++#endif
+ void *_objc_forward_stret_handler = (void*)objc_defaultForwardStretHandler;
+ #endif
+ 
+diff --git a/runtime/objc-sync.h b/runtime/objc-sync.h
+index e9ab64f..98561af 100644
+--- a/runtime/objc-sync.h
++++ b/runtime/objc-sync.h
+@@ -24,7 +24,12 @@
+ #ifndef __OBJC_SNYC_H_
+ #define __OBJC_SNYC_H_
+ 
++// [port] CHANGED: [angle-brackets].
++#if defined(OBJC_PORT)
++#include "objc.h"
++#else
+ #include <objc/objc.h>
++#endif
+ 
+ 
+ /** 
+diff --git a/runtime/objc-sync.mm b/runtime/objc-sync.mm
+index daf743d..9d961c0 100644
+--- a/runtime/objc-sync.mm
++++ b/runtime/objc-sync.mm
+@@ -60,7 +60,12 @@ struct SyncList {
+     SyncData *data;
+     spinlock_t lock;
+ 
++    // [port] CHANGED: See mutex_tt constructors.
++#if defined(OBJC_PORT)
++    SyncList() : data(nil), lock() { }
++#else
+     SyncList() : data(nil), lock(fork_unsafe_lock) { }
++#endif
+ };
+ 
+ // Use multiple parallel lists to decrease contention among unrelated objects.
+@@ -113,7 +118,8 @@ static SyncData* id2data(id object, enum usage why)
+     SyncData **listp = &LIST_FOR_OBJ(object);
+     SyncData* result = NULL;
+ 
+-#if SUPPORT_DIRECT_THREAD_KEYS
++    // [port] CHANGED: [no-direct-keys].
++#if SUPPORT_DIRECT_THREAD_KEYS && !defined(OBJC_PORT)
+     // Check per-thread single-entry fast cache for matching object
+     bool fastCacheOccupied = NO;
+     SyncData *data = (SyncData *)tls_get_direct(SYNC_DATA_DIRECT_KEY);
+@@ -253,7 +259,8 @@ static SyncData* id2data(id object, enum usage why)
+         if (why != ACQUIRE) _objc_fatal("id2data is buggy");
+         if (result->object != object) _objc_fatal("id2data is buggy");
+ 
+-#if SUPPORT_DIRECT_THREAD_KEYS
++        // [port] CHANGED: [no-direct-keys].
++#if SUPPORT_DIRECT_THREAD_KEYS && !defined(OBJC_PORT)
+         if (!fastCacheOccupied) {
+             // Save in fast thread cache
+             tls_set_direct(SYNC_DATA_DIRECT_KEY, result);
+diff --git a/runtime/objc-weak.h b/runtime/objc-weak.h
+index 8c50050..e052da5 100644
+--- a/runtime/objc-weak.h
++++ b/runtime/objc-weak.h
+@@ -24,7 +24,12 @@
+ #ifndef _OBJC_WEAK_H_
+ #define _OBJC_WEAK_H_
+ 
++// [port] CHANGED: [angle-brackets].
++#ifdef OBJC_PORT
++#include "objc.h"
++#else
+ #include <objc/objc.h>
++#endif // [port] !OBJC_PORT
+ #include "objc-config.h"
+ 
+ __BEGIN_DECLS
+diff --git a/runtime/objc-weak.mm b/runtime/objc-weak.mm
+index 3dd6d0a..6c86217 100644
+--- a/runtime/objc-weak.mm
++++ b/runtime/objc-weak.mm
+@@ -28,7 +28,10 @@
+ #include <stdint.h>
+ #include <stdbool.h>
+ #include <sys/types.h>
++// [port] CHANGED: Not needed.
++#if !defined(OBJC_PORT)
+ #include <libkern/OSAtomic.h>
++#endif
+ 
+ #define TABLE_SIZE(entry) (entry->mask ? entry->mask + 1 : 0)
+ 
+diff --git a/runtime/objc.h b/runtime/objc.h
+index 5064016..2cdd60a 100644
+--- a/runtime/objc.h
++++ b/runtime/objc.h
+@@ -28,10 +28,15 @@
+ #ifndef _OBJC_OBJC_H_
+ #define _OBJC_OBJC_H_
+ 
++#ifdef OBJC_PORT
++#include <Availability.h>
++#include "objc-api.h"
++#else
+ #include <sys/types.h>      // for __DARWIN_NULL
+ #include <Availability.h>
+ #include <objc/objc-api.h>
+ #include <stdbool.h>
++#endif // not OBJC_PORT
+ 
+ #if !OBJC_TYPES_DEFINED
+ /// An opaque type that represents an Objective-C class.
+diff --git a/runtime/runtime.h b/runtime/runtime.h
+index ad68c90..f63940b 100644
+--- a/runtime/runtime.h
++++ b/runtime/runtime.h
+@@ -24,7 +24,12 @@
+ #ifndef _OBJC_RUNTIME_H
+ #define _OBJC_RUNTIME_H
+ 
++#ifdef OBJC_PORT
++#include "objc.h"
++#include <atomic> // [port] for atomic_thread_fence
++#else
+ #include <objc/objc.h>
++#endif
+ #include <stdarg.h>
+ #include <stdint.h>
+ #include <stddef.h>
+@@ -2006,7 +2011,7 @@ OBJC_EXPORT id _Nullable
+      OBJC2_UNAVAILABLE;
+      
+ OBJC_EXPORT void
+-(* _Nonnull _error)(id _Nullable, const char * _Nonnull, va_list)
++(* _Nonnull _error)(id _Nullable, const char * _Nonnull, va_list) // [port] TODO: va_list shouldn't be a pointer, but rather some clang's intrinsic...
+      OBJC2_UNAVAILABLE;
+ 
+ #endif
+-- 
+2.18.0.windows.1
+
