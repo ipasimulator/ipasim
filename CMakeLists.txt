@@ -26,6 +26,7 @@ if (SUPERBUILD)
         ExternalProject_Add ("${name}-proj"
             SOURCE_DIR "${SOURCE_DIR}/deps/${dir}"
             URL "${url}"
+            DOWNLOAD_PROGRESS 0
             CONFIGURE_COMMAND ""
             BUILD_COMMAND ""
             INSTALL_COMMAND "")
@@ -48,6 +49,7 @@ ${name}-${version}.tar.gz")
                 "-DREPO=${repo}"
                 "-DTAG=${tag}"
                 -P "${SOURCE_DIR}/scripts/GitClone.cmake"
+            DOWNLOAD_PROGRESS 0
             PATCH_COMMAND git apply "${SOURCE_DIR}/contrib/${name}.patch"
             CONFIGURE_COMMAND ""
             BUILD_COMMAND ""
