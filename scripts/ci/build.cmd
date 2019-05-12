@@ -75,7 +75,7 @@ if %EXIT_ERRORLEVEL% EQU 0 (
 rem Cleanup images.
 :CLEANUP
 docker rm ipasimulator_ipasim_1
-docker images rm janjones/ipasim:latest janjones/ipasim:%BUILD_BUILDNUMBER% ^
+docker image rm janjones/ipasim:latest janjones/ipasim:%BUILD_BUILDNUMBER% ^
  janjones/ipasim:artifacts janjones/ipasim:artifacts-%BUILD_BUILDNUMBER%
 
 rem Shutdown.
