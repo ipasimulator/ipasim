@@ -94,7 +94,7 @@ pthreads-win32/pthreads-w32-2-9-1-release.tar.gz")
         "d38c8fb27f7f94d81ec546bff6c306e21f949d0e")
     git_download (WinObjC
         "https://jjones.visualstudio.com/DefaultCollection/WinObjC/_git/WinObjC"
-        "fa2bef21bf9eee45636376d86ee88acc2c1e13c7")
+        "795c2479b7e9092147dba3def8b47fceb648a06f")
 
     # Configure subprojects.
 
