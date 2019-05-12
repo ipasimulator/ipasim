@@ -25,7 +25,8 @@ if exist .\IPASimulator\ (
     cd IPASimulator
     git pull --recurse-submodules
 ) else (
-    git clone --depth 1 --recurse-submodules --shallow-submodules -b thesis ^
+    git clone --depth 1 --recurse-submodules --shallow-submodules -b ^
+thesis_squash ^
 https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/IPASimulator
     cd IPASimulator
 )
