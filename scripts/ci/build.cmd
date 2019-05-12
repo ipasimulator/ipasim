@@ -54,9 +54,13 @@ docker-compose up --exit-code-from ipasim %DOCKER_COMPOSE_OPTIONS%
 set EXIT_ERRORLEVEL=%ERRORLEVEL%
 
 rem Push artifacts.
-docker tag janjones/ipasim:latest janjones/ipasim:%BUILD_BUILDNUMBER%
 docker commit ipasimulator_ipasim_1^
  janjones/ipasim:artifacts-%BUILD_BUILDNUMBER%
+if %ERRORLEVEL% NEQ 0 (
+    set EXIT_ERRORLEVEL=%ERRORLEVEL%
+    goto CLEANUP
+)
+docker tag janjones/ipasim:latest janjones/ipasim:%BUILD_BUILDNUMBER%
 docker tag janjones/ipasim:artifacts-%BUILD_BUILDNUMBER%^
  janjones/ipasim:artifacts
 docker push janjones/ipasim:%BUILD_BUILDNUMBER%
@@ -67,6 +71,12 @@ if %EXIT_ERRORLEVEL% EQU 0 (
     docker push janjones/ipasim:latest
     docker push janjones/ipasim:artifacts
 )
+
+rem Cleanup images.
+:CLEANUP
+docker rm ipasimulator_ipasim_1
+docker images rm janjones/ipasim:latest janjones/ipasim:%BUILD_BUILDNUMBER% ^
+ janjones/ipasim:artifacts janjones/ipasim:artifacts-%BUILD_BUILDNUMBER%
 
 rem Shutdown.
 if [%SHUTDOWN_WHEN_COMPLETE%]==[1] shutdown /p
