@@ -66,3 +66,4 @@
 *.obj filter=lfs diff=lfs merge=lfs -text
 *.nib filter=lfs diff=lfs merge=lfs -text
 *.pfx filter=lfs diff=lfs merge=lfs -text
+COPYING.LIB -filter=lfs -diff=lfs -merge=lfs text
