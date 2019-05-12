@@ -1,15 +1,11 @@
 # `HeadersAnalyzer`
 
-## Building
+This tool runs at compile time and generates binaries that our emulator uses at
+run time.
 
-First, [build LLVM](../../docs/llvm.md) in the same configuration you want to build `HeadersAnalyzer`.
-Then, open and build `HeadersAnalyzer` in Visual Studio.
+> Note that this documentation might be outdated.
 
-## Running
-
-Make sure your working directory is the root directory of the repository when running the program.
-
-## How should it work (a.k.a. roadmap)
+## How does it work?
 
 There are two types of functions - exported and callbacks.
 By exported functions, we mean functions exported from iOS `.dylib`s, i.e., functions that emulated apps can call.
