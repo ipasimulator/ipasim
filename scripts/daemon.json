@@ -1,0 +1,9 @@
+{
+  "registry-mirrors": [],
+  "insecure-registries": [],
+  "debug": true,
+  "experimental": false,
+  "storage-opts": [
+    "size=120GB"
+  ]
+}

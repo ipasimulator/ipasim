@@ -23,6 +23,7 @@ Invoke-WebRequest "https://github.com/docker/compose/releases/download/1.23.2/do
 cmd /c sc config vstsagent.jjones.AzureVmAgent depend=docker
 
 # TODO: Change Docker and VSTS Agent services to run Automatically, for Local System account and to restart on failures.
+# TODO: Copy file `./scripts/daemon.json` into `%programdata%/docker/config/daemon.json`.
 
 # Install Git LFS.
 cd \
