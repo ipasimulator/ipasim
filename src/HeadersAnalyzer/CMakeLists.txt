@@ -455,6 +455,7 @@ set (CG_OUTPUTS "${CURRENT_IPASIM_CMAKE_DIR}/cg/exports.txt"
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_custom_target (prep-CodeGen
         COMMENT "Prepare Code-gen"
+        BYPRODUCTS "${RELEASE_IPASIM_CMAKE_DIR}/bin/HeadersAnalyzer.exe"
         COMMAND ninja HeadersAnalyzer
         WORKING_DIRECTORY "${RELEASE_IPASIM_CMAKE_DIR}"
         USES_TERMINAL
