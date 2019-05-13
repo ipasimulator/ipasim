@@ -61,7 +61,7 @@ ExternalProject_Add (apple-patch-proj
     DEPENDS apple-headers-projs)
 git_download (clang "https://git.llvm.org/git/clang.git/"
     "4519e2637fcc4bf6e3049a0a80e6a5e7b97667cb")
-apple_proj_download (libclosure "161")
+apple_proj_download (libclosure "67")
 apple_proj_download (libdispatch "1008.200.78")
 git_download (Libffi "https://github.com/newlawrence/Libffi"
     "03309b8867b31d49bc8ef5a6011970e5801651c1")
