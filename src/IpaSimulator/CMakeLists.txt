@@ -16,6 +16,9 @@ set (LLVM_INCLUDE_DIRS
     "${CURRENT_CLANG_CMAKE_DIR}/include"
     "${SOURCE_DIR}/deps/llvm/include")
 file (MAKE_DIRECTORY ${LLVM_INCLUDE_DIRS})
+# HACK: Depend on HeadersAnalyzer which builds LLVM libraries, so that LLVM
+# headers are generated properly.
+add_dependencies (IpaSimLibrary HeadersAnalyzer)
 
 target_include_directories (IpaSimLibrary PRIVATE
     "${SOURCE_DIR}/include"
