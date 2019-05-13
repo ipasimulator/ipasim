@@ -31,6 +31,13 @@ https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/IPASimulator
     cd IPASimulator
 )
 
+rem Prepare dependencies.
+pushd deps
+mkdir build 2>NUL
+cd build
+cmake -G Ninja ..
+cmake --build .
+
 if [%BUILD_TABLEGENS_ONLY%]==[1] (
     rem Use only sample build command. See `scripts/build.ps1` in repository
     rem IPASimulator.

@@ -30,3 +30,16 @@ cd \
 wget https://github.com/git-lfs/git-lfs/releases/download/v2.7.1/git-lfs-windows-v2.7.1.exe -OutFile git-lfs.exe
 .\git-lfs.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
 rm git-lfs.exe
+
+# Install CMake.
+wget https://github.com/Kitware/CMake/releases/download/v3.14.3/cmake-3.14.3-win64-x64.msi -OutFile cmake.msi
+msiexec /quiet /passive /qn /i cmake.msi
+rm cmake.msi
+$env:PATH += ";C:\Program Files\CMake\bin"
+[Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::Machine)
+
+# Install Ninja.
+wget https://github.com/ninja-build/ninja/releases/download/v1.9.0/ninja-win.zip -OutFile ninja.zip
+[System.IO.Compression.ZipFile]::ExtractToDirectory("$PWD\ninja.zip", "$PWD")
+rm ninja.zip
+mv ninja.exe "C:\Program Files\CMake\bin"

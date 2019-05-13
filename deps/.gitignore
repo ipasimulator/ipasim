@@ -1,4 +1,5 @@
 /apple-headers/*/
+/build/
 /clang/
 /libclosure/
 /libdispatch/

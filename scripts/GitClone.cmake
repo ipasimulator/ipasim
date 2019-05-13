@@ -6,7 +6,7 @@ file (REMOVE_RECURSE "${TARGET_DIR}")
 
 file (MAKE_DIRECTORY "${TARGET_DIR}")
 
-execute_process (COMMAND git clone "${REPO}" .
+execute_process (COMMAND git clone -n "${REPO}" .
     WORKING_DIRECTORY "${TARGET_DIR}")
 
 execute_process (COMMAND git checkout -f "${TAG}"
