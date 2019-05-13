@@ -7,8 +7,8 @@ set (BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 include (ExternalProject)
 add_custom_target (apple-headers-projs)
 
-function (download_proj name dir url)
-    ExternalProject_Add ("${name}-proj"
+function (download_proj name dir url tag)
+    ExternalProject_Add ("${name}-proj-${tag}"
         SOURCE_DIR "${SOURCE_DIR}/deps/${dir}"
         URL "${url}"
         DOWNLOAD_NO_PROGRESS 1
@@ -17,14 +17,18 @@ function (download_proj name dir url)
         INSTALL_COMMAND "")
 endfunction (download_proj)
 function (apple_download name source_dir url)
-    download_proj ("${name}" "apple-headers/${source_dir}" "${url}")
-    add_dependencies (apple-headers-projs "${name}-proj")
+    download_proj ("${name}" "apple-headers/${source_dir}" "${url}" ah)
+    add_dependencies (apple-headers-projs "${name}-proj-ah")
 endfunction (apple_download)
 function (apple_headers_download name version)
     apple_download ("${name}" "${name}-${version}"
         "https://opensource.apple.com/tarballs/${name}/\
 ${name}-${version}.tar.gz")
 endfunction (apple_headers_download)
+function (apple_proj_download name version)
+    download_proj ("${name}" "${name}" "https://opensource.apple.com/tarballs/\
+${name}/${name}-${version}.tar.gz" aproj)
+endfunction (apple_proj_download)
 function (git_download name repo tag)
     ExternalProject_Add ("${name}-proj"
         SOURCE_DIR "${SOURCE_DIR}/deps/${name}"
@@ -57,6 +61,8 @@ ExternalProject_Add (apple-patch-proj
     DEPENDS apple-headers-projs)
 git_download (clang "https://git.llvm.org/git/clang.git/"
     "4519e2637fcc4bf6e3049a0a80e6a5e7b97667cb")
+apple_proj_download (libclosure "161")
+apple_proj_download (libdispatch "1008.200.78")
 git_download (Libffi "https://github.com/newlawrence/Libffi"
     "03309b8867b31d49bc8ef5a6011970e5801651c1")
 git_download (LIEF "https://github.com/lief-project/LIEF"
@@ -67,8 +73,9 @@ git_download (lldb "https://git.llvm.org/git/lldb.git/"
     "637da661b5ef6fd47f4b077ffd26a79b1c1892f9")
 git_download (llvm "https://git.llvm.org/git/llvm.git/"
     "dd3329aeb25d87d4ac6429c0af220f92e1ba5f26")
+apple_proj_download (objc4 "723")
 download_proj (pthreads "pthreads.2" "ftp://sourceware.org/pub/pthreads-win32/\
-pthreads-w32-2-9-1-release.tar.gz")
+pthreads-w32-2-9-1-release.tar.gz" cus)
 git_download (tapi "https://github.com/ributzka/tapi"
     "b9205695b4edee91000383695be8de5ba8e0db41")
 git_download (unicorn "https://github.com/unicorn-engine/unicorn"
