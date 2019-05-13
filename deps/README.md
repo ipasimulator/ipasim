@@ -41,7 +41,7 @@
    - <https://github.com/newlawrence/Libffi> at
      `03309b8867b31d49bc8ef5a6011970e5801651c1`,
    - <https://github.com/lief-project/LIEF> at
-     `38c7ef841627e6d6d1a0a5d8ece7e01ef2a59550`,
+     `a448c5ef315ac9dc97a95bba3968fe79fcab543f`,
    - <https://git.llvm.org/git/lld.git/> at
      `b9f34e3a65782a9f33fe9eaf2240ec4f1f6e3f6e`,
    - <https://git.llvm.org/git/lldb.git/> at

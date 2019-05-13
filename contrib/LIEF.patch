@@ -1,13 +1,13 @@
-From f1d74b4a962318acba406f490242a58d75f1aa93 Mon Sep 17 00:00:00 2001
+From 5686e88aa925560284f5787988c1f0e40d67389c Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jan=20Jone=C5=A1?= <jjones@outlook.cz>
-Date: Sun, 12 May 2019 08:47:40 +0200
+Date: Mon, 13 May 2019 16:37:02 +0200
 Subject: [PATCH] Squash branch `port`
 
 ---
  .gitignore           |  5 +++++
- cmake/LIEFGit.cmake  | 16 +++++++---------
+ cmake/LIEFGit.cmake  | 10 +++++++---
  src/MachO/Binary.cpp |  8 ++++++--
- 3 files changed, 18 insertions(+), 11 deletions(-)
+ 3 files changed, 18 insertions(+), 5 deletions(-)
  create mode 100644 .gitignore
 
 diff --git a/.gitignore b/.gitignore
@@ -22,22 +22,16 @@ index 0000000..da779e0
 +# [port] CHANGED: Added.
 +/build/
 diff --git a/cmake/LIEFGit.cmake b/cmake/LIEFGit.cmake
-index b1fefcb..ac7b182 100644
+index 16586c3..ae3aa14 100644
 --- a/cmake/LIEFGit.cmake
 +++ b/cmake/LIEFGit.cmake
-@@ -50,13 +50,11 @@ endif()
+@@ -50,7 +50,11 @@ endif()
  message(STATUS "Current branch: ${LIEF_GIT_BRANCH}")
  
  
--if (VERSION_STRING)
--  list(GET VERSION_STRING 0 LIEF_VERSION_MAJOR)
--  list(GET VERSION_STRING 1 LIEF_VERSION_MINOR)
--  list(GET VERSION_STRING 2 LIEF_VERSION_PATCH)
--else()
--  set(LIEF_VERSION_MAJOR 0)
--  set(LIEF_VERSION_MINOR 0)
--  set(LIEF_VERSION_PATCH 0)
--endif()
+-list(GET VERSION_STRING 0 LIEF_VERSION_MAJOR)
+-list(GET VERSION_STRING 1 LIEF_VERSION_MINOR)
+-list(GET VERSION_STRING 2 LIEF_VERSION_PATCH)
 +# [port] CHANGED: Commented out this section and added the next one. See #20.
 +#list(GET VERSION_STRING 0 LIEF_VERSION_MAJOR)
 +#list(GET VERSION_STRING 1 LIEF_VERSION_MINOR)
@@ -47,10 +41,10 @@ index b1fefcb..ac7b182 100644
 +set(LIEF_VERSION_PATCH 0)
  
 diff --git a/src/MachO/Binary.cpp b/src/MachO/Binary.cpp
-index dc7e348..5b9bcba 100644
+index 399bc04..95332d1 100644
 --- a/src/MachO/Binary.cpp
 +++ b/src/MachO/Binary.cpp
-@@ -225,7 +225,9 @@ it_libraries Binary::libraries(void) {
+@@ -207,7 +207,9 @@ it_libraries Binary::libraries(void) {
    libraries_t result;
  
    for (LoadCommand* library: this->commands_) {
@@ -61,7 +55,7 @@ index dc7e348..5b9bcba 100644
        result.push_back(dynamic_cast<DylibCommand*>(library));
      }
    }
-@@ -237,7 +239,9 @@ it_const_libraries Binary::libraries(void) const {
+@@ -219,7 +221,9 @@ it_const_libraries Binary::libraries(void) const {
    libraries_t result;
  
    for (LoadCommand* library: this->commands_) {

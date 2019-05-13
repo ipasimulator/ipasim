@@ -66,7 +66,7 @@ apple_proj_download (libdispatch "1008.200.78")
 git_download (Libffi "https://github.com/newlawrence/Libffi"
     "03309b8867b31d49bc8ef5a6011970e5801651c1")
 git_download (LIEF "https://github.com/lief-project/LIEF"
-    "38c7ef841627e6d6d1a0a5d8ece7e01ef2a59550")
+    "a448c5ef315ac9dc97a95bba3968fe79fcab543f")
 git_download (lld "https://git.llvm.org/git/lld.git/"
     "b9f34e3a65782a9f33fe9eaf2240ec4f1f6e3f6e")
 git_download (lldb "https://git.llvm.org/git/lldb.git/"
