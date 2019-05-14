@@ -88,8 +88,8 @@
   <ItemDefinitionGroup>
     <PreBuildEvent>
       <Command>robocopy ..\..\..\cmake\ipasim-x86-$(Configuration)\gen\ $(ProjectDir)gen\ * /MIR /NP /NFL /NDL
-robocopy "..\..\..\deps\WinObjC\build\Win32\$(Configuration)\Universal Windows\UIKit.Xaml"\ $(ProjectDir)UIKit.Xaml\ * /MIR /NP /NFL /NDL
-robocopy "..\..\..\deps\WinObjC\build\Win32\$(Configuration)\Universal Windows\Social.Xaml"\ $(ProjectDir)Social.Xaml\ * /MIR /NP /NFL /NDL
+robocopy "..\..\..\deps\WinObjC\Frameworks\UIKit.Xaml\prebuilt\$(Configuration)"\ $(ProjectDir)UIKit.Xaml\ *.xbf /MIR /NP /NFL /NDL
+robocopy "..\..\..\deps\WinObjC\Frameworks\Social.Xaml\prebuilt\$(Configuration)"\ $(ProjectDir)Social.Xaml\ *.xbf /MIR /NP /NFL /NDL
 rem See &lt;https://weblogs.sqlteam.com/robv/2010/02/17/61106/&gt;.
 set /A errlev="%ERRORLEVEL% &amp; 24"
 exit /B %errlev%</Command>
