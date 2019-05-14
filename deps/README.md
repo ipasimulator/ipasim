@@ -15,16 +15,7 @@
    - <http://resources.airnativeextensions.com/ios/iPhoneOS11.1.sdk.zip> into
      `apple-headers/iPhoneOS11.1.sdk/`,
    - <https://github.com/phracker/MacOSX-SDKs/releases/download/10.13/MacOSX10.13.sdk.tar.xz>
-     into `apple-headers/MacOSX10.13.sdk/`.
-
-2. Apply patch inside `apple-headers/`:
-
-   ```bash
-   git apply ../../contrib/apple-headers.patch
-   ```
-
-3. Download and extract
-
+     into `apple-headers/MacOSX10.13.sdk/`,
    - <https://opensource.apple.com/tarballs/libclosure/libclosure-67.tar.gz>
      into `libclosure/`,
    - <https://opensource.apple.com/tarballs/libdispatch/libdispatch-1008.200.78.tar.gz>
@@ -34,7 +25,7 @@
    - <ftp://sourceware.org/pub/pthreads-win32/pthreads-w32-2-9-1-release.tar.gz>
      into `pthreads.2/`.
 
-4. Clone repositories
+2. Clone repositories
 
    - <https://git.llvm.org/git/clang.git/> at
      `4519e2637fcc4bf6e3049a0a80e6a5e7b97667cb`,
@@ -55,9 +46,10 @@
    - <https://jjones.visualstudio.com/DefaultCollection/WinObjC/_git/WinObjC> at
      `5407646cab410b6a5636baca5841d114e7e83607`.
 
-5. Apply patches from `../contrib/` in their corresponding directories. For
+3. Apply patches from `../contrib/` in their corresponding directories. For
    example, apply patch `clang.patch` inside `clang/` like this:
 
    ```bash
+   git init # Use only if not already a git repository.
    git apply ../../contrib/clang.patch
    ```
