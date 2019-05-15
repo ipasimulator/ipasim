@@ -126,6 +126,7 @@ private:
   // `nullptr` means this is not a function
   mutable llvm::FunctionType *DylibType;
   mutable llvm::FunctionType *DLLType;
+  mutable std::vector<llvm::Type *> DLLArgs;
 };
 
 // Represents an iOS's system `.dylib`.
