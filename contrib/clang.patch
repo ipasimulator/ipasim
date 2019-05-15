@@ -1,7 +1,7 @@
-From bea8a75f9f1cb4490a20414853ae2bcc22ab80d0 Mon Sep 17 00:00:00 2001
+From f4a913d43a8fcfd79c449c91e146fb76e745a887 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jan=20Jone=C5=A1?= <jjones@outlook.cz>
-Date: Sun, 12 May 2019 08:51:09 +0200
-Subject: [PATCH] Squash branch `port_70`
+Date: Wed, 15 May 2019 16:54:56 +0200
+Subject: [PATCH] Squash branch `thesis`
 
 ---
  .gitignore                          |   3 +
@@ -15,14 +15,14 @@ Subject: [PATCH] Squash branch `port_70`
  lib/AST/DeclPrinter.cpp             |  14 +-
  lib/AST/StmtPrinter.cpp             |   3 +-
  lib/CodeGen/CGBlocks.cpp            | 656 +++++++++++++---------------
- lib/CodeGen/CGDebugInfo.cpp         |  11 +-
+ lib/CodeGen/CGDebugInfo.cpp         |  10 +-
  lib/CodeGen/CGObjC.cpp              |   9 +-
  lib/CodeGen/CodeGenFunction.cpp     |  10 +-
  lib/CodeGen/CodeGenModule.cpp       |  38 +-
  lib/CodeGen/CodeGenModule.h         |   4 +
  lib/Driver/ToolChains/Darwin.cpp    |  10 +-
  utils/TableGen/ClangAttrEmitter.cpp |  25 +-
- 18 files changed, 462 insertions(+), 372 deletions(-)
+ 18 files changed, 461 insertions(+), 372 deletions(-)
 
 diff --git a/.gitignore b/.gitignore
 index fc842489a0..7dabec6721 100644
@@ -1629,10 +1629,10 @@ index 906b98bfba..68fb8e7c21 100644
    return NSConcreteStackBlock;
  }
 diff --git a/lib/CodeGen/CGDebugInfo.cpp b/lib/CodeGen/CGDebugInfo.cpp
-index 5be6fb3e42..4c21a26b4a 100644
+index 5be6fb3e42..8fcc94911b 100644
 --- a/lib/CodeGen/CGDebugInfo.cpp
 +++ b/lib/CodeGen/CGDebugInfo.cpp
-@@ -293,9 +293,14 @@ StringRef CGDebugInfo::getObjCMethodName(const ObjCMethodDecl *OMD) {
+@@ -293,9 +293,13 @@ StringRef CGDebugInfo::getObjCMethodName(const ObjCMethodDecl *OMD) {
    } else if (isa<ObjCProtocolDecl>(DC)) {
      // We can extract the type of the class from the self pointer.
      if (ImplicitParamDecl *SelfDecl = OMD->getSelfDecl()) {
@@ -1642,7 +1642,6 @@ index 5be6fb3e42..4c21a26b4a 100644
 +      // [port] CHANGED: From `cast` to `if ... dyn_cast`. When we set
 +      // [port] `SelfDecl` ourselves (see [emit-all-decls]), it has not this
 +      // [port] type.
-+      // [port] TODO: Why?
 +      if (auto *OPT = dyn_cast<ObjCObjectPointerType>(SelfDecl->getType())) {
 +        QualType ClassTy = OPT->getPointeeType();
 +        ClassTy.print(OS, PrintingPolicy(LangOptions()));

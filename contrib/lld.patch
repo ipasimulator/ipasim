@@ -1,16 +1,16 @@
-From 8d378ce59f2f6031fdcf415226a70e997ed55405 Mon Sep 17 00:00:00 2001
+From 930545029ab92dda5b788025b58584bacee743c0 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jan=20Jone=C5=A1?= <jjones@outlook.cz>
-Date: Sun, 12 May 2019 08:45:00 +0200
-Subject: [PATCH] Squash branch `port_70`
+Date: Wed, 15 May 2019 16:55:59 +0200
+Subject: [PATCH] Squash branch `thesis`
 
 ---
  .gitignore                                    |   3 +
- COFF/Chunks.cpp                               | 248 ++++++++++++++++++
+ COFF/Chunks.cpp                               | 247 ++++++++++++++++++
  COFF/Chunks.h                                 |  29 ++
  COFF/Config.h                                 |   2 +
- COFF/Driver.cpp                               |  20 ++
+ COFF/Driver.cpp                               |  19 ++
  COFF/Options.td                               |   9 +
- COFF/SymbolTable.cpp                          |  12 +-
+ COFF/SymbolTable.cpp                          |  11 +-
  COFF/Writer.cpp                               |   7 +
  .../lld/ReaderWriter/MachOLinkingContext.h    |   8 +
  lib/Core/Resolver.cpp                         |   4 +
@@ -20,7 +20,7 @@ Subject: [PATCH] Squash branch `port_70`
  .../MachO/MachONormalizedFileBinaryWriter.cpp |  20 ++
  .../MachO/MachONormalizedFileFromAtoms.cpp    |  14 +
  lib/ReaderWriter/MachO/StubsPass.cpp          |   7 +-
- 16 files changed, 396 insertions(+), 4 deletions(-)
+ 16 files changed, 393 insertions(+), 4 deletions(-)
 
 diff --git a/.gitignore b/.gitignore
 index 0a288ee8c..edc4ad5e6 100644
@@ -34,7 +34,7 @@ index 0a288ee8c..edc4ad5e6 100644
 +# [port] CHANGED: Added, [gtm].
 +/.gtm/
 diff --git a/COFF/Chunks.cpp b/COFF/Chunks.cpp
-index 412ff7832..c601c736c 100644
+index 412ff7832..3e87fdf95 100644
 --- a/COFF/Chunks.cpp
 +++ b/COFF/Chunks.cpp
 @@ -10,14 +10,18 @@
@@ -75,7 +75,7 @@ index 412ff7832..c601c736c 100644
  namespace lld {
  namespace coff {
  
-@@ -320,6 +336,16 @@ void SectionChunk::writeTo(uint8_t *Buf) const {
+@@ -320,6 +336,15 @@ void SectionChunk::writeTo(uint8_t *Buf) const {
      if (!Sym) {
        if (isCodeView() || isDWARF())
          continue;
@@ -83,7 +83,6 @@ index 412ff7832..c601c736c 100644
 +      // [port] CHANGED: Added this `if`, [fixbind].
 +      // Ignore discarded symbols inside section `.fixbind`, just set them to
 +      // NULL.
-+      // [port] TODO: Also remove them from the file entirely.
 +      if (getSectionName() == ".fixbind") {
 +        *(uint32_t *)Off = 0;
 +        continue;
@@ -92,7 +91,7 @@ index 412ff7832..c601c736c 100644
        // Symbols in early discarded sections are represented using null pointers,
        // so we need to retrieve the name from the object file.
        COFFSymbolRef Sym =
-@@ -640,5 +666,227 @@ void MergeChunk::writeTo(uint8_t *Buf) const {
+@@ -640,5 +665,227 @@ void MergeChunk::writeTo(uint8_t *Buf) const {
    Builder.write(Buf + OutputSectionOff);
  }
  
@@ -381,14 +380,10 @@ index 3ae50b868..5dd0b1896 100644
    bool DebugDwarf = false;
    bool DebugGHashes = false;
 diff --git a/COFF/Driver.cpp b/COFF/Driver.cpp
-index e42a37f6a..b2197aa52 100644
+index e42a37f6a..d553ea469 100644
 --- a/COFF/Driver.cpp
 +++ b/COFF/Driver.cpp
-@@ -960,9 +960,15 @@ void LinkerDriver::link(ArrayRef<const char *> ArgsArr) {
-     Config->Verbose = true;
-   errorHandler().Verbose = Config->Verbose;
- 
-+  // [port] TODO: Option /force should also turn on /force:multiple.
+@@ -963,6 +963,11 @@ void LinkerDriver::link(ArrayRef<const char *> ArgsArr) {
    // Handle /force or /force:unresolved
    if (Args.hasArg(OPT_force, OPT_force_unresolved))
      Config->Force = true;
@@ -400,7 +395,7 @@ index e42a37f6a..b2197aa52 100644
  
    // Handle /debug
    if (Args.hasArg(OPT_debug, OPT_debug_dwarf, OPT_debug_ghash)) {
-@@ -1441,6 +1447,20 @@ void LinkerDriver::link(ArrayRef<const char *> ArgsArr) {
+@@ -1441,6 +1446,20 @@ void LinkerDriver::link(ArrayRef<const char *> ArgsArr) {
    // Needed for MSVC 2017 15.5 CRT.
    Symtab->addAbsolute(mangle("__enclave_config"), 0);
  
@@ -452,7 +447,7 @@ index 871bad8bd..b8970cc67 100644
  
  defm allowbind : B<"allowbind", "Enable DLL binding (default)",
 diff --git a/COFF/SymbolTable.cpp b/COFF/SymbolTable.cpp
-index b286d865c..65b6f713d 100644
+index b286d865c..9c4da74c2 100644
 --- a/COFF/SymbolTable.cpp
 +++ b/COFF/SymbolTable.cpp
 @@ -59,6 +59,14 @@ void SymbolTable::addFile(InputFile *File) {
@@ -470,13 +465,12 @@ index b286d865c..65b6f713d 100644
  static void errorOrWarn(const Twine &S) {
    if (Config->Force)
      warn(S);
-@@ -253,7 +261,9 @@ void SymbolTable::addLazy(ArchiveFile *F, const Archive::Symbol Sym) {
+@@ -253,7 +261,8 @@ void SymbolTable::addLazy(ArchiveFile *F, const Archive::Symbol Sym) {
  }
  
  void SymbolTable::reportDuplicate(Symbol *Existing, InputFile *NewFile) {
 -  error("duplicate symbol: " + toString(*Existing) + " in " +
 +  // [port] CHANGED: Used `errorOrWarnMultiple` instead of `error`.
-+  // [port] TODO: Is this a correct way to implement `/force:multiple`?
 +  errorOrWarnMultiple("duplicate symbol: " + toString(*Existing) + " in " +
          toString(Existing->getFile()) + " and in " + toString(NewFile));
  }

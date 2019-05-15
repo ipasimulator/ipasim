@@ -1,7 +1,7 @@
-From 6e6cda1576c8aad75d73d7c685b547245d3dd415 Mon Sep 17 00:00:00 2001
+From 6a3a2b96ae5b2ea93226bc82def2a80907e3e1e0 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Jan=20Jone=C5=A1?= <jjones@outlook.cz>
-Date: Tue, 14 May 2019 16:35:22 +0200
-Subject: [PATCH] Squash branch `objc_port`
+Date: Wed, 15 May 2019 16:53:51 +0200
+Subject: [PATCH] Squash branch `thesis`
 
 ---
  .gitattributes                                |   5 +
@@ -9,18 +9,18 @@ Subject: [PATCH] Squash branch `objc_port`
  Libc-825.40.1/pthreads/pthread_machdep.h      |  10 +-
  .../usr/include/libkern/_OSByteOrder.h        |   2 +
  .../usr/include/libkern/i386/OSByteOrder.h    |   2 +
- MacOSX10.13.sdk/usr/include/mach-o/ldsyms.h   |   5 +
- MacOSX10.13.sdk/usr/include/mach-o/loader.h   |   5 +
+ MacOSX10.13.sdk/usr/include/mach-o/ldsyms.h   |   4 +
+ MacOSX10.13.sdk/usr/include/mach-o/loader.h   |   4 +
  MacOSX10.13.sdk/usr/include/mach/mach.h       |  11 +
  MacOSX10.13.sdk/usr/include/mach/mach_init.h  |  24 +++
  MacOSX10.13.sdk/usr/include/mach/message.h    |   2 +
  MacOSX10.13.sdk/usr/include/mach/port.h       |   6 +
  MacOSX10.13.sdk/usr/include/mach/vm_types.h   |   8 +-
- MacOSX10.13.sdk/usr/include/sys/cdefs.h       |  13 ++
+ MacOSX10.13.sdk/usr/include/sys/cdefs.h       |  12 ++
  MacOSX10.13.sdk/usr/include/sys/event.h       |   2 +
  README.md                                     |  25 +++
  dyld-519.2.2/include/mach-o/dyld_priv.h       | 201 +++++++-----------
- 16 files changed, 231 insertions(+), 124 deletions(-)
+ 16 files changed, 228 insertions(+), 124 deletions(-)
  create mode 100644 .gitattributes
  create mode 100644 .gitignore
  create mode 100644 README.md
@@ -148,15 +148,14 @@ index f38e0652..37beb605 100644
  /* Functions for byte reversed loads. */
  
 diff --git a/MacOSX10.13.sdk/usr/include/mach-o/ldsyms.h b/MacOSX10.13.sdk/usr/include/mach-o/ldsyms.h
-index 3f28b1b1..9609ff01 100644
+index 3f28b1b1..6b269d2a 100644
 --- a/MacOSX10.13.sdk/usr/include/mach-o/ldsyms.h
 +++ b/MacOSX10.13.sdk/usr/include/mach-o/ldsyms.h
-@@ -87,6 +87,11 @@ _mh_bundle_header;
+@@ -87,6 +87,10 @@ _mh_bundle_header;
   */
  #define _MH_DYLIB_SYM	"__mh_dylib_header"
  #define MH_DYLIB_SYM	"_mh_dylib_header"
 +// [port] CHANGED: If this was not marked `extern "C"`, it would be mangled badly.
-+// [port] TODO: How come this works in the original code?
 +#if defined(OBJC_PORT)
 +extern "C"
 +#endif
@@ -164,14 +163,13 @@ index 3f28b1b1..9609ff01 100644
  #ifdef __LP64__
  mach_header_64
 diff --git a/MacOSX10.13.sdk/usr/include/mach-o/loader.h b/MacOSX10.13.sdk/usr/include/mach-o/loader.h
-index dc1eb66f..21a19b90 100644
+index dc1eb66f..7ab83480 100644
 --- a/MacOSX10.13.sdk/usr/include/mach-o/loader.h
 +++ b/MacOSX10.13.sdk/usr/include/mach-o/loader.h
-@@ -23,6 +23,11 @@
+@@ -23,6 +23,10 @@
  #ifndef _MACHO_LOADER_H_
  #define _MACHO_LOADER_H_
  
-+// [port] TODO: Don't do this.
 +#if defined(OBJC_PORT)
 +#include <mach/vm_statistics.h>
 +#endif
@@ -338,14 +336,13 @@ index 96a744f5..5f94f56f 100644
  #define UPL_NULL		((upl_t) 0)
  #define VM_NAMED_ENTRY_NULL	((vm_named_entry_t) 0)
 diff --git a/MacOSX10.13.sdk/usr/include/sys/cdefs.h b/MacOSX10.13.sdk/usr/include/sys/cdefs.h
-index 522437e0..0b7d5900 100644
+index 522437e0..c72eae35 100644
 --- a/MacOSX10.13.sdk/usr/include/sys/cdefs.h
 +++ b/MacOSX10.13.sdk/usr/include/sys/cdefs.h
-@@ -75,11 +75,14 @@
+@@ -75,11 +75,13 @@
  #define	__END_DECLS
  #endif
  
-+// [port] TODO: Why is this warning issued even though we use clang?
 +#if !defined(OBJC_PORT)
  /* This SDK is designed to work with clang and specific versions of
   * gcc >= 4.0 with Apple's patch sets */
@@ -356,7 +353,7 @@ index 522437e0..0b7d5900 100644
  
  /*
   * Compatibility with compilers and environments that don't support compiler
-@@ -115,6 +118,10 @@
+@@ -115,6 +117,10 @@
  
  #define	__const		const		/* define reserved names to standard */
  #define	__signed	signed
@@ -367,7 +364,7 @@ index 522437e0..0b7d5900 100644
  #define	__volatile	volatile
  #if defined(__cplusplus)
  #define	__inline	inline		/* convert to C++ keyword */
-@@ -581,6 +588,8 @@
+@@ -581,6 +587,8 @@
  #define __DARWIN_EXTSN(sym)		__asm("_" __STRING(sym) __DARWIN_SUF_EXTSN)
  #define __DARWIN_EXTSN_C(sym)		__asm("_" __STRING(sym) __DARWIN_SUF_EXTSN __DARWIN_SUF_NON_CANCELABLE)
  
@@ -376,7 +373,7 @@ index 522437e0..0b7d5900 100644
  /*
   * symbol release macros
   */
-@@ -593,6 +602,7 @@
+@@ -593,6 +601,7 @@
  #else
  #define __DARWIN_ALIAS_STARTING(_mac, _iphone, x)   x
  #endif
@@ -384,7 +381,7 @@ index 522437e0..0b7d5900 100644
  
  
  /*
-@@ -649,10 +659,13 @@
+@@ -649,10 +658,13 @@
  #define _POSIX_C_SOURCE         198808L
  #endif
  
