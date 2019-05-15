@@ -4,6 +4,7 @@
 #include "ipasim/LoadedLibrary.hpp"
 
 #include "ipasim/DynamicLoader.hpp"
+#include "ipasim/IpaSimulator.hpp"
 
 using namespace ipasim;
 using namespace std;
