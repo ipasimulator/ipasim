@@ -12,7 +12,6 @@
 
 #if !defined(IPASIM_NO_WINDOWS_ERRORS)
 // From <winnt.h>
-// TODO: How are these undefined?
 #define LANG_NEUTRAL 0x00
 #define SUBLANG_DEFAULT 0x01 // user default
 
@@ -33,6 +32,7 @@ public:
 };
 #endif
 
+// Type system helpers
 struct StreamToken {};
 struct EndToken : StreamToken {};
 struct WinErrorToken : StreamToken {};
@@ -81,6 +81,7 @@ struct is_invocable_any<FromTy> : std::bool_constant<false> {};
 template <typename FromTy, typename... ToTys>
 constexpr bool is_invocable_any_v = is_invocable_any<FromTy, ToTys...>::value;
 
+// Represents a stream that can accept both `char`s and `wchar_t`s.
 template <typename DerivedTy> class Stream {
 public:
   using Handler = std::function<void(DerivedTy &)>;
@@ -200,12 +201,14 @@ struct is_stream {
 template <typename StreamTy>
 constexpr bool is_stream_v = is_stream::getValue<StreamTy>(is_stream::b());
 
+// A `Stream` that writes to the debugging console in Visual Studio.
 class DebugStream : public Stream<DebugStream> {
 public:
   void write(const char *S) { OutputDebugStringA(S); }
   void write(const wchar_t *S) { OutputDebugStringW(S); }
 };
 
+// A `Stream` that writes to standard C++ streams.
 class StdStream : public Stream<StdStream> {
 public:
   StdStream(std::ostream &Str, std::wostream &WStr) : Str(Str), WStr(WStr) {}
@@ -221,6 +224,7 @@ private:
   std::wostream &WStr;
 };
 
+// A `Stream` that can write to multiple `Stream`s at once.
 template <typename... StreamTys>
 class AggregateStream : public Stream<AggregateStream<StreamTys...>> {
 public:
@@ -243,6 +247,8 @@ private:
   }
 };
 
+// Logging class with one stream for standard output and another one for errors.
+// Sample usage: `Log.error() << "failed with: " << 42 << Log.end()`.
 template <typename StreamTy> class Logger {
 public:
   Logger() = default;

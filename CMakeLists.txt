@@ -1,7 +1,5 @@
 cmake_minimum_required (VERSION 3.12.2)
 
-# TODO: When calling ninja, hide message "no work to do".
-
 option (SUPERBUILD "Configure Clang and then the project itself." ON)
 
 set (CL_COMPILER OFF)
@@ -166,7 +164,6 @@ testing purposes only." OFF)
     update_commands (C)
     update_commands (CXX)
 
-    # TODO: Don't hardcode the architecture.
     add_prep_target ("prep-ipaSim-x86-${CMAKE_BUILD_TYPE}")
 
     add_custom_target (config-winobjc
@@ -188,8 +185,6 @@ testing purposes only." OFF)
             IMPORTED_LOCATION "${CURRENT_WINOBJC_CMAKE_DIR}/bin/${name}.dll"
             IMPORTED_IMPLIB "${CURRENT_WINOBJC_CMAKE_DIR}/bin/${name}.lib")
     endfunction (add_woc_lib)
-    # TODO: Create these somehow automatically. See
-    # https://cmake.org/pipermail/cmake/2010-September/039388.html
     add_woc_lib (WOCStdLib)
     add_woc_lib (Logging)
     add_woc_lib (Starboard)
@@ -214,7 +209,6 @@ Universal Windows/x86/${name}.lib")
     endfunction (add_prebuilt_lib)
 
     # Library ICU. See <http://site.icu-project.org/>.
-    # TODO: Use CMake function `FindICU` or something like that instead.
     function (add_icu_lib name)
         add_prebuilt_lib_core ("icu${name}" "icu${name}57")
     endfunction (add_icu_lib)
@@ -238,7 +232,6 @@ Universal Windows/x86/${name}.lib")
 
     # See
     # https://medium.com/@alasher/colored-c-compiler-output-with-ninja-clang-gcc-10bfe7f2b949.
-    # TODO: Do this for CL.exe, too.
     option (FORCE_COLORED_OUTPUT "Always produce ANSI-colored output." OFF)
     if (FORCE_COLORED_OUTPUT)
         add_compile_options (-fcolor-diagnostics -fansi-escape-codes)

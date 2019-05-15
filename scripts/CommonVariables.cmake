@@ -1,5 +1,3 @@
-# TODO: Split this file up.
-
 set (LLVM_BIN_DIR "C:/Program Files/LLVM/bin")
 
 macro (dir_pairs name)
@@ -145,10 +143,6 @@ function (add_prep_dep target)
 endfunction (add_prep_dep)
 
 # Common include directories for WinObjC projects.
-# TODO: Track them to source MSBuild files.
-# TODO: Use them in every WinObjC project.
-# TODO: Aren't some of those headers copied from somewhere else? (This should
-# get revealed on a clean build, of course.)
 set (WINOBJC_INCLUDE_DIRS
     # These come from `.tlog` files (MSBuild logs).
     "${SOURCE_DIR}/deps/WinObjC/include"
@@ -187,12 +181,10 @@ set (WINOBJC_CLANG_OPTIONS
     # Probably from `Islandwood.targets`.
     -includeWOCStdlib.h
     # From `sdk-build.props`.
-    # TODO: Add `-Werror`?
     -Wno-c++17-extensions -Wno-nullability-completeness
     -Wno-c++17-compat-mangling -Wno-microsoft --system-header-prefix=winrt/
     # New Clang started complaining...
     -Wno-c++11-narrowing
-    # TODO: Fix these, don't ignore them.
     -Wno-c99-extensions -Wno-deprecated-declarations
     -Wno-nonportable-include-path -Wno-macro-redefined
     -Wno-objc-property-no-attribute -Wno-incompatible-property-type
@@ -217,8 +209,6 @@ set (WINOBJC_DEFS
     __WRL_NO_DEFAULT_LIB__
     # Without this, there is an error in header `Windows.UI.Notifications.h`
     # (and others) where macro `DEPRECATEDENUMERATOR` is used.
-    # TODO: Don't define this, rather use older SDK (e.g., the one we used when
-    # we successfully built WinObjC using MSBuild, i.e., 10.0.14393.0).
     DISABLE_WINRT_DEPRECATION
     # From `ClangCompile.xml`.
     _MT _DLL $<$<CONFIG:Debug>:_DEBUG>

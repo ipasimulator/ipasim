@@ -1,4 +1,4 @@
-// TapiHelper.hpp
+// TapiHelper.hpp: Definition of class `TBDHandler`.
 
 #ifndef IPASIM_TAPI_HELPER_HPP
 #define IPASIM_TAPI_HELPER_HPP
@@ -11,6 +11,7 @@
 
 namespace ipasim {
 
+// Helper class for analyzing `.tbd` files.
 class TBDHandler {
 public:
   TBDHandler(HAContext &HAC);

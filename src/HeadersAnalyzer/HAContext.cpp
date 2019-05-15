@@ -1,10 +1,10 @@
-// HAContext.cpp
+// HAContext.cpp: Implementations of classes defined in `HAContext.hpp`.
 
 #include "ipasim/HAContext.hpp"
 
 #include "ipasim/Common.hpp"
-#include "ipasim/ErrorReporting.hpp"
 #include "ipasim/HeadersAnalyzer/Config.hpp"
+#include "ipasim/Output.hpp"
 
 #include <llvm/ADT/Twine.h>
 
@@ -78,7 +78,6 @@ bool HAContext::isInteresting(const string &Name, ExportPtr &Exp) {
   if (Exp == iOSExps.end()) {
     // If not found among exported functions, try if it isn't an Objective-C
     // function.
-    // TODO: If it is, though, don't really export it by name from the Dylib.
     auto Class = findClassMethod(Name);
     if (Class != iOSClasses.end()) {
       Exp = iOSExps.insert(ExportEntry(Name)).first;

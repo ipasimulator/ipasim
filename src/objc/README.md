@@ -39,8 +39,6 @@ included from the MacOSX SDK.
   `objc-msg-simulator-i386.s` which uses the new ABI (`__OBJC2__`).
 - `[unaligned]` - These instructions need aligned addresses to work, but we
   don't currently have them, so we use their unaligned variants.
-  **TODO: It would be better to align the addresses instead. See e.g. Clang's
-  `-falign-functions` (also do this in WinObjC `.dll`s).**
 - `[classrefs]` - There is a bug which causes Objective-C classes imported
   across assembly boundaries to malfunction. It's because there's an added
   indirect reference which is not expected by the runtime. For example, in the

@@ -224,7 +224,8 @@ add_custom_target (clang-tablegen-targets
     USES_TERMINAL
     DEPENDS config-clang-x86)
 set (LLVM_TABLEGEN_TARGETS
-    # From `add_public_tablegen_target` in `deps/llvm`
+    # From `add_public_tablegen_target` in `deps/llvm`. Unused architectures are
+    # commented out.
     intrinsics_gen
     AttributeCompatFuncTableGen
     # AArch64CommonTableGen
@@ -347,7 +348,7 @@ set (TAPI_SOURCES
 # Making `tapi` `SHARED` doesn't work due to unresolved symbols in
 # `HeadersAnalyzer.exe`.
 add_library (tapi STATIC ${TAPI_SOURCES})
-add_prep_dep (tapi) # TODO: Use original Clang for CodeGen. See also #12.
+add_prep_dep (tapi) # See #12.
 
 target_compile_definitions (tapi PRIVATE
     TAPI_PORT PATH_MAX=_MAX_PATH _CRT_SECURE_NO_WARNINGS)
@@ -376,7 +377,6 @@ add_custom_command (
         "${SOURCE_DIR}/deps/tapi/include/tapi/Driver/DiagnosticTAPIKinds.td"
     DEPENDS "${RELEASE_CLANG_CMAKE_DIR}/bin/clang-tblgen.exe"
         "${SOURCE_DIR}/deps/tapi/include/tapi/Driver/DiagnosticTAPIKinds.td")
-#### TODO: This also depends on some headers (in `deps/llvm/include`)...
 add_custom_command (
     OUTPUT include/tapi/Driver/TAPIOptions.inc
     COMMAND "${RELEASE_CLANG_CMAKE_DIR}/bin/llvm-tblgen.exe" "-o=${INC2}"
@@ -426,7 +426,7 @@ set (SOURCE_FILES
     TapiHelper.cpp)
 
 add_executable (HeadersAnalyzer ${SOURCE_FILES})
-add_prep_dep (HeadersAnalyzer) # TODO: Use original Clang for CodeGen.
+add_prep_dep (HeadersAnalyzer)
 
 target_compile_options (HeadersAnalyzer PRIVATE -std=c++17)
 
@@ -443,13 +443,11 @@ target_include_directories (HeadersAnalyzer PRIVATE
 
 target_link_libraries (HeadersAnalyzer PRIVATE
     ${ALL_CLANG_LIBS} tapi dia ws2_32.lib mincore.lib
-    # TODO: We should use original Clang + `lld-link`, this is just a simpler
-    # workaround for #12.
+    # See #12.
     -fuse-ld=link
     # `link.exe` complains otherwise.
     -Wl,/nodefaultlib:libcmt)
 
-# TODO: Add real outputs and inputs.
 set (CG_OUTPUTS "${CURRENT_IPASIM_CMAKE_DIR}/cg/exports.txt"
     "${CURRENT_IPASIM_CMAKE_DIR}/cg/report.csv")
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -479,5 +477,3 @@ else ()
             "${CURRENT_IPASIM_CMAKE_DIR}/bin/HeadersAnalyzer.exe")
 endif ()
 add_custom_target (CodeGen DEPENDS ${CG_OUTPUTS})
-
-# TODO: Clear the output directory `gen` before emitting binaries.

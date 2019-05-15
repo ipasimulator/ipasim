@@ -72,7 +72,6 @@ add_library (objc SHARED
     ${MACHO_INITIALIZER})
 
 # `runtime.c` needs to be compiled as C++ since there are errors otherwise.
-# TODO: Why?
 set_source_files_properties ("${SOURCE_DIR}/deps/libclosure/runtime.c"
     PROPERTIES COMPILE_OPTIONS -xc++)
 

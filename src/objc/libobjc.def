@@ -52,8 +52,6 @@ _objc_opt_rw_data DATA
 ; From objc-cache.mm.obj.
 _objc_empty_cache DATA
 
-; TODO: Export these from source code instead.
-
 ; From data.c.obj.
 _NSConcreteStackBlock DATA
 _NSConcreteMallocBlock DATA
@@ -78,7 +76,6 @@ _Block_object_assign
 _Block_object_dispose
 
 ; From objc-exception.mm.obj.
-; TODO: Why is this not exported even though it has `OBJC_EXPORT` in source code?
 objc_ehtype_vtable DATA
 
 ; From NSObject.mm.obj.

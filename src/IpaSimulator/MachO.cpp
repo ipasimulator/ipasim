@@ -1,4 +1,4 @@
-// MachO.cpp
+// MachO.cpp: Implementation of class `MachO`.
 
 #include "ipasim/MachO.hpp"
 
@@ -137,15 +137,6 @@ struct class_rw_t {
   const class_ro_t *ro;
 
   method_array_t methods;
-  /*
-  property_array_t properties;
-  protocol_array_t protocols;
-
-  Class firstSubclass;
-  Class nextSiblingClass;
-
-  char *demangledName;
-  */
 };
 
 struct objc_class {
@@ -167,13 +158,6 @@ struct category_t {
   objc_class *cls;
   method_list_t *instanceMethods;
   method_list_t *classMethods;
-
-  /*
-  struct protocol_list_t *protocols;
-  struct property_list_t *instanceProperties;
-  // Fields below this point are not always present on disk.
-  struct property_list_t *_classProperties;
-  */
 };
 
 } // namespace
@@ -208,7 +192,6 @@ static method_t *findMethodImpl(method_list_t *Methods, uint64_t Addr) {
 }
 
 static method_t *findMethodImpl(objc_class *Class, uint64_t Addr) {
-  // TODO: Isn't this first part redundant for realized classes?
   if (method_t *M = findMethodImpl(Class->getInfo()->baseMethodList, Addr))
     return M;
   if (Class->isRealized())

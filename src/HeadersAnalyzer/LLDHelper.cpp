@@ -1,8 +1,8 @@
-// LLDHelper.cpp
+// LLDHelper.cpp: Implementation of class `LLDHelper`.
 
 #include "ipasim/LLDHelper.hpp"
 
-#include "ipasim/ErrorReporting.hpp"
+#include "ipasim/Output.hpp"
 
 #include <llvm/ADT/ArrayRef.h>
 #include <llvm/Support/Program.h>
@@ -16,8 +16,7 @@ using namespace std::filesystem;
 
 LLDHelper::LLDHelper(const path &BuildDir, LLVMHelper &LLVM)
     : Args(LLVM.Saver) {
-  // First argument is expected to be an executable name.
-  // TODO: See #26.
+  // First argument is expected to be an executable name. See also #26.
   Args.add(
       (BuildDir / "../clang-x86-Release/bin/ld64.lld.exe").string().c_str());
 }

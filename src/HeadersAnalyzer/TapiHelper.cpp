@@ -1,8 +1,8 @@
-// TapiHelper.cpp
+// TapiHelper.cpp: Implementation of class `TBDHandler`.
 
 #include "ipasim/TapiHelper.hpp"
 
-#include "ipasim/ErrorReporting.hpp"
+#include "ipasim/Output.hpp"
 
 #include <clang/Basic/FileSystemOptions.h>
 
@@ -34,7 +34,6 @@ void TBDHandler::handleFile(const string &Path) {
     Log.warning() << "TBD file without `.tbd` extension (" << Path << ")"
                   << Log.end();
   InterfaceFileBase *FileBase = *FileOrError;
-  // TODO: Shouldn't this be `armv7s`?
   if (!FileBase->getArchitectures().contains(Architecture::armv7)) {
     Log.error() << "TBD file does not contain architecture ARMv7 (" << Path
                 << ")" << Log.end();

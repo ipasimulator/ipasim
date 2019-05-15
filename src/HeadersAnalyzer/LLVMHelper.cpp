@@ -1,11 +1,11 @@
-// LLVMHelper.cpp
+// LLVMHelper.cpp: Implementation of classes `LLVMHelper` and `IRHelper`.
 
 #include "ipasim/LLVMHelper.hpp"
 
 #include "ipasim/ClangHelper.hpp"
 #include "ipasim/Common.hpp"
-#include "ipasim/ErrorReporting.hpp"
 #include "ipasim/HeadersAnalyzer/Config.hpp"
+#include "ipasim/Output.hpp"
 
 #include <llvm/ADT/None.h>
 #include <llvm/IR/LegacyPassManager.h>
@@ -134,12 +134,6 @@ void IRHelper::defineFunc(llvm::Function *Func) {
   Builder.SetInsertPoint(BB);
 }
 
-// TODO: Store types with size less than pointer size directly in the structure
-// (instead of storing pointer to it as we are doing now). But make sure it'll
-// be aligned equally on both architectures.
-// TODO: Originally, this used union to share space for arguments and return
-// value, but it generated wrong machine code. However, we still would like to
-// share the space if possible.
 StructType *IRHelper::createParamStruct(const ExportEntry &Exp) {
   Type *RetTy = Exp.getDylibType()->getReturnType();
 
@@ -163,9 +157,6 @@ StructType *IRHelper::createParamStruct(const ExportEntry &Exp) {
   // value. It contains space for the return value and addresses of arguments.
   // Structure alignment is different on different platforms, that's why we
   // create a *packed* structure.
-  // TODO: Maybe align it manually.
-  // TODO: Also ensure that WinObjC's and other DLLs' structures are aligned as
-  // they would be on iOS.
   return StructType::create(ParamPointers, "struct", /* isPacked */ true);
 }
 
@@ -206,9 +197,8 @@ void IRHelper::emitObj(const path &BuildDir, StringRef Path) {
     return;
   Module.print(*IROutput, nullptr);
 
-  // Emit object file.
-  // TODO: Doing this via `PassManager` and `addPassesToEmitFile` didn't work
-  // well (for, e.g., `UIApplicationMain`).
+  // Emit object file. Note that doing this via `PassManager` and
+  // `addPassesToEmitFile` didn't work well (for, e.g., `UIApplicationMain`).
   ClangHelper Clang(BuildDir, LLVM);
   Clang.Args.add("-target");
   Clang.Args.add(Module.getTargetTriple().c_str());
@@ -216,7 +206,6 @@ void IRHelper::emitObj(const path &BuildDir, StringRef Path) {
   Clang.Args.add(IRPath.c_str());
   Clang.Args.add("-o");
   Clang.Args.add(Path.data());
-  // TODO: Use THUMB, but make sure it's emulated correctly.
   if (TM->getTargetTriple().isARM())
     Clang.Args.add("-mno-thumb");
   Clang.Args.add("-Wno-override-module");

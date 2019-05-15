@@ -1,4 +1,5 @@
-// IpaSimulator.cpp
+// IpaSimulator.cpp: Implementation of class `IpaSimulator` and
+// `IpaSimLibrary`'s public API.
 
 #include "ipasim/IpaSimulator.hpp"
 
@@ -12,7 +13,6 @@ using namespace std;
 using namespace winrt;
 using namespace Windows::ApplicationModel::Activation;
 
-// TODO: This Emu-Dyld circular reference is not very cool.
 IpaSimulator::IpaSimulator() : Emu(Dyld), Dyld(Emu), Sys(Dyld, Emu) {}
 
 void ipasim::start(const hstring &Path,

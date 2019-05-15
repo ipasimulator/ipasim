@@ -1,5 +1,3 @@
-// TODO: Implement these functions.
-
 #include "..\..\deps\objc4\runtime\objc-private.h"
 
 OBJC_EXPORT void dyld_stub_binder() { assert(false); }
@@ -18,9 +16,6 @@ bool dispatch_is_dispatch_object(const void *obj) {
 }
 
 // Copied from libobjc2/encoding2.c.
-// TODO: Do these work correctly for our runtime? Maybe port Apple's NSGetSizeAndAlignment instead (if there is its source code).
-// TODO: This doesn't work, why?
-//#define alignof(type) __builtin_offsetof(struct { const char c; type member; }, member)
 typedef const char *(*type_parser)(const char*, void*);
 static int parse_array(const char **type, type_parser callback, void *context)
 {
@@ -306,10 +301,6 @@ OBJC_EXPORT size_t objc_aligned_size(const char *type)
 }
 
 // Signatures copied from libobjc2/objc/runtime.h.
-// TODO: Move this to something like `compat.mm`.
-// TODO: From obj-abi.h on `objc_msgLookup` and related:
-// "These are not callable C functions. Do not call them directly."
-// Maybe just modify WinObjC so that it doesn't use this.
 OBJC_EXPORT IMP objc_msg_lookup(id self, SEL _cmd) {
     return reinterpret_cast<IMP (*)(id, SEL)>(objc_msgLookup)(self, _cmd);
 }
@@ -318,7 +309,6 @@ OBJC_EXPORT IMP objc_msg_lookup_super(struct objc_super *super, SEL _cmd) {
 }
 
 // Originals are in libobjc2/associate.m.
-// TODO: Implement these correctly!
 OBJC_EXPORT BOOL object_addMethod_np(id object, SEL name, IMP imp, const char *types)
 {
 	return class_addMethod(object, name, imp, types);
@@ -329,7 +319,6 @@ OBJC_EXPORT IMP object_replaceMethod_np(id object, SEL name, IMP imp, const char
 }
 
 // From libobjc2/NSBlocks.mm.
-// TODO: Move to more appropriate place than `stubs.mm`.
 extern "C" struct objc_class _NSConcreteGlobalBlock;
 extern "C" struct objc_class _NSConcreteStackBlock;
 extern "C" struct objc_class _NSConcreteMallocBlock;

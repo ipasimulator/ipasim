@@ -66,7 +66,6 @@ static IAsyncOperation<StorageFolder> copyFolder(StorageFolder Source,
   co_return Dest;
 }
 
-// TODO: Move these into `IpaSimLibrary` when possible.
 static IAsyncAction startCore(LaunchActivatedEventArgs LaunchArgs) {
   // Ask user for folder containing the binary.
   FolderPicker FP;
@@ -76,7 +75,6 @@ static IAsyncAction startCore(LaunchActivatedEventArgs LaunchArgs) {
     ipasim::error("no folder selected");
     co_return;
   }
-  // TODO: This is not used right now.
   StorageApplicationPermissions::FutureAccessList().AddOrReplace(
       L"PickedFolderToken", Folder);
 
@@ -97,9 +95,6 @@ static IAsyncAction startCore(LaunchActivatedEventArgs LaunchArgs) {
   ApplicationView::GetForCurrentView().Title(to_hstring(BinaryName));
 
   // Copy the folder into app's data.
-  // TODO: Without this, files inside the folder cannot be opened by standard
-  // C++ means (e.g., `fstream`). But maybe we could workaround that.
-  // TODO: Delete old files first.
   Folder = co_await copyFolder(Folder,
                                ApplicationData::Current().LocalCacheFolder());
   Bin = co_await Folder.GetFileAsync(Bin.Name());

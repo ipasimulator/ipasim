@@ -31,7 +31,6 @@ RUN powershell -c "choco install python --version 3.7.0 -y"
 RUN powershell -c "choco install nuget.commandline --version 4.9.1 -y"
 
 # Install C++/WinRT.
-# TODO: Use the one from Windows SDK when we use some newer version of the SDK.
 RUN powershell -c "nuget install cppwinrt -Version 2017.4.6.1 -OutputDirectory C:/packages"
 
 # Install Node.js LTS.
@@ -39,7 +38,6 @@ ADD https://nodejs.org/dist/v8.11.3/node-v8.11.3-x64.msi C:/temp/node-install.ms
 RUN start /wait msiexec.exe /i C:/temp/node-install.msi /l*vx "C:/temp/MSI-node-install.log" /qn ADDLOCAL=ALL
 
 # Install Visual Studio Build Tools.
-# TODO: Don't do this, use LLVM-only toolchain instead when possible.
 # For a list of components, see <https://docs.microsoft.com/en-us/visualstudio/
 # install/workload-component-id-vs-build-tools?view=vs-2017>. For more
 # information, see <https://blogs.msdn.microsoft.com/heaths/2018/06/14/
@@ -47,10 +45,6 @@ RUN start /wait msiexec.exe /i C:/temp/node-install.msi /l*vx "C:/temp/MSI-node-
 # docs.microsoft.com/en-us/visualstudio/install/
 # build-tools-container?view=vs-2017> or <https://github.com/Microsoft/
 # vs-dockerfiles/tree/5f5c58248a97e881273bebe94fdaaca640d75002/native-desktop>.
-# TODO: Maybe execute the following in a new container based on image from
-# previous steps which would also have a volume in C:/vscache and use that for,
-# as its name suggests, cache of the Visual Studio Installer, so that it doesn't
-# have to download everything over and over again.
 # See also #16.
 COPY scripts/install_vs.cmd C:/temp/
 ADD https://download.microsoft.com/download/8/3/4/834E83F6-C377-4DCE-A757-69A418B6C6DF/Collect.exe C:/temp/collect.exe

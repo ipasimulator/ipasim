@@ -1,4 +1,4 @@
-// TextBlockStream.cpp
+// TextBlockStream.cpp: Implementation of class `TextBlockStream`.
 
 #include "ipasim/TextBlockStream.hpp"
 

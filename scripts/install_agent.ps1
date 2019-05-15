@@ -2,7 +2,7 @@
 # forget to provide Personal Access Token as the first argument. This PAT only
 # needs "Agent Pools (Read & manage); Code (Read); Code (Status)" access rights.
 
-# TODO: Disable Server Manager to start automatically at logon.
+# IMPORTANT: Disable Server Manager to start automatically at logon.
 
 cd \
 wget https://vstsagentpackage.azureedge.net/agent/2.144.0/vsts-agent-win-x64-2.144.0.zip -OutFile agent.zip
@@ -22,8 +22,8 @@ Invoke-WebRequest "https://github.com/docker/compose/releases/download/1.23.2/do
 # Make `VSTSAgent` service depends on `docker`.
 cmd /c sc config vstsagent.jjones.AzureVmAgent depend=docker
 
-# TODO: Change Docker and VSTS Agent services to run Automatically, for Local System account and to restart on failures.
-# TODO: Copy file `./scripts/daemon.json` into `%programdata%/docker/config/daemon.json`.
+# IMPORTANT: Change Docker and VSTS Agent services to run Automatically, for Local System account and to restart on failures.
+# IMPORTANT: Copy file `./scripts/daemon.json` into `%programdata%/docker/config/daemon.json`.
 
 # Install Git LFS.
 cd \

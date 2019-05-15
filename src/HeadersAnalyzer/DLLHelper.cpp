@@ -1,4 +1,4 @@
-// DLLHelper.cpp
+// DLLHelper.cpp: Implementation of class `DLLHelper`.
 
 #include "ipasim/DLLHelper.hpp"
 
@@ -71,7 +71,6 @@ void DLLHelper::load(LLDBHelper &LLDB, ClangHelper &Clang, CodeGenModule *CGM) {
 
     // Verify that the function has the same signature as the iOS one.
     if constexpr (CompareTypes) {
-      // TODO: #28 is not considered here.
       if (!TC.areEquivalent(Exp->getDylibType(), Func))
         Log.error() << "functions' signatures are not equivalent (" << Exp->Name
                     << ")" << Log.end();
@@ -86,7 +85,6 @@ void DLLHelper::load(LLDBHelper &LLDB, ClangHelper &Clang, CodeGenModule *CGM) {
       size_t DylibCount = Exp->getDylibType()->getNumParams();
       size_t DLLCount = Func.getSignature()->getCount();
 
-      // TODO: Also check that `Func`'s return type is NOT void.
       if (DylibCount == DLLCount + 1 &&
           Exp->getDylibType()->getReturnType()->isVoidTy())
         // See #28.
@@ -110,11 +108,8 @@ void DLLHelper::load(LLDBHelper &LLDB, ClangHelper &Clang, CodeGenModule *CGM) {
       ObjCMethodScout::discoverMethods(DLLPathStr, COFF));
   for (const ObjCMethod &Method : ObjCMethods) {
     ExportPtr Exp;
-    if (!analyzeWindowsFunction(Method.Name, Method.RVA,
-                                /* IgnoreDuplicates */ true, Exp))
-      continue;
-
-    // TODO: Compare signatures.
+    analyzeWindowsFunction(Method.Name, Method.RVA,
+                           /* IgnoreDuplicates */ true, Exp);
   }
 }
 
@@ -165,8 +160,7 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
 
     FunctionGuard WrapperGuard(IR, Wrapper);
 
-    // TODO: Handle variadic functions specially. For now, we simply don't
-    // call them.
+    // Handle variadic functions specially. For now, we simply don't call them.
     if (Exp->getDLLType()->isVarArg()) {
       Exp->UnhandledVararg = true;
       Log.error() << "unhandled variadic function (" << Exp->Name << ")"
@@ -247,7 +241,6 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
         Value *SR = IR.Builder.CreateLoad(SRP, "sr");
 
         // Copy structure's content.
-        // TODO: Don't hardcode the alignments here.
         IR.Builder.CreateMemCpy(SR, 4, RS, 4, IR.getSize(R->getType()));
       } else { // !Exp->DylibStretOnly
         // Get pointer to the return value inside the union.
@@ -404,13 +397,7 @@ bool DLLHelper::analyzeWindowsFunction(const string &Name, uint32_t RVA,
     return false;
   }
 
-  // Skip type verification of vararg functions. It doesn't work well -
-  // at least for `_NSLog`. There is a weird bug that happens randomly -
-  // sometimes everything works fine, sometimes there is an assertion
-  // failure `Assertion failed: isValidArgumentType(Params[i]) && "Not a
-  // valid type for function argument!", file ..\..\lib\IR\Type.cpp,
-  // line 288`.
-  // TODO: Investigate and fix this bug.
+  // Skip type verification of vararg functions.
   if (Exp->getDylibType()->isVarArg())
     return false;
 

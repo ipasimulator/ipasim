@@ -1,4 +1,4 @@
-// HeadersAnalyzer.cpp
+// HeadersAnalyzer.cpp: Main logic of tool `HeadersAnalyzer`.
 
 #include "ipasim/ClangHelper.hpp"
 #include "ipasim/DLLHelper.hpp"
@@ -48,12 +48,7 @@ using namespace tapi::internal;
 
 namespace {
 
-// TODO: Generate distinct wrappers only for functions with distinct signatures.
-// And then export those wrappers as aliases for all functions with the same
-// signature.
-// TODO: Also analyze WinObjC's header files to find API status information and
-// also our DLLs, e.g., our Objective-C runtime to find types of
-// assembly-implemented functions.
+// Encapsulates the workflow of `HeadersAnalyzer`.
 class HeadersAnalyzer {
 public:
   HeadersAnalyzer(path BuildDir, bool Debug) : Debug(Debug), LLVM(LLVMInit) {
@@ -82,8 +77,6 @@ public:
 
     // Fill `ExportEntry.Dylib` fields. This must not be done earlier since
     // `DylibPtr`s need to be stable.
-    // TODO: Maybe don't do this and have only Objective-C methods inside
-    // `WrapperIndex`.
     for (auto [LibPtr, Lib] : withPtrs(HAC.iOSLibs))
       for (const ExportPtr &Exp : Lib.Exports)
         if (!Exp->Dylib)
@@ -138,10 +131,6 @@ public:
 
     // Now we simply consider all symbols found in TBDs and not in headers to be
     // data symbols.
-    // TODO: We should actually search for definitions of those data symbols in
-    // `Module`, as well, to be sure they're really data and not functions. But
-    // be aware that class symbols (e.g., `_OBJC_CLASS_$_NSObject`) are probably
-    // not gonna be listed explicitly in `Module`'s tables.
   }
   void loadDLLs() {
     Log.info("loading DLLs");
@@ -183,7 +172,6 @@ public:
       IRHelper IR(LLVM, LibNo, Lib.Name, IRHelper::Apple);
 
       // Generate function wrappers.
-      // TODO: Shouldn't we use aligned instructions?
       for (ExportPtr Exp : Lib.Exports) {
 
         // Ignore functions that haven't been found in any DLL.
@@ -213,8 +201,6 @@ public:
           // no parameter registers are changed when jumping to the result of
           // `msgLookup`. And thanks to that tail call, even returning should
           // work correctly.
-          // TODO: Ideally, we would like to use `PreserveMost` CC (see commit
-          // `eeae6dc2`), but it's only for `x86_64` right now.
 
           // Declare the messenger.
           llvm::Function *MessengerFunc =
@@ -286,10 +272,6 @@ public:
           IR.Builder.CreateRetVoid();
           continue;
         }
-
-        // TODO: For some reason, order matters here a lot. Other orderings can
-        // even generate wrong machine code. Or does it? Maybe the bug was
-        // somewhere else...
 
         // Reserve space for arguments.
         vector<llvm::Value *> APs;
@@ -461,7 +443,6 @@ private:
     Clang.initFromInvocation();
 
     // Include all declarations in the result. See [emit-all-decls].
-    // TODO: Maybe filter them (include only those exported from iOS Dylibs).
     Clang.CI.getLangOpts().EmitAllDecls = true;
 
     // But don't emit bodies, we don't need them. See [emit-bodies].

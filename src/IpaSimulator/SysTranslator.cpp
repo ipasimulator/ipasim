@@ -1,4 +1,5 @@
-// SysTranslator.cpp
+// SysTranslator.cpp: Implementation of classes `SysTranslator`, `DynamicCaller`
+// and `TypeDecoder`.
 
 #include "ipasim/SysTranslator.hpp"
 
@@ -55,9 +56,6 @@ void SysTranslator::execute(LoadedLibrary *Lib) {
   Emu.hook(UC_HOOK_MEM_READ_UNMAPPED | UC_HOOK_MEM_WRITE_UNMAPPED,
            &SysTranslator::handleMemUnmapped, this);
 
-  // TODO: Do this also for all non-wrapper Dylibs (i.e., Dylibs that come with
-  // the `.ipa` file).
-  // TODO: Call also other (user) C++ initializers.
   // Initialize the binary with our Objective-C runtime. This simulates what
   // `MachOInitializer.cpp` does.
   uint64_t Hdr = Dylib->findSymbol(Dyld, "__mh_execute_header");
@@ -316,8 +314,6 @@ bool SysTranslator::handleMemWrite(uc_mem_type Type, uint64_t Addr, int Size,
   return true;
 }
 
-// TODO: Maybe this happens when the emulated app accesses some non-directly
-// dependent DLL and we should load it as a whole.
 bool SysTranslator::handleMemUnmapped(uc_mem_type Type, uint64_t Addr, int Size,
                                       int64_t Value) {
   if constexpr (PrintEmuInfo)
@@ -380,8 +376,6 @@ void *SysTranslator::translate(void *FP) {
   // We have found metadata of the callback method. Now, for simple methods,
   // it's actually quite simple to translate i386 -> ARM calls dynamically,
   // so that's what we do here.
-  // TODO: Generate wrappers for callbacks, too (see README of
-  // `HeadersAnalyzer` for more details).
   if constexpr (PrintEmuInfo)
     Log.info() << "dynamically handling callback " << Dyld.dumpAddr(Addr, LI, M)
                << Log.end();
@@ -481,14 +475,12 @@ void *SysTranslator::translate(void *FP, size_t ArgC, bool Returns) {
 void *SysTranslator::createTrampoline(void *FP, size_t ArgC, bool Returns) {
   assert(ArgC <= 4);
 
-  // TODO: Don't create different trampolines for the same `FP`.
   auto *Tr = new Trampoline;
   Tr->Returns = Returns;
   Tr->ArgC = ArgC;
   Tr->Addr = reinterpret_cast<uint64_t>(FP);
 
   void *Ptr;
-  // TODO: `Closure` nor `Tr` are never deallocated.
   auto *Closure = reinterpret_cast<ffi_closure *>(
       ffi_closure_alloc(sizeof(ffi_closure), &Ptr));
   if (!Closure) {

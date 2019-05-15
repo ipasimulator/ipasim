@@ -1,4 +1,4 @@
-// DynamicLoader.cpp
+// DynamicLoader.cpp: Implementation of class `DynamicLoader`
 
 #include "ipasim/DynamicLoader.hpp"
 
@@ -7,7 +7,7 @@
 #include "ipasim/IpaSimulator/Config.hpp"
 
 #include <filesystem>
-#include <psapi.h> // for `GetModuleInformation`
+#include <psapi.h> // For `GetModuleInformation`
 #include <winrt/Windows.ApplicationModel.h>
 #include <winrt/Windows.Storage.h>
 
@@ -101,7 +101,6 @@ void DynamicLoader::handleMachOs(size_t HdrOffset, size_t HandlerOffset) {
   vector<const void *> Headers;
   Headers.reserve(Hdrs.size() - HdrOffset);
   for (ptrdiff_t I = Hdrs.size() - 1, End = HdrOffset - 1; I != End; --I) {
-    // TODO: Find out paths from `LLs`.
     Paths.push_back(nullptr);
     Headers.push_back(Hdrs[I]);
   }
@@ -111,7 +110,6 @@ void DynamicLoader::handleMachOs(size_t HdrOffset, size_t HandlerOffset) {
     MachOHandler &Handler = *I;
     Handler.Mapped(Headers.size(), Paths.data(), Headers.data());
     for (ptrdiff_t I = Hdrs.size() - 1, End = HdrOffset - 1; I != End; --I)
-      // TODO: Find out path from `LLs`.
       Handler.Init(nullptr, Hdrs[I]);
   }
 }
@@ -140,7 +138,6 @@ BinaryPath DynamicLoader::resolvePath(const string &Path) {
                       /* Relative */ true};
   }
 
-  // TODO: Handle also `.ipa`-relative paths.
   return BinaryPath{Path, filesystem::path(Path).is_relative()};
 }
 
@@ -150,7 +147,6 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
   auto LL = make_unique<LoadedDylib>(Parser::parse(Path));
   LoadedDylib *LLP = LL.get();
 
-  // TODO: Select the correct binary more intelligently.
   Binary &Bin = LL->Bin;
 
   LLs[Path] = move(LL);
@@ -220,10 +216,7 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
       // No protection means we don't have to copy any data, we just map it.
       Emu.mapMemory(VAddr, VSize, Perms);
     } else {
-      // TODO: Memory-map the segment instead of copying it.
       auto &Buff = Seg.content();
-      // TODO: Copy to the end of the allocated space if flag `SG_HIGHVM` is
-      // present.
       memcpy(Mem, Buff.data(), Buff.size());
       Emu.mapMemory(VAddr, VSize, Perms);
 
@@ -246,7 +239,6 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
 
         uint64_t RelAddr = RelBase + Rel.address();
 
-        // TODO: Implement what `ImageLoader::containsAddress` does.
         if (RelAddr > VAddr + VSize || RelAddr < VAddr)
           Log.error("relocation target out of range");
 
@@ -254,8 +246,6 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
         // We actively leave NULL pointers untouched. Technically it would be
         // correct to slide them because the PAGEZERO segment slid, too. But
         // programs probably wouldn't be happy if their NULLs were non-zero.
-        // TODO: Solve this as the original dyld does. Maybe by always mapping
-        // PAGEZERO to address 0 or something like that.
         if (*Val != 0)
           *Val = *Val + Slide;
       }

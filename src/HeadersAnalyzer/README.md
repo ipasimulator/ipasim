@@ -76,8 +76,6 @@ Or we could just somehow "use" the function's type since that all we care about 
 For example, emitting some global variable and initializing it with address to that function.
 But that would also require an AST-rewriting step or emitting textual code.
 
-**TODO: This doesn't get us inherited methods, so we don't have wrappers for them.**
-
 #### Our approach
 
 We chose the simplest (and we believe also the cleanest) solution - we used Clang's `LangOpts.EmitAllDecls` and made it emit really all declarations.
@@ -85,14 +83,14 @@ Until our changes, this option only emitted functions that *had bodies* but were
 After our changes, this option emits also functions without bodies.
 See tag `[emit-all-decls]` in Clang's code to see those changes.
 
-**TODO: Note that currently, we actually emit *definitions* even if they were only *declarations* in the source code.
+Note that currently, we actually emit *definitions* even if they were only *declarations* in the source code.
 Those fake definitions have probably invalid bodies but we don't care since we are only interested in signatures.
 We do that just for simplicity - there were less modification of Clang's code this way.
 But it would really be better if we didn't emit any bodies, i.e., declarations were emitted as declarations.
 Now, it would probably be a problem if there was a definition and a declaration of the same function in the analyzed files.
 Because we would make the declaration into a definition and then there would be two definitions of the same thing.
 Also, we should probably name the option differently and don't extend the existing `EmitAllDecls` since it actually does a different thing.
-Our option (let's call it `DeclareEverything`) includes all declarations in the resulting LLVM IR, whereas the existing option `EmitAllDecls` really just makes *definitions* (duh) that would otherwise be discarded visible in the resulting LLVM IR.**
+Our option (let's call it `DeclareEverything`) includes all declarations in the resulting LLVM IR, whereas the existing option `EmitAllDecls` really just makes *definitions* (duh) that would otherwise be discarded visible in the resulting LLVM IR.
 
 ### Generating wrappers
 
@@ -176,7 +174,7 @@ Maybe it's just a problem of Microsoft's linker, though, so using `lld-link` cou
 
 #### Generating callback wrappers
 
-**TODO: This is not actually implemented yet.**
+> This is actually not implemented yet.
 
 Currently, we only handle callbacks that go through Objective-C runtime (i.e.,
 through some kind of `objc_msgSend` function). It's possible that those are all
@@ -240,8 +238,6 @@ The disadvantage in the second approach is that there is an inconsistency betwee
 If the emulated code only calls those addresses, it's not a problem as the former are just wrappers around the latter.
 But if the code somehow depended on the values of those addresses, e.g., it compared them, it would be a problem.
 Note that this usually doesn't happen since the addresses stored in the Objective-C metadata are not exported as functions that the dynamic loader could bind.
-**TODO: Will this ever happen, then, or can we just ignore it?
-Note that we should be able to determine what's the case, since it only depends on whether *our* DLLs (in accordance to iOS `.dylib`s, though) export Objective-C functions or not.**
 
 How to solve this?
 One possibility would be to compile all Objective-C declarations along with the wrapper functions into a small `.dylib`, that would be then loaded by the dynamic loader into the emulated address space.

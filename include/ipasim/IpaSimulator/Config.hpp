@@ -1,4 +1,5 @@
-// Config.hpp
+// IpaSimulator/Config.hpp: Contains configuration switches for library
+// `IpaSimLibrary`.
 
 #ifndef IPASIM_IPA_SIMULATOR_CONFIG_HPP
 #define IPASIM_IPA_SIMULATOR_CONFIG_HPP

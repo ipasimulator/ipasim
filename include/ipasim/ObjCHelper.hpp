@@ -1,4 +1,4 @@
-// ObjCHelper.hpp
+// ObjCHelper.hpp: Definition of class `ObjCMethodScout`.
 
 #ifndef IPASIM_OBJC_HELPER_HPP
 #define IPASIM_OBJC_HELPER_HPP
@@ -10,6 +10,7 @@
 
 namespace ipasim {
 
+// Result of Objective-C method scouting, see below.
 struct ObjCMethod {
   uint32_t RVA;
   std::string Name;
@@ -17,6 +18,9 @@ struct ObjCMethod {
   bool operator<(const ObjCMethod &Other) const { return RVA < Other.RVA; }
 };
 
+// Helper class that can discover Objective-C methods from binary's metadata.
+// Note that the Mach-O binary being analyzed is the file, not the image loaded
+// into memory at runtime (cf. class `MachO`).
 class ObjCMethodScout {
 public:
   static std::set<ObjCMethod>

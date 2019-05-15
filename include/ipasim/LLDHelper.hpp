@@ -1,4 +1,4 @@
-// LLDHelper.hpp
+// LLDHelper.hpp: Definition of class `LLDHelper`.
 
 #ifndef IPASIM_LLD_HELPER_HPP
 #define IPASIM_LLD_HELPER_HPP
@@ -9,6 +9,8 @@
 
 namespace ipasim {
 
+// Represents an instance of LLD (LLVM's linker). Used similarly to
+// `ClangHelper`.
 class LLDHelper {
 public:
   LLDHelper(const std::filesystem::path &BuildDir, LLVMHelper &LLVM);

@@ -1,4 +1,4 @@
-// Emulator.cpp
+// Emulator.cpp: Implementation of class `Emulator`.
 
 #include "ipasim/Emulator.hpp"
 
@@ -22,7 +22,6 @@ void Emulator::writeReg(uc_arm_reg RegId, uint32_t Value) {
   callUC(uc_reg_write(UC, RegId, &Value));
 }
 
-// TODO: What if the mappings overlap?
 void Emulator::mapMemory(uint64_t Addr, uint64_t Size, uc_prot Perms) {
   if (uc_mem_map_ptr(UC, Addr, Size, Perms, reinterpret_cast<void *>(Addr)))
     Log.error() << "couldn't map memory at 0x" << to_hex_string(Addr)

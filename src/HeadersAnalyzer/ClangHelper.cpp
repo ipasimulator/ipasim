@@ -1,4 +1,4 @@
-// ClangHelper.cpp
+// ClangHelper.cpp: Implementation of class `ClangHelper`.
 
 #include "ipasim/ClangHelper.hpp"
 
@@ -18,16 +18,13 @@ using namespace llvm;
 ClangHelper::ClangHelper(const path &BuildDir, LLVMHelper &LLVM)
     : LLVM(LLVM), Args(LLVM.Saver) {
   CI.createDiagnostics();
-  // First argument is expected to be an executable name.
-  // TODO: See #26.
+  // First argument is expected to be an executable name. See also #26.
   Args.add((BuildDir / "../clang-x86-Release/bin/clang.exe").string().c_str());
   if constexpr (VerboseClang)
     Args.add("-v");
 }
 
 void ClangHelper::initFromInvocation() {
-  // TODO: No diagnostics options set at the beginning (like ignore unknown
-  // arguments, etc.). How should that be done?
   CI.setInvocation(createInvocationFromCommandLine(Args.get()));
 }
 
@@ -58,8 +55,6 @@ void ClangHelper::linkDLL(StringRef Output, StringRef ObjectFile,
 
   executeArgs();
 }
-// TODO: Not currently used (but it's referenced from a comment at
-// `LLDHelper::addDylibArgs`).
 void ClangHelper::addDylibArgs(StringRef Output, StringRef ObjectFile,
                                StringRef InstallName) {
   Args.add("-target");

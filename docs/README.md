@@ -87,11 +87,9 @@ WinObjC sources are located in `/deps/WinObjC/`.
   the same thing, we only replace those symbols in `.def` files so it only
   causes them to be exported which is exactly what we want. Note that this "tag"
   is not actually used, because it would be virtually in every `.def` file
-  inside `/deps/WinObjC/build/`. **TODO: Write a script that will do this
-  automatically (without the need for manually changing those `.def` files).**
+  inside `/deps/WinObjC/build/`.
 - `[ehtype]` - So that it is not an error to have multiple occurrences of symbol
-  `_OBJC_EHTYPE_$_NSException`. **TODO: Instead make `clang` to not generate
-  those symbols.**
+  `_OBJC_EHTYPE_$_NSException`.
 - `[no-nsobject]` - `NSObject` is implemented in our runtime, so we disabled it
   in WinObjC's `Foundation` framework.
 - `[uikit-autolayout]` - There is a circular dependency between projects
@@ -124,9 +122,7 @@ LLVM's sources are located in `/deps/llvm/`, `/deps/clang/`, `/deps/lld/` and
   in `HeadersAnalyzer`.
 - `[emit-all-decls]`: See [`HeadersAnalyzer`](../src/HeadersAnalyzer/README.md).
 - `[irt]`: We renamed folder `InstrumentationRuntime` to `IRt` because the
-  former was too long for Windows. **TODO: Obviously, don't do this. Rather move
-  our sources near the root (e.g., `C:\src\`). But then also mention that in
-  build instructions.**
+  former was too long for Windows.
 - `[macho]`: We want to read Mach-O object files on Windows, too. Alternative to
   this would be to emit PE/COFF instead, or just DWARF (`-gsplit-dwarf`). Then,
   we wouldn't have to read Mach-O object files.

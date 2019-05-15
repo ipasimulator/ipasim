@@ -8,7 +8,7 @@ detailed documentation [is available](docs/README.md).
 - `contrib` contains patches to third-party dependencies.
 - `deps` contains third-party dependencies. These must be downloaded and
   patched [manually](deps/README.md) or, if you have CMake and Ninja installed,
-  you can let CMake download and patch these dependencies for you:
+  you can let them download and patch these dependencies for you:
 
   ```bash
   cd deps

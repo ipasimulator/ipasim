@@ -1,5 +1,4 @@
 #ifndef OBJC_PORT
-// TODO: Define TARGET_CPU_X86, __MACH__ and then include this header, it should work!
 #include "MacOSX10.13.sdk/usr/include/TargetConditionals.h"
 #else
 #define TARGET_CPU_X86 1

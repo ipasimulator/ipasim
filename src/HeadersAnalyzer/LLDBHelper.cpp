@@ -1,4 +1,4 @@
-// LLDBHelper.cpp
+// LLDBHelper.cpp: Implementation of classes `LLDBHelper` and `TypeComparer`.
 
 #include "ipasim/LLDBHelper.hpp"
 
@@ -63,8 +63,6 @@ bool TypeComparer::areEquivalent(llvm::FunctionType *Func,
                                  const SymbolTy &SymbolFunc) {
   auto *Func2 = static_cast<llvm::FunctionType *>(getLLVMType(SymbolFunc));
   if (!Func2) {
-    // TODO: Compare signatures from header files, then. Maybe by loading those
-    // headers into LLDB.
     Log.error()
         << "cannot compare signatures of a function and non-typed symbol `"
         << SymbolFunc.getName() << "'" << Log.end();

@@ -1,4 +1,4 @@
-// Common.hpp
+// Common.hpp: Helper macros and functions used throughout the project.
 
 #ifndef IPASIM_COMMON_HPP
 #define IPASIM_COMMON_HPP
