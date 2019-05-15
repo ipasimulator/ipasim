@@ -416,13 +416,13 @@ set_target_properties (dia PROPERTIES
 set (SOURCE_FILES
     ClangHelper.cpp
     DLLHelper.cpp
-    ErrorReporting.cpp
     HAContext.cpp
     HeadersAnalyzer.cpp
     LLDBHelper.cpp
     LLDHelper.cpp
     LLVMHelper.cpp
     ObjCHelper.cpp
+    Output.cpp
     TapiHelper.cpp)
 
 add_executable (HeadersAnalyzer ${SOURCE_FILES})
