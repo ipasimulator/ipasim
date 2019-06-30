@@ -5,6 +5,13 @@
 This repository contains source code of `ipasim`, an iOS emulator for Windows.
 More detailed documentation [is available](docs/README.md).
 
+## Cloning the repository
+
+We use [Git Submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
+(recursively), so make sure you clone with `--recurse-submodules`. We also use
+[Git LFS](https://git-lfs.github.com/), so make sure you have that installed if
+you want to get all files.
+
 ## Directory structure
 
 - `contrib` contains patches to third-party dependencies.
