@@ -1,0 +1,12 @@
+[ver:1,total:780]
+scripts/push_all.cmd:323,1561899600:323,r
+scripts/ci/build.cmd:207,1561899600:207,m
+.azure-ci.yml:118,1561899600:118,m
+.gitmodules:60,1561899600:60,r
+scripts/push_one.cmd:15,1561899600:15,r
+scripts/init.cmd:15,1561899600:15,d
+docker-compose.yml:11,1561899600:11,m
+Dockerfile:8,1561899600:8,r
+scripts/ci/auth.ps1:8,1561899600:8,r
+scripts/ci/git_askpass_helper.cmd:8,1561899600:8,r
+.gitignore:7,1561899600:7,r
