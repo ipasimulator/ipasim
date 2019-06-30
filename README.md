@@ -1,6 +1,6 @@
 # ipasim
 
-[![Build Status](https://dev.azure.com/ipasim/ipasim/_apis/build/status/ipasim-CI?branchName=master)](https://dev.azure.com/ipasim/ipasim/_build/latest?definitionId=1&branchName=master)
+[![Build status](https://dev.azure.com/ipasim/ipasim/_apis/build/status/ipasim-CI?branchName=master)](https://dev.azure.com/ipasim/ipasim/_build/latest?definitionId=1&branchName=master)
 
 This repository contains source code of `ipasim`, an iOS emulator for Windows.
 More detailed documentation [is available](docs/README.md).
@@ -27,3 +27,7 @@ you want to get all files.
   - [IpaSimulator](src/IpaSimulator/README.md) is the emulator itself.
   - [objc](src/objc/README.md) contains our port of Apple's Objective-C
     runtime to Windows.
+
+## Executive summary
+
+[![Poster preview](docs/thesis/poster.png)](docs/thesis/poster.pdf)
