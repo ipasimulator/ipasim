@@ -1,4 +1,4 @@
-// DynamicLoader.cpp
+// DynamicLoader.cpp: Implementation of class `DynamicLoader`
 
 #include "ipasim/DynamicLoader.hpp"
 
@@ -7,7 +7,7 @@
 #include "ipasim/IpaSimulator/Config.hpp"
 
 #include <filesystem>
-#include <psapi.h> // for `GetModuleInformation`
+#include <psapi.h> // For `GetModuleInformation`
 #include <winrt/Windows.ApplicationModel.h>
 #include <winrt/Windows.Storage.h>
 

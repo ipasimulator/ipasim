@@ -1,10 +1,10 @@
-// ClangHelper.hpp
+// ClangHelper.hpp: Definition of class `ClangHelper`.
 
 #ifndef IPASIM_CLANG_HELPER_HPP
 #define IPASIM_CLANG_HELPER_HPP
 
-#include "ipasim/ErrorReporting.hpp"
 #include "ipasim/LLVMHelper.hpp"
+#include "ipasim/Output.hpp"
 
 #include <CodeGen/CodeGenModule.h>
 #include <clang/Frontend/CompilerInstance.h>
@@ -12,6 +12,10 @@
 
 namespace ipasim {
 
+// Represents an instance of compiler Clang. Encapsulates common tasks that can
+// be done using Clang. A common workflow is to populate `Args`, then initialize
+// the compiler from them via `initFromInvocation` and finally call one of the
+// `execute*` methods.
 class ClangHelper {
 public:
   ClangHelper(const std::filesystem::path &BuildDir, LLVMHelper &LLVM);

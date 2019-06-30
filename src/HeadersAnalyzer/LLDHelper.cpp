@@ -1,8 +1,8 @@
-// LLDHelper.cpp
+// LLDHelper.cpp: Implementation of class `LLDHelper`.
 
 #include "ipasim/LLDHelper.hpp"
 
-#include "ipasim/ErrorReporting.hpp"
+#include "ipasim/Output.hpp"
 
 #include <llvm/ADT/ArrayRef.h>
 #include <llvm/Support/Program.h>

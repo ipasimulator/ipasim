@@ -1,4 +1,4 @@
-// MachO.cpp
+// MachO.cpp: Implementation of class `MachO`.
 
 #include "ipasim/MachO.hpp"
 

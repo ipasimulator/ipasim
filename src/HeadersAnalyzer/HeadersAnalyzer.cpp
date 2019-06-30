@@ -1,4 +1,4 @@
-// HeadersAnalyzer.cpp
+// HeadersAnalyzer.cpp: Main logic of tool `HeadersAnalyzer`.
 
 #include "ipasim/ClangHelper.hpp"
 #include "ipasim/DLLHelper.hpp"
@@ -48,6 +48,7 @@ using namespace tapi::internal;
 
 namespace {
 
+// Encapsulates the workflow of `HeadersAnalyzer`.
 // TODO: Generate distinct wrappers only for functions with distinct signatures.
 // And then export those wrappers as aliases for all functions with the same
 // signature.

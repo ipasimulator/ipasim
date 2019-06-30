@@ -1,4 +1,4 @@
-// LoadedLibrary.hpp
+// LoadedLibrary.hpp: Definition of class `LoadedLibrary` and its descendants.
 
 #ifndef IPASIM_LOADED_LIBRARY_HPP
 #define IPASIM_LOADED_LIBRARY_HPP
@@ -15,6 +15,7 @@ namespace ipasim {
 
 class DynamicLoader;
 
+// Iterator over symbols of LIEF's Mach-O binary filtered by a RVA.
 class DylibSymbolIterator {
 public:
   DylibSymbolIterator(uint64_t RVA, LIEF::MachO::it_exported_symbols Symbols)
@@ -32,6 +33,7 @@ private:
   LIEF::MachO::it_exported_symbols Symbols;
 };
 
+// Represents a dynamic library (or executable) loaded by `DynamicLoader`.
 class LoadedLibrary {
 public:
   LoadedLibrary() : StartAddress(0), Size(0), IsWrapper(false) {}
@@ -51,6 +53,7 @@ public:
   virtual MachO getMachO() = 0;
 };
 
+// A `.dylib` loaded via library LIEF.
 class LoadedDylib : public LoadedLibrary {
 public:
   LIEF::MachO::Binary &Bin;
@@ -75,6 +78,7 @@ private:
   uint64_t Header;
 };
 
+// A `.dll` loaded via Windows API.
 class LoadedDll : public LoadedLibrary {
 public:
   HMODULE Ptr;

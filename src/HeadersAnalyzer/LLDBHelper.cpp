@@ -1,4 +1,4 @@
-// LLDBHelper.cpp
+// LLDBHelper.cpp: Implementation of classes `LLDBHelper` and `TypeComparer`.
 
 #include "ipasim/LLDBHelper.hpp"
 

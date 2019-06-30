@@ -1,11 +1,11 @@
-// LLVMHelper.cpp
+// LLVMHelper.cpp: Implementation of classes `LLVMHelper` and `IRHelper`.
 
 #include "ipasim/LLVMHelper.hpp"
 
 #include "ipasim/ClangHelper.hpp"
 #include "ipasim/Common.hpp"
-#include "ipasim/ErrorReporting.hpp"
 #include "ipasim/HeadersAnalyzer/Config.hpp"
+#include "ipasim/Output.hpp"
 
 #include <llvm/ADT/None.h>
 #include <llvm/IR/LegacyPassManager.h>

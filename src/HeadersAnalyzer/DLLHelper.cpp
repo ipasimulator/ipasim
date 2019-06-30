@@ -1,4 +1,4 @@
-// DLLHelper.cpp
+// DLLHelper.cpp: Implementation of class `DLLHelper`.
 
 #include "ipasim/DLLHelper.hpp"
 

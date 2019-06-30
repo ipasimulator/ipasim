@@ -1,4 +1,4 @@
-// MachO.hpp
+// MachO.hpp: Definition of class `MachO` and related `ObjC*` classes.
 
 #ifndef IPASIM_MACHO_HPP
 #define IPASIM_MACHO_HPP
@@ -10,6 +10,7 @@
 
 namespace ipasim {
 
+// Represents Objective-C class or category.
 class ObjCClass {
 public:
   ObjCClass() : Category(false), Data(nullptr) {}
@@ -26,6 +27,7 @@ private:
   void *Data;
 };
 
+// Represents Objective-C method.
 class ObjCMethod {
 public:
   ObjCMethod() : ClassData(nullptr), MethodData(nullptr) {}
@@ -45,6 +47,7 @@ private:
   void *MethodData;
 };
 
+// Logs as much information about `ObjCMethod` as possible.
 template <typename StreamTy>
 std::enable_if_t<is_stream_v<StreamTy>, StreamTy> &operator<<(StreamTy &Str,
                                                               ObjCMethod M) {
@@ -60,6 +63,9 @@ std::enable_if_t<is_stream_v<StreamTy>, StreamTy> &operator<<(StreamTy &Str,
   return Str;
 }
 
+// Helper class for reading sections, especially Objective-C-related, by
+// analyzing Mach-O headers. Note that the Mach-O binary being analyzed must be
+// loaded in memory at runtime (cf. class `ObjCMethodScout`).
 class MachO {
 public:
   MachO(const void *Hdr) : Hdr(Hdr) {}

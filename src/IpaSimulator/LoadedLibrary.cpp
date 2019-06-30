@@ -1,4 +1,5 @@
-// LoadedLibrary.cpp
+// LoadedLibrary.cpp: Implementation of class `LoadedLibrary` and its
+// descendants.
 
 #include "ipasim/LoadedLibrary.hpp"
 
@@ -34,9 +35,8 @@ bool LoadedLibrary::isInRange(uint64_t Addr) {
 }
 
 void LoadedLibrary::checkInRange(uint64_t Addr) {
-  // TODO: Do more flexible error reporting here.
   if (!isInRange(Addr))
-    throw "address out of range";
+    Log.error() << "address " << Addr << " out of range" << Log.end();
 }
 
 uint64_t LoadedDylib::findSymbol(DynamicLoader &DL, const string &Name) {

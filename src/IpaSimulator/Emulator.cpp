@@ -1,4 +1,4 @@
-// Emulator.cpp
+// Emulator.cpp: Implementation of class `Emulator`.
 
 #include "ipasim/Emulator.hpp"
 

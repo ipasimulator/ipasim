@@ -1,4 +1,4 @@
-// ClangHelper.cpp
+// ClangHelper.cpp: Implementation of class `ClangHelper`.
 
 #include "ipasim/ClangHelper.hpp"
 

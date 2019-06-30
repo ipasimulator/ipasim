@@ -1,4 +1,5 @@
-// HeadersAnalyzer/Config.hpp
+// HeadersAnalyzer/Config.hpp: Contains configuration switches for tool
+// `HeadersAnalyzer`.
 
 #ifndef IPASIM_HEADERS_ANALYZER_CONFIG_HPP
 #define IPASIM_HEADERS_ANALYZER_CONFIG_HPP
@@ -7,6 +8,8 @@
 #include "ipasim/HAContext.hpp"
 
 #include <cstdint>
+
+namespace ipasim {
 
 #ifndef IPASIM_DEBUG
 #define IPASIM_DEBUG 0
@@ -20,6 +23,8 @@ constexpr bool IgnoreErrors = false;
 constexpr bool Sample = IPASIM_DEBUG && true;
 // TODO: Fix `TypeComparer` and then turn this on.
 constexpr bool CompareTypes = false;
+
+} // namespace ipasim
 
 // !defined(IPASIM_HEADERS_ANALYZER_CONFIG_HPP)
 #endif

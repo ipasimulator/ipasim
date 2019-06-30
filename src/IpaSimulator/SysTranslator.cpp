@@ -1,4 +1,5 @@
-// SysTranslator.cpp
+// SysTranslator.cpp: Implementation of classes `SysTranslator`, `DynamicCaller`
+// and `TypeDecoder`.
 
 #include "ipasim/SysTranslator.hpp"
 

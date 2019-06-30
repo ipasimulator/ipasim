@@ -1,4 +1,4 @@
-// MachOInitializer.cpp
+// MachOInitializer.cpp: Contains class `MachOInitializer`.
 
 #define IPASIM_IMPORT extern "C" __declspec(dllimport)
 
@@ -15,6 +15,7 @@ IPASIM_IMPORT void _objc_init(void);        // From `objc`
 
 namespace {
 
+// Ensures the current library is initialized via RAII.
 struct MachOInitializer {
   MachOInitializer() {
     // Register itself within `IpaSimLibrary`.

@@ -1,4 +1,5 @@
-// IpaSimulator.cpp
+// IpaSimulator.cpp: Implementation of class `IpaSimulator` and
+// `IpaSimLibrary`'s public API.
 
 #include "ipasim/IpaSimulator.hpp"
 

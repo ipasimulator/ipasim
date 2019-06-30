@@ -1,4 +1,5 @@
-// HAContext.hpp
+// HAContext.hpp: Definition of class `HAContext` and other related classes. It
+// also contains some `HeadersAnalyzer`-specific helpers.
 
 #ifndef IPASIM_HA_CONTEXT_HPP
 #define IPASIM_HA_CONTEXT_HPP
@@ -61,6 +62,7 @@ using GroupPtr = size_t;
 using DLLEntryList = std::vector<DLLEntry>;
 using DLLPtr = size_t;
 
+// Represents one of our system `.dll`s.
 struct DLLEntry {
   DLLEntry(std::string Name) : Name(Name) {}
 
@@ -69,6 +71,7 @@ struct DLLEntry {
   ExportPtr ReferenceSymbol;
 };
 
+// DLLs are grouped by their containing folder.
 struct DLLGroup {
   std::filesystem::path Dir;
   DLLEntryList DLLs;
@@ -82,6 +85,7 @@ enum class ExportStatus { NotFound = 0, Found, Overloaded, FoundInDLL };
 // so that we don't change the ordering which would break internal structures of
 // `std::set`).
 
+// Represents a single exported function or data.
 struct ExportEntry {
   ExportEntry(std::string Name)
       : Name(move(Name)), Status(ExportStatus::NotFound), RVA(0),
@@ -92,7 +96,7 @@ struct ExportEntry {
 
   std::string Name;
   mutable ExportStatus Status;
-  mutable uint32_t RVA;
+  mutable uint32_t RVA; // RVA inside its DLL
   mutable bool ObjCMethod : 1;
   mutable bool Messenger : 1;
   mutable bool Stret : 1;
@@ -103,7 +107,7 @@ struct ExportEntry {
   mutable bool UnhandledVararg : 1;
   mutable GroupPtr DLLGroup;
   mutable DLLPtr DLL;
-  mutable DylibPtr Dylib; // first Dylib that implements this function
+  mutable DylibPtr Dylib; // First Dylib that implements this function
 
   bool operator<(const ExportEntry &Other) const { return Name < Other.Name; }
   bool isTrivial() const {
@@ -125,6 +129,7 @@ private:
   mutable std::vector<llvm::Type *> DLLArgs;
 };
 
+// Represents an iOS's system `.dylib`.
 struct Dylib {
   Dylib(std::string Name) : Name(move(Name)) {}
 
@@ -135,6 +140,7 @@ struct Dylib {
   bool operator<(const Dylib &Other) const { return Name < Other.Name; }
 };
 
+// It is allowed for multiple Dylibs to export the same class.
 struct ClassExport {
   ClassExport(std::string Name) : Name(move(Name)) {}
 
@@ -147,6 +153,7 @@ struct ClassExport {
   bool operator<(const ClassExport &Other) const { return Name < Other.Name; }
 };
 
+// Context of `HeadersAnalyzer`.
 class HAContext {
 public:
   ExportList iOSExps;
@@ -154,6 +161,7 @@ public:
   ClassExportList iOSClasses;
   GroupList DLLGroups;
 
+  // Messengers-related constants
   static constexpr ConstexprString MsgSendPrefix = "_objc_msgSend";
   static constexpr ConstexprString StretPostfix = "_stret";
   static constexpr ConstexprString MsgLookupPrefix = "_objc_msgLookup";
@@ -164,7 +172,10 @@ public:
   // TODO: Find out whether there aren't any Objective-C method name parsers
   // somewhere in the LLVM ecosystem already.
   ClassExportPtr findClassMethod(const std::string &Name);
+  // Determines whether the given symbol should be further analyzed when found
+  // in a Dylib.
   bool isInteresting(const std::string &Name, ExportPtr &Exp);
+  // Like `isInteresting` but used when the symbol is found in a DLL.
   bool isInterestingForWindows(const std::string &Name, ExportPtr &Exp,
                                uint32_t RVA, bool IgnoreDuplicates = false);
   ExportPtr addExport(std::string &&Name) {

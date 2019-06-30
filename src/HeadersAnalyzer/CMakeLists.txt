@@ -224,7 +224,8 @@ add_custom_target (clang-tablegen-targets
     USES_TERMINAL
     DEPENDS config-clang-x86)
 set (LLVM_TABLEGEN_TARGETS
-    # From `add_public_tablegen_target` in `deps/llvm`
+    # From `add_public_tablegen_target` in `deps/llvm`. Unused architectures are
+    # commented out.
     intrinsics_gen
     AttributeCompatFuncTableGen
     # AArch64CommonTableGen

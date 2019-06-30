@@ -1,4 +1,4 @@
-// TextBlockStream.hpp
+// TextBlockStream.hpp: Definition of class `TextBlockStream`.
 
 #ifndef IPASIM_TEXT_BLOCK_STREAM_HPP
 #define IPASIM_TEXT_BLOCK_STREAM_HPP
@@ -9,6 +9,7 @@
 
 namespace ipasim {
 
+// Wrapper around control `TextBlock`.
 class TextBlockProvider {
 public:
   TextBlockProvider() : TB(nullptr) {}
@@ -22,6 +23,7 @@ private:
   winrt::Windows::UI::Xaml::Controls::TextBlock TB;
 };
 
+// A `Stream` that can append to a `TextBlock`.
 class TextBlockStream : public Stream<TextBlockStream> {
 public:
   TextBlockStream(bool Error, TextBlockProvider &TBP)

@@ -1,10 +1,11 @@
-// LLDBHelper.hpp
+// LLDBHelper.hpp: Definition of class `LLDBHelper`, some `ObjectFile`
+// descendants and class `TypeComparer`.
 
 #ifndef IPASIM_LLDB_HELPER_HPP
 #define IPASIM_LLDB_HELPER_HPP
 
 #include "ipasim/Common.hpp"
-#include "ipasim/ErrorReporting.hpp"
+#include "ipasim/Output.hpp"
 
 #include <CodeGen/CodeGenModule.h>
 #include <Plugins/SymbolFile/PDB/PDBASTParser.h>
@@ -17,6 +18,7 @@
 
 namespace ipasim {
 
+// An `ObjectFile` whose all methods are unimplemented.
 class ObjectFileUnimplemented : public lldb_private::ObjectFile {
 public:
   ObjectFileUnimplemented(const lldb::ModuleSP &Module,
@@ -47,6 +49,8 @@ public:
 #undef unimplemented
 };
 
+// A dummy `ObjectFile`. Currently, it's equivalent to the unimplemented
+// `ObjectFile`. It's used to ease the integration with LLDB.
 class ObjectFileDummy : public ObjectFileUnimplemented {
 public:
   ObjectFileDummy(const lldb::ModuleSP &Module,
@@ -54,12 +58,15 @@ public:
       : ObjectFileUnimplemented(Module, Buffer) {}
 };
 
+// Used to initialize LLDB via RAII.
 class LLDBInitializer {
 public:
   LLDBInitializer();
   ~LLDBInitializer();
 };
 
+// Represents an instance of LLDB (a LLVM debugger). We use that to parse PDBs
+// (Windows debugging symbol files).
 class LLDBHelper {
 public:
   LLDBHelper();
@@ -77,6 +84,7 @@ private:
   std::unique_ptr<llvm::pdb::PDBSymbolExe> RootSymbol;
 
 public:
+  // Helper iterator over PDB's symbols
   template <typename> class SymbolIterator;
   template <typename SymbolTy> class SymbolList {
   public:
@@ -130,6 +138,7 @@ LLDBHelper::SymbolIterator<SymbolTy> LLDBHelper::SymbolList<SymbolTy>::end() {
   return SymbolIterator<SymbolTy>(*this, Enum->getChildCount());
 }
 
+// Helper class that can compare types from PDB and LLVM IR.
 class TypeComparer {
 public:
   // Note that if we got `PDBAstParser` from `Module` rather then created it,

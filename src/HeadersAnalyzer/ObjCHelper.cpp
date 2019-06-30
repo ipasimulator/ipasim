@@ -1,8 +1,8 @@
-// ObjCHelper.cpp
+// ObjCHelper.cpp: Implementation of class `ObjCMethodScout`.
 
 #include "ipasim/ObjCHelper.hpp"
 
-#include "ipasim/ErrorReporting.hpp"
+#include "ipasim/Output.hpp"
 
 using namespace ipasim;
 using namespace llvm;

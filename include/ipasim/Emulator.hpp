@@ -1,4 +1,4 @@
-// Emulator.hpp
+// Emulator.hpp: Definition of class `Emulator`.
 
 #ifndef IPASIM_EMULATOR_HPP
 #define IPASIM_EMULATOR_HPP
@@ -14,6 +14,7 @@ namespace hooks {
 
 template <typename T, typename F> struct FunctionHelper;
 
+// Template helper used in `Emulator::hook`.
 template <typename T, typename RetTy, typename... ArgTys>
 struct FunctionHelper<T, RetTy(ArgTys...)> {
   using F = RetTy(ArgTys...);
@@ -31,6 +32,7 @@ struct FunctionHelper<T, RetTy(ArgTys...)> {
 
 } // namespace hooks
 
+// Wraps an instance of the Unicorn emulator. Automatically reports errors.
 class Emulator {
 public:
   Emulator(DynamicLoader &Dyld)
@@ -57,6 +59,7 @@ public:
     using Helper = hooks::FunctionHelper<T, F>;
     hook(Type, Helper::hook, new typename Helper::DataTy{Instance, Handler});
   }
+  // Won't report the next error.
   void ignoreNextError();
 
 private:

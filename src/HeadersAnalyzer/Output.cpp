@@ -1,6 +1,6 @@
-// ErrorReporting.cpp
+// Output.cpp: Definitions of functions declared in `Output.hpp`.
 
-#include "ipasim/ErrorReporting.hpp"
+#include "ipasim/Output.hpp"
 
 #include "ipasim/HeadersAnalyzer/Config.hpp"
 

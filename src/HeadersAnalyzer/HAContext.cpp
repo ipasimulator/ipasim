@@ -1,10 +1,10 @@
-// HAContext.cpp
+// HAContext.cpp: Implementations of classes defined in `HAContext.hpp`.
 
 #include "ipasim/HAContext.hpp"
 
 #include "ipasim/Common.hpp"
-#include "ipasim/ErrorReporting.hpp"
 #include "ipasim/HeadersAnalyzer/Config.hpp"
+#include "ipasim/Output.hpp"
 
 #include <llvm/ADT/Twine.h>
 
