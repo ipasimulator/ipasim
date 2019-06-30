@@ -29,7 +29,11 @@ resources:
   fetchDepth: 1
   clean: true
   lfs: true
-trigger: none
+trigger:
+  batch: true
+  branches:
+    include:
+    - master
 jobs:
 - job: StartVM
   pool: Hosted VS2017
