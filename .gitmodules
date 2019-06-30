@@ -1,52 +1,52 @@
 [submodule "deps/objc4"]
 	path = deps/objc4
-	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/objc4
+	url = https://github.com/ipasimulator/objc4
 	branch = port
 [submodule "deps/apple-headers"]
 	path = deps/apple-headers
-	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/apple-headers
+	url = https://github.com/ipasimulator/apple-headers
     branch = objc_port
 [submodule "deps/libclosure"]
 	path = deps/libclosure
-	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/libclosure
+	url = https://github.com/ipasimulator/libclosure
 	branch = objc_port
 [submodule "deps/WinObjC"]
 	path = deps/WinObjC
-	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/WinObjC
+	url = https://github.com/ipasimulator/WinObjC
 	branch = thesis
 [submodule "deps/llvm"]
 	path = deps/llvm
-	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/llvm
+	url = https://github.com/ipasimulator/llvm
 	branch = port_70
 [submodule "deps/clang"]
 	path = deps/clang
-	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/clang
+	url = https://github.com/ipasimulator/clang
 	branch = port_70
 [submodule "deps/lld"]
 	path = deps/lld
-	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/lld
+	url = https://github.com/ipasimulator/lld
 	branch = port_70
 [submodule "deps/LIEF"]
 	path = deps/LIEF
-	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/LIEF
+	url = https://github.com/ipasimulator/LIEF
 	branch = port
 [submodule "deps/tapi"]
 	path = deps/tapi
-	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/tapi
+	url = https://github.com/ipasimulator/tapi
 	branch = port
 [submodule "deps/lldb"]
 	path = deps/lldb
-	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/lldb
+	url = https://github.com/ipasimulator/lldb
 	branch = port_70
 [submodule "deps/unicorn"]
 	path = deps/unicorn
-	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/unicorn
+	url = https://github.com/ipasimulator/unicorn
 	branch = port
 [submodule "deps/libdispatch"]
 	path = deps/libdispatch
-	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/libdispatch
+	url = https://github.com/ipasimulator/libdispatch
 	branch = port
 [submodule "deps/Libffi"]
 	path = deps/Libffi
-	url = https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/Libffi
+	url = https://github.com/ipasimulator/Libffi
 	branch = port
