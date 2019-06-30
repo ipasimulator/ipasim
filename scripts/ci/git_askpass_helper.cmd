@@ -1,1 +1,0 @@
-@echo %GIT_TOKEN%

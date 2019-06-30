@@ -19,15 +19,15 @@ rem Install Git LFS.
 git lfs install
 
 rem Clone sources.
-set GIT_ASKPASS=%CD%\scripts\ci\git_askpass_helper.cmd
-if exist .\IPASimulator\ (
+if exist .\ipasim\ (
     rem See #14.
-    cd IPASimulator
+    cd ipasim
     git pull --recurse-submodules
 ) else (
-    git clone --depth 1 --recurse-submodules --shallow-submodules -b thesis ^
-https://jjones.visualstudio.com/DefaultCollection/IPASimulator/_git/IPASimulator
-    cd IPASimulator
+    rem TODO: Clone the current branch.
+    git clone --depth 1 --recurse-submodules --shallow-submodules ^
+https://github.com/ipasimulator/ipasim
+    cd ipasim
 )
 
 if [%BUILD_TABLEGENS_ONLY%]==[1] (
