@@ -1,7 +1,9 @@
-# ipaSim
+# ipasim
 
-This folder contains source code of `ipaSim`, an iOS emulator for Windows. More
-detailed documentation [is available](docs/README.md).
+[![Build Status](https://jjones.visualstudio.com/IPASimulator/_apis/build/status/ipasim-CI?branchName=master)](https://jjones.visualstudio.com/IPASimulator/_build/latest?definitionId=19&branchName=master)
+
+This repository contains source code of `ipasim`, an iOS emulator for Windows.
+More detailed documentation [is available](docs/README.md).
 
 ## Directory structure
 
