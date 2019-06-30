@@ -6,8 +6,8 @@ detailed documentation [is available](docs/README.md).
 ## Directory structure
 
 - `contrib` contains patches to third-party dependencies.
-- `deps` contains third-party dependencies. These are currently downloaded and
-  patched automatically by CMake (see [CMakeLists.txt](CMakeLists.txt)).
+- `deps` contains third-party dependencies (mostly as Git submodules because
+  patching was necessary).
 - `docs` contains [documentation and issues](docs/README.md).
 - `include` has C++ headers of the project.
 - `samples` contains sources of sample iOS applications and some other samples.
