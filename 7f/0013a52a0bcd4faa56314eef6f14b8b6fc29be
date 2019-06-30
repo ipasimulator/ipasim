@@ -1,0 +1,7 @@
+[ver:1,total:420]
+scripts/ci/build.cmd:271,1561899600:271,m
+.azure-ci.yml:101,1561899600:101,m
+scripts/ci/auth.ps1:26,1561899600:26,r
+scripts/install_agent.ps1:10,1561899600:10,r
+scripts/ci/git_askpass_helper.cmd:6,1561899600:6,d
+scripts/ci/README.md:6,1561899600:6,r
