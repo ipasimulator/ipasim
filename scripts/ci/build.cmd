@@ -39,10 +39,10 @@ if [%BUILD_TABLEGENS_ONLY%]==[1] (
 )
 
 rem Build.
-docker login -u janjones -p %DOCKER_PASSWORD%
+docker login -u ipasim -p %DOCKER_PASSWORD%
 if [%PULL_BUILD_ARTIFACTS%]==[1] (
-    docker pull janjones/ipasim:artifacts
-    docker tag janjones/ipasim:artifacts janjones/ipasim
+    docker pull ipasim/artifacts
+    docker tag ipasim/artifacts ipasim/build
     set DOCKER_COMPOSE_OPTIONS=--no-build
 ) else if [%PULL_DOCKER_IMAGE%]==[1] (
     docker-compose pull
@@ -54,29 +54,27 @@ docker-compose up --exit-code-from ipasim %DOCKER_COMPOSE_OPTIONS%
 set EXIT_ERRORLEVEL=%ERRORLEVEL%
 
 rem Push artifacts.
-docker commit ipasimulator_ipasim_1^
- janjones/ipasim:artifacts-%BUILD_BUILDNUMBER%
+docker commit ipasimulator_ipasim_1 ipasim/artifacts:%BUILD_BUILDNUMBER%
 if %ERRORLEVEL% NEQ 0 (
     set EXIT_ERRORLEVEL=%ERRORLEVEL%
     goto CLEANUP
 )
-docker tag janjones/ipasim:latest janjones/ipasim:%BUILD_BUILDNUMBER%
-docker tag janjones/ipasim:artifacts-%BUILD_BUILDNUMBER%^
- janjones/ipasim:artifacts
-docker push janjones/ipasim:%BUILD_BUILDNUMBER%
-docker push janjones/ipasim:artifacts-%BUILD_BUILDNUMBER%
+docker tag ipasim/build:latest ipasim/build:%BUILD_BUILDNUMBER%
+docker tag ipasim/artifacts:%BUILD_BUILDNUMBER% ipasim/artifacts
+docker push ipasim/build:%BUILD_BUILDNUMBER%
+docker push ipasim/artifacts:%BUILD_BUILDNUMBER%
 
-rem Don't push tags `latest` and `artifacts` for unsuccessful builds.
+rem Don't push latest `build` and `artifacts` tags for unsuccessful builds.
 if %EXIT_ERRORLEVEL% EQU 0 (
-    docker push janjones/ipasim:latest
-    docker push janjones/ipasim:artifacts
+    docker push ipasim/build
+    docker push ipasim/artifacts
 )
 
 rem Cleanup images.
 :CLEANUP
 docker rm ipasimulator_ipasim_1
-docker image rm janjones/ipasim:latest janjones/ipasim:%BUILD_BUILDNUMBER% ^
- janjones/ipasim:artifacts janjones/ipasim:artifacts-%BUILD_BUILDNUMBER%
+docker image rm ipasim/build ipasim/build:%BUILD_BUILDNUMBER% ipasim/artifacts^
+ ipasim/artifacts:%BUILD_BUILDNUMBER%
 
 rem Shutdown.
 if [%SHUTDOWN_WHEN_COMPLETE%]==[1] shutdown /p

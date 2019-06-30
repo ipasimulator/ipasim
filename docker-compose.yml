@@ -4,7 +4,7 @@ version: "2.4"
 
 services:
   ipasim:
-    image: janjones/ipasim
+    image: ipasim/build
     build: .
     volumes:
       - type: bind

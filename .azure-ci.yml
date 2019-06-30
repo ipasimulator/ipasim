@@ -4,7 +4,7 @@
 #
 # `git.token` ...Azure DevOps token to access sources of `IPASimulator`, you can
 # use the same one as in `/scripts/install_agent.ps1`.
-# `docker.password` ...password to Docker repository `jjones`.
+# `docker.password` ...password to Docker repository `ipasim`.
 # `azure.key`, `azure.app.id`, `azure.tenant` ...see `/scripts/ci/README.md` for
 # more details.
 # `azure.subscription.id` ...ID of the subscription the VM is located in.
