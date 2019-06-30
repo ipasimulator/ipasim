@@ -1,6 +1,6 @@
 # ipasim
 
-[![Build Status](https://jjones.visualstudio.com/IPASimulator/_apis/build/status/ipasim-CI?branchName=master)](https://jjones.visualstudio.com/IPASimulator/_build/latest?definitionId=19&branchName=master)
+[![Build Status](https://dev.azure.com/ipasim/ipasim/_apis/build/status/ipasim-CI?branchName=master)](https://dev.azure.com/ipasim/ipasim/_build/latest?definitionId=1&branchName=master)
 
 This repository contains source code of `ipasim`, an iOS emulator for Windows.
 More detailed documentation [is available](docs/README.md).
