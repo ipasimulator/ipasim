@@ -12,6 +12,15 @@ We use [Git Submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
 [Git LFS](https://git-lfs.github.com/), so make sure you have that installed if
 you want to get all files.
 
+## Building and installation
+
+If you want to use the emulator, you can either [build it from
+sources](docs/build.md) (that's slow), [use partially prebuilt
+artifacts](docs/artifacts.md) (that's fast and recommended if you want to make
+changes; however, you still need to have Docker and Visual Studio installed) or
+just [use prebuilt binaries](https://github.com/ipasimulator/ipasim/releases)
+(recommended if you don't want to make changes).
+
 ## Directory structure
 
 - [`deps`](deps) contains third-party dependencies (mostly as Git submodules because

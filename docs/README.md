@@ -24,6 +24,9 @@
 
 ## Building
 
+In this section, we describe some advanced building scenarios. Basic building
+instructions [are available elsewhere](build.md).
+
 Install and run Docker for Windows (tested with version `18.06.1-ce-win73`),
 enable Windows containers,
 [increase maximum container disk size](https://docs.microsoft.com/en-us/visualstudio/install/build-tools-container?view=vs-2017#step-4-expand-maximum-container-disk-size)
