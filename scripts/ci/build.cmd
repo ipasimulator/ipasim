@@ -54,7 +54,7 @@ docker-compose up --exit-code-from ipasim %DOCKER_COMPOSE_OPTIONS%
 set EXIT_ERRORLEVEL=%ERRORLEVEL%
 
 rem Push artifacts.
-docker commit ipasimulator_ipasim_1 ipasim/artifacts:%BUILD_BUILDNUMBER%
+docker commit ipasim_ipasim_1 ipasim/artifacts:%BUILD_BUILDNUMBER%
 if %ERRORLEVEL% NEQ 0 (
     set EXIT_ERRORLEVEL=%ERRORLEVEL%
     goto CLEANUP
@@ -72,7 +72,7 @@ if %EXIT_ERRORLEVEL% EQU 0 (
 
 rem Cleanup images.
 :CLEANUP
-docker rm ipasimulator_ipasim_1
+docker rm ipasim_ipasim_1
 docker image rm ipasim/build ipasim/build:%BUILD_BUILDNUMBER% ipasim/artifacts^
  ipasim/artifacts:%BUILD_BUILDNUMBER%
 
