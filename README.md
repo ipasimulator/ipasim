@@ -3,7 +3,10 @@
 [![Build status](https://dev.azure.com/ipasim/ipasim/_apis/build/status/ipasim-CI?branchName=master)](https://dev.azure.com/ipasim/ipasim/_build/latest?definitionId=1&branchName=master)
 
 This repository contains source code of `ipasim`, an iOS emulator for Windows.
-More detailed documentation [is available](docs/README.md).
+It takes a compiled iOS application and emulates it. However, only the
+application's machine code is emulated, whereas system functionality originally
+provided by iOS is translated to an equivalent functionality available on
+Windows. [More detailed documentation](docs/README.md) is available.
 
 ## Cloning the repository
 
