@@ -17,7 +17,7 @@ using namespace std::filesystem;
 LLDHelper::LLDHelper(const path &BuildDir, LLVMHelper &LLVM)
     : Args(LLVM.Saver) {
   // First argument is expected to be an executable name.
-  // TODO: See #26.
+  // TODO: See i26.
   Args.add(
       (BuildDir / "../clang-x86-Release/bin/ld64.lld.exe").string().c_str());
 }
@@ -43,7 +43,7 @@ void LLDHelper::addDylibArgs(StringRef Output, StringRef ObjectFile,
   Args.add("-no_version_load_command");
 }
 void LLDHelper::reexportLibrary(llvm::StringRef Name) {
-  // See #23.
+  // See i23.
   Args.add("-reexport_library");
   Args.add(Name.data());
 }

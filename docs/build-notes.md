@@ -24,4 +24,4 @@ Debug). Then, move to `C:\ipaSim\build\ipaSim-x86-Debug` and continue using
 Ninja from there (e.g., run `ninja -t targets` to see list of possible build
 targets). To enable incremental builds across Docker builds, use scripts
 `C:\ipaSim\src\scripts\backup.ps1` and `C:\ipaSim\src\scripts\restore.ps1`. See
-[issue #3](issues/3.md) for more details.
+[issue i3](issues/3.md) for more details.

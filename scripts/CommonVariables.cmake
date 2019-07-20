@@ -23,7 +23,7 @@ dir_pairs (Libffi)
 
 # First we set the compiler to the original Clang, because at least it exists.
 # We will change this after the project is configured (and compiler is tested).
-# See #2.
+# See i2.
 set (CLANG_EXE "${LLVM_BIN_DIR}/clang.exe")
 set (LLD_LINK_EXE "${LLVM_BIN_DIR}/lld-link.exe")
 
@@ -49,7 +49,7 @@ set (IPASIM_RUNTIME_LIBS
     $<IF:$<CONFIG:Debug>,msvcrtd,msvcrt>
     $<IF:$<CONFIG:Debug>,msvcprtd,msvcprt>)
 
-# See #13.
+# See i13.
 set (CF_PUBLIC_HEADERS
     # From `sdk-build.props`.
     Stream.subproj/CFStream.h
@@ -117,7 +117,7 @@ function (add_prep_target cmd)
     option (DEPEND_ON_COMPILER "Rebuild everything whenever one of `clang.exe` \
 or `lld-link.exe` is rebuilt." ON)
 
-    # Copy header files. See #13.
+    # Copy header files. See i13.
     list (TRANSFORM CF_PUBLIC_HEADERS PREPEND
         "${SOURCE_DIR}/deps/WinObjC/include/CoreFoundation/")
     list (TRANSFORM CF_PRIVATE_HEADERS PREPEND
@@ -278,7 +278,7 @@ function (woc_framework name)
     add_dependencies (Frameworks "${name}")
 
     # Initialization compatible with our Objective-C runtime and dynamic loader
-    # (in IpaSimLibrary). Also see #17.
+    # (in IpaSimLibrary). Also see i17.
     target_sources ("${name}" PRIVATE ${MACHO_INITIALIZER})
     target_link_libraries ("${name}" PRIVATE IpaSimLibrary objc pthread)
 endfunction (woc_framework)

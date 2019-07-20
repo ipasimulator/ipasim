@@ -18,7 +18,7 @@
 # (otherwise, if the repo already exists locally, it's only incrementally
 # updated to the latest version).
 # `build.tablegens.only`: 1 ...runs only a sample build command (bulding just
-# tablegens). This can be used to test incremental building (see also #14).
+# tablegens). This can be used to test incremental building (see also i14).
 #
 # Note that these variables are converted to uppercase and have dots replaced
 # with underscores before being visible as environment variables in batch

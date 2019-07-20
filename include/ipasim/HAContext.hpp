@@ -102,7 +102,7 @@ struct ExportEntry {
   mutable bool Stret : 1;
   mutable bool Super : 1;
   mutable bool Super2 : 1;
-  mutable bool DylibStretOnly : 1; // See #28.
+  mutable bool DylibStretOnly : 1; // See i28.
   mutable bool UnhandledMessenger : 1;
   mutable bool UnhandledVararg : 1;
   mutable GroupPtr DLLGroup;
@@ -135,7 +135,7 @@ struct Dylib {
 
   std::string Name;
   mutable std::vector<ExportPtr> Exports;
-  mutable std::set<std::pair<GroupPtr, DLLPtr>> ReExports; // See #23.
+  mutable std::set<std::pair<GroupPtr, DLLPtr>> ReExports; // See i23.
 
   bool operator<(const Dylib &Other) const { return Name < Other.Name; }
 };

@@ -1,7 +1,10 @@
 # Issues and tags
 
 We use a concept of *issues*. They are contained in folder `/docs/issues/` and
-can be referenced from code by hashtag and number, e.g., `#1`.
+can be referenced from code by `i` and number, e.g., `i1`. (This convention is
+used since July 2019 when the project was published to GitHub. Before that date,
+we used hashtag and number, e.g. `#1`. We changed this convention to distinguish
+our issues and GitHub issues.)
 
 Before we started using issues, we also used *tags*, i.e., unique short
 identifiers that were referenced from code and documented elsewhere. Below are

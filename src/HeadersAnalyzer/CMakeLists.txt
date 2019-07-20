@@ -348,7 +348,7 @@ set (TAPI_SOURCES
 # Making `tapi` `SHARED` doesn't work due to unresolved symbols in
 # `HeadersAnalyzer.exe`.
 add_library (tapi STATIC ${TAPI_SOURCES})
-add_prep_dep (tapi) # TODO: Use original Clang for CodeGen. See also #12.
+add_prep_dep (tapi) # TODO: Use original Clang for CodeGen. See also i12.
 
 target_compile_definitions (tapi PRIVATE
     TAPI_PORT PATH_MAX=_MAX_PATH _CRT_SECURE_NO_WARNINGS)
@@ -445,7 +445,7 @@ target_include_directories (HeadersAnalyzer PRIVATE
 target_link_libraries (HeadersAnalyzer PRIVATE
     ${ALL_CLANG_LIBS} tapi dia ws2_32.lib mincore.lib
     # TODO: We should use original Clang + `lld-link`, this is just a simpler
-    # workaround for #12.
+    # workaround for i12.
     -fuse-ld=link
     # `link.exe` complains otherwise.
     -Wl,/nodefaultlib:libcmt)

@@ -1,4 +1,4 @@
-// See #28.
+// See i28.
 
 struct BigStr {
     int One;

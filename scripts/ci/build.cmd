@@ -20,7 +20,7 @@ git lfs install
 
 rem Clone sources.
 if exist .\ipasim\ (
-    rem See #14.
+    rem See i14.
     cd ipasim
     git pull --recurse-submodules
 ) else (

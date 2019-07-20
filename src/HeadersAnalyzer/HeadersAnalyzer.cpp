@@ -199,7 +199,7 @@ public:
           continue;
         }
 
-        // Re-export data symbols. See #23.
+        // Re-export data symbols. See i23.
         if (!Exp->getDylibType()) {
           Lib.ReExports.insert({Exp->DLLGroup, Exp->DLL});
           continue;

@@ -1,4 +1,4 @@
-# This script is used by `scripts/CommonVariables.cmake`. See #13.
+# This script is used by `scripts/CommonVariables.cmake`. See i13.
 
 list (APPEND CMAKE_MODULE_PATH "${SOURCE_DIR}/scripts")
 include (CommonVariables)

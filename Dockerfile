@@ -51,7 +51,7 @@ RUN start /wait msiexec.exe /i C:/temp/node-install.msi /l*vx "C:/temp/MSI-node-
 # previous steps which would also have a volume in C:/vscache and use that for,
 # as its name suggests, cache of the Visual Studio Installer, so that it doesn't
 # have to download everything over and over again.
-# See also #16.
+# See also i16.
 COPY scripts/install_vs.cmd C:/temp/
 ADD https://download.microsoft.com/download/8/3/4/834E83F6-C377-4DCE-A757-69A418B6C6DF/Collect.exe C:/temp/collect.exe
 ADD https://download.visualstudio.microsoft.com/download/pr/7ce359b9-c96f-43bd-aa85-386a3e6af941/40e7e21dabde5db7c06f04e6710cad28/visualstudio.15.release.chman C:/temp/visualstudio.chman

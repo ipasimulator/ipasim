@@ -262,7 +262,7 @@ LoadedLibrary *DynamicLoader::loadMachO(const string &Path) {
     }
   }
 
-  // Load referenced libraries. See also #22.
+  // Load referenced libraries. See also i22.
   for (DylibCommand &Lib : Bin.libraries())
     load(Lib.name());
 

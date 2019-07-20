@@ -128,7 +128,7 @@ testing purposes only." OFF)
     include (CommonVariables)
 
     # Now, the compiler was tested, so we can change it to our
-    # possibly-not-yet-existing patched Clang. See #2.
+    # possibly-not-yet-existing patched Clang. See i2.
     if (NOT USE_ORIG_CLANG)
         if (USE_DEBUG_CLANG)
             set (CLANG_EXE "${BUILT_DEBUG_CLANG_EXE}")

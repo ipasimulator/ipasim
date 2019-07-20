@@ -22,7 +22,7 @@ template <LibType T> llvm::FunctionType *ExportEntry::getType() const {
     if (!DLLType) {
       // Manually craft type of the DLL function. It doesn't have the first
       // parameter for struct return, but returns the struct directly instead.
-      // See #28.
+      // See i28.
       DLLArgs.reserve(DylibType->getNumParams() - 1);
       std::copy(DylibType->param_begin() + 1, DylibType->param_end(),
                 std::back_inserter(DLLArgs));

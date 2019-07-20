@@ -19,7 +19,7 @@ ClangHelper::ClangHelper(const path &BuildDir, LLVMHelper &LLVM)
     : LLVM(LLVM), Args(LLVM.Saver) {
   CI.createDiagnostics();
   // First argument is expected to be an executable name.
-  // TODO: See #26.
+  // TODO: See i26.
   Args.add((BuildDir / "../clang-x86-Release/bin/clang.exe").string().c_str());
   if constexpr (VerboseClang)
     Args.add("-v");
@@ -49,7 +49,7 @@ void ClangHelper::linkDLL(StringRef Output, StringRef ObjectFile,
   Args.add(Output.data());
   Args.add(ObjectFile.data());
   Args.add(ImportLib.data());
-  // See #25.
+  // See i25.
   Args.add("-nostdlib");
   if (Debug)
     Args.add("-Wl,-defaultlib:msvcrtd");

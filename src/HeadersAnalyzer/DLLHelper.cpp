@@ -71,7 +71,7 @@ void DLLHelper::load(LLDBHelper &LLDB, ClangHelper &Clang, CodeGenModule *CGM) {
 
     // Verify that the function has the same signature as the iOS one.
     if constexpr (CompareTypes) {
-      // TODO: #28 is not considered here.
+      // TODO: i28 is not considered here.
       if (!TC.areEquivalent(Exp->getDylibType(), Func))
         Log.error() << "functions' signatures are not equivalent (" << Exp->Name
                     << ")" << Log.end();
@@ -89,7 +89,7 @@ void DLLHelper::load(LLDBHelper &LLDB, ClangHelper &Clang, CodeGenModule *CGM) {
       // TODO: Also check that `Func`'s return type is NOT void.
       if (DylibCount == DLLCount + 1 &&
           Exp->getDylibType()->getReturnType()->isVoidTy())
-        // See #28.
+        // See i28.
         Exp->DylibStretOnly = true;
       else if (DylibCount != DLLCount)
         Log.error() << "function '" << Exp->Name
@@ -235,7 +235,7 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
       R = IR.createCall(Func, Args, "r");
 
     if (R) {
-      // See #28.
+      // See i28.
       if (Exp->DylibStretOnly) {
         // Store the return value.
         Value *RS = IR.Builder.CreateAlloca(R->getType());
@@ -310,7 +310,7 @@ void DLLHelper::generate(const DirContext &DC, bool Debug) {
   // Create the wrapper DLL.
   {
     ClangHelper Clang(DC.BuildDir, LLVM);
-    // See #24.
+    // See i24.
     if (DLL.Name == (Debug ? "ucrtbased.dll" : "ucrtbase.dll"))
       Clang.Args.add(
           (DC.BuildDir / "src/crt/CMakeFiles/crtstubs.dir/stubs.cpp.obj")
