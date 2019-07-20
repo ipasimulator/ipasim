@@ -1,16 +1,23 @@
 {
-    "cSpell.language": "en,cs",
-    "cSpell.words": [
-        "IIRC",
-        "LLDB",
-        "LLVM",
-        "LLVM's",
-        "TAPI",
-        "dylib",
-        "ipasim",
-        "recurse",
-        "roadmap",
-        "submodules"
-    ],
-    "editor.rulers": [80]
+  "cSpell.language": "en,cs",
+  "cSpell.words": [
+    "IIRC",
+    "LLDB",
+    "LLVM",
+    "LLVM's",
+    "TAPI",
+    "dylib",
+    "ipasim",
+    "recurse",
+    "roadmap",
+    "submodules"
+  ],
+  "editor.rulers": [
+    80
+  ],
+  "files.associations": {
+    "*.m": "objective-c",
+    ".clang-format": "yaml",
+    ".lfsconfig": "properties"
+  }
 }

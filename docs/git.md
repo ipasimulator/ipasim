@@ -25,6 +25,7 @@ line).
 - [sam] - Samples (`/samples/`).
 - [rtoc] - `RTObjCInterop` (`/src/RTObjCInterop/`).
 - [build] - General build files (e.g., Docker and CMake files).
+- [config] - Other configuration files (e.g., `.gitmodules`).
 - [crt] - CRT library goodies (`/deps/crt/` and `/src/crt/`).
 
 ## Forking repositories
