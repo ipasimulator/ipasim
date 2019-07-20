@@ -8,6 +8,13 @@ application's machine code is emulated, whereas system functionality originally
 provided by iOS is translated to an equivalent functionality available on
 Windows. [More detailed documentation](docs/README.md) is available.
 
+## Project status
+
+Currently, only simple applications can be emulated. Working samples can be
+found in folder [`samples`](samples). For more information about (un)implemented
+features, see [author's thesis](docs/thesis/README.md), its *Conclusion* in
+particular.
+
 ## Cloning the repository
 
 We use [Git Submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
@@ -26,12 +33,14 @@ just [use prebuilt binaries](https://github.com/ipasimulator/ipasim/releases)
 
 ## Directory structure
 
-- [`deps`](deps) contains third-party dependencies (mostly as Git submodules because
-  patching was necessary).
+- [`deps`](deps) contains third-party dependencies (mostly as Git submodules
+  because patching was necessary).
 - [`docs`](docs) contains [documentation and issues](docs/README.md).
 - [`include`](include) has C++ headers of the project.
-- [`samples`](samples) contains sources of sample iOS applications and some other samples.
-- [`scripts`](scripts) contains various scripts, mostly supporting build of the project.
+- [`samples`](samples) contains sources of sample iOS applications and some
+  other samples.
+- [`scripts`](scripts) contains various scripts, mostly supporting build of the
+  project.
 - [`src`](src) contains C++ sources of the project.
   - [HeadersAnalyzer](src/HeadersAnalyzer/README.md) is a tool that runs at
     compile-time, generating supporting code for the emulator.
@@ -42,3 +51,8 @@ just [use prebuilt binaries](https://github.com/ipasimulator/ipasim/releases)
 ## Executive summary
 
 [![Poster preview](docs/thesis/poster.png)](docs/thesis/poster.pdf)
+
+## Research
+
+- [iOS emulator for Windows](docs/thesis/README.md), a bachelor thesis of [Jan
+  Joneš](https://github.com/jjonescz).
