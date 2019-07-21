@@ -1,2 +1,2 @@
 [lfs]
-    lfsurl = https://ipasim@dev.azure.com/ipasim/ipasim/_git/ipasim-lfs.git/info/lfs
+    url = https://ipasim@dev.azure.com/ipasim/ipasim/_git/ipasim-lfs.git/info/lfs
