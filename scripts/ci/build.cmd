@@ -39,7 +39,7 @@ if [%BUILD_TABLEGENS_ONLY%]==[1] (
 )
 
 rem Build.
-docker login -u ipasim -p %DOCKER_PASSWORD%
+docker login -u janjones -p %DOCKER_PASSWORD%
 if [%PULL_BUILD_ARTIFACTS%]==[1] (
     docker pull ipasim/artifacts
     docker tag ipasim/artifacts ipasim/build
