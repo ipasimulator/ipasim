@@ -34,6 +34,7 @@ trigger:
   branches:
     include:
     - master
+pr: none
 jobs:
 - job: StartVM
   pool: Hosted VS2017
