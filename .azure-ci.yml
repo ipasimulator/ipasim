@@ -13,7 +13,8 @@
 # `pull.docker.image`: 1 ...pulls the Docker image instead of building it.
 # `pull.build.artifacts`: 1 ...pulls Docker image containing build artifacts,
 # effectively doing an incremental build.
-# `shutdown.when.complete`: 1 ...shutdowns the computer in the end.
+# `shutdown.when.complete`: 1 ...shutdowns the computer in the end. This is
+# deprecated. See job `StopVM` below.
 # `reset.repository`: 1 ...removes and then clones sources from scratch
 # (otherwise, if the repo already exists locally, it's only incrementally
 # updated to the latest version).
@@ -23,6 +24,12 @@
 # Note that these variables are converted to uppercase and have dots replaced
 # with underscores before being visible as environment variables in batch
 # scripts.
+#
+# Set listed variables to 1 (others to 0) if you want to...
+# ...rebuild artifacts (default): `pull.docker.image`;
+# ...rebuild everything (even Docker image `ipasim/build`): `reset.repository`;
+# ...build incrementally: `pull.build.artifacts`;
+# ...test the workflow (build only small target): `build.tablegens.only`.
 
 resources:
 - repo: self
