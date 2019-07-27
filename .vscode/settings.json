@@ -19,5 +19,6 @@
     "*.m": "objective-c",
     ".clang-format": "yaml",
     ".lfsconfig": "properties"
-  }
+  },
+  "git.inputValidationLength": 50
 }
