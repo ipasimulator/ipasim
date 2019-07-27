@@ -1,0 +1,8 @@
+[ver:1,total:1440]
+include/ipasim/SysTranslator.hpp:435,1564164000:380,1564207200:55,r
+CMakeLists.txt:310,1564167600:150,1564207200:160,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:281,1564164000:66,1564207200:215,m
+scripts/extract.ps1:169,1564164000:74,1564167600:30,1564207200:65,m
+docs/issues/30.md:155,1564207200:155,m
+scripts/Libffi-x86-Release.cmake:50,1564207200:50,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:40,1564164000:20,1564207200:20,r
