@@ -92,3 +92,8 @@ making the changes in this separate branch and adding it as a submodule. This
 way, we could easily update the dependency by pulling changes into the branch
 with the original code and then merging it with the branch containing the
 changes. Still, comments explaining those changes should be added, though.**
+
+## Further reading
+
+- MSDN: [How to: Use Existing C++ Code in a Universal Windows Platform
+  App](https://docs.microsoft.com/en-us/cpp/porting/how-to-use-existing-cpp-code-in-a-universal-windows-platform-app?view=vs-2019).
