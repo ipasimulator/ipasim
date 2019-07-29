@@ -1,0 +1,14 @@
+[ver:1,total:3420]
+deps/crt/README.md:1129,1564398000:1129,m
+src/IpaSimulator/CMakeLists.txt:564,1564394400:330,1564398000:234,r
+Dockerfile:393,1564398000:393,r
+src/IpaSimulator/IpaSimApp/Release/IpaSimApp.tlog/link.read.1.tlog:324,1564394400:240,1564398000:84,r
+.vscode/settings.json:245,1564398000:245,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:243,1564398000:243,m
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj.filters:170,1564398000:170,r
+include/ipasim/SysTranslator.hpp:150,1564394400:150,r
+src/IpaSimulator/IpaSimApp/Release/IpaSimApp.tlog/link.command.1.tlog:102,1564394400:60,1564398000:42,r
+VsDevCmd.bat:30,1564398000:30,d
+CMakeLists.txt:30,1564394400:30,r
+src/IpaSimulator/IpaSimApp/Package.appxmanifest:30,1564394400:30,r
+deps/crt/vcruntime140.dll:10,1564398000:10,d
