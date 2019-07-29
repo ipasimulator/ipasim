@@ -1,0 +1,5 @@
+[ver:1,total:120]
+src/IpaSimulator/CMakeLists.txt:66,1564390800:66,m
+src/HeadersAnalyzer/ClangHelper.cpp:30,1564390800:30,r
+scripts/extract.ps1:12,1564390800:12,r
+scripts/CommonVariables.cmake:12,1564390800:12,r
