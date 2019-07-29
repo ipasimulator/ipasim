@@ -1,0 +1,7 @@
+[ver:1,total:120]
+scripts/CommonVariables.cmake:30,1564390800:30,r
+CMakeLists.txt:20,1564390800:20,r
+docs/issues/25.md:20,1564390800:20,r
+docs/porting.md:20,1564390800:20,r
+src/HeadersAnalyzer/ClangHelper.cpp:15,1564390800:15,r
+src/IpaSimulator/CMakeLists.txt:15,1564390800:15,r
