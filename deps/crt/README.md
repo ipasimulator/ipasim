@@ -21,6 +21,8 @@ symchk .\ucrtbased.dll /s SRV*%CD%\syms*https://msdl.microsoft.com/download/symb
 
 And copied from folder `./syms/` to `./`.
 
+**TODO: Maybe the DLLs should be extracted from the Docker machine instead.**
+
 ## Getting LIBs
 
 `ucrtd.lib` is located in
@@ -28,3 +30,18 @@ And copied from folder `./syms/` to `./`.
 doesn't contain all symbols (e.g., `strrchr`). So, instead, we crafted our own
 import library. Inspiration was
 [an answer on StackOverflow](https://stackoverflow.com/a/9946390).
+
+## Desktop VCLibs
+
+We are currently using Visual C++ libraries intended for desktop applications.
+That is achieved by referencing SDK `Microsoft.VCLibs.Desktop` in
+[IpaSimApp](../../src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj).
+
+We need to do that because only `*_app.dll` versions are available for UWP apps
+by default (unless Visual C++ Redistributable is installed). See [issue
+#2](https://github.com/ipasimulator/ipasim/issues/2).
+
+Better solution would be to link against the `*_app.dll`s by passing
+`-app_platform=uwp` to `VsDevCmd.bat` in [`Dockerfile`](../../Dockerfile).
+However, that needs some preparations first, because not all functions we
+currently use are available in those `*_app.dll`s.
