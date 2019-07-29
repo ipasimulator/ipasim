@@ -68,7 +68,7 @@ set_target_properties (ffi PROPERTIES
     IMPORTED_LOCATION "${CURRENT_LIBFFI_CMAKE_DIR}/lib/libffi.lib")
 add_dependencies (ffi Libffi-x86)
 set (LIBFFI_INCLUDE_DIRS
-    "${SOURCE_DIR}/deps/Libffi/build/include")
+    "${CURRENT_LIBFFI_CMAKE_DIR}/build/include")
 # CMake would complain if some include dirs didn't exist.
 file (MAKE_DIRECTORY ${LIBFFI_INCLUDE_DIRS})
 target_include_directories (ffi SYSTEM INTERFACE ${LIBFFI_INCLUDE_DIRS})
