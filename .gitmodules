@@ -1,52 +1,52 @@
 [submodule "deps/objc4"]
-	path = deps/objc4
-	url = https://github.com/ipasimulator/objc4
-	branch = port
+    path = deps/objc4
+    url = https://github.com/ipasimulator/objc4
+    branch = port
 [submodule "deps/apple-headers"]
-	path = deps/apple-headers
-	url = https://github.com/ipasimulator/apple-headers
+    path = deps/apple-headers
+    url = https://github.com/ipasimulator/apple-headers
     branch = objc_port
 [submodule "deps/libclosure"]
-	path = deps/libclosure
-	url = https://github.com/ipasimulator/libclosure
-	branch = objc_port
+    path = deps/libclosure
+    url = https://github.com/ipasimulator/libclosure
+    branch = objc_port
 [submodule "deps/WinObjC"]
-	path = deps/WinObjC
-	url = https://github.com/ipasimulator/WinObjC
-	branch = thesis
+    path = deps/WinObjC
+    url = https://github.com/ipasimulator/WinObjC
+    branch = thesis
 [submodule "deps/llvm"]
-	path = deps/llvm
-	url = https://github.com/ipasimulator/llvm
-	branch = port_70
+    path = deps/llvm
+    url = https://github.com/ipasimulator/llvm
+    branch = port_70
 [submodule "deps/clang"]
-	path = deps/clang
-	url = https://github.com/ipasimulator/clang
-	branch = port_70
+    path = deps/clang
+    url = https://github.com/ipasimulator/clang
+    branch = port_70
 [submodule "deps/lld"]
-	path = deps/lld
-	url = https://github.com/ipasimulator/lld
-	branch = port_70
+    path = deps/lld
+    url = https://github.com/ipasimulator/lld
+    branch = port_70
 [submodule "deps/LIEF"]
-	path = deps/LIEF
-	url = https://github.com/ipasimulator/LIEF
-	branch = port
+    path = deps/LIEF
+    url = https://github.com/ipasimulator/LIEF
+    branch = port
 [submodule "deps/tapi"]
-	path = deps/tapi
-	url = https://github.com/ipasimulator/tapi
-	branch = port
+    path = deps/tapi
+    url = https://github.com/ipasimulator/tapi
+    branch = port
 [submodule "deps/lldb"]
-	path = deps/lldb
-	url = https://github.com/ipasimulator/lldb
-	branch = port_70
+    path = deps/lldb
+    url = https://github.com/ipasimulator/lldb
+    branch = port_70
 [submodule "deps/unicorn"]
-	path = deps/unicorn
-	url = https://github.com/ipasimulator/unicorn
-	branch = port
+    path = deps/unicorn
+    url = https://github.com/ipasimulator/unicorn
+    branch = port
 [submodule "deps/libdispatch"]
-	path = deps/libdispatch
-	url = https://github.com/ipasimulator/libdispatch
-	branch = port
+    path = deps/libdispatch
+    url = https://github.com/ipasimulator/libdispatch
+    branch = port
 [submodule "deps/Libffi"]
-	path = deps/Libffi
-	url = https://github.com/ipasimulator/Libffi
-	branch = port
+    path = deps/Libffi
+    url = https://github.com/ipasimulator/Libffi
+    branch = port
