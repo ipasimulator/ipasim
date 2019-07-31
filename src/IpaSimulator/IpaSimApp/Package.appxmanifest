@@ -3,7 +3,7 @@
   <Identity
     Name="0ee863f9-dcc5-4d3b-9c2a-457bcfafc07e"
     Publisher="CN=jjone"
-    Version="1.0.0.0" />
+    Version="1.0.1.0" />
   <mp:PhoneIdentity PhoneProductId="0ee863f9-dcc5-4d3b-9c2a-457bcfafc07e" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
   <Properties>
     <DisplayName>ipaSim</DisplayName>
