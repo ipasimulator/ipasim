@@ -1,2 +1,11 @@
 [ver:1,total:120]
 docs/install.md:120,1564581600:120,m
+
+[ver:1,total:420]
+docs/install.md:235,1564578000:235,m
+README.md:80,1564578000:80,m
+docs/artifacts.md:30,1564578000:30,r
+src/IpaSimulator/IpaSimApp/IpaSimApp.vcxproj:20,1564578000:20,r
+scripts/ci/vsbuild.ps1:20,1564578000:20,d
+scripts/ci/build.cmd:20,1564578000:20,r
+.azure-ci.yml:15,1564578000:15,r
