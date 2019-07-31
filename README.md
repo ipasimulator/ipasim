@@ -28,8 +28,8 @@ If you want to use the emulator, you can either [build it from
 sources](docs/build.md) (that's slow), [use partially prebuilt
 artifacts](docs/artifacts.md) (that's fast and recommended if you want to make
 changes; however, you still need to have Docker and Visual Studio installed) or
-just [use prebuilt binaries](https://github.com/ipasimulator/ipasim/releases)
-(recommended if you don't want to make changes).
+just [use prebuilt binaries](docs/install.md) (recommended if you don't want to
+make changes).
 
 ## Directory structure
 
