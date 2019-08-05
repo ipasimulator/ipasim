@@ -1,6 +1,7 @@
 # ipasim
 
-[![Build status](https://dev.azure.com/ipasim/ipasim/_apis/build/status/ipasim-CI?branchName=master)](https://dev.azure.com/ipasim/ipasim/_build/latest?definitionId=1&branchName=master)
+[![Build status](https://img.shields.io/azure-devops/build/ipasim/ipasim/1/master)](https://dev.azure.com/ipasim/ipasim/_build/latest?definitionId=1&branchName=master)
+[![Downloads](https://img.shields.io/github/downloads/ipasimulator/ipasim/total)](https://github.com/ipasimulator/ipasim/releases)
 
 This repository contains source code of `ipasim`, an iOS emulator for Windows.
 It takes a compiled iOS application and emulates it. However, only the
