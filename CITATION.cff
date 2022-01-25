@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it as below.
+authors:
+- family-names: Joneš
+  given-names: Jan
+  affiliation: Charles University, Faculty of Mathematics and Physics
+title: iOS emulator for Windows
+date-released: 2019-06-27
+url: https://github.com/ipasimulator/ipasim
+preferred-citation:
+  type: thesis
+  authors:
+  - family-names: Joneš
+    given-names: Jan
+    affiliation: Charles University, Faculty of Mathematics and Physics
+  title: iOS emulator for Windows
+  year: 2019
+  publisher:
+    name: Charles University, Faculty of Mathematics and Physics
