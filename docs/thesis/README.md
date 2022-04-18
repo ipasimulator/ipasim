@@ -17,6 +17,7 @@ below.
   title={iOS emulator for Windows},
   author={Jan Jones},
   year={2019},
-  publisher={Charles University, Faculty of Mathematics and Physics}
+  school={Charles University, Faculty of Mathematics and Physics},
+  type={BS Thesis}
 }
 ```
