@@ -21,7 +21,8 @@ particular.
 We use [Git Submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
 (recursively), so make sure you clone with `--recurse-submodules`. We also use
 [Git LFS](https://git-lfs.github.com/), so make sure you have that installed if
-you want to get all files.
+you want to get all files. You might also want to use `--depth 1` for a faster
+checkout.
 
 ## Building and installation
 
