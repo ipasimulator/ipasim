@@ -53,7 +53,7 @@ WinObjC sources are located in `/deps/WinObjC/`.
 
 ## Objective-C runtime
 
-See [its documentation](../src/objc/README.md).
+See [its documentation](../../src/objc/README.md).
 
 ## LLVM
 
@@ -76,7 +76,8 @@ LLVM's sources are located in `/deps/llvm/`, `/deps/clang/`, `/deps/lld/` and
   `dyld`.
 - `[pretty-print]`: We improved pretty printing of functions to match our needs
   in `HeadersAnalyzer`.
-- `[emit-all-decls]`: See [`HeadersAnalyzer`](../src/HeadersAnalyzer/README.md).
+- `[emit-all-decls]`: See
+  [`HeadersAnalyzer`](../../src/HeadersAnalyzer/README.md).
 - `[irt]`: We renamed folder `InstrumentationRuntime` to `IRt` because the
   former was too long for Windows. **TODO: Obviously, don't do this. Rather move
   our sources near the root (e.g., `C:\src\`). But then also mention that in
