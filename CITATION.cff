@@ -1,19 +1,52 @@
+# This CITATION.cff file was generated with https://bit.ly/cffinit.
+
 cff-version: 1.2.0
-message: If you use this software, please cite it as below.
-authors:
-- family-names: Joneš
-  given-names: Jan
-  affiliation: Charles University, Faculty of Mathematics and Physics
 title: iOS emulator for Windows
-date-released: 2019-06-27
-url: https://github.com/ipasimulator/ipasim
+message: >-
+  Please cite this software using the metadata from
+  'preferred-citation'.
 preferred-citation:
   type: thesis
   authors:
-  - family-names: Joneš
-    given-names: Jan
-    affiliation: Charles University, Faculty of Mathematics and Physics
+    - family-names: Joneš
+      given-names: Jan
   title: iOS emulator for Windows
+  thesis-type: BS
   year: 2019
-  publisher:
-    name: Charles University, Faculty of Mathematics and Physics
+  department: Department of Software Engineering
+  institution:
+    name: Charles University
+    city: Prague
+    country: CZ
+  date-published: 2019-06-27
+  url: http://hdl.handle.net/20.500.11956/108316
+type: software
+authors:
+  - given-names: Jan
+    family-names: Joneš
+repository-code: 'https://github.com/ipasimulator/ipasim'
+url: 'https://janjones.me/projects/ipasim/'
+repository-artifact: >-
+  https://github.com/ipasimulator/ipasim/releases/tag/v1.0
+abstract: >
+  The goal of this thesis is to create a program for
+  Windows that takes a compiled iOS application and
+  emulates it. However, only the application's
+  machine code is emulated, whereas system
+  functionality originally provided by iOS is
+  translated to an equivalent functionality available
+  on Windows. Hence, the emulated application employs
+  a user interface and behavior that feel native on
+  the target platform. At compile time, custom
+  machine code is generated that supports the
+  translation at runtime. The thesis also describes
+  iOS's internals that the emulator needs to imitate
+  and discusses different approaches to
+  cross-platform development.
+keywords:
+  - emulator
+  - iOS
+  - Objective-C
+commit: 16729d2ab5bc36feb84a8a43227076af187d8a06
+version: v1.0
+date-released: '2019-05-16'
