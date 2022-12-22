@@ -1,0 +1,19 @@
+name: Renew certificate
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Every half year
+    - cron: '0 0 1 1,7 *'
+
+jobs:
+  renew:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Renew certificate
+        shell: pwsh
+        run: ./scripts/renew-cert.ps1
+        env:
+          GH_TOKEN: ${{ github.token }}
