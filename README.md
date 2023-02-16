@@ -16,6 +16,10 @@ found in folder [`samples`](samples). For more information about (un)implemented
 features, see [author's thesis](docs/thesis/README.md), its *Conclusion* in
 particular.
 
+### Related work
+
+- [touchHLE](https://github.com/hikari-no-yume/touchHLE) (2023)
+
 ## Cloning the repository
 
 We use [Git Submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
