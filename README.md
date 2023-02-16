@@ -16,7 +16,7 @@ found in folder [`samples`](samples). For more information about (un)implemented
 features, see [author's thesis](docs/thesis/README.md), its *Conclusion* in
 particular.
 
-### Related work
+### Alternatives
 
 - [touchHLE](https://github.com/hikari-no-yume/touchHLE) (2023)
 
