@@ -268,3 +268,8 @@ Generated Files/
 # Temporary CMake build files directory. TODO: Change this to `build` when we
 # are ready.
 /cmake/
+
+# XCode
+.DS_Store
+project.xcworkspace/
+xcuserdata/
